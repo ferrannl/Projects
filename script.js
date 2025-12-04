@@ -1,255 +1,60 @@
-console.log("[Projects] script.js loaded");
+// --- Config ---
+const GITHUB_USER = "ferrannl";
+const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`;
 
-// All your GitHub repos (from https://github.com/ferrannl?tab=repositories)
-const projects = [
-  {
-    name: "Projects",
-    repo: "Projects",
-    description: "All my repositories centralized.",
-    language: "HTML",
-    type: "website",
-    tags: ["portfolio", "overview"],
-    pages: true
-  },
-  {
-    name: "Cafeteria-Churreria-San-Pedro",
-    repo: "Cafeteria-Churreria-San-Pedro",
-    description: "Informational website for Cafetería Churrería San Pedro in Tenerife.",
-    language: "HTML",
-    type: "website",
-    tags: ["client", "restaurant"],
-    pages: true
-  },
-  {
-    name: "elegant-barbershop",
-    repo: "elegant-barbershop",
-    description: "Website suggestion for Elegant Barbershop in ’s-Hertogenbosch.",
-    language: "Less",
-    type: "website",
-    tags: ["client", "barbershop"],
-    pages: true
-  },
-  {
-    name: "CodePen",
-    repo: "CodePen",
-    description: "Collection of CodePen experiments and snippets.",
-    language: "JavaScript",
-    type: "website",
-    tags: ["experiments", "frontend"],
-    pages: true
-  },
-  {
-    name: "pso-wiiu-guide",
-    repo: "pso-wiiu-guide",
-    description: "HTML guide / documentation related to Phantasy Star Online on Wii U.",
-    language: "HTML",
-    type: "website",
-    tags: ["guide", "gaming"],
-    pages: true
-  },
-  {
-    name: "ps2-covers",
-    repo: "ps2-covers",
-    description: "Fork of a large PS2 covers collection.",
-    language: "HTML",
-    type: "other",
-    tags: ["fork", "assets", "ps2"],
-    pages: false
-  },
-  {
-    name: "Monsterzoo",
-    repo: "Monsterzoo",
-    description: "JavaScript assignment: Monsterzoo project.",
-    language: "JavaScript",
-    type: "website",
-    tags: ["assignment", "game"],
-    pages: true
-  },
-  {
-    name: "meinlager",
-    repo: "meinlager",
-    description: "Website suggestion for Mein Lager.",
-    language: "HTML",
-    type: "website",
-    tags: ["client", "landing-page"],
-    pages: true
-  },
-  {
-    name: "Sudoku-Design-Patterns",
-    repo: "Sudoku-Design-Patterns",
-    description: "C# project applying design patterns to a Sudoku puzzle application.",
-    language: "C#",
-    type: "school",
-    tags: ["design-patterns", "csharp"],
-    pages: false
-  },
-  {
-    name: "Linear-Algebra",
-    repo: "Linear-Algebra",
-    description: "C project related to linear algebra for game development.",
-    language: "C",
-    type: "school",
-    tags: ["math", "games"],
-    pages: false
-  },
-  {
-    name: "Speuren-met-Krul-2020",
-    repo: "Speuren-met-Krul-2020",
-    description: "C++ project (2020 edition) for the Speuren met Krul assignment.",
-    language: "C++",
-    type: "school",
-    tags: ["c++", "assignment"],
-    pages: false
-  },
-  {
-    name: "Speuren-met-Krul-2021",
-    repo: "Speuren-met-Krul-2021",
-    description: "C++ project (2021 edition) for the Speuren met Krul assignment.",
-    language: "C++",
-    type: "school",
-    tags: ["c++", "assignment"],
-    pages: false
-  },
-  {
-    name: "Study-Mate",
-    repo: "Study-Mate",
-    description: "PHP final assignment: Study-Mate application.",
-    language: "PHP",
-    type: "website",
-    tags: ["school", "php"],
-    pages: true
-  },
-  {
-    name: "Address-Distance-Calculator",
-    repo: "Address-Distance-Calculator",
-    description: ".NET/C# API case: calculate distance between addresses.",
-    language: "C#",
-    type: "api",
-    tags: ["api", "dotnet"],
-    pages: false
-  },
-  {
-    name: "Broadway-Boogie-Weggie",
-    repo: "Broadway-Boogie-Weggie",
-    description: "C# project inspired by Broadway Boogie Woogie.",
-    language: "C#",
-    type: "school",
-    tags: ["csharp"],
-    pages: false
-  },
-  {
-    name: "Image-Compare-API",
-    repo: "Image-Compare-API",
-    description: "NodeJS REST API to compare similarity between images using Imagga.",
-    language: "JavaScript",
-    type: "api",
-    tags: ["nodejs", "imagga", "rest"],
-    pages: false
-  },
-  {
-    name: "DevOps",
-    repo: "DevOps",
-    description: "DevOps project using TypeScript and related tooling.",
-    language: "TypeScript",
-    type: "school",
-    tags: ["devops", "typescript"],
-    pages: false
-  },
-  {
-    name: "Niks-voor-Niks",
-    repo: "Niks-voor-Niks",
-    description: "PHP marketplace project: NiksVoorNiks.",
-    language: "PHP",
-    type: "website",
-    tags: ["marketplace", "php"],
-    pages: true
-  },
-  {
-    name: "Imgur-App-iOS",
-    repo: "Imgur-App-iOS",
-    description: "iOS Imgur client app written in Swift.",
-    language: "Swift",
-    type: "mobile",
-    tags: ["ios", "imgur"],
-    pages: false
-  },
-  {
-    name: "Imgur-App-Android",
-    repo: "Imgur-App-Android",
-    description: "Android Imgur client – final assignment for Mobile Development.",
-    language: "Java",
-    type: "mobile",
-    tags: ["android", "imgur"],
-    pages: false
-  },
-  {
-    name: "WEBS5_WS_WK2_Bookstore",
-    repo: "WEBS5_WS_WK2_Bookstore",
-    description: "Forked bookstore project for a web development workshop.",
-    language: "JavaScript",
-    type: "website",
-    tags: ["fork", "workshop"],
-    pages: true
-  },
-  {
-    name: "AvanSync",
-    repo: "AvanSync",
-    description: "C++ CPPLS2 final assignment: AvanSync.",
-    language: "C++",
-    type: "school",
-    tags: ["cpp"],
-    pages: false
-  },
-  {
-    name: "Dimitri",
-    repo: "Dimitri",
-    description: "C++ project for Software Architecture.",
-    language: "C++",
-    type: "school",
-    tags: ["architecture", "cpp"],
-    pages: false
-  },
-  {
-    name: "Ecobit-Internship",
-    repo: "Ecobit-Internship",
-    description: "C# code related to a third-year internship at Ecobit.",
-    language: "C#",
-    type: "school",
-    tags: ["internship", "csharp"],
-    pages: false
-  },
-  {
-    name: "Munchkin",
-    repo: "Munchkin",
-    description: "Website assignment for the card game Munchkin.",
-    language: "CSS",
-    type: "website",
-    tags: ["assignment", "game"],
-    pages: true
-  },
-  {
-    name: "Kolonisten-van-Catan",
-    repo: "Kolonisten-van-Catan",
-    description: "Java project for the board game Settlers of Catan.",
-    language: "Java",
-    type: "school",
-    tags: ["java", "game"],
-    pages: false
-  }
-];
-
-// Add URLs
-const projectsWithUrls = projects.map(p => ({
-  ...p,
-  githubUrl: `https://github.com/ferrannl/${p.repo}`,
-  pagesUrl: p.pages ? `https://ferrannl.github.io/${p.repo}/index.html` : null
-}));
-
+// --- State ---
+let repos = [];
 const state = {
   search: "",
   typeFilter: "all",
   languageFilter: "all"
 };
+
+// --- Helpers to grab DOM elements ---
+const gridEl = document.getElementById("projectsGrid");
+const emptyEl = document.getElementById("emptyState");
+const searchEl = document.getElementById("search");
+const languageSelectEl = document.getElementById("languageFilter");
+const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
+
+// --- Type inference for each repo ---
+function inferType(repo) {
+  const name = (repo.name || "").toLowerCase();
+  const desc = (repo.description || "").toLowerCase();
+  const lang = (repo.language || "").toLowerCase();
+
+  // If pages are enabled, we treat it as a website
+  if (repo.has_pages) return "website";
+
+  // Obvious website languages
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) {
+    return "website";
+  }
+
+  // Mobile apps (rough guess)
+  if (["swift", "java", "kotlin"].includes(lang) && (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))) {
+    return "mobile";
+  }
+
+  // APIs
+  if (name.includes("api") || desc.includes("api")) {
+    return "api";
+  }
+
+  // School / study vibe
+  if (
+    desc.includes("assignment") ||
+    desc.includes("project") ||
+    desc.includes("internship") ||
+    desc.includes("final") ||
+    desc.includes("cppls") ||
+    desc.includes("devops")
+  ) {
+    return "school";
+  }
+
+  return "other";
+}
 
 function getTypeLabel(type) {
   switch (type) {
@@ -261,23 +66,50 @@ function getTypeLabel(type) {
   }
 }
 
-function matchesFilters(project) {
-  // type
-  if (state.typeFilter !== "all") {
-    if (state.typeFilter !== project.type &&
-        !(state.typeFilter === "other" &&
-          !["website", "mobile", "api", "school"].includes(project.type))) {
-      return false;
-    }
-  }
+// Map GitHub repo JSON → our internal object
+function mapRepo(repo) {
+  const type = inferType(repo);
 
-  // language
-  if (state.languageFilter !== "all" &&
-      project.language !== state.languageFilter) {
+  return {
+    name: repo.name,
+    description: repo.description || "No description yet.",
+    language: repo.language || "Various",
+    type,
+    tags: buildTags(repo, type),
+    githubUrl: repo.html_url,
+    pagesUrl: repo.has_pages
+      ? `https://${GITHUB_USER}.github.io/${repo.name}/`
+      : null
+  };
+}
+
+function buildTags(repo, type) {
+  const tags = [];
+
+  if (repo.fork) tags.push("fork");
+  if (repo.archived) tags.push("archived");
+
+  if (type === "website") tags.push("web");
+  if (type === "mobile") tags.push("mobile");
+  if (type === "api") tags.push("api");
+  if (type === "school") tags.push("school");
+
+  return tags;
+}
+
+// --- Filtering logic ---
+function matchesFilters(project) {
+  // Type filter
+  if (state.typeFilter !== "all" && project.type !== state.typeFilter) {
     return false;
   }
 
-  // search
+  // Language filter
+  if (state.languageFilter !== "all" && project.language !== state.languageFilter) {
+    return false;
+  }
+
+  // Search filter
   if (state.search) {
     const haystack = [
       project.name,
@@ -295,6 +127,7 @@ function matchesFilters(project) {
   return true;
 }
 
+// --- Card creation ---
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -337,6 +170,7 @@ function createProjectCard(project) {
   const linksRow = document.createElement("div");
   linksRow.className = "project-links";
 
+  // GitHub link (primary)
   const ghLink = document.createElement("a");
   ghLink.className = "project-link-btn primary-link";
   ghLink.href = project.githubUrl;
@@ -345,7 +179,8 @@ function createProjectCard(project) {
   ghLink.innerHTML = "<span>View on GitHub</span>";
   linksRow.appendChild(ghLink);
 
-  if (project.pages && project.pagesUrl) {
+  // GitHub Pages link if available
+  if (project.pagesUrl) {
     const pagesLink = document.createElement("a");
     pagesLink.className = "project-link-btn";
     pagesLink.href = project.pagesUrl;
@@ -373,56 +208,33 @@ function createProjectCard(project) {
   return card;
 }
 
+// --- Rendering ---
 function renderProjects() {
-  const grid = document.getElementById("projectsGrid");
-  const emptyState = document.getElementById("emptyState");
+  if (!gridEl) return;
 
-  if (!grid) {
-    console.error("projectsGrid element not found");
-    return;
-  }
+  gridEl.innerHTML = "";
 
-  grid.innerHTML = "";
-
-  const filtered = projectsWithUrls.filter(matchesFilters);
+  const filtered = repos.filter(matchesFilters);
 
   if (!filtered.length) {
-    if (emptyState) emptyState.hidden = false;
+    if (emptyEl) {
+      emptyEl.hidden = false;
+      emptyEl.textContent = "No projects match your search/filter. Try another search term.";
+    }
     return;
   }
 
-  if (emptyState) emptyState.hidden = true;
+  if (emptyEl) emptyEl.hidden = true;
 
   filtered.forEach(project => {
-    grid.appendChild(createProjectCard(project));
+    const card = createProjectCard(project);
+    gridEl.appendChild(card);
   });
 }
 
-function setupFilters() {
-  const searchInput = document.getElementById("search");
-  const languageSelect = document.getElementById("languageFilter");
-  const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
-
-  // language options
-  if (languageSelect) {
-    const langs = Array.from(
-      new Set(projectsWithUrls.map(p => p.language).filter(Boolean))
-    ).sort((a, b) => a.localeCompare(b));
-
-    langs.forEach(lang => {
-      const opt = document.createElement("option");
-      opt.value = lang;
-      opt.textContent = lang;
-      languageSelect.appendChild(opt);
-    });
-
-    languageSelect.addEventListener("change", () => {
-      state.languageFilter = languageSelect.value;
-      renderProjects();
-    });
-  }
-
-  // type chips
+// --- UI setup (filters & search) ---
+function initFiltersAndSearch() {
+  // Type chips
   typeChips.forEach(chip => {
     chip.addEventListener("click", () => {
       typeChips.forEach(c => c.classList.remove("chip-active"));
@@ -432,18 +244,77 @@ function setupFilters() {
     });
   });
 
-  // search
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      state.search = searchInput.value.toLowerCase().trim();
+  // Search
+  if (searchEl) {
+    searchEl.addEventListener("input", () => {
+      state.search = searchEl.value.toLowerCase().trim();
       renderProjects();
     });
   }
 }
 
-// Run immediately (script is at the bottom of the HTML)
+// Populate language dropdown based on loaded repos
+function initLanguageFilter() {
+  if (!languageSelectEl) return;
+  languageSelectEl.innerHTML = "";
+
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = "All languages";
+  languageSelectEl.appendChild(allOption);
+
+  const languages = Array.from(
+    new Set(repos.map(r => r.language).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b));
+
+  languages.forEach(lang => {
+    const opt = document.createElement("option");
+    opt.value = lang;
+    opt.textContent = lang;
+    languageSelectEl.appendChild(opt);
+  });
+
+  languageSelectEl.addEventListener("change", () => {
+    state.languageFilter = languageSelectEl.value;
+    renderProjects();
+  });
+}
+
+// --- Load repos from GitHub ---
+async function loadRepos() {
+  if (gridEl) {
+    gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects from GitHub…</p>";
+  }
+  if (emptyEl) emptyEl.hidden = true;
+
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) {
+      throw new Error(`GitHub API error: ${res.status}`);
+    }
+    const data = await res.json();
+
+    // Map all public repos
+    repos = data
+      .filter(r => !r.private) // just in case
+      .map(mapRepo);
+
+    initLanguageFilter();
+    renderProjects();
+  } catch (err) {
+    console.error(err);
+    if (gridEl) {
+      gridEl.innerHTML = "";
+    }
+    if (emptyEl) {
+      emptyEl.hidden = false;
+      emptyEl.textContent = "Could not load projects from GitHub (rate limit / network issue?).";
+    }
+  }
+}
+
+// --- Init (runs immediately because script is at the end of <body>) ---
 (function init() {
-  console.log("[Projects] Initializing");
-  setupFilters();
-  renderProjects();
+  initFiltersAndSearch();
+  loadRepos();
 })();
