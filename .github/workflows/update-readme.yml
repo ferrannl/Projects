@@ -1,0 +1,76 @@
+name: Update README projects list
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC – tweak as you like
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate projects list in README
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const username = 'ferrannl';
+
+            // Fetch up to 100 public repos, sorted by last update
+            const { data: repos } = await github.rest.repos.listForUser({
+              username,
+              per_page: 100,
+              sort: 'updated'
+            });
+
+            const lines = repos.map(r => {
+              const desc = (r.description || '').trim();
+              const descPart = desc ? ` — ${desc}` : '';
+              return `- [${r.name}](${r.html_url})${descPart}`;
+            });
+
+            const fs = require('fs');
+            const path = 'README.md';
+            const startMarker = '<!-- PROJECTS-LIST:START -->';
+            const endMarker = '<!-- PROJECTS-LIST:END -->';
+
+            const readme = fs.readFileSync(path, 'utf8');
+
+            if (!readme.includes(startMarker) || !readme.includes(endMarker)) {
+              core.setFailed('Could not find PROJECTS-LIST markers in README.md');
+              return;
+            }
+
+            const before = readme.split(startMarker)[0];
+            const after = readme.split(endMarker)[1];
+
+            const newContent = [
+              before,
+              startMarker,
+              lines.join('\n'),
+              endMarker,
+              after
+            ].join('\n');
+
+            fs.writeFileSync(path, newContent);
+
+      - name: Commit and push changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add README.md
+          git commit -m "chore: update projects list"
+          git push
