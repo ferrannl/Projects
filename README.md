@@ -277,7 +277,7 @@ Fork of a large PS2 covers collection.
 
 ---
 
-## 🗂 Auto-generated list (for nerds)
+## 🗂 Auto-generated list
 
 This block is meant to be automatically updated by a GitHub Action that syncs with the GitHub API.  
 If you enable the workflow in `.github/workflows/update-readme.yml`, it will keep this list in sync.
