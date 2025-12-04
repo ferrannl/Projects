@@ -10,7 +10,7 @@ const state = {
   languageFilter: "all"
 };
 
-// --- Helpers to grab DOM elements ---
+// --- DOM ---
 const gridEl = document.getElementById("projectsGrid");
 const emptyEl = document.getElementById("emptyState");
 const searchEl = document.getElementById("search");
@@ -23,16 +23,19 @@ function inferType(repo) {
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  // If pages are enabled, we treat it as a website
+  // If pages are enabled, treat as website
   if (repo.has_pages) return "website";
 
-  // Obvious website languages
+  // Typical website languages
   if (["html", "css", "javascript", "typescript", "php"].includes(lang)) {
     return "website";
   }
 
-  // Mobile apps (rough guess)
-  if (["swift", "java", "kotlin"].includes(lang) && (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))) {
+  // Mobile apps
+  if (
+    ["swift", "java", "kotlin"].includes(lang) &&
+    (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))
+  ) {
     return "mobile";
   }
 
@@ -127,11 +130,12 @@ function matchesFilters(project) {
   return true;
 }
 
-// --- Card creation ---
+// --- Card creation (with collapsible description) ---
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
 
+  // Title row
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
 
@@ -146,10 +150,30 @@ function createProjectCard(project) {
   titleRow.appendChild(nameEl);
   titleRow.appendChild(typePill);
 
+  // DESCRIPTION (collapsible)
+  const descWrapper = document.createElement("div");
+  descWrapper.className = "project-description-wrapper";
+
   const descEl = document.createElement("p");
   descEl.className = "project-description";
   descEl.textContent = project.description;
+  descWrapper.appendChild(descEl);
 
+  // Only show "Show more" if description is long-ish
+  if (project.description && project.description.length > 140) {
+    const toggleBtn = document.createElement("span");
+    toggleBtn.className = "show-more-btn";
+    toggleBtn.textContent = "Show more";
+
+    toggleBtn.addEventListener("click", () => {
+      const expanded = descEl.classList.toggle("expanded");
+      toggleBtn.textContent = expanded ? "Show less" : "Show more";
+    });
+
+    descWrapper.appendChild(toggleBtn);
+  }
+
+  // Meta row (language + tags)
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
@@ -167,10 +191,10 @@ function createProjectCard(project) {
     metaRow.appendChild(tagPill);
   });
 
+  // Links
   const linksRow = document.createElement("div");
   linksRow.className = "project-links";
 
-  // GitHub link (primary)
   const ghLink = document.createElement("a");
   ghLink.className = "project-link-btn primary-link";
   ghLink.href = project.githubUrl;
@@ -179,7 +203,6 @@ function createProjectCard(project) {
   ghLink.innerHTML = "<span>View on GitHub</span>";
   linksRow.appendChild(ghLink);
 
-  // GitHub Pages link if available
   if (project.pagesUrl) {
     const pagesLink = document.createElement("a");
     pagesLink.className = "project-link-btn";
@@ -190,6 +213,7 @@ function createProjectCard(project) {
     linksRow.appendChild(pagesLink);
   }
 
+  // Footer meta
   const footerMeta = document.createElement("div");
   footerMeta.className = "project-footer-meta";
   footerMeta.textContent =
@@ -200,7 +224,7 @@ function createProjectCard(project) {
                                 "Misc project";
 
   card.appendChild(titleRow);
-  card.appendChild(descEl);
+  card.appendChild(descWrapper);
   card.appendChild(metaRow);
   card.appendChild(linksRow);
   card.appendChild(footerMeta);
@@ -294,9 +318,8 @@ async function loadRepos() {
     }
     const data = await res.json();
 
-    // Map all public repos
     repos = data
-      .filter(r => !r.private) // just in case
+      .filter(r => !r.private)
       .map(mapRepo);
 
     initLanguageFilter();
@@ -313,7 +336,7 @@ async function loadRepos() {
   }
 }
 
-// --- Init (runs immediately because script is at the end of <body>) ---
+// --- Init (script at end of body so DOM is ready) ---
 (function init() {
   initFiltersAndSearch();
   loadRepos();
