@@ -1,4 +1,4 @@
-![Ferran’s Projects Banner](./banner.png)
+[![Ferran’s Projects Banner](./banner.png)](https://ferrannl.github.io/Projects/index.html)
 
 # 🚀 Ferran’s Projects Portfolio
 
