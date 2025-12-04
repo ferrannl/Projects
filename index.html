@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ferrannl · Projects</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Overview of all projects by GitHub user ferrannl.">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-main">
+        <div class="brand">
+          <span class="brand-dot"></span>
+          <span class="brand-title">ferrannl</span>
+          <span class="brand-subtitle">projects hub</span>
+        </div>
+
+        <nav class="nav">
+          <a href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer" class="nav-link">
+            GitHub Profile
+          </a>
+        </nav>
+      </div>
+
+      <section class="hero">
+        <h1>All my <span class="accent">projects</span> in one place.</h1>
+        <p>
+          This page pulls my public repositories directly from GitHub and mixes them with projects I add manually.
+          Great for websites, experiments, and random ideas.
+        </p>
+
+        <div class="controls">
+          <div class="search-wrapper">
+            <input
+              type="search"
+              id="searchInput"
+              placeholder="Search projects by name or description..."
+              autocomplete="off"
+            >
+          </div>
+
+          <label class="checkbox">
+            <input type="checkbox" id="showForks">
+            <span>Show forks</span>
+          </label>
+        </div>
+      </section>
+    </header>
+
+    <main class="main">
+      <section class="projects-section">
+        <div id="projectsGrid" class="projects-grid" aria-live="polite"></div>
+        <div id="statusMessage" class="status-message"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Built with ♥ using the GitHub API.
+        Edit <code>script.js</code> to add or tweak projects manually.
+      </p>
+    </footer>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
