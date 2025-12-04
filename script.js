@@ -10,7 +10,7 @@ const state = {
   languageFilter: "all"
 };
 
-// --- DOM ---
+// --- DOM refs ---
 const gridEl = document.getElementById("projectsGrid");
 const emptyEl = document.getElementById("emptyState");
 const searchEl = document.getElementById("search");
@@ -23,10 +23,10 @@ function inferType(repo) {
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  // If pages are enabled, treat as website
+  // Pages → website
   if (repo.has_pages) return "website";
 
-  // Typical website languages
+  // Typical website stack
   if (["html", "css", "javascript", "typescript", "php"].includes(lang)) {
     return "website";
   }
@@ -69,7 +69,7 @@ function getTypeLabel(type) {
   }
 }
 
-// Map GitHub repo JSON → our internal object
+// Map GitHub repo JSON → internal object
 function mapRepo(repo) {
   const type = inferType(repo);
 
@@ -150,7 +150,7 @@ function createProjectCard(project) {
   titleRow.appendChild(nameEl);
   titleRow.appendChild(typePill);
 
-  // DESCRIPTION (collapsible)
+  // DESCRIPTION (collapsible for long text)
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
@@ -159,15 +159,25 @@ function createProjectCard(project) {
   descEl.textContent = project.description;
   descWrapper.appendChild(descEl);
 
-  // Only show "Show more" if description is long-ish
-  if (project.description && project.description.length > 140) {
+  // Only long descriptions get collapsed + button
+  const isLong = project.description && project.description.length > 180;
+
+  if (isLong) {
+    descEl.classList.add("collapsed");
+
     const toggleBtn = document.createElement("span");
     toggleBtn.className = "show-more-btn";
     toggleBtn.textContent = "Show more";
 
     toggleBtn.addEventListener("click", () => {
       const expanded = descEl.classList.toggle("expanded");
-      toggleBtn.textContent = expanded ? "Show less" : "Show more";
+      if (expanded) {
+        descEl.classList.remove("collapsed");
+        toggleBtn.textContent = "Show less";
+      } else {
+        descEl.classList.add("collapsed");
+        toggleBtn.textContent = "Show more";
+      }
     });
 
     descWrapper.appendChild(toggleBtn);
