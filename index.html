@@ -2,73 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ferrannl · Projects</title>
+  <title>Ferran – Projects</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Overview of all projects by GitHub user ferrannl.">
-
-  <link rel="stylesheet" href="style.css">
+  <meta name="description"
+        content="Overview of all projects by Ferran (ferrannl) – web, mobile, APIs, school assignments and more.">
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app">
-    <header class="header">
-      <div class="header-main">
-        <div class="brand">
-          <span class="brand-dot"></span>
-          <span class="brand-title">ferrannl</span>
-          <span class="brand-subtitle">projects hub</span>
-        </div>
+<div class="app">
+  <header class="site-header">
+    <div class="site-title-block">
+      <h1>Ferran’s Projects</h1>
+      <p class="site-subtitle">
+        All my GitHub stuff in one place – web experiments, school projects, guides, APIs and more.
+      </p>
+    </div>
+    <div class="header-actions">
+      <a class="ghost-btn" href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
+        View GitHub Profile
+      </a>
+    </div>
+  </header>
 
-        <nav class="nav">
-          <a href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer" class="nav-link">
-            GitHub Profile
-          </a>
-        </nav>
+  <section class="controls">
+    <div class="search-block">
+      <label for="search" class="sr-only">Search projects</label>
+      <input id="search" type="search" placeholder="Search by name, description, language or tag…">
+    </div>
+
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Type</span>
+        <button class="chip chip-active" data-filter-type="type" data-filter-value="all">All</button>
+        <button class="chip" data-filter-type="type" data-filter-value="website">Websites</button>
+        <button class="chip" data-filter-type="type" data-filter-value="mobile">Mobile</button>
+        <button class="chip" data-filter-type="type" data-filter-value="api">APIs / Backend</button>
+        <button class="chip" data-filter-type="type" data-filter-value="school">School / Study</button>
+        <button class="chip" data-filter-type="type" data-filter-value="other">Other</button>
       </div>
 
-      <section class="hero">
-        <h1>All my <span class="accent">projects</span> in one place.</h1>
-        <p>
-          This page pulls my public repositories directly from GitHub and mixes them with projects I add manually.
-          Great for websites, experiments, and random ideas.
-        </p>
+      <div class="filter-group">
+        <span class="filter-label">Language</span>
+        <select id="languageFilter">
+          <option value="all">All languages</option>
+        </select>
+      </div>
+    </div>
+  </section>
 
-        <div class="controls">
-          <div class="search-wrapper">
-            <input
-              type="search"
-              id="searchInput"
-              placeholder="Search projects by name or description..."
-              autocomplete="off"
-            >
-          </div>
+  <main>
+    <section id="projectsGrid" class="projects-grid" aria-live="polite">
+      <!-- Cards injected by script.js -->
+    </section>
 
-          <label class="checkbox">
-            <input type="checkbox" id="showForks">
-            <span>Show forks</span>
-          </label>
-        </div>
-      </section>
-    </header>
+    <div id="emptyState" class="empty-state" hidden>
+      <p>No projects match your search/filter. Try another search term.</p>
+    </div>
+  </main>
 
-    <main class="main">
-      <section class="projects-section">
-        <div id="projectsGrid" class="projects-grid" aria-live="polite"></div>
-        <div id="statusMessage" class="status-message"></div>
-      </section>
-    </main>
+  <footer class="site-footer">
+    <span>Built with ♥ by Ferran</span>
+    <span class="footer-links">
+      <a href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">@ferrannl</a>
+      <span>·</span>
+      <a href="https://ferrannl.github.io/Projects/index.html" target="_blank" rel="noopener noreferrer">
+        View this site on GitHub Pages
+      </a>
+    </span>
+  </footer>
+</div>
 
-    <footer class="footer">
-      <p>
-        Built with ♥ using the GitHub API.
-        Edit <code>script.js</code> to add or tweak projects manually.
-      </p>
-    </footer>
-  </div>
+<noscript>
+  <style>
+    .projects-grid { display: block !important; }
+  </style>
+  <p style="color:#fff; text-align:center; padding:1rem;">
+    JavaScript is disabled – enable it to see the interactive project listing.
+  </p>
+</noscript>
 
-  <script src="script.js" defer></script>
+<script src="script.js"></script>
 </body>
 </html>
