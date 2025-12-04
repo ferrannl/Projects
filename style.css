@@ -316,30 +316,20 @@ body {
   margin: 0;
   font-size: 0.9rem;
   color: var(--text-muted);
-  position: relative;
   line-height: 1.3;
-  max-height: 3.9em; /* ~3 lines */
   overflow: hidden;
+  position: relative;
+  max-height: none; /* full height by default */
   transition: max-height 0.25s ease;
 }
 
-.project-description::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1.4em;
-  background: linear-gradient(to bottom, rgba(11, 15, 32, 0), rgba(11, 15, 32, 0.95));
-  pointer-events: none;
+/* Only long descriptions get these classes via JS */
+.project-description.collapsed {
+  max-height: 3.9em; /* ≈ 3 lines */
 }
 
 .project-description.expanded {
-  max-height: 500px; /* plenty */
-}
-
-.project-description.expanded::after {
-  opacity: 0;
+  max-height: 500px;
 }
 
 .show-more-btn {
