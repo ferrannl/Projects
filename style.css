@@ -306,7 +306,7 @@ body {
   white-space: nowrap;
 }
 
-/* Collapsible description */
+/* Descriptions – collapsible only for long ones */
 
 .project-description-wrapper {
   margin: 0.1rem 0 0.4rem;
@@ -319,16 +319,14 @@ body {
   line-height: 1.3;
   overflow: hidden;
   position: relative;
-  max-height: none; /* full height by default */
-  transition: max-height 0.25s ease;
 }
 
-/* Only long descriptions get these classes via JS */
-.project-description.collapsed {
-  max-height: 3.9em; /* ≈ 3 lines */
+/* Alleen lange descriptions (met .is-long) worden ingekort */
+.project-description.is-long.collapsed {
+  max-height: 3.9em; /* ≈ 3 regels */
 }
 
-.project-description.expanded {
+.project-description.is-long.expanded {
   max-height: 500px;
 }
 
