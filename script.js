@@ -102,17 +102,14 @@ function buildTags(repo, type) {
 
 // --- Filtering logic ---
 function matchesFilters(project) {
-  // Type filter
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) {
     return false;
   }
 
-  // Language filter
   if (state.languageFilter !== "all" && project.language !== state.languageFilter) {
     return false;
   }
 
-  // Search filter
   if (state.search) {
     const haystack = [
       project.name,
@@ -130,7 +127,7 @@ function matchesFilters(project) {
   return true;
 }
 
-// --- Card creation (with collapsible description) ---
+// --- Card creation (with simple collapsible description) ---
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -150,7 +147,7 @@ function createProjectCard(project) {
   titleRow.appendChild(nameEl);
   titleRow.appendChild(typePill);
 
-  // DESCRIPTION (collapsible for long text)
+  // DESCRIPTION
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
@@ -159,31 +156,26 @@ function createProjectCard(project) {
   descEl.textContent = project.description;
   descWrapper.appendChild(descEl);
 
-  // Only long descriptions get collapsed + button
+  // Alleen lange descriptions inklappen (lengte > 180 chars)
   const isLong = project.description && project.description.length > 180;
 
   if (isLong) {
-    descEl.classList.add("collapsed");
+    descEl.classList.add("is-long", "collapsed");
 
     const toggleBtn = document.createElement("span");
     toggleBtn.className = "show-more-btn";
     toggleBtn.textContent = "Show more";
 
     toggleBtn.addEventListener("click", () => {
-      const expanded = descEl.classList.toggle("expanded");
-      if (expanded) {
-        descEl.classList.remove("collapsed");
-        toggleBtn.textContent = "Show less";
-      } else {
-        descEl.classList.add("collapsed");
-        toggleBtn.textContent = "Show more";
-      }
+      const isExpanded = descEl.classList.toggle("expanded");
+      descEl.classList.toggle("collapsed", !isExpanded);
+      toggleBtn.textContent = isExpanded ? "Show less" : "Show more";
     });
 
     descWrapper.appendChild(toggleBtn);
   }
 
-  // Meta row (language + tags)
+  // Meta row
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
@@ -266,7 +258,7 @@ function renderProjects() {
   });
 }
 
-// --- UI setup (filters & search) ---
+// --- UI setup ---
 function initFiltersAndSearch() {
   // Type chips
   typeChips.forEach(chip => {
@@ -287,7 +279,7 @@ function initFiltersAndSearch() {
   }
 }
 
-// Populate language dropdown based on loaded repos
+// Language dropdown
 function initLanguageFilter() {
   if (!languageSelectEl) return;
   languageSelectEl.innerHTML = "";
@@ -346,7 +338,7 @@ async function loadRepos() {
   }
 }
 
-// --- Init (script at end of body so DOM is ready) ---
+// --- Init ---
 (function init() {
   initFiltersAndSearch();
   loadRepos();
