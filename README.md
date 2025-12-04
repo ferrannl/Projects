@@ -15,7 +15,7 @@ All my GitHub stuff in one place — client websites, school projects, APIs, mob
 > A dark, modern dashboard that lists and filters all my projects.
 
 🔗 **Portfolio site:**  
-**https://ferrannl.github.io/Projects/**  
+**https://ferrannl.github.io/Projects/index.html**  
 
 🔗 **This repo:**  
 **https://github.com/ferrannl/Projects**
