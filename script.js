@@ -21,6 +21,45 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
 
+// --- Name prettifying ---
+
+const SMALL_WORDS = new Set([
+  "voor", "van", "met",
+  "en", "of",
+  "de", "het", "een",
+  "in", "op", "aan", "bij"
+]);
+
+function prettifyName(raw) {
+  if (!raw) return "";
+
+  // Replace separators with spaces
+  let s = raw.replace(/[-_.]+/g, " ");
+
+  // Split camelCase: "myCoolRepo" -> "my Cool Repo"
+  s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
+
+  // Normalize spaces
+  s = s.replace(/\s+/g, " ").trim();
+
+  const originalWords = s.split(" ");
+  const lowerWords = s.toLowerCase().split(" ");
+
+  const resultWords = lowerWords.map((word, idx) => {
+    const orig = originalWords[idx];
+
+    // keep small words lowercase, except first word
+    if (idx > 0 && SMALL_WORDS.has(word)) {
+      return word;
+    }
+
+    if (!word.length) return word;
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+
+  return resultWords.join(" ");
+}
+
 // --- Helpers for README summary ---
 
 function stripMarkdown(text) {
@@ -169,7 +208,8 @@ function mapRepo(repo) {
   const baseDesc = repo.description || "No description yet.";
 
   return {
-    name: repo.name,
+    rawName: repo.name,                    // original (for URLs / API)
+    displayName: prettifyName(repo.name),  // nice title for UI
     language: repo.language || "Various",
     type,
     tags: buildTags(repo, type),
@@ -200,7 +240,8 @@ function matchesFilters(project) {
 
   if (state.search) {
     const haystack = [
-      project.name,
+      project.rawName,
+      project.displayName,
       project.summary,
       project.language,
       project.type,
@@ -253,10 +294,10 @@ function createProjectCard(project) {
 
     const thumbImg = document.createElement("img");
     thumbImg.src = project.thumbnailUrl;
-    thumbImg.alt = `${project.name} thumbnail`;
+    thumbImg.alt = `${project.displayName} thumbnail`;
     thumbBtn.appendChild(thumbImg);
 
-    thumbBtn.addEventListener("click", () => openImageModal(project.thumbnailUrl, project.name));
+    thumbBtn.addEventListener("click", () => openImageModal(project.thumbnailUrl, project.displayName));
 
     titleRow.appendChild(thumbBtn);
   }
@@ -266,7 +307,7 @@ function createProjectCard(project) {
 
   const nameEl = document.createElement("h2");
   nameEl.className = "project-name";
-  nameEl.textContent = project.name;
+  nameEl.textContent = project.displayName;
 
   const typePill = document.createElement("span");
   typePill.className = "project-type-pill";
@@ -424,7 +465,7 @@ function initLanguageFilter() {
 async function enhanceDescriptionsFromReadme() {
   const tasks = repos.map(async (project) => {
     try {
-      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.name}/HEAD/README.md`;
+      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/README.md`;
       const res = await fetch(url);
       if (!res.ok) return; // no README
 
@@ -434,7 +475,7 @@ async function enhanceDescriptionsFromReadme() {
         project.summary = summary;
       }
     } catch (e) {
-      console.error("README fetch failed for", project.name, e);
+      console.error("README fetch failed for", project.rawName, e);
     }
   });
 
@@ -446,7 +487,7 @@ async function enhanceDescriptionsFromReadme() {
 
 async function findThumbnailForRepo(project) {
   try {
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${project.name}/contents/`;
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${project.rawName}/contents/`;
     const res = await fetch(url);
     if (!res.ok) return;
 
@@ -465,11 +506,11 @@ async function findThumbnailForRepo(project) {
 
     const pick = candidates[0];
     const urlToUse = pick.download_url ||
-      `https://raw.githubusercontent.com/${GITHUB_USER}/${project.name}/HEAD/${pick.path}`;
+      `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${pick.path}`;
 
     project.thumbnailUrl = urlToUse;
   } catch (e) {
-    console.error("Thumbnail fetch failed for", project.name, e);
+    console.error("Thumbnail fetch failed for", project.rawName, e);
   }
 }
 
