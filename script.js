@@ -17,6 +17,8 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
 
+// --- name prettifying ---
+
 const SMALL_WORDS = new Set([
   "voor", "van", "met",
   "en", "of",
@@ -57,7 +59,8 @@ function prettifyName(raw) {
   return resultWords.join(" ");
 }
 
-// Just use GitHub description directly; no extra README fetches.
+// --- description summary (no README calls) ---
+
 function buildShortSummaryFromDescription(desc) {
   if (!desc) return "No description yet.";
   const maxLen = 220;
@@ -72,6 +75,8 @@ function buildShortSummaryFromDescription(desc) {
   }
   return text;
 }
+
+// --- type + tags ---
 
 function inferType(repo) {
   const name = (repo.name || "").toLowerCase();
@@ -130,6 +135,8 @@ function buildTags(repo, type) {
   return tags;
 }
 
+// --- emoji thumbnails ---
+
 function getEmojiForProject(project) {
   switch (project.type) {
     case "website": return "🌐";
@@ -139,6 +146,8 @@ function getEmojiForProject(project) {
     default:        return "🧪";
   }
 }
+
+// --- map GitHub repo -> project object ---
 
 function mapRepo(repo) {
   const type = inferType(repo);
@@ -155,12 +164,13 @@ function mapRepo(repo) {
       ? `https://${GITHUB_USER}.github.io/${repo.name}/`
       : null,
     summary: buildShortSummaryFromDescription(baseDesc),
-    thumbnailEmoji: null
+    // images are decided at render-time
   };
 
-  project.thumbnailEmoji = getEmojiForProject(project);
   return project;
 }
+
+// --- filtering ---
 
 function matchesFilters(project) {
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
@@ -182,7 +192,8 @@ function matchesFilters(project) {
   return true;
 }
 
-// Modal only matters if we ever put real images back in.
+// --- modal (for when an image actually loads) ---
+
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
   imageModalImgEl.src = url;
@@ -201,6 +212,63 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
+// --- image guessing using raw.githubusercontent.com (no API) ---
+
+const IMAGE_CANDIDATES = [
+  "class-diagram.png",
+  "ClassDiagram.png",
+  "classDiagram.png",
+  "diagram.png",
+  "uml.png",
+  "uml-diagram.png",
+  "logo.png",
+  "Logo.png",
+  "logo.jpg",
+  "banner.png",
+  "hero.png",
+  "thumbnail.png",
+  "thumb.png",
+  "preview.png",
+  "screenshot.png"
+];
+
+function setupProjectImage(project, imgEl, emojiSpan, thumbBtn) {
+  const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/`;
+  let idx = 0;
+
+  imgEl.style.display = "none"; // start hidden, emoji visible
+
+  function tryNext() {
+    if (idx >= IMAGE_CANDIDATES.length) {
+      // nothing worked → keep emoji, no click
+      return;
+    }
+    const candidate = IMAGE_CANDIDATES[idx++];
+    imgEl.src = base + candidate;
+  }
+
+  imgEl.onerror = () => {
+    // try next file name
+    tryNext();
+  };
+
+  imgEl.onload = () => {
+    // we found a working image
+    emojiSpan.style.display = "none";
+    imgEl.style.display = "block";
+
+    // clicking thumbnail opens fullscreen modal
+    thumbBtn.addEventListener("click", () => {
+      openImageModal(imgEl.src, project.displayName);
+    }, { once: true }); // only need to attach once
+  };
+
+  // kick off first attempt
+  tryNext();
+}
+
+// --- card creation ---
+
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -208,15 +276,27 @@ function createProjectCard(project) {
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
 
-  // Emoji "thumbnail"
-  const thumbBtn = document.createElement("div");
+  // thumbnail (emoji + optional real image)
+  const thumbBtn = document.createElement("button");
   thumbBtn.className = "project-thumb";
+  thumbBtn.type = "button";
+
   const emojiSpan = document.createElement("span");
   emojiSpan.className = "project-thumb-emoji";
-  emojiSpan.textContent = project.thumbnailEmoji || getEmojiForProject(project);
+  emojiSpan.textContent = getEmojiForProject(project);
   thumbBtn.appendChild(emojiSpan);
+
+  const imgEl = document.createElement("img");
+  imgEl.alt = `${project.displayName} thumbnail`;
+  // CSS for .project-thumb img already handles sizing
+  thumbBtn.appendChild(imgEl);
+
   titleRow.appendChild(thumbBtn);
 
+  // let JS try to find an actual image; emoji stays if it fails
+  setupProjectImage(project, imgEl, emojiSpan, thumbBtn);
+
+  // title + type pill
   const titleBlock = document.createElement("div");
   titleBlock.className = "project-title-text";
 
@@ -232,6 +312,7 @@ function createProjectCard(project) {
   titleBlock.appendChild(typePill);
   titleRow.appendChild(titleBlock);
 
+  // description
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
@@ -240,6 +321,7 @@ function createProjectCard(project) {
   descEl.textContent = project.summary;
   descWrapper.appendChild(descEl);
 
+  // meta pills
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
@@ -257,6 +339,7 @@ function createProjectCard(project) {
     metaRow.appendChild(tagPill);
   });
 
+  // links
   const linksRow = document.createElement("div");
   linksRow.className = "project-links";
 
@@ -296,6 +379,8 @@ function createProjectCard(project) {
   return card;
 }
 
+// --- rendering ---
+
 function renderProjects() {
   if (!gridEl) return;
   gridEl.innerHTML = "";
@@ -317,6 +402,8 @@ function renderProjects() {
     gridEl.appendChild(card);
   });
 }
+
+// --- UI wiring ---
 
 function initFiltersAndSearch() {
   typeChips.forEach(chip => {
@@ -361,6 +448,8 @@ function initLanguageFilter() {
     renderProjects();
   });
 }
+
+// --- load repos (single API call) ---
 
 async function loadRepos() {
   if (gridEl) {
