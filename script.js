@@ -6,6 +6,7 @@ const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
 const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
 const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
+const LANGUAGE_STORAGE_KEY = "ferranProjectsLang";
 
 let repos = [];
 const state = {
@@ -13,6 +14,8 @@ const state = {
   typeFilter: "all",
   languageFilter: "all"
 };
+
+let currentLang = "en";
 
 const gridEl = document.getElementById("projectsGrid");
 const emptyEl = document.getElementById("emptyState");
@@ -22,6 +25,7 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
+const langGateEl = document.getElementById("langGate");
 
 const SMALL_WORDS = new Set([
   "voor", "van", "met",
@@ -42,6 +46,118 @@ const SPECIAL_WORDS = {
   ux: "UX"
 };
 
+/* ---------- Translations ---------- */
+
+const I18N = {
+  en: {
+    subtitle: "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
+    filterTypeLabel: "Type",
+    filterLanguageLabel: "Language",
+    typeAll: "All",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "School / Study",
+    typeOther: "Other",
+    allLanguagesOption: "All languages",
+    searchPlaceholder: "Search by name, description, language or tag…",
+    emptyState: "No projects match your search/filter. Try another search term.",
+    footerBuiltWith: "Built with ♥ by Ferran",
+    footerViewOnPages: "View this site on GitHub Pages",
+    loading: "Loading projects…"
+  },
+  nl: {
+    subtitle: "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolprojecten, handleidingen, API’s en meer.",
+    filterTypeLabel: "Type",
+    filterLanguageLabel: "Taal",
+    typeAll: "Alles",
+    typeWebsite: "Websites",
+    typeMobile: "Mobiel",
+    typeApi: "API’s / Backend",
+    typeSchool: "School / Studie",
+    typeOther: "Overig",
+    allLanguagesOption: "Alle talen",
+    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
+    emptyState: "Geen projecten gevonden voor deze zoekopdracht of filters.",
+    footerBuiltWith: "Gemaakt met ♥ door Ferran",
+    footerViewOnPages: "Bekijk deze site op GitHub Pages",
+    loading: "Projecten laden…"
+  },
+  de: {
+    subtitle: "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienarbeiten, Guides, APIs und mehr.",
+    filterTypeLabel: "Typ",
+    filterLanguageLabel: "Sprache",
+    typeAll: "Alle",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "Schule / Studium",
+    typeOther: "Sonstiges",
+    allLanguagesOption: "Alle Sprachen",
+    searchPlaceholder: "Suche nach Name, Beschreibung, Sprache oder Tag…",
+    emptyState: "Keine Projekte für diese Suche/Filter gefunden.",
+    footerBuiltWith: "Mit ♥ erstellt von Ferran",
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
+    loading: "Projekte werden geladen…"
+  },
+  pl: {
+    subtitle: "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
+    filterTypeLabel: "Typ",
+    filterLanguageLabel: "Język",
+    typeAll: "Wszystko",
+    typeWebsite: "Strony WWW",
+    typeMobile: "Mobilne",
+    typeApi: "API / Backend",
+    typeSchool: "Szkoła / Studia",
+    typeOther: "Inne",
+    allLanguagesOption: "Wszystkie języki",
+    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
+    emptyState: "Brak projektów pasujących do wyszukiwania/filtrów.",
+    footerBuiltWith: "Stworzone z ♥ przez Ferrana",
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
+    loading: "Ładowanie projektów…"
+  },
+  tr: {
+    subtitle: "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
+    filterTypeLabel: "Tür",
+    filterLanguageLabel: "Dil",
+    typeAll: "Hepsi",
+    typeWebsite: "Web siteleri",
+    typeMobile: "Mobil",
+    typeApi: "API / Backend",
+    typeSchool: "Okul / Çalışma",
+    typeOther: "Diğer",
+    allLanguagesOption: "Tüm diller",
+    searchPlaceholder: "Ada, açıklamaya, dile veya etikete göre ara…",
+    emptyState: "Arama/filtre için eşleşen proje bulunamadı.",
+    footerBuiltWith: "Ferran tarafından ♥ ile geliştirildi",
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde gör",
+    loading: "Projeler yükleniyor…"
+  },
+  es: {
+    subtitle: "Todos mis proyectos de programación en un solo lugar: sitios web, apps, trabajos de estudio, guías, APIs y más.",
+    filterTypeLabel: "Tipo",
+    filterLanguageLabel: "Idioma",
+    typeAll: "Todo",
+    typeWebsite: "Sitios web",
+    typeMobile: "Móvil",
+    typeApi: "APIs / Backend",
+    typeSchool: "Escuela / Estudio",
+    typeOther: "Otro",
+    allLanguagesOption: "Todos los idiomas",
+    searchPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…",
+    emptyState: "No hay proyectos que coincidan con tu búsqueda/filtros.",
+    footerBuiltWith: "Hecho con ♥ por Ferran",
+    footerViewOnPages: "Ver este sitio en GitHub Pages",
+    loading: "Cargando proyectos…"
+  }
+};
+
+function t(key) {
+  const pack = I18N[currentLang] || I18N.en;
+  return pack[key] || I18N.en[key] || "";
+}
+
 /* ---------- Helpers ---------- */
 
 function isSelfProjectsRepoName(name) {
@@ -51,25 +167,20 @@ function isSelfProjectsRepoName(name) {
 function prettifyName(raw) {
   if (!raw) return "";
 
-  // Normalize separators first
   let s = raw.replace(/[-_.]+/g, " ");
 
-  // TEMPORARILY protect iOS so CamelCase splitting doesn't break it
   const IOS_PLACEHOLDER = "__IOS__";
   s = s.replace(/iOS|IOS|Ios|ioS/gi, IOS_PLACEHOLDER);
 
-  // Split camelCase and PascalCase EXCEPT the placeholder
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   s = s.replace(/\s+/g, " ").trim();
 
   let words = s.split(" ").map(w => w.trim());
 
-  // Now restore proper iOS style
   words = words.map(w =>
     w === IOS_PLACEHOLDER ? "iOS" : w
   );
 
-  // Basic dictionary corrections
   return words
     .map((w, i) => {
       const lw = w.toLowerCase();
@@ -84,13 +195,29 @@ function prettifyName(raw) {
     .join(" ");
 }
 
+function looksLikeSchool(text) {
+  const t = (text || "").toLowerCase();
+  return (
+    t.includes("assignment") ||
+    t.includes("school") ||
+    t.includes("studie") ||
+    t.includes("study") ||
+    (t.includes("project") && t.includes("school")) ||
+    t.includes("hbo-ict") ||
+    t.includes("hbo ict") ||
+    t.includes("avans") ||
+    t.includes("cppls") ||
+    t.includes("devops") ||
+    t.includes("minor")
+  );
+}
+
 function inferTypeFromGitHub(repo) {
   const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  if (repo.has_pages) return "website";
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
+  if (looksLikeSchool(`${name} ${desc}`)) return "school";
 
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
@@ -99,14 +226,8 @@ function inferTypeFromGitHub(repo) {
 
   if (name.includes("api") || desc.includes("api")) return "api";
 
-  if (
-    desc.includes("assignment") ||
-    desc.includes("project") ||
-    desc.includes("internship") ||
-    desc.includes("final") ||
-    desc.includes("cppls") ||
-    desc.includes("devops")
-  ) return "school";
+  if (repo.has_pages) return "website";
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
 
   return "other";
 }
@@ -117,7 +238,7 @@ function inferTypeFromEntry(entry) {
   const name = (entry.name || "").toLowerCase();
   const desc = (entry.description || "").toLowerCase();
 
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
+  if (looksLikeSchool(`${name} ${desc}`)) return "school";
 
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
@@ -126,14 +247,7 @@ function inferTypeFromEntry(entry) {
 
   if (name.includes("api") || desc.includes("api")) return "api";
 
-  if (
-    desc.includes("assignment") ||
-    desc.includes("project") ||
-    desc.includes("internship") ||
-    desc.includes("final") ||
-    desc.includes("cppls") ||
-    desc.includes("devops")
-  ) return "school";
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
 
   return "other";
 }
@@ -148,22 +262,20 @@ function getTypeLabel(type) {
   }
 }
 
-/**
- * Build a base set of tags from type + primary language.
- * Keep it small & meaningful, then dedupe & cap.
- */
 function buildTagsBase(type, primaryLang) {
   const tags = [];
   const langLower = (primaryLang || "").toLowerCase();
+  const isWebLang = ["html", "css", "javascript", "typescript", "php"].includes(langLower);
 
-  // Type-based tags
   if (type === "website") tags.push("web");
   if (type === "mobile")  tags.push("mobile");
   if (type === "api")     tags.push("api");
-  if (type === "school")  tags.push("school");
+  if (type === "school") {
+    tags.push("school");
+    if (isWebLang && !tags.includes("web")) tags.push("web");
+  }
 
-  // Language-based tags
-  if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
+  if (isWebLang) {
     if (!tags.includes("web")) tags.push("web");
     tags.push("frontend");
   }
@@ -188,16 +300,10 @@ function buildTagsBase(type, primaryLang) {
     tags.push("python");
   }
 
-  // Dedupe and cap total tags to avoid flooding
   const unique = [...new Set(tags)];
   return unique.slice(0, 6);
 }
 
-/**
- * Compute language array based on primary language, type and name/description.
- * Returns an array with primary language first, up to 3 total.
- * Tries to show realistic stacks like: HTML + CSS + JS, C# + .NET/ASP.NET, etc.
- */
 function computeLanguages(primaryLang, rawName, desc, type) {
   const langs = [];
   const main = primaryLang || "Various";
@@ -209,7 +315,6 @@ function computeLanguages(primaryLang, rawName, desc, type) {
     if (!langs.includes(lang)) langs.push(lang);
   }
 
-  // If GitHub doesn't know: bail out early
   if (!main || main === "Various") {
     add(main);
     return langs;
@@ -217,7 +322,6 @@ function computeLanguages(primaryLang, rawName, desc, type) {
 
   const l = main.toLowerCase();
 
-  // --- HTML / CSS / JS combos ---
   if (l === "html") {
     add("HTML");
     add("CSS");
@@ -228,41 +332,37 @@ function computeLanguages(primaryLang, rawName, desc, type) {
     add("JavaScript");
   } else if (l === "javascript") {
     add("JavaScript");
-    if (typeL === "website" || text.includes("html") || text.includes("css")) {
+    if (typeL === "website" || typeL === "school" || text.includes("html") || text.includes("css")) {
       add("HTML");
       add("CSS");
     }
   } else if (l === "typescript") {
     add("TypeScript");
     add("JavaScript");
-    if (typeL === "website" || text.includes("html") || text.includes("css")) {
+    if (typeL === "website" || typeL === "school" || text.includes("html") || text.includes("css")) {
       add("HTML");
       add("CSS");
     }
   } else if (l === "php") {
     add("PHP");
-    if (typeL === "website" || text.includes("html")) {
+    if (typeL === "website" || typeL === "school" || text.includes("html")) {
       add("HTML");
       add("CSS");
     }
   } else if (l === "c++") {
-    // C++ stack
     add("C++");
     add("C");
   } else if (l === "c#") {
     add("C#");
-    // Try to pick ASP.NET vs plain .NET
     if (text.includes("asp.net")) {
       add("ASP.NET");
     } else {
       add(".NET");
     }
   } else {
-    // Fallback: just use the main language as-is
     add(main);
   }
 
-  // Extra heuristics based on description/name
   if (langs.length < 3) {
     if (text.includes("asp.net") && !langs.includes("ASP.NET")) {
       add("ASP.NET");
@@ -280,7 +380,6 @@ function computeLanguages(primaryLang, rawName, desc, type) {
     add("JavaScript");
   }
 
-  // Deduplicate + cap to 3
   const unique = [...new Set(langs)];
   return unique.slice(0, 3);
 }
@@ -306,10 +405,10 @@ function mapRepoFromGitHub(repo) {
     tags: buildTagsBase(type, primaryLang),
     githubUrl: repo.html_url,
     pagesUrl,
-    hasLiveSite: !!pagesUrl, // will be verified later
+    hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null  // may be filled from projects.json or auto-detect
+    thumbnailUrl: null
   };
 }
 
@@ -342,21 +441,21 @@ function mapEntryToProject(entry) {
     language: languages[0] || "Various",
     languages,
     type,
-    tags: mergedTags.slice(0, 8), // extra safety cap if projects.json is very tag-happy
+    tags: mergedTags.slice(0, 8),
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
     pagesUrl,
-    hasLiveSite: !!pagesUrl, // will be verified later
+    hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
     thumbnailUrl
   };
 }
 
-/* ---------- Filter / search ---------- */
+/* ---------- Filters / search ---------- */
 
 function matchesFilters(project) {
   const rawName = project.rawName || "";
-  if (isSelfProjectsRepoName(rawName)) return false; // never show self repo
+  if (isSelfProjectsRepoName(rawName)) return false;
 
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
 
@@ -403,6 +502,100 @@ function closeImageModal() {
 
 if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
+}
+
+/* ---------- Language gate + i18n ---------- */
+
+function applyTranslations() {
+  const subtitleEl = document.querySelector("[data-i18n='subtitle']");
+  const typeLabelEl = document.querySelector("[data-i18n='filterTypeLabel']");
+  const langLabelEl = document.querySelector("[data-i18n='filterLanguageLabel']");
+  const footerBuiltEl = document.querySelector("[data-i18n='footerBuiltWith']");
+  const footerViewEl = document.querySelector("[data-i18n='footerViewOnPages']");
+
+  if (subtitleEl) subtitleEl.textContent = t("subtitle");
+  if (typeLabelEl) typeLabelEl.textContent = t("filterTypeLabel");
+  if (langLabelEl) langLabelEl.textContent = t("filterLanguageLabel");
+  if (footerBuiltEl) footerBuiltEl.textContent = t("footerBuiltWith");
+  if (footerViewEl) footerViewEl.textContent = t("footerViewOnPages");
+
+  if (searchEl) searchEl.placeholder = t("searchPlaceholder");
+
+  const chipAll = document.querySelector("[data-i18n='typeAll']");
+  const chipWebsite = document.querySelector("[data-i18n='typeWebsite']");
+  const chipMobile = document.querySelector("[data-i18n='typeMobile']");
+  const chipApi = document.querySelector("[data-i18n='typeApi']");
+  const chipSchool = document.querySelector("[data-i18n='typeSchool']");
+  const chipOther = document.querySelector("[data-i18n='typeOther']");
+
+  if (chipAll) chipAll.textContent = t("typeAll");
+  if (chipWebsite) chipWebsite.textContent = t("typeWebsite");
+  if (chipMobile) chipMobile.textContent = t("typeMobile");
+  if (chipApi) chipApi.textContent = t("typeApi");
+  if (chipSchool) chipSchool.textContent = t("typeSchool");
+  if (chipOther) chipOther.textContent = t("typeOther");
+
+  if (emptyEl) emptyEl.textContent = t("emptyState");
+
+  if (languageSelectEl) {
+    const first = languageSelectEl.querySelector("option[value='all']");
+    if (first) first.textContent = t("allLanguagesOption");
+  }
+}
+
+function hideLangGate() {
+  if (langGateEl) {
+    langGateEl.hidden = true;
+  }
+}
+
+function showLangGate() {
+  if (langGateEl) {
+    langGateEl.hidden = false;
+  }
+}
+
+function setLanguage(lang) {
+  if (!I18N[lang]) lang = "en";
+  currentLang = lang;
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLang);
+  applyTranslations();
+  hideLangGate();
+}
+
+function initLanguageGate() {
+  const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  if (saved && I18N[saved]) {
+    currentLang = saved;
+    applyTranslations();
+    hideLangGate();
+  } else {
+    currentLang = "en";
+    applyTranslations();
+    showLangGate();
+  }
+
+  if (langGateEl) {
+    langGateEl.addEventListener("click", (e) => {
+      if (e.target === langGateEl) {
+        setLanguage("en");
+      }
+    });
+  }
+
+  const langButtons = document.querySelectorAll(".btn-lang[data-lang]");
+  langButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      setLanguage(lang || "en");
+    });
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !langGateEl.hidden) {
+      setLanguage("en");
+    }
+  });
 }
 
 /* ---------- Cards ---------- */
@@ -465,7 +658,6 @@ function createProjectCard(project) {
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
-  // Languages (show up to 3)
   const langList = project.languages && project.languages.length
     ? project.languages
     : (project.language ? [project.language] : []);
@@ -478,7 +670,6 @@ function createProjectCard(project) {
     metaRow.appendChild(langPill);
   });
 
-  // Tags
   (project.tags || []).forEach(tag => {
     const tagPill = document.createElement("span");
     tagPill.className = "meta-pill tag-pill";
@@ -536,14 +727,13 @@ function renderProjects() {
   if (!filtered.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent = "No projects match your search/filter. Try another search term.";
+      emptyEl.textContent = t("emptyState");
     }
     return;
   }
 
   if (emptyEl) emptyEl.hidden = true;
 
-  // Sort: live sites first, then alphabetically by displayName
   filtered = filtered.slice().sort((a, b) => {
     const aLive = a.hasLiveSite && a.pagesUrl ? 1 : 0;
     const bLive = b.hasLiveSite && b.pagesUrl ? 1 : 0;
@@ -583,7 +773,7 @@ function initLanguageFilter() {
 
   const allOption = document.createElement("option");
   allOption.value = "all";
-  allOption.textContent = "All languages";
+  allOption.textContent = t("allLanguagesOption");
   languageSelectEl.appendChild(allOption);
 
   const languages = Array.from(
@@ -618,7 +808,6 @@ function getCache() {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.projects)) return null;
 
-    // Clean out self repo from cache as well
     parsed.projects = parsed.projects.filter(
       p => !isSelfProjectsRepoName(p.rawName)
     );
@@ -636,7 +825,6 @@ function saveCache(projects) {
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
   } catch {
-    // ignore
   }
 }
 
@@ -655,7 +843,6 @@ function setRateLimited() {
     const payload = { until: Date.now() + RATE_LIMIT_BACKOFF_MS };
     localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(payload));
   } catch {
-    // ignore
   }
 }
 
@@ -665,26 +852,18 @@ function canCallApiNow() {
   return Date.now() > info.until;
 }
 
-/* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
-/* logo.* has highest priority; if not found, fall back to banner/screenshot/etc. */
+/* ---------- Thumbnails ---------- */
 
 const thumbnailCandidates = [
-  // HIGH PRIORITY: logos first
   "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
-
-  // Website / app style images
   "banner.png", "banner.jpg",
   "screenshot.png", "screenshot.jpg",
   "screenshot-1.png", "screenshot-1.jpg",
   "hero.png", "hero.jpg",
   "thumbnail.png", "thumbnail.jpg",
   "cover.png", "cover.jpg",
-
-  // Icons & favicons
   "favicon.png", "favicon.jpg", "favicon.ico",
   "icon.png", "icon.jpg",
-
-  // Diagrams and model images
   "NewClassDiagram.png", "NewClassDiagram.jpg",
   "OldClassDiagram.png", "OldClassDiagram.jpg",
   "SequenceDiagram.png", "SequenceDiagram.jpg",
@@ -697,7 +876,7 @@ const thumbnailCandidates = [
 ];
 
 const thumbnailFolders = [
-  "",          // root
+  "",
   "images",
   "img",
   "media",
@@ -706,7 +885,6 @@ const thumbnailFolders = [
 ];
 
 async function findThumbnailForRepo(project) {
-  // If projects.json already defined an explicit thumbnail, leave it
   if (project.thumbnailUrl) {
     return;
   }
@@ -717,7 +895,7 @@ async function findThumbnailForRepo(project) {
       const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${path}`;
 
       try {
-        const res = await fetch(url); // GET instead of HEAD
+        const res = await fetch(url);
         if (res.ok) {
           console.log(`Found thumbnail for ${project.rawName}: ${url}`);
           project.thumbnailUrl = url;
@@ -733,7 +911,6 @@ async function findThumbnailForRepo(project) {
 }
 
 async function enhanceThumbnails() {
-  // To avoid hammering GitHub: only probe a subset per page load
   const subset = repos.slice(0, 60);
   console.log(`Enhancing thumbnails for ${subset.length} projects...`);
   const tasks = subset.map(project => findThumbnailForRepo(project));
@@ -808,14 +985,13 @@ async function loadFromProjectsJson() {
 
 async function loadRepos() {
   if (gridEl) {
-    gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects…</p>";
+    gridEl.innerHTML = `<p class='project-footer-meta'>${t("loading")}</p>`;
   }
   if (emptyEl) emptyEl.hidden = true;
 
   const cache = getCache();
   let usedCache = false;
 
-  // 1) Use cache if present
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
     repos = cache.projects.filter(p => !isSelfProjectsRepoName(p.rawName));
@@ -824,17 +1000,14 @@ async function loadRepos() {
     renderProjects();
     usedCache = true;
 
-    // Run verification and thumbnail enhancement even when cache is "fresh"
     verifyLiveSites();
     enhanceThumbnails();
 
     if (age < CACHE_TTL_MS) {
       return;
     }
-    // else: cache old, we may refresh below
   }
 
-  // 2) Respect rate-limit backoff
   if (!canCallApiNow()) {
     console.warn("Skipping GitHub API call due to recent rate-limit; using cache or fallback.");
     if (!usedCache) {
@@ -843,7 +1016,6 @@ async function loadRepos() {
     return;
   }
 
-  // 3) Try GitHub API
   try {
     const res = await fetch(API_URL);
 
@@ -879,7 +1051,6 @@ async function loadRepos() {
 
     console.log(`Fetched ${repos.length} repos from GitHub API`);
 
-    // Merge projects.json extras (thumbnails, better descriptions) if available
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
       if (fallbackRes.ok) {
@@ -923,6 +1094,7 @@ async function loadRepos() {
 
 (function init() {
   console.log("Initializing Ferran Projects page…");
+  initLanguageGate();
   initFiltersAndSearch();
   loadRepos();
 })();
