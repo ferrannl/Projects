@@ -303,6 +303,20 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
+/* Emoji variant for thumbnails */
+.project-thumb-emoji {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), rgba(5, 7, 20, 0.95));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
 .project-title-text {
   display: flex;
   flex-direction: column;
@@ -341,7 +355,7 @@ body {
   color: var(--text-muted);
   line-height: 1.3;
   display: -webkit-box;
-  -webkit-line-clamp: 3;   /* hard cap at 3 lines */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
