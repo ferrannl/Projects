@@ -47,40 +47,37 @@ const SPECIAL_WORDS = {
 function prettifyName(raw) {
   if (!raw) return "";
 
-  // Normalize separators
+  // Normalize separators first
   let s = raw.replace(/[-_.]+/g, " ");
 
-  // Split camelCase and weird capitals like IOS / iOS / IoS
+  // TEMPORARILY protect iOS so CamelCase splitting doesn't break it
+  const IOS_PLACEHOLDER = "__IOS__";
+  s = s.replace(/iOS|IOS|Ios|ioS/gi, IOS_PLACEHOLDER);
+
+  // Split camelCase and PascalCase EXCEPT the placeholder
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   s = s.replace(/\s+/g, " ").trim();
 
   let words = s.split(" ").map(w => w.trim());
 
-  // If any combination equals "ios", force it back into a single word iOS
-  const reIOS = /^i?os$/i;
-  words = words.flatMap((w, i) => {
-    if (reIOS.test(w)) return ["iOS"];
-    return [w];
-  });
+  // Now restore proper iOS style
+  words = words.map(w =>
+    w === IOS_PLACEHOLDER ? "iOS" : w
+  );
 
-  // Lowercase original words but preserve SPECIAL_WORDS and iOS
-  const lowerWords = words.map(w => w.toLowerCase());
+  // Basic dictionary corrections
+  return words
+    .map((w, i) => {
+      const lw = w.toLowerCase();
 
-  const resultWords = lowerWords.map((word, idx) => {
-    if (word === "ios") return "iOS";  // force correct Apple branding
+      if (lw === "ios") return "iOS";
+      if (SPECIAL_WORDS[lw]) return SPECIAL_WORDS[lw];
 
-    if (SPECIAL_WORDS[word]) {
-      return SPECIAL_WORDS[word];
-    }
+      if (i > 0 && SMALL_WORDS.has(lw)) return lw;
 
-    if (idx > 0 && SMALL_WORDS.has(word)) {
-      return word;
-    }
-
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  });
-
-  return resultWords.join(" ");
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
+    .join(" ");
 }
 
 function inferTypeFromGitHub(repo) {
