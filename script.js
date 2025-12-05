@@ -187,6 +187,11 @@ function mapEntryToProject(entry) {
   const extraTags = entry.tags ? entry.tags : [];
   const mergedTags = [...new Set([...tagsFromType, ...extraTags])];
 
+  let thumbnailUrl = null;
+  if (entry.thumbnailUrl && entry.thumbnailUrl.trim()) {
+    thumbnailUrl = entry.thumbnailUrl.trim();
+  }
+
   return {
     rawName: entry.name,
     displayName: prettifyName(entry.name),
@@ -199,9 +204,7 @@ function mapEntryToProject(entry) {
       : null,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: entry.thumbnailUrl && entry.thumbnailUrl.trim()
-      ? entry.thumbnailUrl.trim()
-      : null
+    thumbnailUrl
   };
 }
 
@@ -480,10 +483,12 @@ function canCallApiNow() {
 }
 
 /* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
-/* Try normal logos/screenshots first; if none, fall back to diagrams like
-   NewClassDiagram.jpg, SequenceDiagram.jpg, OldClassDiagram.jpg, etc. */
+/* logo.* has highest priority; if not found, fall back to banner/screenshot/etc. */
 
 const thumbnailCandidates = [
+  // HIGH PRIORITY: logos first
+  "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
+
   // Website / app style images
   "banner.png", "banner.jpg",
   "screenshot.png", "screenshot.jpg",
@@ -492,12 +497,11 @@ const thumbnailCandidates = [
   "thumbnail.png", "thumbnail.jpg",
   "cover.png", "cover.jpg",
 
-  // Logos & icons
-  "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
+  // Icons & favicons
   "favicon.png", "favicon.jpg", "favicon.ico",
   "icon.png", "icon.jpg",
 
-  // Diagrams and model images (fallbacks when no dedicated logo exists)
+  // Diagrams and model images
   "NewClassDiagram.png", "NewClassDiagram.jpg",
   "OldClassDiagram.png", "OldClassDiagram.jpg",
   "SequenceDiagram.png", "SequenceDiagram.jpg",
@@ -509,7 +513,6 @@ const thumbnailCandidates = [
   "model.png", "model.jpg"
 ];
 
-// Folders inside the repo we search for these files
 const thumbnailFolders = [
   "",          // root
   "images",
@@ -521,7 +524,9 @@ const thumbnailFolders = [
 
 async function findThumbnailForRepo(project) {
   // If projects.json already defined an explicit thumbnail, leave it
-  if (project.thumbnailUrl) return;
+  if (project.thumbnailUrl) {
+    return;
+  }
 
   for (const folder of thumbnailFolders) {
     for (const file of thumbnailCandidates) {
@@ -529,24 +534,25 @@ async function findThumbnailForRepo(project) {
       const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${path}`;
 
       try {
-        // HEAD is lighter than GET; GitHub supports HEAD for raw files
-        const res = await fetch(url, { method: "HEAD" });
+        const res = await fetch(url); // GET instead of HEAD
         if (res.ok) {
+          console.log(`Found thumbnail for ${project.rawName}: ${url}`);
           project.thumbnailUrl = url;
           return;
         }
-      } catch {
-        // ignore and try next candidate
+      } catch (err) {
+        console.warn(`Error checking thumbnail for ${project.rawName} at ${url}`, err);
       }
     }
   }
 
-  // If we get here, no image was found – card will show letter placeholder
+  console.log(`No thumbnail found for ${project.rawName}`);
 }
 
 async function enhanceThumbnails() {
   // To avoid hammering GitHub: only probe a subset per page load
   const subset = repos.slice(0, 60);
+  console.log(`Enhancing thumbnails for ${subset.length} projects...`);
   const tasks = subset.map(project => findThumbnailForRepo(project));
   await Promise.all(tasks);
   saveCache(repos);
@@ -591,11 +597,12 @@ async function loadRepos() {
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
     repos = cache.projects;
+    console.log("Loaded projects from cache. Age (ms):", age);
     initLanguageFilter();
     renderProjects();
     usedCache = true;
 
-    // Ensure thumbnails are enhanced even when using fresh cache
+    // Run thumbnail enhancement even when cache is "fresh"
     enhanceThumbnails();
 
     if (age < CACHE_TTL_MS) {
@@ -646,6 +653,8 @@ async function loadRepos() {
       .filter(r => !r.private)
       .map(mapRepoFromGitHub);
 
+    console.log(`Fetched ${repos.length} repos from GitHub API`);
+
     // Merge projects.json extras (thumbnails, better descriptions) if available
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
@@ -686,6 +695,7 @@ async function loadRepos() {
 /* ---------- Init ---------- */
 
 (function init() {
+  console.log("Initializing Ferran Projects page…");
   initFiltersAndSearch();
   loadRepos();
 })();
