@@ -17,57 +17,87 @@ const searchEl = document.getElementById("search");
 const languageSelectEl = document.getElementById("languageFilter");
 const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 
+// Image modal refs
+const imageModalEl = document.getElementById("imageModal");
+const imageModalImgEl = document.getElementById("imageModalImg");
+
 // --- Helpers for README summary ---
 
+function stripMarkdown(text) {
+  if (!text) return "";
+  let out = text;
+
+  // Remove images ![alt](url)
+  out = out.replace(/!\[[^\]]*]\([^)]*\)/g, "");
+
+  // Links [text](url) -> text
+  out = out.replace(/\[([^\]]+)]\([^)]*\)/g, "$1");
+
+  // Inline code `code`
+  out = out.replace(/`([^`]+)`/g, "$1");
+
+  // Bold / italic **text**, *text*, __text__, _text_
+  out = out.replace(/\*\*([^*]+)\*\*/g, "$1");
+  out = out.replace(/\*([^*]+)\*/g, "$1");
+  out = out.replace(/__([^_]+)__/g, "$1");
+  out = out.replace(/_([^_]+)_/g, "$1");
+
+  // Simple HTML tags
+  out = out.replace(/<\/?[^>]+(>|$)/g, "");
+
+  // Heading hashes (if any left)
+  out = out.replace(/#+\s*/g, "");
+
+  return out.trim();
+}
+
 /**
- * Extracts a small summary from README markdown:
- * - skips headings / badges / empty top lines
- * - takes a few content lines
- * - splits into "main" and "extra" (for faded lines)
+ * Build a short, human-readable summary from README:
+ * - skip headings / empty / badge lines
+ * - take first 2–3 content lines
+ * - strip markdown and hard-limit length
  */
-function extractSummaryFromReadme(markdown) {
+function buildShortSummaryFromReadme(markdown) {
   if (!markdown) return null;
 
   const lines = markdown.split(/\r?\n/);
-  const cleanLines = [];
+  const contentLines = [];
 
-  for (const line of lines) {
-    const trimmed = line.trim();
+  for (const raw of lines) {
+    let line = raw.trim();
+    if (!line) continue;
 
-    // Skip empty lines and heading/badge noise at top
-    if (
-      !cleanLines.length &&
-      (
-        trimmed === "" ||
-        /^#{1,6}\s/.test(trimmed) ||         // markdown headings
-        /^\[!\[/.test(trimmed) ||            // badges
-        /^!\[/.test(trimmed) ||              // images
-        /^<\!--/.test(trimmed)               // comments
-      )
-    ) {
-      continue;
-    }
+    // Skip headings, quotes, badges, comments
+    if (/^#{1,6}\s/.test(line)) continue;
+    if (/^>\s?/.test(line)) continue;
+    if (/^\[!\[/.test(line) || /^!\[/.test(line)) continue;
+    if (/^<!--/.test(line)) continue;
 
-    if (trimmed) {
-      cleanLines.push(trimmed);
-    }
-
-    // We only need a small preview
-    if (cleanLines.length >= 7) break;
+    contentLines.push(line);
+    if (contentLines.length >= 3) break;
   }
 
-  if (!cleanLines.length) return null;
+  if (!contentLines.length) return null;
 
-  const primaryLines = cleanLines.slice(0, 3);   // fully visible
-  const extraLines   = cleanLines.slice(3, 5);   // faded, clickable
-  const main = primaryLines.join(" ");
-  const extra = extraLines.join(" ");
-  const fullPreview = cleanLines.join(" ");
+  let text = contentLines.join(" ");
+  text = stripMarkdown(text);
+  if (!text) return null;
 
-  return { main, extra, fullPreview };
+  const maxLen = 220; // keep this short
+  if (text.length > maxLen) {
+    text = text.slice(0, maxLen - 1);
+    const lastSpace = text.lastIndexOf(" ");
+    if (lastSpace > 60) {
+      text = text.slice(0, lastSpace);
+    }
+    text += "…";
+  }
+
+  return text;
 }
 
 // --- Type inference for each repo ---
+
 function inferType(repo) {
   const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
@@ -148,15 +178,17 @@ function mapRepo(repo) {
       ? `https://${GITHUB_USER}.github.io/${repo.name}/`
       : null,
 
-    // description-related fields
-    baseDescription: baseDesc,        // raw fallback
-    descriptionMain: baseDesc,        // main visible summary
-    descriptionExtra: "",             // faded “extra lines”
-    fullReadme: "",                   // first chunk from README
+    // description / summary fields
+    baseDescription: baseDesc,
+    summary: baseDesc,     // will be replaced by README summary if possible
+
+    // thumbnail image url (class diagram etc.)
+    thumbnailUrl: null
   };
 }
 
 // --- Filtering logic ---
+
 function matchesFilters(project) {
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) {
     return false;
@@ -169,8 +201,7 @@ function matchesFilters(project) {
   if (state.search) {
     const haystack = [
       project.name,
-      project.descriptionMain,
-      project.descriptionExtra,
+      project.summary,
       project.language,
       project.type,
       ...(project.tags || [])
@@ -184,7 +215,28 @@ function matchesFilters(project) {
   return true;
 }
 
-// --- Card creation with README-based summary ---
+// --- Image modal helpers ---
+
+function openImageModal(url, alt) {
+  if (!imageModalEl || !imageModalImgEl) return;
+  imageModalImgEl.src = url;
+  imageModalImgEl.alt = alt || "";
+  imageModalEl.hidden = false;
+}
+
+function closeImageModal() {
+  if (!imageModalEl || !imageModalImgEl) return;
+  imageModalImgEl.src = "";
+  imageModalImgEl.alt = "";
+  imageModalEl.hidden = true;
+}
+
+if (imageModalEl) {
+  imageModalEl.addEventListener("click", closeImageModal);
+}
+
+// --- Card creation (short summary + optional thumbnail) ---
+
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -192,6 +244,25 @@ function createProjectCard(project) {
   // Title row
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
+
+  // Optional thumbnail (class diagram / uml image)
+  if (project.thumbnailUrl) {
+    const thumbBtn = document.createElement("button");
+    thumbBtn.className = "project-thumb";
+    thumbBtn.type = "button";
+
+    const thumbImg = document.createElement("img");
+    thumbImg.src = project.thumbnailUrl;
+    thumbImg.alt = `${project.name} thumbnail`;
+    thumbBtn.appendChild(thumbImg);
+
+    thumbBtn.addEventListener("click", () => openImageModal(project.thumbnailUrl, project.name));
+
+    titleRow.appendChild(thumbBtn);
+  }
+
+  const titleBlock = document.createElement("div");
+  titleBlock.className = "project-title-text";
 
   const nameEl = document.createElement("h2");
   nameEl.className = "project-name";
@@ -201,72 +272,19 @@ function createProjectCard(project) {
   typePill.className = "project-type-pill";
   typePill.textContent = getTypeLabel(project.type);
 
-  titleRow.appendChild(nameEl);
-  titleRow.appendChild(typePill);
+  titleBlock.appendChild(nameEl);
+  titleBlock.appendChild(typePill);
 
-  // DESCRIPTION WRAPPER
+  titleRow.appendChild(titleBlock);
+
+  // DESCRIPTION – just a tiny summary, no crazy stuff
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
-  const mainText = project.descriptionMain || project.baseDescription || "";
-  const extraText = project.descriptionExtra || "";
-
-  const descMainEl = document.createElement("p");
-  descMainEl.className = "project-description-main";
-  descMainEl.textContent = mainText;
-  descWrapper.appendChild(descMainEl);
-
-  let extraEl = null;
-  if (extraText) {
-    extraEl = document.createElement("p");
-    extraEl.className = "project-description-extra";
-    extraEl.textContent = extraText;
-    descWrapper.appendChild(extraEl);
-  }
-
-  // Collapsible logic: only for repos where we actually have a fullReadme
-  const longEnough = project.fullReadme && project.fullReadme.length > 280;
-
-  if (longEnough) {
-    descWrapper.classList.add("is-collapsible", "is-collapsed");
-
-    const toggleBtn = document.createElement("span");
-    toggleBtn.className = "show-more-btn";
-    toggleBtn.textContent = "Show full README";
-
-    const handleToggle = () => {
-      const isCurrentlyCollapsed = descWrapper.classList.contains("is-collapsed");
-      if (isCurrentlyCollapsed) {
-        // Expand – show a bigger chunk of the README
-        const expandedText = project.fullReadme.slice(0, 1600); // still capped
-        descMainEl.textContent = expandedText;
-        if (extraEl) {
-          extraEl.style.display = "none";
-        }
-        descWrapper.classList.remove("is-collapsed");
-        descWrapper.classList.add("is-expanded");
-        toggleBtn.textContent = "Show less";
-      } else {
-        // Collapse – go back to small summary (main + faded extra)
-        descMainEl.textContent = mainText;
-        if (extraEl) {
-          extraEl.style.display = "";
-        }
-        descWrapper.classList.remove("is-expanded");
-        descWrapper.classList.add("is-collapsed");
-        toggleBtn.textContent = "Show full README";
-      }
-    };
-
-    toggleBtn.addEventListener("click", handleToggle);
-
-    // Clicking the faded lines also expands
-    if (extraEl) {
-      extraEl.addEventListener("click", handleToggle);
-    }
-
-    descWrapper.appendChild(toggleBtn);
-  }
+  const descEl = document.createElement("p");
+  descEl.className = "project-description";
+  descEl.textContent = project.summary;
+  descWrapper.appendChild(descEl);
 
   // Meta row
   const metaRow = document.createElement("div");
@@ -328,6 +346,7 @@ function createProjectCard(project) {
 }
 
 // --- Rendering ---
+
 function renderProjects() {
   if (!gridEl) return;
 
@@ -352,6 +371,7 @@ function renderProjects() {
 }
 
 // --- UI setup ---
+
 function initFiltersAndSearch() {
   // Type chips
   typeChips.forEach(chip => {
@@ -399,33 +419,68 @@ function initLanguageFilter() {
   });
 }
 
-// --- Enrich repos with README summaries ---
+// --- Enrich summaries from README ---
+
 async function enhanceDescriptionsFromReadme() {
   const tasks = repos.map(async (project) => {
     try {
       const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.name}/HEAD/README.md`;
       const res = await fetch(url);
-      if (!res.ok) return; // no README, just keep base description
+      if (!res.ok) return; // no README
 
       const text = await res.text();
-      const summary = extractSummaryFromReadme(text);
-      if (!summary) return;
-
-      project.fullReadme = summary.fullPreview;
-      project.descriptionMain = summary.main || project.baseDescription;
-      project.descriptionExtra = summary.extra || "";
+      const summary = buildShortSummaryFromReadme(text);
+      if (summary) {
+        project.summary = summary;
+      }
     } catch (e) {
       console.error("README fetch failed for", project.name, e);
     }
   });
 
   await Promise.all(tasks);
+  renderProjects();
+}
 
-  // After all summaries are fetched, re-render with nicer descriptions
+// --- Find thumbnails (class diagrams) in repo root ---
+
+async function findThumbnailForRepo(project) {
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${project.name}/contents/`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+
+    const items = await res.json();
+    if (!Array.isArray(items)) return;
+
+    const candidates = items.filter(item => {
+      if (item.type !== "file") return false;
+      const lower = item.name.toLowerCase();
+      const isImage = /\.(png|jpe?g|gif|webp|svg)$/.test(lower);
+      const looksLikeDiagram = /(class|diagram|uml|arch|architecture)/.test(lower);
+      return isImage && looksLikeDiagram;
+    });
+
+    if (!candidates.length) return;
+
+    const pick = candidates[0];
+    const urlToUse = pick.download_url ||
+      `https://raw.githubusercontent.com/${GITHUB_USER}/${project.name}/HEAD/${pick.path}`;
+
+    project.thumbnailUrl = urlToUse;
+  } catch (e) {
+    console.error("Thumbnail fetch failed for", project.name, e);
+  }
+}
+
+async function enhanceThumbnails() {
+  const tasks = repos.map((project) => findThumbnailForRepo(project));
+  await Promise.all(tasks);
   renderProjects();
 }
 
 // --- Load repos from GitHub ---
+
 async function loadRepos() {
   if (gridEl) {
     gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects from GitHub…</p>";
@@ -444,10 +499,11 @@ async function loadRepos() {
       .map(mapRepo);
 
     initLanguageFilter();
-    // Initial render with plain descriptions
     renderProjects();
-    // Then upgrade descriptions using README summaries
+
+    // then improve summaries + thumbnails in background
     enhanceDescriptionsFromReadme().catch(console.error);
+    enhanceThumbnails().catch(console.error);
   } catch (err) {
     console.error(err);
     if (gridEl) {
