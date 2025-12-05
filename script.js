@@ -6,17 +6,16 @@ const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
 const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
 const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
-const LANGUAGE_STORAGE_KEY = "ferranProjectsLang";
-const DOB_ISO = "1999-08-15";
+const LANG_STORAGE_KEY = "ferranProjectsUILang";
 
 let repos = [];
+let currentLang = "en";
+
 const state = {
   search: "",
   typeFilter: "all",
   languageFilter: "all"
 };
-
-let currentLang = "en";
 
 const gridEl = document.getElementById("projectsGrid");
 const emptyEl = document.getElementById("emptyState");
@@ -26,6 +25,7 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
+
 const langGateEl = document.getElementById("langGate");
 const uiLangSwitcherEl = document.getElementById("uiLangSwitcher");
 
@@ -48,116 +48,177 @@ const SPECIAL_WORDS = {
   ux: "UX"
 };
 
-/* ---------- Translations ---------- */
+/* ---------- i18n definitions ---------- */
 
 const I18N = {
   en: {
     subtitle: "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
     filterTypeLabel: "Type",
-    filterLanguageLabel: "Language",
     typeAll: "All",
     typeWebsite: "Websites",
     typeMobile: "Mobile",
     typeApi: "APIs / Backend",
     typeSchool: "School / Study",
     typeOther: "Other",
-    allLanguagesOption: "All languages",
-    searchPlaceholder: "Search by name, description, language or tag…",
+    filterLanguageLabel: "Language",
     emptyState: "No projects match your search/filter. Try another search term.",
     footerBuiltWith: "Built with ♥ by Ferran",
     footerViewOnPages: "View this site on GitHub Pages",
-    loading: "Loading projects…"
+    searchPlaceholder: "Search by name, description, language or tag…"
   },
   nl: {
-    subtitle: "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolprojecten, handleidingen, API’s en meer.",
+    subtitle: "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolwerk, handleidingen, API’s en meer.",
     filterTypeLabel: "Type",
-    filterLanguageLabel: "Taal",
     typeAll: "Alles",
     typeWebsite: "Websites",
     typeMobile: "Mobiel",
     typeApi: "API’s / Backend",
     typeSchool: "School / Studie",
     typeOther: "Overig",
-    allLanguagesOption: "Alle talen",
-    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
-    emptyState: "Geen projecten gevonden voor deze zoekopdracht of filters.",
+    filterLanguageLabel: "Taal",
+    emptyState: "Geen projecten gevonden voor deze zoekopdracht of filters. Probeer iets anders.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
     footerViewOnPages: "Bekijk deze site op GitHub Pages",
-    loading: "Projecten laden…"
+    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…"
   },
   de: {
-    subtitle: "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienarbeiten, Guides, APIs und mehr.",
+    subtitle: "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
     filterTypeLabel: "Typ",
-    filterLanguageLabel: "Sprache",
     typeAll: "Alle",
     typeWebsite: "Websites",
     typeMobile: "Mobile",
     typeApi: "APIs / Backend",
     typeSchool: "Schule / Studium",
     typeOther: "Sonstiges",
-    allLanguagesOption: "Alle Sprachen",
-    searchPlaceholder: "Suche nach Name, Beschreibung, Sprache oder Tag…",
-    emptyState: "Keine Projekte für diese Suche/Filter gefunden.",
-    footerBuiltWith: "Mit ♥ erstellt von Ferran",
+    filterLanguageLabel: "Sprache",
+    emptyState: "Keine Projekte passen zu Suche oder Filtern. Bitte etwas anderes ausprobieren.",
+    footerBuiltWith: "Mit ♥ gebaut von Ferran",
     footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
-    loading: "Projekte werden geladen…"
+    searchPlaceholder: "Nach Name, Beschreibung, Sprache oder Tag suchen…"
   },
   pl: {
     subtitle: "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
     filterTypeLabel: "Typ",
-    filterLanguageLabel: "Język",
     typeAll: "Wszystko",
     typeWebsite: "Strony WWW",
-    typeMobile: "Mobilne",
+    typeMobile: "Mobile",
     typeApi: "API / Backend",
-    typeSchool: "Szkoła / Studia",
+    typeSchool: "Szkoła / studia",
     typeOther: "Inne",
-    allLanguagesOption: "Wszystkie języki",
-    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
-    emptyState: "Brak projektów pasujących do wyszukiwania/filtrów.",
+    filterLanguageLabel: "Język",
+    emptyState: "Brak projektów spełniających kryteria wyszukiwania/filtrów. Spróbuj innego hasła.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
     footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
-    loading: "Ładowanie projektów…"
+    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…"
   },
   tr: {
-    subtitle: "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
+    subtitle: "Tüm yazılım ve kod projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
     filterTypeLabel: "Tür",
-    filterLanguageLabel: "Dil",
     typeAll: "Hepsi",
     typeWebsite: "Web siteleri",
     typeMobile: "Mobil",
     typeApi: "API / Backend",
-    typeSchool: "Okul / Çalışma",
+    typeSchool: "Okul / eğitim",
     typeOther: "Diğer",
-    allLanguagesOption: "Tüm diller",
-    searchPlaceholder: "Ada, açıklamaya, dile veya etikete göre ara…",
-    emptyState: "Arama/filtre için eşleşen proje bulunamadı.",
-    footerBuiltWith: "Ferran tarafından ♥ ile geliştirildi",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde gör",
-    loading: "Projeler yükleniyor…"
+    filterLanguageLabel: "Dil",
+    emptyState: "Arama veya filtrelere uyan proje bulunamadı. Lütfen başka bir şey deneyin.",
+    footerBuiltWith: "Ferran tarafından ♥ ile hazırlandı",
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
+    searchPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…"
   },
   es: {
-    subtitle: "Todos mis proyectos de programación en un solo lugar: sitios web, apps, trabajos de estudio, guías, APIs y más.",
+    subtitle: "Todos mis proyectos de programación y código en un solo lugar: sitios web, apps, trabajos de estudio, guías, APIs y más.",
     filterTypeLabel: "Tipo",
-    filterLanguageLabel: "Idioma",
     typeAll: "Todo",
     typeWebsite: "Sitios web",
     typeMobile: "Móvil",
     typeApi: "APIs / Backend",
-    typeSchool: "Escuela / Estudio",
-    typeOther: "Otro",
-    allLanguagesOption: "Todos los idiomas",
-    searchPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…",
-    emptyState: "No hay proyectos que coincidan con tu búsqueda/filtros.",
+    typeSchool: "Escuela / estudios",
+    typeOther: "Otros",
+    filterLanguageLabel: "Idioma",
+    emptyState: "Ningún proyecto coincide con tu búsqueda o filtros. Prueba con otro término.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
     footerViewOnPages: "Ver este sitio en GitHub Pages",
-    loading: "Cargando proyectos…"
+    searchPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…"
   }
 };
 
-function t(key) {
-  const pack = I18N[currentLang] || I18N.en;
-  return pack[key] || I18N.en[key] || "";
+function getI18n(key) {
+  const dict = I18N[currentLang] || I18N.en;
+  return dict[key] || I18N.en[key] || "";
+}
+
+function applyTranslations(lang) {
+  const dict = I18N[lang] || I18N.en;
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) {
+      el.textContent = dict[key];
+    }
+  });
+
+  if (searchEl && dict.searchPlaceholder) {
+    searchEl.placeholder = dict.searchPlaceholder;
+  }
+
+  if (emptyEl && dict.emptyState) {
+    emptyEl.textContent = dict.emptyState;
+  }
+}
+
+function setLanguage(lang) {
+  const code = I18N[lang] ? lang : "en";
+  currentLang = code;
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, code);
+  } catch {
+    // ignore
+  }
+  if (uiLangSwitcherEl) {
+    uiLangSwitcherEl.value = code;
+  }
+  applyTranslations(code);
+}
+
+function initLanguageUi() {
+  let stored = "en";
+  try {
+    const raw = localStorage.getItem(LANG_STORAGE_KEY);
+    if (raw && I18N[raw]) {
+      stored = raw;
+    }
+  } catch {
+    stored = "en";
+  }
+
+  const hasStored = !!stored;
+  currentLang = stored;
+  applyTranslations(currentLang);
+
+  if (uiLangSwitcherEl) {
+    uiLangSwitcherEl.value = currentLang;
+    uiLangSwitcherEl.addEventListener("change", () => {
+      const val = uiLangSwitcherEl.value || "en";
+      setLanguage(val);
+    });
+  }
+
+  const langButtons = document.querySelectorAll(".btn-lang");
+  langButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang") || "en";
+      setLanguage(lang);
+      if (langGateEl) {
+        langGateEl.hidden = true;
+      }
+    });
+  });
+
+  if (langGateEl) {
+    // Show gate only if we didn't store a language before
+    langGateEl.hidden = !!stored;
+  }
 }
 
 /* ---------- Helpers ---------- */
@@ -169,20 +230,25 @@ function isSelfProjectsRepoName(name) {
 function prettifyName(raw) {
   if (!raw) return "";
 
+  // Normalize separators first
   let s = raw.replace(/[-_.]+/g, " ");
 
+  // TEMPORARILY protect iOS so CamelCase splitting doesn't break it
   const IOS_PLACEHOLDER = "__IOS__";
   s = s.replace(/iOS|IOS|Ios|ioS/gi, IOS_PLACEHOLDER);
 
+  // Split camelCase and PascalCase EXCEPT the placeholder
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   s = s.replace(/\s+/g, " ").trim();
 
   let words = s.split(" ").map(w => w.trim());
 
+  // Now restore proper iOS style
   words = words.map(w =>
     w === IOS_PLACEHOLDER ? "iOS" : w
   );
 
+  // Basic dictionary corrections
   return words
     .map((w, i) => {
       const lw = w.toLowerCase();
@@ -197,29 +263,13 @@ function prettifyName(raw) {
     .join(" ");
 }
 
-function looksLikeSchool(text) {
-  const t = (text || "").toLowerCase();
-  return (
-    t.includes("assignment") ||
-    t.includes("school") ||
-    t.includes("studie") ||
-    t.includes("study") ||
-    (t.includes("project") && t.includes("school")) ||
-    t.includes("hbo-ict") ||
-    t.includes("hbo ict") ||
-    t.includes("avans") ||
-    t.includes("cppls") ||
-    t.includes("devops") ||
-    t.includes("minor")
-  );
-}
-
 function inferTypeFromGitHub(repo) {
   const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  if (looksLikeSchool(`${name} ${desc}`)) return "school";
+  if (repo.has_pages) return "website";
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
 
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
@@ -228,8 +278,14 @@ function inferTypeFromGitHub(repo) {
 
   if (name.includes("api") || desc.includes("api")) return "api";
 
-  if (repo.has_pages) return "website";
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
+  if (
+    desc.includes("assignment") ||
+    desc.includes("project") ||
+    desc.includes("internship") ||
+    desc.includes("final") ||
+    desc.includes("cppls") ||
+    desc.includes("devops")
+  ) return "school";
 
   return "other";
 }
@@ -240,7 +296,7 @@ function inferTypeFromEntry(entry) {
   const name = (entry.name || "").toLowerCase();
   const desc = (entry.description || "").toLowerCase();
 
-  if (looksLikeSchool(`${name} ${desc}`)) return "school";
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
 
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
@@ -249,7 +305,14 @@ function inferTypeFromEntry(entry) {
 
   if (name.includes("api") || desc.includes("api")) return "api";
 
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
+  if (
+    desc.includes("assignment") ||
+    desc.includes("project") ||
+    desc.includes("internship") ||
+    desc.includes("final") ||
+    desc.includes("cppls") ||
+    desc.includes("devops")
+  ) return "school";
 
   return "other";
 }
@@ -264,122 +327,64 @@ function getTypeLabel(type) {
   }
 }
 
-function buildTagsBase(type, primaryLang) {
+function buildTagsBase(type, language) {
   const tags = [];
-  const langLower = (primaryLang || "").toLowerCase();
-  const isWebLang = ["html", "css", "javascript", "typescript", "php"].includes(langLower);
+  const langLower = (language || "").toLowerCase();
 
   if (type === "website") tags.push("web");
   if (type === "mobile")  tags.push("mobile");
   if (type === "api")     tags.push("api");
   if (type === "school") {
     tags.push("school");
-    if (isWebLang && !tags.includes("web")) tags.push("web");
+    if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
+      tags.push("web");
+    }
   }
 
-  if (isWebLang) {
-    if (!tags.includes("web")) tags.push("web");
-    tags.push("frontend");
-  }
-
-  if (langLower === "c#") {
-    tags.push("csharp", "dotnet");
-  }
-
-  if (langLower === "c++") {
-    tags.push("cpp");
-  }
-
-  if (langLower === "java") {
-    tags.push("java");
-  }
-
-  if (langLower === "php") {
-    tags.push("backend");
-  }
-
-  if (langLower === "python") {
-    tags.push("python");
-  }
-
-  const unique = [...new Set(tags)];
-  return unique.slice(0, 6);
+  return tags;
 }
 
+/**
+ * Compute language array based on primary language, type and name/description.
+ * Returns an array with primary language first, up to 3 total.
+ */
 function computeLanguages(primaryLang, rawName, desc, type) {
   const langs = [];
   const main = primaryLang || "Various";
-  const text = `${rawName || ""} ${desc || ""}`.toLowerCase();
+  const nameL = (rawName || "").toLowerCase();
+  const descL = (desc || "").toLowerCase();
   const typeL = (type || "").toLowerCase();
 
-  function add(lang) {
-    if (!lang || !lang.trim()) return;
-    if (!langs.includes(lang)) langs.push(lang);
-  }
-
   if (!main || main === "Various") {
-    add(main);
+    langs.push(main);
     return langs;
   }
 
   const l = main.toLowerCase();
 
   if (l === "html") {
-    add("HTML");
-    add("CSS");
-    add("JavaScript");
+    langs.push("HTML", "CSS", "JavaScript");
   } else if (l === "css") {
-    add("CSS");
-    add("HTML");
-    add("JavaScript");
+    langs.push("CSS", "HTML", "JavaScript");
   } else if (l === "javascript") {
-    add("JavaScript");
-    if (typeL === "website" || typeL === "school" || text.includes("html") || text.includes("css")) {
-      add("HTML");
-      add("CSS");
+    if (typeL === "website") {
+      langs.push("JavaScript", "HTML", "CSS");
+    } else {
+      langs.push("JavaScript");
     }
   } else if (l === "typescript") {
-    add("TypeScript");
-    add("JavaScript");
-    if (typeL === "website" || typeL === "school" || text.includes("html") || text.includes("css")) {
-      add("HTML");
-      add("CSS");
-    }
-  } else if (l === "php") {
-    add("PHP");
-    if (typeL === "website" || typeL === "school" || text.includes("html")) {
-      add("HTML");
-      add("CSS");
-    }
+    langs.push("TypeScript", "JavaScript");
   } else if (l === "c++") {
-    add("C++");
-    add("C");
+    langs.push("C++", "C");
   } else if (l === "c#") {
-    add("C#");
-    if (text.includes("asp.net")) {
-      add("ASP.NET");
+    langs.push("C#");
+    if (descL.includes("asp.net") || nameL.includes("asp.net")) {
+      langs.push("ASP.NET");
     } else {
-      add(".NET");
+      langs.push(".NET");
     }
   } else {
-    add(main);
-  }
-
-  if (langs.length < 3) {
-    if (text.includes("asp.net") && !langs.includes("ASP.NET")) {
-      add("ASP.NET");
-    } else if (text.includes(".net") && !langs.includes(".NET") && !langs.includes("ASP.NET")) {
-      add(".NET");
-    }
-  }
-
-  if (langs.length < 3 && (text.includes("html") || text.includes("css"))) {
-    if (!langs.includes("HTML")) add("HTML");
-    if (!langs.includes("CSS") && langs.length < 3) add("CSS");
-  }
-
-  if (langs.length < 3 && text.includes("javascript") && !langs.includes("JavaScript")) {
-    add("JavaScript");
+    langs.push(main);
   }
 
   const unique = [...new Set(langs)];
@@ -407,10 +412,10 @@ function mapRepoFromGitHub(repo) {
     tags: buildTagsBase(type, primaryLang),
     githubUrl: repo.html_url,
     pagesUrl,
-    hasLiveSite: !!pagesUrl,
+    hasLiveSite: !!pagesUrl, // will be verified later
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null
+    thumbnailUrl: null  // may be filled from projects.json or auto-detect
   };
 }
 
@@ -443,21 +448,21 @@ function mapEntryToProject(entry) {
     language: languages[0] || "Various",
     languages,
     type,
-    tags: mergedTags.slice(0, 8),
+    tags: mergedTags,
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
     pagesUrl,
-    hasLiveSite: !!pagesUrl,
+    hasLiveSite: !!pagesUrl, // will be verified later
     baseDescription: baseDesc,
     summary: baseDesc,
     thumbnailUrl
   };
 }
 
-/* ---------- Filters / search ---------- */
+/* ---------- Filter / search ---------- */
 
 function matchesFilters(project) {
   const rawName = project.rawName || "";
-  if (isSelfProjectsRepoName(rawName)) return false;
+  if (isSelfProjectsRepoName(rawName)) return false; // never show self repo
 
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
 
@@ -504,128 +509,6 @@ function closeImageModal() {
 
 if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
-}
-
-/* ---------- Age helper ---------- */
-
-function updateAge() {
-  const el = document.getElementById("ageValue");
-  if (!el) return;
-  const today = new Date();
-  const dob = new Date(`${DOB_ISO}T00:00:00`);
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  el.textContent = age.toString();
-}
-
-/* ---------- Language gate + i18n ---------- */
-
-function applyTranslations() {
-  const subtitleEl = document.querySelector("[data-i18n='subtitle']");
-  const typeLabelEl = document.querySelector("[data-i18n='filterTypeLabel']");
-  const langLabelEl = document.querySelector("[data-i18n='filterLanguageLabel']");
-  const footerBuiltEl = document.querySelector("[data-i18n='footerBuiltWith']");
-  const footerViewEl = document.querySelector("[data-i18n='footerViewOnPages']");
-
-  if (subtitleEl) subtitleEl.textContent = t("subtitle");
-  if (typeLabelEl) typeLabelEl.textContent = t("filterTypeLabel");
-  if (langLabelEl) langLabelEl.textContent = t("filterLanguageLabel");
-  if (footerBuiltEl) footerBuiltEl.textContent = t("footerBuiltWith");
-  if (footerViewEl) footerViewEl.textContent = t("footerViewOnPages");
-
-  if (searchEl) searchEl.placeholder = t("searchPlaceholder");
-
-  const chipAll = document.querySelector("[data-i18n='typeAll']");
-  const chipWebsite = document.querySelector("[data-i18n='typeWebsite']");
-  const chipMobile = document.querySelector("[data-i18n='typeMobile']");
-  const chipApi = document.querySelector("[data-i18n='typeApi']");
-  const chipSchool = document.querySelector("[data-i18n='typeSchool']");
-  const chipOther = document.querySelector("[data-i18n='typeOther']");
-
-  if (chipAll) chipAll.textContent = t("typeAll");
-  if (chipWebsite) chipWebsite.textContent = t("typeWebsite");
-  if (chipMobile) chipMobile.textContent = t("typeMobile");
-  if (chipApi) chipApi.textContent = t("typeApi");
-  if (chipSchool) chipSchool.textContent = t("typeSchool");
-  if (chipOther) chipOther.textContent = t("typeOther");
-
-  if (emptyEl) emptyEl.textContent = t("emptyState");
-
-  if (languageSelectEl) {
-    const first = languageSelectEl.querySelector("option[value='all']");
-    if (first) first.textContent = t("allLanguagesOption");
-  }
-
-  if (uiLangSwitcherEl) {
-    uiLangSwitcherEl.value = currentLang;
-  }
-}
-
-function hideLangGate() {
-  if (langGateEl) {
-    langGateEl.hidden = true;
-  }
-}
-
-function showLangGate() {
-  if (langGateEl) {
-    langGateEl.hidden = false;
-  }
-}
-
-function setLanguage(lang) {
-  if (!I18N[lang]) lang = "en";
-  currentLang = lang;
-  localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLang);
-  applyTranslations();
-  hideLangGate();
-}
-
-function initLanguageGate() {
-  const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  if (saved && I18N[saved]) {
-    currentLang = saved;
-    applyTranslations();
-    hideLangGate();
-  } else {
-    currentLang = "en";
-    applyTranslations();
-    showLangGate();
-  }
-
-  if (langGateEl) {
-    langGateEl.addEventListener("click", (e) => {
-      if (e.target === langGateEl) {
-        setLanguage("en");
-      }
-    });
-  }
-
-  const langButtons = document.querySelectorAll(".btn-lang[data-lang]");
-  langButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const lang = btn.getAttribute("data-lang");
-      setLanguage(lang || "en");
-    });
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !langGateEl.hidden) {
-      setLanguage("en");
-    }
-  });
-}
-
-function initLanguageSwitcher() {
-  if (!uiLangSwitcherEl) return;
-  uiLangSwitcherEl.value = currentLang;
-  uiLangSwitcherEl.addEventListener("change", () => {
-    const lang = uiLangSwitcherEl.value || "en";
-    setLanguage(lang);
-  });
 }
 
 /* ---------- Cards ---------- */
@@ -757,7 +640,7 @@ function renderProjects() {
   if (!filtered.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent = t("emptyState");
+      emptyEl.textContent = getI18n("emptyState");
     }
     return;
   }
@@ -803,7 +686,7 @@ function initLanguageFilter() {
 
   const allOption = document.createElement("option");
   allOption.value = "all";
-  allOption.textContent = t("allLanguagesOption");
+  allOption.textContent = "All languages";
   languageSelectEl.appendChild(allOption);
 
   const languages = Array.from(
@@ -855,6 +738,7 @@ function saveCache(projects) {
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
   } catch {
+    // ignore
   }
 }
 
@@ -873,6 +757,7 @@ function setRateLimited() {
     const payload = { until: Date.now() + RATE_LIMIT_BACKOFF_MS };
     localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(payload));
   } catch {
+    // ignore
   }
 }
 
@@ -882,7 +767,7 @@ function canCallApiNow() {
   return Date.now() > info.until;
 }
 
-/* ---------- Thumbnails ---------- */
+/* ---------- Thumbnail autodetect ---------- */
 
 const thumbnailCandidates = [
   "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
@@ -1006,7 +891,7 @@ async function loadFromProjectsJson() {
     if (emptyEl) {
       emptyEl.hidden = false;
       emptyEl.textContent =
-        "Could not load project list (GitHub API and projects.json both failed).";
+        getI18n("emptyState") || "Could not load project list (GitHub API and projects.json both failed).";
     }
   }
 }
@@ -1015,7 +900,7 @@ async function loadFromProjectsJson() {
 
 async function loadRepos() {
   if (gridEl) {
-    gridEl.innerHTML = `<p class='project-footer-meta'>${t("loading")}</p>`;
+    gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects…</p>";
   }
   if (emptyEl) emptyEl.hidden = true;
 
@@ -1124,9 +1009,7 @@ async function loadRepos() {
 
 (function init() {
   console.log("Initializing Ferran Projects page…");
-  updateAge();
-  initLanguageGate();
-  initLanguageSwitcher();
+  initLanguageUi();
   initFiltersAndSearch();
   loadRepos();
 })();
