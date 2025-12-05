@@ -88,10 +88,20 @@ body {
 }
 
 .site-subtitle {
-  margin: 0.45rem 0 0;
+  margin: 0.45rem 0 0.4rem;
   max-width: 32rem;
   color: var(--text-muted);
   font-size: 0.95rem;
+}
+
+/* Small intro about Ferran */
+
+.site-intro {
+  margin: 0.1rem 0 0;
+  max-width: 38rem;
+  font-size: 0.8rem;
+  color: rgba(200, 203, 230, 0.85);
+  line-height: 1.4;
 }
 
 .header-actions {
@@ -100,6 +110,35 @@ body {
   gap: 0.75rem;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+/* Language switcher in header */
+
+.header-lang-switcher {
+  order: 10;
+}
+
+.header-lang-switcher select {
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(7, 10, 28, 0.95);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast),
+              background var(--transition-fast);
+}
+
+.header-lang-switcher select:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(10, 14, 34, 0.98);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75);
 }
 
 /* Social links (including GitHub) */
