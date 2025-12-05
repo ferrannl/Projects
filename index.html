@@ -88,16 +88,45 @@
     </div>
 
     <div class="header-actions">
-      <!-- Language switcher in header -->
-      <div class="header-lang-switcher" aria-label="Change interface language">
-        <select id="uiLangSwitcher" aria-label="Interface language">
-          <option value="en">🌐 🇬🇧 English</option>
-          <option value="nl">🌐 🇳🇱 Nederlands</option>
-          <option value="de">🌐 🇩🇪 Deutsch</option>
-          <option value="pl">🌐 🇵🇱 Polski</option>
-          <option value="tr">🌐 🇹🇷 Türkçe</option>
-          <option value="es">🌐 🇪🇸 Español</option>
-        </select>
+      <!-- Custom language switcher -->
+      <div class="header-lang-switcher" id="uiLangSwitcherRoot">
+        <button
+          type="button"
+          class="lang-switch-btn"
+          id="uiLangButton"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+        >
+          <span class="lang-btn-icon" aria-hidden="true">🌐</span>
+          <span class="lang-btn-label" id="uiLangLabel">English</span>
+        </button>
+
+        <ul class="lang-options" id="uiLangList" role="listbox">
+          <li class="lang-option" data-lang="en" role="option" aria-selected="true">
+            <span class="flag">🇬🇧</span>
+            <span class="lang-name">English</span>
+          </li>
+          <li class="lang-option" data-lang="nl" role="option" aria-selected="false">
+            <span class="flag">🇳🇱</span>
+            <span class="lang-name">Nederlands</span>
+          </li>
+          <li class="lang-option" data-lang="de" role="option" aria-selected="false">
+            <span class="flag">🇩🇪</span>
+            <span class="lang-name">Deutsch</span>
+          </li>
+          <li class="lang-option" data-lang="pl" role="option" aria-selected="false">
+            <span class="flag">🇵🇱</span>
+            <span class="lang-name">Polski</span>
+          </li>
+          <li class="lang-option" data-lang="tr" role="option" aria-selected="false">
+            <span class="flag">🇹🇷</span>
+            <span class="lang-name">Türkçe</span>
+          </li>
+          <li class="lang-option" data-lang="es" role="option" aria-selected="false">
+            <span class="flag">🇪🇸</span>
+            <span class="lang-name">Español</span>
+          </li>
+        </ul>
       </div>
 
       <a class="social-chip social-github" href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
