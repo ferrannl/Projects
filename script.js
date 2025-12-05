@@ -483,85 +483,74 @@ function canCallApiNow() {
 }
 
 /* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
+/* Try normal logos/screenshots first; if none, fall back to diagrams like
+   NewClassDiagram.jpg, SequenceDiagram.jpg, OldClassDiagram.jpg, etc. */
 
-function getThumbnailCandidates(project) {
-  // Root-level usual suspects
-  const base = [
-    "logo.png",
-    "logo.jpg",
-    "logo.jpeg",
-    "logo.svg",
-    "favicon.png",
-    "favicon.ico",
-    "banner.png",
-    "banner.jpg",
-    "hero.png",
-    "hero.jpg",
-    "screenshot.png",
-    "screenshot.jpg",
-    "class-diagram.png",
-    "class-diagram.jpg",
-    "diagram.png",
-    "diagram.jpg",
-    "uml.png",
-    "uml.jpg",
-    "model.png",
-    "model.jpg"
-  ];
+const thumbnailCandidates = [
+  // Website / app style images
+  "banner.png", "banner.jpg",
+  "screenshot.png", "screenshot.jpg",
+  "screenshot-1.png", "screenshot-1.jpg",
+  "hero.png", "hero.jpg",
+  "thumbnail.png", "thumbnail.jpg",
+  "cover.png", "cover.jpg",
 
-  // Common subfolders
-  const nested = [
-    "images/logo.png",
-    "images/logo.jpg",
-    "images/logo.jpeg",
-    "images/favicon.png",
-    "images/favicon.ico",
-    "images/class-diagram.png",
-    "images/diagram.png",
-    "images/uml.png",
+  // Logos & icons
+  "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
+  "favicon.png", "favicon.jpg", "favicon.ico",
+  "icon.png", "icon.jpg",
 
-    "img/logo.png",
-    "img/logo.jpg",
-    "img/favicon.png",
-    "img/class-diagram.png",
-    "img/diagram.png",
+  // Diagrams and model images (fallbacks when no dedicated logo exists)
+  "NewClassDiagram.png", "NewClassDiagram.jpg",
+  "OldClassDiagram.png", "OldClassDiagram.jpg",
+  "SequenceDiagram.png", "SequenceDiagram.jpg",
+  "ClassDiagram.png", "ClassDiagram.jpg",
+  "class-diagram.png", "class-diagram.jpg",
+  "diagram.png", "diagram.jpg",
+  "Diagram.png", "Diagram.jpg",
+  "uml.png", "uml.jpg",
+  "model.png", "model.jpg"
+];
 
-    "assets/logo.png",
-    "assets/logo.jpg",
-    "assets/banner.png",
-    "assets/hero.png",
-
-    "public/logo.png",
-    "public/logo.jpg",
-    "public/favicon.png"
-  ];
-
-  return [...base, ...nested];
-}
+// Folders inside the repo we search for these files
+const thumbnailFolders = [
+  "",          // root
+  "images",
+  "img",
+  "media",
+  "assets",
+  "public"
+];
 
 async function findThumbnailForRepo(project) {
-  if (project.thumbnailUrl) return; // already has one from projects.json
+  // If projects.json already defined an explicit thumbnail, leave it
+  if (project.thumbnailUrl) return;
 
-  const candidates = getThumbnailCandidates(project);
+  for (const folder of thumbnailFolders) {
+    for (const file of thumbnailCandidates) {
+      const path = folder ? `${folder}/${file}` : file;
+      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${path}`;
 
-  for (const path of candidates) {
-    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${path}`;
-    try {
-      const res = await fetch(url, { method: "GET" });
-      if (res.ok) {
-        project.thumbnailUrl = url;
-        return;
+      try {
+        // HEAD is lighter than GET; GitHub supports HEAD for raw files
+        const res = await fetch(url, { method: "HEAD" });
+        if (res.ok) {
+          project.thumbnailUrl = url;
+          return;
+        }
+      } catch {
+        // ignore and try next candidate
       }
-    } catch (e) {
-      console.error("Thumb fetch failed", project.rawName, path, e);
     }
   }
+
+  // If we get here, no image was found – card will show letter placeholder
 }
 
 async function enhanceThumbnails() {
-  // Don't hammer too hard: limit how many repos we probe per load
+  // To avoid hammering GitHub: only probe a subset per page load
   const subset = repos.slice(0, 60);
-  const tasks = subset.map((project) => findThumbnailForRepo(project));
+  const tasks = subset.map(project => findThumbnailForRepo(project));
   await Promise.all(tasks);
   saveCache(repos);
   renderProjects();
