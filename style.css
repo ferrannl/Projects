@@ -184,12 +184,16 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #fff;
-  position: relative;
+  overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.social-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .social-label {
@@ -197,107 +201,24 @@ body {
   z-index: 1;
 }
 
-/* Instagram style */
+/* Tiny per-platform flavor, but still simple */
 
 .social-instagram {
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.05), transparent 60%),
-              linear-gradient(135deg, rgba(245, 133, 41, 0.22),
-                                   rgba(221, 42, 123, 0.4),
-                                   rgba(129, 52, 175, 0.4),
-                                   rgba(81, 91, 212, 0.5));
-  border-color: rgba(221, 42, 123, 0.75);
+  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 60%),
+              rgba(7, 10, 28, 0.95);
+  border-color: rgba(255, 75, 129, 0.7);
 }
-
-.social-instagram:hover {
-  filter: saturate(1.2);
-}
-
-.social-instagram .social-icon {
-  background: conic-gradient(
-    from 200deg,
-    #f58529,
-    #feda77,
-    #dd2a7b,
-    #8134af,
-    #515bd4,
-    #f58529
-  );
-  border: 2px solid rgba(255, 255, 255, 0.85);
-}
-
-.social-instagram .social-icon-inner {
-  width: 58%;
-  height: 58%;
-  border-radius: 30%;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  box-sizing: border-box;
-  position: relative;
-}
-
-.social-instagram .social-icon-inner::before {
-  content: "";
-  position: absolute;
-  width: 36%;
-  height: 36%;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  top: 14%;
-  right: 10%;
-}
-
-/* LinkedIn style */
 
 .social-linkedin {
-  background: linear-gradient(145deg, rgba(10, 102, 194, 0.85), rgba(0, 51, 102, 0.95));
-  border-color: rgba(10, 102, 194, 0.95);
+  background: radial-gradient(circle at 0 0, rgba(10, 102, 194, 0.25), transparent 60%),
+              rgba(7, 10, 28, 0.95);
+  border-color: rgba(10, 102, 194, 0.8);
 }
-
-.social-linkedin .social-icon {
-  background: #0a66c2;
-  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-/* Outlook / Email style */
 
 .social-outlook {
-  background: radial-gradient(circle at 0 0, rgba(75, 195, 255, 0.2), transparent 60%),
-              linear-gradient(135deg, rgba(0, 120, 212, 0.9), rgba(0, 88, 158, 0.95));
-  border-color: rgba(0, 120, 212, 0.95);
-}
-
-.social-outlook .social-icon {
-  background: #0078d4;
-  position: relative;
-  overflow: hidden;
-}
-
-.social-outlook .envelope-body,
-.social-outlook .envelope-top {
-  position: absolute;
-  left: 18%;
-  width: 64%;
-  box-sizing: border-box;
-}
-
-.social-outlook .envelope-body {
-  bottom: 18%;
-  height: 44%;
-  border-radius: 4px;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  border-top: none;
-}
-
-.social-outlook .envelope-top {
-  bottom: 40%;
-  height: 40%;
-  border-left: 2px solid rgba(255, 255, 255, 0.9);
-  border-right: 2px solid rgba(255, 255, 255, 0.9);
-  border-top: 2px solid rgba(255, 255, 255, 0.9);
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  transform: skewY(-10deg);
+  background: radial-gradient(circle at 0 0, rgba(0, 120, 212, 0.3), transparent 60%),
+              rgba(7, 10, 28, 0.95);
+  border-color: rgba(0, 120, 212, 0.85);
 }
 
 /* Controls */
