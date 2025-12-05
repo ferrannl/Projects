@@ -4,7 +4,7 @@ const PROJECTS_URL = "./projects.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
-const CACHE_TTL_MS = 1000 * 60 * 60 * 1;      // 1 hour cache
+const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
 const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
 
 let repos = [];
