@@ -57,44 +57,11 @@ function prettifyName(raw) {
   return resultWords.join(" ");
 }
 
-function stripMarkdown(text) {
-  if (!text) return "";
-  let out = text;
-  out = out.replace(/!\[[^\]]*]\([^)]*\)/g, "");
-  out = out.replace(/\[([^\]]+)]\([^)]*\)/g, "$1");
-  out = out.replace(/`([^`]+)`/g, "$1");
-  out = out.replace(/\*\*([^*]+)\*\*/g, "$1");
-  out = out.replace(/\*([^*]+)\*/g, "$1");
-  out = out.replace(/__([^_]+)__/g, "$1");
-  out = out.replace(/_([^_]+)_/g, "$1");
-  out = out.replace(/<\/?[^>]+(>|$)/g, "");
-  out = out.replace(/#+\s*/g, "");
-  return out.trim();
-}
-
-function buildShortSummaryFromReadme(markdown) {
-  if (!markdown) return null;
-  const lines = markdown.split(/\r?\n/);
-  const contentLines = [];
-
-  for (const raw of lines) {
-    let line = raw.trim();
-    if (!line) continue;
-    if (/^#{1,6}\s/.test(line)) continue;
-    if (/^>\s?/.test(line)) continue;
-    if (/^\[!\[/.test(line) || /^!\[/.test(line)) continue;
-    if (/^<!--/.test(line)) continue;
-    contentLines.push(line);
-    if (contentLines.length >= 3) break;
-  }
-
-  if (!contentLines.length) return null;
-
-  let text = contentLines.join(" ");
-  text = stripMarkdown(text);
-  if (!text) return null;
-
+// Just use GitHub description directly; no extra README fetches.
+function buildShortSummaryFromDescription(desc) {
+  if (!desc) return "No description yet.";
   const maxLen = 220;
+  let text = desc.trim();
   if (text.length > maxLen) {
     text = text.slice(0, maxLen - 1);
     const lastSpace = text.lastIndexOf(" ");
@@ -103,7 +70,6 @@ function buildShortSummaryFromReadme(markdown) {
     }
     text += "…";
   }
-
   return text;
 }
 
@@ -164,11 +130,21 @@ function buildTags(repo, type) {
   return tags;
 }
 
+function getEmojiForProject(project) {
+  switch (project.type) {
+    case "website": return "🌐";
+    case "mobile":  return "📱";
+    case "api":     return "🔌";
+    case "school":  return "🎓";
+    default:        return "🧪";
+  }
+}
+
 function mapRepo(repo) {
   const type = inferType(repo);
   const baseDesc = repo.description || "No description yet.";
 
-  return {
+  const project = {
     rawName: repo.name,
     displayName: prettifyName(repo.name),
     language: repo.language || "Various",
@@ -178,11 +154,12 @@ function mapRepo(repo) {
     pagesUrl: repo.has_pages
       ? `https://${GITHUB_USER}.github.io/${repo.name}/`
       : null,
-    baseDescription: baseDesc,
-    summary: baseDesc,
-    thumbnailUrl: null,
+    summary: buildShortSummaryFromDescription(baseDesc),
     thumbnailEmoji: null
   };
+
+  project.thumbnailEmoji = getEmojiForProject(project);
+  return project;
 }
 
 function matchesFilters(project) {
@@ -205,6 +182,7 @@ function matchesFilters(project) {
   return true;
 }
 
+// Modal only matters if we ever put real images back in.
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
   imageModalImgEl.src = url;
@@ -223,16 +201,6 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
-function getEmojiForProject(project) {
-  switch (project.type) {
-    case "website": return "🌐";
-    case "mobile":  return "📱";
-    case "api":     return "🔌";
-    case "school":  return "🎓";
-    default:        return "🧪";
-  }
-}
-
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -240,30 +208,14 @@ function createProjectCard(project) {
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
 
-  if (project.thumbnailUrl || project.thumbnailEmoji) {
-    const thumbBtn = document.createElement("button");
-    thumbBtn.className = "project-thumb";
-    thumbBtn.type = "button";
-
-    if (project.thumbnailUrl) {
-      const thumbImg = document.createElement("img");
-      thumbImg.src = project.thumbnailUrl;
-      thumbImg.alt = `${project.displayName} thumbnail`;
-      thumbBtn.appendChild(thumbImg);
-
-      thumbBtn.addEventListener("click", () =>
-        openImageModal(project.thumbnailUrl, project.displayName)
-      );
-    } else if (project.thumbnailEmoji) {
-      const emojiSpan = document.createElement("span");
-      emojiSpan.className = "project-thumb-emoji";
-      emojiSpan.textContent = project.thumbnailEmoji;
-      thumbBtn.appendChild(emojiSpan);
-      // no modal for emoji
-    }
-
-    titleRow.appendChild(thumbBtn);
-  }
+  // Emoji "thumbnail"
+  const thumbBtn = document.createElement("div");
+  thumbBtn.className = "project-thumb";
+  const emojiSpan = document.createElement("span");
+  emojiSpan.className = "project-thumb-emoji";
+  emojiSpan.textContent = project.thumbnailEmoji || getEmojiForProject(project);
+  thumbBtn.appendChild(emojiSpan);
+  titleRow.appendChild(thumbBtn);
 
   const titleBlock = document.createElement("div");
   titleBlock.className = "project-title-text";
@@ -353,7 +305,7 @@ function renderProjects() {
   if (!filtered.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent = "No projects match your search/filter. Try another search term.";
+      emptyEl.textContent = "No projects match your search/filter.";
     }
     return;
   }
@@ -410,92 +362,6 @@ function initLanguageFilter() {
   });
 }
 
-async function enhanceDescriptionsFromReadme() {
-  const tasks = repos.map(async (project) => {
-    try {
-      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/README.md`;
-      const res = await fetch(url);
-      if (!res.ok) return;
-      const text = await res.text();
-      const summary = buildShortSummaryFromReadme(text);
-      if (summary) project.summary = summary;
-    } catch (e) {
-      console.error("README fetch failed for", project.rawName, e);
-    }
-  });
-
-  await Promise.all(tasks);
-  renderProjects();
-}
-
-async function findThumbnailForRepo(project) {
-  try {
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${project.rawName}/contents/`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      project.thumbnailEmoji = getEmojiForProject(project);
-      return;
-    }
-
-    const items = await res.json();
-    if (!Array.isArray(items)) {
-      project.thumbnailEmoji = getEmojiForProject(project);
-      return;
-    }
-
-    const imageItems = items.filter(item => {
-      if (item.type !== "file") return false;
-      const lower = item.name.toLowerCase();
-      return /\.(png|jpe?g|gif|webp|svg|ico)$/.test(lower);
-    });
-
-    if (!imageItems.length) {
-      project.thumbnailEmoji = getEmojiForProject(project);
-      return;
-    }
-
-    const diagramCandidates = imageItems.filter(item => {
-      const lower = item.name.toLowerCase();
-      return /(class|diagram|uml|arch|architecture)/.test(lower);
-    });
-
-    let chosen = null;
-
-    if (diagramCandidates.length) {
-      chosen = diagramCandidates[0];
-    } else {
-      const logoCandidates = imageItems.filter(item => {
-        const lower = item.name.toLowerCase();
-        return /(logo|icon|favicon|banner|hero|cover|thumbnail|thumb|screenshot|preview)/.test(lower);
-      });
-      if (logoCandidates.length) {
-        chosen = logoCandidates[0];
-      } else {
-        chosen = imageItems[0];
-      }
-    }
-
-    if (!chosen) {
-      project.thumbnailEmoji = getEmojiForProject(project);
-      return;
-    }
-
-    const urlToUse = chosen.download_url ||
-      `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${chosen.path}`;
-
-    project.thumbnailUrl = urlToUse;
-  } catch (e) {
-    console.error("Thumbnail fetch failed for", project.rawName, e);
-    project.thumbnailEmoji = getEmojiForProject(project);
-  }
-}
-
-async function enhanceThumbnails() {
-  const tasks = repos.map((project) => findThumbnailForRepo(project));
-  await Promise.all(tasks);
-  renderProjects();
-}
-
 async function loadRepos() {
   if (gridEl) {
     gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects from GitHub…</p>";
@@ -504,24 +370,41 @@ async function loadRepos() {
 
   try {
     const res = await fetch(API_URL);
-    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("GitHub API error:", res.status, text);
+      throw new Error(`GitHub API error: ${res.status}`);
+    }
     const data = await res.json();
+
+    if (!Array.isArray(data)) {
+      throw new Error("GitHub API did not return a list of repos.");
+    }
 
     repos = data
       .filter(r => !r.private)
       .map(mapRepo);
 
+    console.log("Loaded repos:", repos.length);
+
+    if (!repos.length) {
+      if (emptyEl) {
+        emptyEl.hidden = false;
+        emptyEl.textContent = "No public repositories found for this user.";
+      }
+      if (gridEl) gridEl.innerHTML = "";
+      return;
+    }
+
     initLanguageFilter();
     renderProjects();
-
-    enhanceDescriptionsFromReadme().catch(console.error);
-    enhanceThumbnails().catch(console.error);
   } catch (err) {
-    console.error(err);
+    console.error("Error loading repos:", err);
     if (gridEl) gridEl.innerHTML = "";
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent = "Could not load projects from GitHub (rate limit / network issue?).";
+      emptyEl.textContent =
+        "Could not load projects from GitHub (API or network error). See console for details.";
     }
   }
 }
