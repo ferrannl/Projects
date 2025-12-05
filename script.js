@@ -17,8 +17,6 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
 
-// --- name prettifying ---
-
 const SMALL_WORDS = new Set([
   "voor", "van", "met",
   "en", "of",
@@ -50,8 +48,13 @@ function prettifyName(raw) {
   const resultWords = lowerWords.map((word, idx) => {
     if (!word.length) return word;
 
-    if (SPECIAL_WORDS[word]) return SPECIAL_WORDS[word];
-    if (idx > 0 && SMALL_WORDS.has(word)) return word;
+    if (SPECIAL_WORDS[word]) {
+      return SPECIAL_WORDS[word];
+    }
+
+    if (idx > 0 && SMALL_WORDS.has(word)) {
+      return word;
+    }
 
     return word.charAt(0).toUpperCase() + word.slice(1);
   });
@@ -59,12 +62,44 @@ function prettifyName(raw) {
   return resultWords.join(" ");
 }
 
-// --- description summary (no README calls) ---
+function stripMarkdown(text) {
+  if (!text) return "";
+  let out = text;
+  out = out.replace(/!\[[^\]]*]\([^)]*\)/g, "");
+  out = out.replace(/\[([^\]]+)]\([^)]*\)/g, "$1");
+  out = out.replace(/`([^`]+)`/g, "$1");
+  out = out.replace(/\*\*([^*]+)\*\*/g, "$1");
+  out = out.replace(/\*([^*]+)\*/g, "$1");
+  out = out.replace(/__([^_]+)__/g, "$1");
+  out = out.replace(/_([^_]+)_/g, "$1");
+  out = out.replace(/<\/?[^>]+(>|$)/g, "");
+  out = out.replace(/#+\s*/g, "");
+  return out.trim();
+}
 
-function buildShortSummaryFromDescription(desc) {
-  if (!desc) return "No description yet.";
+function buildShortSummaryFromReadme(markdown) {
+  if (!markdown) return null;
+  const lines = markdown.split(/\r?\n/);
+  const contentLines = [];
+
+  for (const raw of lines) {
+    let line = raw.trim();
+    if (!line) continue;
+    if (/^#{1,6}\s/.test(line)) continue;
+    if (/^>\s?/.test(line)) continue;
+    if (/^\[!\[/.test(line) || /^!\[/.test(line)) continue;
+    if (/^<!--/.test(line)) continue;
+    contentLines.push(line);
+    if (contentLines.length >= 3) break;
+  }
+
+  if (!contentLines.length) return null;
+
+  let text = contentLines.join(" ");
+  text = stripMarkdown(text);
+  if (!text) return null;
+
   const maxLen = 220;
-  let text = desc.trim();
   if (text.length > maxLen) {
     text = text.slice(0, maxLen - 1);
     const lastSpace = text.lastIndexOf(" ");
@@ -73,10 +108,9 @@ function buildShortSummaryFromDescription(desc) {
     }
     text += "…";
   }
+
   return text;
 }
-
-// --- type + tags ---
 
 function inferType(repo) {
   const name = (repo.name || "").toLowerCase();
@@ -84,21 +118,14 @@ function inferType(repo) {
   const lang = (repo.language || "").toLowerCase();
 
   if (repo.has_pages) return "website";
-
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) {
-    return "website";
-  }
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
 
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
     (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))
-  ) {
-    return "mobile";
-  }
+  ) return "mobile";
 
-  if (name.includes("api") || desc.includes("api")) {
-    return "api";
-  }
+  if (name.includes("api") || desc.includes("api")) return "api";
 
   if (
     desc.includes("assignment") ||
@@ -107,9 +134,7 @@ function inferType(repo) {
     desc.includes("final") ||
     desc.includes("cppls") ||
     desc.includes("devops")
-  ) {
-    return "school";
-  }
+  ) return "school";
 
   return "other";
 }
@@ -135,25 +160,11 @@ function buildTags(repo, type) {
   return tags;
 }
 
-// --- emoji thumbnails ---
-
-function getEmojiForProject(project) {
-  switch (project.type) {
-    case "website": return "🌐";
-    case "mobile":  return "📱";
-    case "api":     return "🔌";
-    case "school":  return "🎓";
-    default:        return "🧪";
-  }
-}
-
-// --- map GitHub repo -> project object ---
-
 function mapRepo(repo) {
   const type = inferType(repo);
   const baseDesc = repo.description || "No description yet.";
 
-  const project = {
+  return {
     rawName: repo.name,
     displayName: prettifyName(repo.name),
     language: repo.language || "Various",
@@ -163,14 +174,11 @@ function mapRepo(repo) {
     pagesUrl: repo.has_pages
       ? `https://${GITHUB_USER}.github.io/${repo.name}/`
       : null,
-    summary: buildShortSummaryFromDescription(baseDesc),
-    // images are decided at render-time
+    baseDescription: baseDesc,
+    summary: baseDesc,
+    thumbnailUrl: null
   };
-
-  return project;
 }
-
-// --- filtering ---
 
 function matchesFilters(project) {
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
@@ -192,8 +200,6 @@ function matchesFilters(project) {
   return true;
 }
 
-// --- modal (for when an image actually loads) ---
-
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
   imageModalImgEl.src = url;
@@ -212,63 +218,6 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
-// --- image guessing using raw.githubusercontent.com (no API) ---
-
-const IMAGE_CANDIDATES = [
-  "class-diagram.png",
-  "ClassDiagram.png",
-  "classDiagram.png",
-  "diagram.png",
-  "uml.png",
-  "uml-diagram.png",
-  "logo.png",
-  "Logo.png",
-  "logo.jpg",
-  "banner.png",
-  "hero.png",
-  "thumbnail.png",
-  "thumb.png",
-  "preview.png",
-  "screenshot.png"
-];
-
-function setupProjectImage(project, imgEl, emojiSpan, thumbBtn) {
-  const base = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/`;
-  let idx = 0;
-
-  imgEl.style.display = "none"; // start hidden, emoji visible
-
-  function tryNext() {
-    if (idx >= IMAGE_CANDIDATES.length) {
-      // nothing worked → keep emoji, no click
-      return;
-    }
-    const candidate = IMAGE_CANDIDATES[idx++];
-    imgEl.src = base + candidate;
-  }
-
-  imgEl.onerror = () => {
-    // try next file name
-    tryNext();
-  };
-
-  imgEl.onload = () => {
-    // we found a working image
-    emojiSpan.style.display = "none";
-    imgEl.style.display = "block";
-
-    // clicking thumbnail opens fullscreen modal
-    thumbBtn.addEventListener("click", () => {
-      openImageModal(imgEl.src, project.displayName);
-    }, { once: true }); // only need to attach once
-  };
-
-  // kick off first attempt
-  tryNext();
-}
-
-// --- card creation ---
-
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -276,27 +225,31 @@ function createProjectCard(project) {
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
 
-  // thumbnail (emoji + optional real image)
-  const thumbBtn = document.createElement("button");
-  thumbBtn.className = "project-thumb";
-  thumbBtn.type = "button";
+  if (project.thumbnailUrl) {
+    const thumbBtn = document.createElement("button");
+    thumbBtn.className = "project-thumb has-image";
+    thumbBtn.type = "button";
 
-  const emojiSpan = document.createElement("span");
-  emojiSpan.className = "project-thumb-emoji";
-  emojiSpan.textContent = getEmojiForProject(project);
-  thumbBtn.appendChild(emojiSpan);
+    const thumbImg = document.createElement("img");
+    thumbImg.src = project.thumbnailUrl;
+    thumbImg.alt = `${project.displayName} thumbnail`;
+    thumbBtn.appendChild(thumbImg);
 
-  const imgEl = document.createElement("img");
-  imgEl.alt = `${project.displayName} thumbnail`;
-  // CSS for .project-thumb img already handles sizing
-  thumbBtn.appendChild(imgEl);
+    thumbBtn.addEventListener("click", () =>
+      openImageModal(project.thumbnailUrl, project.displayName)
+    );
 
-  titleRow.appendChild(thumbBtn);
+    titleRow.appendChild(thumbBtn);
+  } else {
+    const placeholder = document.createElement("div");
+    placeholder.className = "project-thumb placeholder";
+    const span = document.createElement("span");
+    const base = project.displayName || project.rawName || "?";
+    span.textContent = base.charAt(0).toUpperCase();
+    placeholder.appendChild(span);
+    titleRow.appendChild(placeholder);
+  }
 
-  // let JS try to find an actual image; emoji stays if it fails
-  setupProjectImage(project, imgEl, emojiSpan, thumbBtn);
-
-  // title + type pill
   const titleBlock = document.createElement("div");
   titleBlock.className = "project-title-text";
 
@@ -312,7 +265,6 @@ function createProjectCard(project) {
   titleBlock.appendChild(typePill);
   titleRow.appendChild(titleBlock);
 
-  // description
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
@@ -321,7 +273,6 @@ function createProjectCard(project) {
   descEl.textContent = project.summary;
   descWrapper.appendChild(descEl);
 
-  // meta pills
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
@@ -339,7 +290,6 @@ function createProjectCard(project) {
     metaRow.appendChild(tagPill);
   });
 
-  // links
   const linksRow = document.createElement("div");
   linksRow.className = "project-links";
 
@@ -379,8 +329,6 @@ function createProjectCard(project) {
   return card;
 }
 
-// --- rendering ---
-
 function renderProjects() {
   if (!gridEl) return;
   gridEl.innerHTML = "";
@@ -390,7 +338,7 @@ function renderProjects() {
   if (!filtered.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent = "No projects match your search/filter.";
+      emptyEl.textContent = "No projects match your search/filter. Try another search term.";
     }
     return;
   }
@@ -402,8 +350,6 @@ function renderProjects() {
     gridEl.appendChild(card);
   });
 }
-
-// --- UI wiring ---
 
 function initFiltersAndSearch() {
   typeChips.forEach(chip => {
@@ -449,7 +395,69 @@ function initLanguageFilter() {
   });
 }
 
-// --- load repos (single API call) ---
+async function enhanceDescriptionsFromReadme() {
+  const tasks = repos.map(async (project) => {
+    try {
+      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/README.md`;
+      const res = await fetch(url);
+      if (!res.ok) return;
+      const text = await res.text();
+      const summary = buildShortSummaryFromReadme(text);
+      if (summary) project.summary = summary;
+    } catch (e) {
+      console.error("README fetch failed for", project.rawName, e);
+    }
+  });
+
+  await Promise.all(tasks);
+  renderProjects();
+}
+
+function getThumbnailCandidates(project) {
+  if (project.type === "website") {
+    return [
+      "logo.png",
+      "logo.svg",
+      "logo.jpg",
+      "banner.png",
+      "thumbnail.png",
+      "class-diagram.png",
+      "diagram.png"
+    ];
+  }
+  return [
+    "class-diagram.png",
+    "diagram.png",
+    "uml.png",
+    "logo.png",
+    "logo.jpg",
+    "thumbnail.png"
+  ];
+}
+
+async function findThumbnailForRepo(project) {
+  const candidates = getThumbnailCandidates(project);
+
+  for (const fileName of candidates) {
+    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${fileName}`;
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        project.thumbnailUrl = url;
+        return;
+      }
+    } catch (e) {
+      console.error("Thumb fetch failed", project.rawName, fileName, e);
+    }
+  }
+}
+
+async function enhanceThumbnails() {
+  const subset = repos.slice(0, 40); // avoid spamming too many requests
+  const tasks = subset.map((project) => findThumbnailForRepo(project));
+  await Promise.all(tasks);
+  renderProjects();
+}
 
 async function loadRepos() {
   if (gridEl) {
@@ -459,41 +467,24 @@ async function loadRepos() {
 
   try {
     const res = await fetch(API_URL);
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("GitHub API error:", res.status, text);
-      throw new Error(`GitHub API error: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
     const data = await res.json();
-
-    if (!Array.isArray(data)) {
-      throw new Error("GitHub API did not return a list of repos.");
-    }
 
     repos = data
       .filter(r => !r.private)
       .map(mapRepo);
 
-    console.log("Loaded repos:", repos.length);
-
-    if (!repos.length) {
-      if (emptyEl) {
-        emptyEl.hidden = false;
-        emptyEl.textContent = "No public repositories found for this user.";
-      }
-      if (gridEl) gridEl.innerHTML = "";
-      return;
-    }
-
     initLanguageFilter();
     renderProjects();
+
+    enhanceDescriptionsFromReadme().catch(console.error);
+    enhanceThumbnails().catch(console.error);
   } catch (err) {
-    console.error("Error loading repos:", err);
+    console.error(err);
     if (gridEl) gridEl.innerHTML = "";
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent =
-        "Could not load projects from GitHub (API or network error). See console for details.";
+      emptyEl.textContent = "Could not load projects from GitHub (rate limit / network issue?).";
     }
   }
 }
