@@ -616,3 +616,117 @@ body {
     width: 100%;
   }
 }
+
+/* --- Language gate (overlay) --- */
+
+.lang-gate-backdrop {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255, 75, 129, 0.18), transparent 60%),
+              radial-gradient(circle at bottom, rgba(75, 195, 255, 0.18), transparent 60%),
+              rgba(0, 0, 10, 0.88);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+}
+
+.lang-gate-backdrop[hidden] {
+  display: none;
+}
+
+.lang-gate-card {
+  max-width: 640px;
+  width: calc(100% - 2.5rem);
+  padding: 1.8rem 1.6rem 1.5rem;
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(11, 15, 32, 0.96), rgba(15, 21, 49, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85);
+  color: var(--text);
+}
+
+.lang-gate-logo {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.35rem;
+}
+
+.lang-gate-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.lang-gate-sub {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.lang-gate-sub small {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.35rem;
+}
+
+.lang-gate-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+
+.btn-lang {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 55%),
+              rgba(8, 10, 28, 0.95);
+  color: var(--text);
+  padding: 0.55rem 0.8rem;
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+              border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.btn-lang:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+  border-color: rgba(255, 255, 255, 0.46);
+}
+
+.flag {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.label-main {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.label-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.lang-gate-hint {
+  font-size: 0.78rem;
+  color: rgba(200, 203, 230, 0.85);
+  text-align: right;
+}
+
+/* small screens */
+@media (max-width: 480px) {
+  .lang-gate-card {
+    padding: 1.4rem 1.1rem 1.1rem;
+  }
+}
