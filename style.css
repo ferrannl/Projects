@@ -286,35 +286,46 @@ body {
   margin-bottom: 0.35rem;
 }
 
+/* Thumbnail (image or placeholder) */
+
 .project-thumb {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
   flex-shrink: 0;
 }
 
-.project-thumb img {
+.project-thumb.has-image {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.project-thumb.has-image img {
   width: 52px;
   height: 52px;
   border-radius: 12px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* Emoji variant for thumbnails */
-.project-thumb-emoji {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), rgba(5, 7, 20, 0.95));
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  display: inline-flex;
+.project-thumb.placeholder {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.6), rgba(14, 24, 55, 1));
+  border-radius: 12px;
+  cursor: default;
+}
+
+.project-thumb.placeholder span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #ffffff;
 }
 
 .project-title-text {
