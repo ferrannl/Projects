@@ -7,6 +7,7 @@ const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
 const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
 const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
 const LANGUAGE_STORAGE_KEY = "ferranProjectsLang";
+const DOB_ISO = "1999-08-15";
 
 let repos = [];
 const state = {
@@ -26,6 +27,7 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
 const langGateEl = document.getElementById("langGate");
+const uiLangSwitcherEl = document.getElementById("uiLangSwitcher");
 
 const SMALL_WORDS = new Set([
   "voor", "van", "met",
@@ -504,6 +506,21 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
+/* ---------- Age helper ---------- */
+
+function updateAge() {
+  const el = document.getElementById("ageValue");
+  if (!el) return;
+  const today = new Date();
+  const dob = new Date(`${DOB_ISO}T00:00:00`);
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  el.textContent = age.toString();
+}
+
 /* ---------- Language gate + i18n ---------- */
 
 function applyTranslations() {
@@ -540,6 +557,10 @@ function applyTranslations() {
   if (languageSelectEl) {
     const first = languageSelectEl.querySelector("option[value='all']");
     if (first) first.textContent = t("allLanguagesOption");
+  }
+
+  if (uiLangSwitcherEl) {
+    uiLangSwitcherEl.value = currentLang;
   }
 }
 
@@ -595,6 +616,15 @@ function initLanguageGate() {
     if (e.key === "Escape" && !langGateEl.hidden) {
       setLanguage("en");
     }
+  });
+}
+
+function initLanguageSwitcher() {
+  if (!uiLangSwitcherEl) return;
+  uiLangSwitcherEl.value = currentLang;
+  uiLangSwitcherEl.addEventListener("change", () => {
+    const lang = uiLangSwitcherEl.value || "en";
+    setLanguage(lang);
   });
 }
 
@@ -1094,7 +1124,9 @@ async function loadRepos() {
 
 (function init() {
   console.log("Initializing Ferran Projects page…");
+  updateAge();
   initLanguageGate();
+  initLanguageSwitcher();
   initFiltersAndSearch();
   loadRepos();
 })();
