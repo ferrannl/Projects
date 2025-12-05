@@ -64,7 +64,10 @@ const I18N = {
     emptyState: "No projects match your search/filter. Try another search term.",
     footerBuiltWith: "Built with ♥ by Ferran",
     footerViewOnPages: "View this site on GitHub Pages",
-    searchPlaceholder: "Search by name, description, language or tag…"
+    searchPlaceholder: "Search by name, description, language or tag…",
+    aboutTitle: "About Me",
+    aboutP1: "Hey 👋🏻 Ferran here. I am a Dutch developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools and putting everything together on this page.",
+    aboutP2: "In my free time I enjoy inline skating, ice skating, longboarding and cycling. I also like rock, rap and electronic music, videogames and modding game consoles, something I started doing when I was about 12 years old."
   },
   nl: {
     subtitle: "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolwerk, handleidingen, API’s en meer.",
@@ -79,7 +82,10 @@ const I18N = {
     emptyState: "Geen projecten gevonden voor deze zoekopdracht of filters. Probeer iets anders.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
     footerViewOnPages: "Bekijk deze site op GitHub Pages",
-    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…"
+    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
+    aboutTitle: "Over mij",
+    aboutP1: "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse developer uit Utrecht / 's-Hertogenbosch. Ik bouw graag websites, apps en kleine tools en verzamel alles hier op deze pagina.",
+    aboutP2: "In mijn vrije tijd skate ik graag inline, schaats ik op ijs, longboard ik en fiets ik. Ik hou ook van rock, rap en elektronische muziek, videogames en het modden van gameconsoles, iets waar ik rond mijn twaalfde mee ben begonnen."
   },
   de: {
     subtitle: "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
@@ -94,7 +100,10 @@ const I18N = {
     emptyState: "Keine Projekte passen zu Suche oder Filtern. Bitte etwas anderes ausprobieren.",
     footerBuiltWith: "Mit ♥ gebaut von Ferran",
     footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
-    searchPlaceholder: "Nach Name, Beschreibung, Sprache oder Tag suchen…"
+    searchPlaceholder: "Nach Name, Beschreibung, Sprache oder Tag suchen…",
+    aboutTitle: "Über mich",
+    aboutP1: "Hey 👋🏻 ich bin Ferran. Ich bin ein niederländischer Entwickler aus Utrecht / 's-Hertogenbosch. Ich entwickle gerne Websites, Apps und kleine Tools und sammle alles hier auf dieser Seite.",
+    aboutP2: "In meiner Freizeit fahre ich gerne Inline-Skates, gehe eislaufen, longboarde und fahre Fahrrad. Ich mag auch Rock, Rap und elektronische Musik, Videospiele und das Modden von Spielkonsolen, womit ich ungefähr mit zwölf Jahren angefangen habe."
   },
   pl: {
     subtitle: "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
@@ -106,10 +115,13 @@ const I18N = {
     typeSchool: "Szkoła / studia",
     typeOther: "Inne",
     filterLanguageLabel: "Język",
-    emptyState: "Brak projektów spełniających kryteria wyszukiwania/filtrów. Spróbuj innego hasła.",
+    emptyState: "Brak projektów spełniających kryteria wyszukiwania lub filtrów. Spróbuj innego hasła.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
     footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
-    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…"
+    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
+    aboutTitle: "O mnie",
+    aboutP1: "Hej 👋🏻 tu Ferran. Jestem holenderskim developerem z Utrechtu / 's-Hertogenbosch. Lubię tworzyć strony internetowe, aplikacje i małe narzędzia i zbieram wszystko w jednym miejscu na tej stronie.",
+    aboutP2: "W wolnym czasie lubię jazdę na rolkach, łyżwach, longboardzie i rowerze. Lubię też rock, rap i muzykę elektroniczną, gry wideo oraz moddowanie konsol, czym zacząłem się zajmować, gdy miałem około dwanaście lat."
   },
   tr: {
     subtitle: "Tüm yazılım ve kod projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
@@ -124,7 +136,10 @@ const I18N = {
     emptyState: "Arama veya filtrelere uyan proje bulunamadı. Lütfen başka bir şey deneyin.",
     footerBuiltWith: "Ferran tarafından ♥ ile hazırlandı",
     footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
-    searchPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…"
+    searchPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…",
+    aboutTitle: "Hakkımda",
+    aboutP1: "Hey 👋🏻 ben Ferran. Utrecht / 's-Hertogenbosch bölgesinden Hollandalı bir developerım. Web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum ve hepsini bu sayfada bir araya getiriyorum.",
+    aboutP2: "Boş zamanlarımda inline paten, buz pateni, longboard ve bisiklet sürmekten hoşlanıyorum. Rock, rap ve elektronik müzik, video oyunları ve oyun konsollarını modlamak da hoşuma gidiyor. Konsol modlamaya yaklaşık on iki yaşımdayken başladım."
   },
   es: {
     subtitle: "Todos mis proyectos de programación y código en un solo lugar: sitios web, apps, trabajos de estudio, guías, APIs y más.",
@@ -139,7 +154,10 @@ const I18N = {
     emptyState: "Ningún proyecto coincide con tu búsqueda o filtros. Prueba con otro término.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
     footerViewOnPages: "Ver este sitio en GitHub Pages",
-    searchPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…"
+    searchPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…",
+    aboutTitle: "Sobre mí",
+    aboutP1: "Hey 👋🏻 soy Ferran. Soy un desarrollador holandés de Utrecht / 's-Hertogenbosch. Me gusta crear sitios web, aplicaciones y pequeñas herramientas y juntar todo en esta página.",
+    aboutP2: "En mi tiempo libre me gusta patinar en línea, patinar sobre hielo, ir en longboard y montar en bicicleta. También me gustan el rock, el rap y la música electrónica, los videojuegos y modificar consolas, algo que empecé a hacer cuando tenía unos doce años."
   }
 };
 
@@ -192,7 +210,6 @@ function initLanguageUi() {
     stored = "en";
   }
 
-  const hasStored = !!stored;
   currentLang = stored;
   applyTranslations(currentLang);
 
@@ -216,8 +233,9 @@ function initLanguageUi() {
   });
 
   if (langGateEl) {
-    // Show gate only if we didn't store a language before
-    langGateEl.hidden = !!stored;
+    // Show gate only if language is not explicitly stored yet
+    const hadStored = !!stored;
+    langGateEl.hidden = hadStored;
   }
 }
 
@@ -230,25 +248,20 @@ function isSelfProjectsRepoName(name) {
 function prettifyName(raw) {
   if (!raw) return "";
 
-  // Normalize separators first
   let s = raw.replace(/[-_.]+/g, " ");
 
-  // TEMPORARILY protect iOS so CamelCase splitting doesn't break it
   const IOS_PLACEHOLDER = "__IOS__";
   s = s.replace(/iOS|IOS|Ios|ioS/gi, IOS_PLACEHOLDER);
 
-  // Split camelCase and PascalCase EXCEPT the placeholder
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   s = s.replace(/\s+/g, " ").trim();
 
   let words = s.split(" ").map(w => w.trim());
 
-  // Now restore proper iOS style
   words = words.map(w =>
     w === IOS_PLACEHOLDER ? "iOS" : w
   );
 
-  // Basic dictionary corrections
   return words
     .map((w, i) => {
       const lw = w.toLowerCase();
@@ -351,8 +364,8 @@ function buildTagsBase(type, language) {
 function computeLanguages(primaryLang, rawName, desc, type) {
   const langs = [];
   const main = primaryLang || "Various";
-  const nameL = (rawName || "").toLowerCase();
   const descL = (desc || "").toLowerCase();
+  const nameL = (rawName || "").toLowerCase();
   const typeL = (type || "").toLowerCase();
 
   if (!main || main === "Various") {
@@ -412,10 +425,10 @@ function mapRepoFromGitHub(repo) {
     tags: buildTagsBase(type, primaryLang),
     githubUrl: repo.html_url,
     pagesUrl,
-    hasLiveSite: !!pagesUrl, // will be verified later
+    hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null  // may be filled from projects.json or auto-detect
+    thumbnailUrl: null
   };
 }
 
@@ -451,7 +464,7 @@ function mapEntryToProject(entry) {
     tags: mergedTags,
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
     pagesUrl,
-    hasLiveSite: !!pagesUrl, // will be verified later
+    hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
     thumbnailUrl
@@ -462,7 +475,7 @@ function mapEntryToProject(entry) {
 
 function matchesFilters(project) {
   const rawName = project.rawName || "";
-  if (isSelfProjectsRepoName(rawName)) return false; // never show self repo
+  if (isSelfProjectsRepoName(rawName)) return false;
 
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
 
