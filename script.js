@@ -46,15 +46,28 @@ const SPECIAL_WORDS = {
 
 function prettifyName(raw) {
   if (!raw) return "";
+
+  // Normalize separators
   let s = raw.replace(/[-_.]+/g, " ");
+
+  // Split camelCase and weird capitals like IOS / iOS / IoS
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   s = s.replace(/\s+/g, " ").trim();
 
-  const originalWords = s.split(" ");
-  const lowerWords = s.toLowerCase().split(" ");
+  let words = s.split(" ").map(w => w.trim());
+
+  // If any combination equals "ios", force it back into a single word iOS
+  const reIOS = /^i?os$/i;
+  words = words.flatMap((w, i) => {
+    if (reIOS.test(w)) return ["iOS"];
+    return [w];
+  });
+
+  // Lowercase original words but preserve SPECIAL_WORDS and iOS
+  const lowerWords = words.map(w => w.toLowerCase());
 
   const resultWords = lowerWords.map((word, idx) => {
-    if (!word.length) return word;
+    if (word === "ios") return "iOS";  // force correct Apple branding
 
     if (SPECIAL_WORDS[word]) {
       return SPECIAL_WORDS[word];
