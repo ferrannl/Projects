@@ -132,7 +132,7 @@ body {
   margin-bottom: 0;
 }
 
-/* (Legacy class, safe) */
+/* Legacy intro class (safe) */
 .site-intro {
   margin: 0.1rem 0 0;
   max-width: 38rem;
@@ -802,7 +802,6 @@ body {
   color: var(--text-muted);
 }
 
-/* small screens */
 @media (max-width: 480px) {
   .lang-gate-card {
     padding: 1.4rem 1.1rem 1.1rem;
