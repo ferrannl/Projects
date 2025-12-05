@@ -11,7 +11,8 @@ let repos = [];
 const state = {
   search: "",
   typeFilter: "all",
-  languageFilter: "all"
+  languageFilter: "all",
+  showSelfRepo: false   // default: hide "Projects" repo
 };
 
 const gridEl = document.getElementById("projectsGrid");
@@ -19,6 +20,7 @@ const emptyEl = document.getElementById("emptyState");
 const searchEl = document.getElementById("search");
 const languageSelectEl = document.getElementById("languageFilter");
 const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
+const showSelfRepoEl = document.getElementById("showSelfRepo");
 
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
@@ -144,13 +146,69 @@ function getTypeLabel(type) {
   }
 }
 
-function buildTagsBase(type) {
+function buildTagsBase(type, language) {
   const tags = [];
+  const langLower = (language || "").toLowerCase();
+
   if (type === "website") tags.push("web");
   if (type === "mobile")  tags.push("mobile");
   if (type === "api")     tags.push("api");
-  if (type === "school")  tags.push("school");
+  if (type === "school") {
+    tags.push("school");
+    if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
+      tags.push("web");
+    }
+  }
+
   return tags;
+}
+
+/**
+ * Compute language array based on primary language, type and name/description.
+ * Returns an array with primary language first, up to 3 total.
+ */
+function computeLanguages(primaryLang, rawName, desc, type) {
+  const langs = [];
+  const main = primaryLang || "Various";
+  const nameL = (rawName || "").toLowerCase();
+  const descL = (desc || "").toLowerCase();
+  const typeL = (type || "").toLowerCase();
+
+  if (!main || main === "Various") {
+    langs.push(main);
+    return langs;
+  }
+
+  const l = main.toLowerCase();
+
+  if (l === "html") {
+    langs.push("HTML", "CSS", "JavaScript");
+  } else if (l === "css") {
+    langs.push("CSS", "HTML", "JavaScript");
+  } else if (l === "javascript") {
+    if (typeL === "website") {
+      langs.push("JavaScript", "HTML", "CSS");
+    } else {
+      langs.push("JavaScript");
+    }
+  } else if (l === "typescript") {
+    langs.push("TypeScript", "JavaScript");
+  } else if (l === "c++") {
+    langs.push("C++", "C");
+  } else if (l === "c#") {
+    langs.push("C#");
+    if (descL.includes("asp.net") || nameL.includes("asp.net")) {
+      langs.push("ASP.NET");
+    } else {
+      langs.push(".NET");
+    }
+  } else {
+    langs.push(main);
+  }
+
+  // Deduplicate + cap to 3
+  const unique = [...new Set(langs)];
+  return unique.slice(0, 3);
 }
 
 /* ---------- Map GitHub repo → internal ---------- */
@@ -158,17 +216,23 @@ function buildTagsBase(type) {
 function mapRepoFromGitHub(repo) {
   const type = inferTypeFromGitHub(repo);
   const baseDesc = repo.description || "No description yet.";
+  const primaryLang = repo.language || "Various";
+  const languages = computeLanguages(primaryLang, repo.name, repo.description, type);
+
+  const pagesUrl = repo.has_pages
+    ? `https://${GITHUB_USER}.github.io/${repo.name}/`
+    : null;
 
   return {
     rawName: repo.name,
     displayName: prettifyName(repo.name),
-    language: repo.language || "Various",
+    language: languages[0] || "Various",
+    languages,
     type,
-    tags: buildTagsBase(type),
+    tags: buildTagsBase(type, primaryLang),
     githubUrl: repo.html_url,
-    pagesUrl: repo.has_pages
-      ? `https://${GITHUB_USER}.github.io/${repo.name}/`
-      : null,
+    pagesUrl,
+    hasLiveSite: !!pagesUrl, // will be verified later
     baseDescription: baseDesc,
     summary: baseDesc,
     thumbnailUrl: null  // may be filled from projects.json or auto-detect
@@ -180,10 +244,12 @@ function mapRepoFromGitHub(repo) {
 function mapEntryToProject(entry) {
   const type = inferTypeFromEntry(entry);
   const baseDesc = entry.description || "No description yet.";
-  const hasPages = !!entry.hasPages;
+  const hasPagesFlag = !!entry.hasPages;
   const customPagesUrl = entry.pagesUrl;
+  const primaryLang = entry.language || "Various";
+  const languages = computeLanguages(primaryLang, entry.name, entry.description, type);
 
-  const tagsFromType = buildTagsBase(type);
+  const tagsFromType = buildTagsBase(type, primaryLang);
   const extraTags = entry.tags ? entry.tags : [];
   const mergedTags = [...new Set([...tagsFromType, ...extraTags])];
 
@@ -192,16 +258,20 @@ function mapEntryToProject(entry) {
     thumbnailUrl = entry.thumbnailUrl.trim();
   }
 
+  const pagesUrl = hasPagesFlag
+    ? (customPagesUrl || `https://${GITHUB_USER}.github.io/${entry.name}/`)
+    : null;
+
   return {
     rawName: entry.name,
     displayName: prettifyName(entry.name),
-    language: entry.language || "Various",
+    language: languages[0] || "Various",
+    languages,
     type,
     tags: mergedTags,
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
-    pagesUrl: hasPages
-      ? (customPagesUrl || `https://${GITHUB_USER}.github.io/${entry.name}/`)
-      : null,
+    pagesUrl,
+    hasLiveSite: !!pagesUrl, // will be verified later
     baseDescription: baseDesc,
     summary: baseDesc,
     thumbnailUrl
@@ -211,8 +281,21 @@ function mapEntryToProject(entry) {
 /* ---------- Filter / search ---------- */
 
 function matchesFilters(project) {
+  const rawName = (project.rawName || "").toLowerCase();
+  const isSelfRepo = rawName === "projects";
+
+  // Hide "Projects" (this site) unless explicitly allowed
+  if (!state.showSelfRepo && isSelfRepo) return false;
+
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
-  if (state.languageFilter !== "all" && project.language !== state.languageFilter) return false;
+
+  if (state.languageFilter !== "all") {
+    const langs = project.languages && project.languages.length
+      ? project.languages
+      : (project.language ? [project.language] : []);
+    const matchLang = langs.some(l => (l || "").toLowerCase() === state.languageFilter.toLowerCase());
+    if (!matchLang) return false;
+  }
 
   if (state.search) {
     const haystack = [
@@ -221,6 +304,7 @@ function matchesFilters(project) {
       project.summary,
       project.language,
       project.type,
+      ...(project.languages || []),
       ...(project.tags || [])
     ].join(" ").toLowerCase();
 
@@ -310,13 +394,20 @@ function createProjectCard(project) {
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
-  if (project.language) {
+  // Languages (show up to 3)
+  const langList = project.languages && project.languages.length
+    ? project.languages
+    : (project.language ? [project.language] : []);
+
+  langList.slice(0, 3).forEach(lang => {
+    if (!lang) return;
     const langPill = document.createElement("span");
     langPill.className = "meta-pill language";
-    langPill.textContent = project.language;
+    langPill.textContent = lang;
     metaRow.appendChild(langPill);
-  }
+  });
 
+  // Tags
   (project.tags || []).forEach(tag => {
     const tagPill = document.createElement("span");
     tagPill.className = "meta-pill tag-pill";
@@ -335,7 +426,7 @@ function createProjectCard(project) {
   ghLink.innerHTML = "<span>View on GitHub</span>";
   linksRow.appendChild(ghLink);
 
-  if (project.pagesUrl) {
+  if (project.hasLiveSite && project.pagesUrl) {
     const pagesLink = document.createElement("a");
     pagesLink.className = "project-link-btn";
     pagesLink.href = project.pagesUrl;
@@ -369,7 +460,7 @@ function renderProjects() {
   if (!gridEl) return;
   gridEl.innerHTML = "";
 
-  const filtered = repos.filter(matchesFilters);
+  let filtered = repos.filter(matchesFilters);
 
   if (!filtered.length) {
     if (emptyEl) {
@@ -380,6 +471,16 @@ function renderProjects() {
   }
 
   if (emptyEl) emptyEl.hidden = true;
+
+  // Sort: live sites first, then alphabetically by displayName
+  filtered = filtered.slice().sort((a, b) => {
+    const aLive = a.hasLiveSite && a.pagesUrl ? 1 : 0;
+    const bLive = b.hasLiveSite && b.pagesUrl ? 1 : 0;
+    if (bLive !== aLive) return bLive - aLive;
+    const nameA = (a.displayName || a.rawName || "").toLowerCase();
+    const nameB = (b.displayName || b.rawName || "").toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
 
   filtered.forEach(project => {
     const card = createProjectCard(project);
@@ -403,6 +504,13 @@ function initFiltersAndSearch() {
       renderProjects();
     });
   }
+
+  if (showSelfRepoEl) {
+    showSelfRepoEl.addEventListener("change", () => {
+      state.showSelfRepo = showSelfRepoEl.checked;
+      renderProjects();
+    });
+  }
 }
 
 function initLanguageFilter() {
@@ -415,7 +523,13 @@ function initLanguageFilter() {
   languageSelectEl.appendChild(allOption);
 
   const languages = Array.from(
-    new Set(repos.map(r => r.language).filter(Boolean))
+    new Set(
+      repos.flatMap(r => {
+        if (r.languages && r.languages.length) return r.languages;
+        if (r.language) return [r.language];
+        return [];
+      }).filter(Boolean)
+    )
   ).sort((a, b) => a.localeCompare(b));
 
   languages.forEach(lang => {
@@ -559,6 +673,40 @@ async function enhanceThumbnails() {
   renderProjects();
 }
 
+/* ---------- Live site verification ---------- */
+
+async function checkLiveSite(project) {
+  if (!project.pagesUrl) {
+    project.hasLiveSite = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(project.pagesUrl, { method: "GET" });
+    if (res.ok) {
+      project.hasLiveSite = true;
+    } else {
+      project.hasLiveSite = false;
+      project.pagesUrl = null;
+    }
+  } catch (err) {
+    console.warn(`Error checking live site for ${project.rawName} at ${project.pagesUrl}`, err);
+    project.hasLiveSite = false;
+    project.pagesUrl = null;
+  }
+}
+
+async function verifyLiveSites() {
+  console.log("Verifying live sites for projects with pagesUrl...");
+  const tasks = repos
+    .filter(p => p.pagesUrl)
+    .map(p => checkLiveSite(p));
+
+  await Promise.all(tasks);
+  saveCache(repos);
+  renderProjects();
+}
+
 /* ---------- Fallback: projects.json ---------- */
 
 async function loadFromProjectsJson() {
@@ -570,6 +718,7 @@ async function loadFromProjectsJson() {
     repos = projects;
     initLanguageFilter();
     renderProjects();
+    await verifyLiveSites();
     await enhanceThumbnails();
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
@@ -602,7 +751,8 @@ async function loadRepos() {
     renderProjects();
     usedCache = true;
 
-    // Run thumbnail enhancement even when cache is "fresh"
+    // Run verification and thumbnail enhancement even when cache is "fresh"
+    verifyLiveSites();
     enhanceThumbnails();
 
     if (age < CACHE_TTL_MS) {
@@ -683,6 +833,7 @@ async function loadRepos() {
     saveCache(repos);
     initLanguageFilter();
     renderProjects();
+    await verifyLiveSites();
     await enhanceThumbnails();
   } catch (err) {
     console.error("Network / fetch error while calling GitHub API:", err);
