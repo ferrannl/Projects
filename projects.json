@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Imgur-App-Android",
+    "description": "Simple Imgur client app for Android with login and image browsing.",
+    "language": "Java",
+    "type": "mobile",
+    "hasPages": false,
+    "thumbnailUrl": "https://raw.githubusercontent.com/ferrannl/Imgur-App-Android/HEAD/class-diagram.png",
+    "tags": ["imgur", "client"]
+  },
+  {
+    "name": "Cafeteria-Churreria-San-Pedro",
+    "description": "Single-page website for Cafetería Churrería San Pedro in Tenerife.",
+    "language": "HTML",
+    "type": "website",
+    "hasPages": true,
+    "thumbnailUrl": "https://raw.githubusercontent.com/ferrannl/Cafeteria-Churreria-San-Pedro/HEAD/hero.jpg",
+    "tags": ["restaurant", "churros", "tenerife"]
+  }
+]
