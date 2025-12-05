@@ -148,64 +148,136 @@ function getTypeLabel(type) {
   }
 }
 
-function buildTagsBase(type, language) {
+/**
+ * Build a base set of tags from type + primary language.
+ * Keep it small & meaningful, then dedupe & cap.
+ */
+function buildTagsBase(type, primaryLang) {
   const tags = [];
-  const langLower = (language || "").toLowerCase();
+  const langLower = (primaryLang || "").toLowerCase();
 
+  // Type-based tags
   if (type === "website") tags.push("web");
   if (type === "mobile")  tags.push("mobile");
   if (type === "api")     tags.push("api");
-  if (type === "school") {
-    tags.push("school");
-    if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
-      tags.push("web");
-    }
+  if (type === "school")  tags.push("school");
+
+  // Language-based tags
+  if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
+    if (!tags.includes("web")) tags.push("web");
+    tags.push("frontend");
   }
 
-  return tags;
+  if (langLower === "c#") {
+    tags.push("csharp", "dotnet");
+  }
+
+  if (langLower === "c++") {
+    tags.push("cpp");
+  }
+
+  if (langLower === "java") {
+    tags.push("java");
+  }
+
+  if (langLower === "php") {
+    tags.push("backend");
+  }
+
+  if (langLower === "python") {
+    tags.push("python");
+  }
+
+  // Dedupe and cap total tags to avoid flooding
+  const unique = [...new Set(tags)];
+  return unique.slice(0, 6);
 }
 
 /**
  * Compute language array based on primary language, type and name/description.
  * Returns an array with primary language first, up to 3 total.
+ * Tries to show realistic stacks like: HTML + CSS + JS, C# + .NET/ASP.NET, etc.
  */
 function computeLanguages(primaryLang, rawName, desc, type) {
   const langs = [];
   const main = primaryLang || "Various";
-  const nameL = (rawName || "").toLowerCase();
-  const descL = (desc || "").toLowerCase();
+  const text = `${rawName || ""} ${desc || ""}`.toLowerCase();
   const typeL = (type || "").toLowerCase();
 
+  function add(lang) {
+    if (!lang || !lang.trim()) return;
+    if (!langs.includes(lang)) langs.push(lang);
+  }
+
+  // If GitHub doesn't know: bail out early
   if (!main || main === "Various") {
-    langs.push(main);
+    add(main);
     return langs;
   }
 
   const l = main.toLowerCase();
 
+  // --- HTML / CSS / JS combos ---
   if (l === "html") {
-    langs.push("HTML", "CSS", "JavaScript");
+    add("HTML");
+    add("CSS");
+    add("JavaScript");
   } else if (l === "css") {
-    langs.push("CSS", "HTML", "JavaScript");
+    add("CSS");
+    add("HTML");
+    add("JavaScript");
   } else if (l === "javascript") {
-    if (typeL === "website") {
-      langs.push("JavaScript", "HTML", "CSS");
-    } else {
-      langs.push("JavaScript");
+    add("JavaScript");
+    if (typeL === "website" || text.includes("html") || text.includes("css")) {
+      add("HTML");
+      add("CSS");
     }
   } else if (l === "typescript") {
-    langs.push("TypeScript", "JavaScript");
+    add("TypeScript");
+    add("JavaScript");
+    if (typeL === "website" || text.includes("html") || text.includes("css")) {
+      add("HTML");
+      add("CSS");
+    }
+  } else if (l === "php") {
+    add("PHP");
+    if (typeL === "website" || text.includes("html")) {
+      add("HTML");
+      add("CSS");
+    }
   } else if (l === "c++") {
-    langs.push("C++", "C");
+    // C++ stack
+    add("C++");
+    add("C");
   } else if (l === "c#") {
-    langs.push("C#");
-    if (descL.includes("asp.net") || nameL.includes("asp.net")) {
-      langs.push("ASP.NET");
+    add("C#");
+    // Try to pick ASP.NET vs plain .NET
+    if (text.includes("asp.net")) {
+      add("ASP.NET");
     } else {
-      langs.push(".NET");
+      add(".NET");
     }
   } else {
-    langs.push(main);
+    // Fallback: just use the main language as-is
+    add(main);
+  }
+
+  // Extra heuristics based on description/name
+  if (langs.length < 3) {
+    if (text.includes("asp.net") && !langs.includes("ASP.NET")) {
+      add("ASP.NET");
+    } else if (text.includes(".net") && !langs.includes(".NET") && !langs.includes("ASP.NET")) {
+      add(".NET");
+    }
+  }
+
+  if (langs.length < 3 && (text.includes("html") || text.includes("css"))) {
+    if (!langs.includes("HTML")) add("HTML");
+    if (!langs.includes("CSS") && langs.length < 3) add("CSS");
+  }
+
+  if (langs.length < 3 && text.includes("javascript") && !langs.includes("JavaScript")) {
+    add("JavaScript");
   }
 
   // Deduplicate + cap to 3
@@ -270,7 +342,7 @@ function mapEntryToProject(entry) {
     language: languages[0] || "Various",
     languages,
     type,
-    tags: mergedTags,
+    tags: mergedTags.slice(0, 8), // extra safety cap if projects.json is very tag-happy
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
     pagesUrl,
     hasLiveSite: !!pagesUrl, // will be verified later
