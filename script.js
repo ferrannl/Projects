@@ -595,6 +595,9 @@ async function loadRepos() {
     renderProjects();
     usedCache = true;
 
+    // Ensure thumbnails are enhanced even when using fresh cache
+    enhanceThumbnails();
+
     if (age < CACHE_TTL_MS) {
       return;
     }
