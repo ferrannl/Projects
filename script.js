@@ -17,6 +17,56 @@ const searchEl = document.getElementById("search");
 const languageSelectEl = document.getElementById("languageFilter");
 const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 
+// --- Helpers for README summary ---
+
+/**
+ * Extracts a small summary from README markdown:
+ * - skips headings / badges / empty top lines
+ * - takes a few content lines
+ * - splits into "main" and "extra" (for faded lines)
+ */
+function extractSummaryFromReadme(markdown) {
+  if (!markdown) return null;
+
+  const lines = markdown.split(/\r?\n/);
+  const cleanLines = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Skip empty lines and heading/badge noise at top
+    if (
+      !cleanLines.length &&
+      (
+        trimmed === "" ||
+        /^#{1,6}\s/.test(trimmed) ||         // markdown headings
+        /^\[!\[/.test(trimmed) ||            // badges
+        /^!\[/.test(trimmed) ||              // images
+        /^<\!--/.test(trimmed)               // comments
+      )
+    ) {
+      continue;
+    }
+
+    if (trimmed) {
+      cleanLines.push(trimmed);
+    }
+
+    // We only need a small preview
+    if (cleanLines.length >= 7) break;
+  }
+
+  if (!cleanLines.length) return null;
+
+  const primaryLines = cleanLines.slice(0, 3);   // fully visible
+  const extraLines   = cleanLines.slice(3, 5);   // faded, clickable
+  const main = primaryLines.join(" ");
+  const extra = extraLines.join(" ");
+  const fullPreview = cleanLines.join(" ");
+
+  return { main, extra, fullPreview };
+}
+
 // --- Type inference for each repo ---
 function inferType(repo) {
   const name = (repo.name || "").toLowerCase();
@@ -69,23 +119,6 @@ function getTypeLabel(type) {
   }
 }
 
-// Map GitHub repo JSON → internal object
-function mapRepo(repo) {
-  const type = inferType(repo);
-
-  return {
-    name: repo.name,
-    description: repo.description || "No description yet.",
-    language: repo.language || "Various",
-    type,
-    tags: buildTags(repo, type),
-    githubUrl: repo.html_url,
-    pagesUrl: repo.has_pages
-      ? `https://${GITHUB_USER}.github.io/${repo.name}/`
-      : null
-  };
-}
-
 function buildTags(repo, type) {
   const tags = [];
 
@@ -98,6 +131,29 @@ function buildTags(repo, type) {
   if (type === "school") tags.push("school");
 
   return tags;
+}
+
+// Map GitHub repo JSON → internal object
+function mapRepo(repo) {
+  const type = inferType(repo);
+  const baseDesc = repo.description || "No description yet.";
+
+  return {
+    name: repo.name,
+    language: repo.language || "Various",
+    type,
+    tags: buildTags(repo, type),
+    githubUrl: repo.html_url,
+    pagesUrl: repo.has_pages
+      ? `https://${GITHUB_USER}.github.io/${repo.name}/`
+      : null,
+
+    // description-related fields
+    baseDescription: baseDesc,        // raw fallback
+    descriptionMain: baseDesc,        // main visible summary
+    descriptionExtra: "",             // faded “extra lines”
+    fullReadme: "",                   // first chunk from README
+  };
 }
 
 // --- Filtering logic ---
@@ -113,7 +169,8 @@ function matchesFilters(project) {
   if (state.search) {
     const haystack = [
       project.name,
-      project.description,
+      project.descriptionMain,
+      project.descriptionExtra,
       project.language,
       project.type,
       ...(project.tags || [])
@@ -127,7 +184,7 @@ function matchesFilters(project) {
   return true;
 }
 
-// --- Card creation (with simple collapsible description) ---
+// --- Card creation with README-based summary ---
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -147,30 +204,66 @@ function createProjectCard(project) {
   titleRow.appendChild(nameEl);
   titleRow.appendChild(typePill);
 
-  // DESCRIPTION
+  // DESCRIPTION WRAPPER
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
-  const descEl = document.createElement("p");
-  descEl.className = "project-description";
-  descEl.textContent = project.description;
-  descWrapper.appendChild(descEl);
+  const mainText = project.descriptionMain || project.baseDescription || "";
+  const extraText = project.descriptionExtra || "";
 
-  // Alleen lange descriptions inklappen (lengte > 180 chars)
-  const isLong = project.description && project.description.length > 180;
+  const descMainEl = document.createElement("p");
+  descMainEl.className = "project-description-main";
+  descMainEl.textContent = mainText;
+  descWrapper.appendChild(descMainEl);
 
-  if (isLong) {
-    descEl.classList.add("is-long", "collapsed");
+  let extraEl = null;
+  if (extraText) {
+    extraEl = document.createElement("p");
+    extraEl.className = "project-description-extra";
+    extraEl.textContent = extraText;
+    descWrapper.appendChild(extraEl);
+  }
+
+  // Collapsible logic: only for repos where we actually have a fullReadme
+  const longEnough = project.fullReadme && project.fullReadme.length > 280;
+
+  if (longEnough) {
+    descWrapper.classList.add("is-collapsible", "is-collapsed");
 
     const toggleBtn = document.createElement("span");
     toggleBtn.className = "show-more-btn";
-    toggleBtn.textContent = "Show more";
+    toggleBtn.textContent = "Show full README";
 
-    toggleBtn.addEventListener("click", () => {
-      const isExpanded = descEl.classList.toggle("expanded");
-      descEl.classList.toggle("collapsed", !isExpanded);
-      toggleBtn.textContent = isExpanded ? "Show less" : "Show more";
-    });
+    const handleToggle = () => {
+      const isCurrentlyCollapsed = descWrapper.classList.contains("is-collapsed");
+      if (isCurrentlyCollapsed) {
+        // Expand – show a bigger chunk of the README
+        const expandedText = project.fullReadme.slice(0, 1600); // still capped
+        descMainEl.textContent = expandedText;
+        if (extraEl) {
+          extraEl.style.display = "none";
+        }
+        descWrapper.classList.remove("is-collapsed");
+        descWrapper.classList.add("is-expanded");
+        toggleBtn.textContent = "Show less";
+      } else {
+        // Collapse – go back to small summary (main + faded extra)
+        descMainEl.textContent = mainText;
+        if (extraEl) {
+          extraEl.style.display = "";
+        }
+        descWrapper.classList.remove("is-expanded");
+        descWrapper.classList.add("is-collapsed");
+        toggleBtn.textContent = "Show full README";
+      }
+    };
+
+    toggleBtn.addEventListener("click", handleToggle);
+
+    // Clicking the faded lines also expands
+    if (extraEl) {
+      extraEl.addEventListener("click", handleToggle);
+    }
 
     descWrapper.appendChild(toggleBtn);
   }
@@ -306,6 +399,32 @@ function initLanguageFilter() {
   });
 }
 
+// --- Enrich repos with README summaries ---
+async function enhanceDescriptionsFromReadme() {
+  const tasks = repos.map(async (project) => {
+    try {
+      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.name}/HEAD/README.md`;
+      const res = await fetch(url);
+      if (!res.ok) return; // no README, just keep base description
+
+      const text = await res.text();
+      const summary = extractSummaryFromReadme(text);
+      if (!summary) return;
+
+      project.fullReadme = summary.fullPreview;
+      project.descriptionMain = summary.main || project.baseDescription;
+      project.descriptionExtra = summary.extra || "";
+    } catch (e) {
+      console.error("README fetch failed for", project.name, e);
+    }
+  });
+
+  await Promise.all(tasks);
+
+  // After all summaries are fetched, re-render with nicer descriptions
+  renderProjects();
+}
+
 // --- Load repos from GitHub ---
 async function loadRepos() {
   if (gridEl) {
@@ -325,7 +444,10 @@ async function loadRepos() {
       .map(mapRepo);
 
     initLanguageFilter();
+    // Initial render with plain descriptions
     renderProjects();
+    // Then upgrade descriptions using README summaries
+    enhanceDescriptionsFromReadme().catch(console.error);
   } catch (err) {
     console.error(err);
     if (gridEl) {
