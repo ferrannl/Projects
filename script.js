@@ -143,6 +143,8 @@ function buildTagsBase(type) {
   return tags;
 }
 
+/* ---------- Map GitHub repo → internal ---------- */
+
 function mapRepoFromGitHub(repo) {
   const type = inferTypeFromGitHub(repo);
   const baseDesc = repo.description || "No description yet.";
@@ -159,9 +161,11 @@ function mapRepoFromGitHub(repo) {
       : null,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null  // only from projects.json for now
+    thumbnailUrl: null  // may be filled from projects.json or auto-detect
   };
 }
+
+/* ---------- Map projects.json entry → internal ---------- */
 
 function mapEntryToProject(entry) {
   const type = inferTypeFromEntry(entry);
@@ -190,6 +194,8 @@ function mapEntryToProject(entry) {
       : null
   };
 }
+
+/* ---------- Filter / search ---------- */
 
 function matchesFilters(project) {
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
@@ -463,6 +469,64 @@ function canCallApiNow() {
   return Date.now() > info.until;
 }
 
+/* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
+
+function getThumbnailCandidates(project) {
+  // try to catch favicon.png, logo.jpg, etc., including nested images/ paths
+  const base = [
+    "logo.png",
+    "logo.jpg",
+    "logo.svg",
+    "favicon.png",
+    "favicon.ico",
+    "banner.png",
+    "hero.jpg",
+    "hero.png",
+    "screenshot.png",
+    "screenshot.jpg"
+  ];
+
+  const nested = [
+    "images/logo.png",
+    "images/logo.jpg",
+    "images/favicon.png",
+    "img/logo.png",
+    "img/logo.jpg",
+    "assets/logo.png",
+    "assets/logo.jpg"
+  ];
+
+  return [...base, ...nested];
+}
+
+async function findThumbnailForRepo(project) {
+  if (project.thumbnailUrl) return; // already has one from projects.json
+
+  const candidates = getThumbnailCandidates(project);
+
+  for (const path of candidates) {
+    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${path}`;
+    try {
+      const res = await fetch(url, { method: "GET" });
+      if (res.ok) {
+        project.thumbnailUrl = url;
+        return;
+      }
+    } catch (e) {
+      console.error("Thumb fetch failed", project.rawName, path, e);
+    }
+  }
+}
+
+async function enhanceThumbnails() {
+  // Don't hammer too hard: limit how many repos we probe per load
+  const subset = repos.slice(0, 60);
+  const tasks = subset.map((project) => findThumbnailForRepo(project));
+  await Promise.all(tasks);
+  saveCache(repos);
+  renderProjects();
+}
+
 /* ---------- Fallback: projects.json ---------- */
 
 async function loadFromProjectsJson() {
@@ -472,9 +536,9 @@ async function loadFromProjectsJson() {
     const data = await res.json();
     const projects = Array.isArray(data) ? data.map(mapEntryToProject) : [];
     repos = projects;
-    saveCache(repos);
     initLanguageFilter();
     renderProjects();
+    await enhanceThumbnails();
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
     if (gridEl) gridEl.innerHTML = "";
@@ -505,11 +569,10 @@ async function loadRepos() {
     renderProjects();
     usedCache = true;
 
-    // If cache is fresh (< TTL), do NOT call API
     if (age < CACHE_TTL_MS) {
       return;
     }
-    // Else: cache is old; we can still show it but may refresh below
+    // else: cache old, we may refresh below
   }
 
   // 2) Respect rate-limit backoff
@@ -543,7 +606,6 @@ async function loadRepos() {
         return;
       }
 
-      // Other HTTP errors → fallback if no cache
       if (!usedCache) {
         await loadFromProjectsJson();
       }
@@ -555,7 +617,7 @@ async function loadRepos() {
       .filter(r => !r.private)
       .map(mapRepoFromGitHub);
 
-    // Merge in extra info from projects.json (thumbnails, nicer descriptions) if names match
+    // Merge projects.json extras (thumbnails, better descriptions) if available
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
       if (fallbackRes.ok) {
@@ -583,6 +645,7 @@ async function loadRepos() {
     saveCache(repos);
     initLanguageFilter();
     renderProjects();
+    await enhanceThumbnails();
   } catch (err) {
     console.error("Network / fetch error while calling GitHub API:", err);
     if (!usedCache) {
