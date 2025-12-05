@@ -10,11 +10,59 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+
+<!-- LANGUAGE GATE -->
+<div class="lang-gate-backdrop" id="langGate" hidden>
+  <div class="lang-gate-card" role="dialog" aria-modal="true" aria-labelledby="langGateTitle">
+    <div class="lang-gate-logo">Ferran’s Projects</div>
+    <div class="lang-gate-title" id="langGateTitle">Choose your language</div>
+    <div class="lang-gate-sub">
+      Kies je taal · Wähle deine Sprache · Elige tu idioma
+      <small>You can change this later if the site gets more translations.</small>
+    </div>
+    <div class="lang-gate-buttons">
+      <button class="btn-lang" data-lang="nl">
+        <span class="flag">🇳🇱</span>
+        <span class="label-main">Nederlands</span>
+        <span class="label-sub">Standaardtaal voor Ferran</span>
+      </button>
+      <button class="btn-lang" data-lang="en">
+        <span class="flag">🇬🇧</span>
+        <span class="label-main">English</span>
+        <span class="label-sub">Good default for most visitors</span>
+      </button>
+      <button class="btn-lang" data-lang="de">
+        <span class="flag">🇩🇪</span>
+        <span class="label-main">Deutsch</span>
+        <span class="label-sub">Für Gäste aus Deutschland</span>
+      </button>
+      <button class="btn-lang" data-lang="pl">
+        <span class="flag">🇵🇱</span>
+        <span class="label-main">Polski</span>
+        <span class="label-sub">Dla odwiedzających z Polski</span>
+      </button>
+      <button class="btn-lang" data-lang="tr">
+        <span class="flag">🇹🇷</span>
+        <span class="label-main">Türkçe</span>
+        <span class="label-sub">Türkçe konuşan ziyaretçiler için</span>
+      </button>
+      <button class="btn-lang" data-lang="es">
+        <span class="flag">🇪🇸</span>
+        <span class="label-main">Español</span>
+        <span class="label-sub">Para amigos de España y Canarias</span>
+      </button>
+    </div>
+    <div class="lang-gate-hint">
+      Press <strong>Esc</strong> to close and use English by default.
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <header class="site-header">
     <div class="site-title-block">
       <h1>Ferran’s Projects</h1>
-      <p class="site-subtitle">
+      <p class="site-subtitle" data-i18n="subtitle">
         All my programming &amp; coding projects in one place – websites, apps, school work, guides, APIs and more.
       </p>
     </div>
@@ -56,17 +104,17 @@
 
     <div class="filters">
       <div class="filter-group">
-        <span class="filter-label">Type</span>
-        <button class="chip chip-active" data-filter-type="type" data-filter-value="all">All</button>
-        <button class="chip" data-filter-type="type" data-filter-value="website">Websites</button>
-        <button class="chip" data-filter-type="type" data-filter-value="mobile">Mobile</button>
-        <button class="chip" data-filter-type="type" data-filter-value="api">APIs / Backend</button>
-        <button class="chip" data-filter-type="type" data-filter-value="school">School / Study</button>
-        <button class="chip" data-filter-type="type" data-filter-value="other">Other</button>
+        <span class="filter-label" data-i18n="filterTypeLabel">Type</span>
+        <button class="chip chip-active" data-filter-type="type" data-filter-value="all" data-i18n="typeAll">All</button>
+        <button class="chip" data-filter-type="type" data-filter-value="website" data-i18n="typeWebsite">Websites</button>
+        <button class="chip" data-filter-type="type" data-filter-value="mobile" data-i18n="typeMobile">Mobile</button>
+        <button class="chip" data-filter-type="type" data-filter-value="api" data-i18n="typeApi">APIs / Backend</button>
+        <button class="chip" data-filter-type="type" data-filter-value="school" data-i18n="typeSchool">School / Study</button>
+        <button class="chip" data-filter-type="type" data-filter-value="other" data-i18n="typeOther">Other</button>
       </div>
 
       <div class="filter-group">
-        <span class="filter-label">Language</span>
+        <span class="filter-label" data-i18n="filterLanguageLabel">Language</span>
         <select id="languageFilter">
           <option value="all">All languages</option>
         </select>
@@ -79,17 +127,17 @@
       <!-- Cards injected by script.js -->
     </section>
 
-    <div id="emptyState" class="empty-state" hidden>
-      <p>No projects match your search/filter. Try another search term.</p>
+    <div id="emptyState" class="empty-state" hidden data-i18n="emptyState">
+      No projects match your search/filter. Try another search term.
     </div>
   </main>
 
   <footer class="site-footer">
-    <span>Built with ♥ by Ferran</span>
+    <span data-i18n="footerBuiltWith">Built with ♥ by Ferran</span>
     <span class="footer-links">
       <a href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">@ferrannl</a>
       <span>·</span>
-      <a href="https://ferrannl.github.io/Projects/index.html" target="_blank" rel="noopener noreferrer">
+      <a href="https://ferrannl.github.io/Projects/index.html" target="_blank" rel="noopener noreferrer" data-i18n="footerViewOnPages">
         View this site on GitHub Pages
       </a>
     </span>
