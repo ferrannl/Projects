@@ -2,9 +2,8 @@ const GITHUB_USER = "ferrannl";
 const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`;
 const PROJECTS_URL = "./projects.json";
 
-// localStorage keys + timings
-const CACHE_KEY = "ferranProjectsCacheV1";
-const RATE_LIMIT_KEY = "ferranProjectsRateLimitV1";
+const CACHE_KEY = "ferranProjectsCacheV2";
+const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
 const CACHE_TTL_MS = 1000 * 60 * 60 * 6;      // 6 hours cache
 const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
 
@@ -43,7 +42,7 @@ const SPECIAL_WORDS = {
   ux: "UX"
 };
 
-/* ---------- Name prettifier ---------- */
+/* ---------- Helpers ---------- */
 
 function prettifyName(raw) {
   if (!raw) return "";
@@ -70,60 +69,6 @@ function prettifyName(raw) {
 
   return resultWords.join(" ");
 }
-
-/* ---------- Markdown → short summary ---------- */
-
-function stripMarkdown(text) {
-  if (!text) return "";
-  let out = text;
-  out = out.replace(/!\[[^\]]*]\([^)]*\)/g, "");
-  out = out.replace(/\[([^\]]+)]\([^)]*\)/g, "$1");
-  out = out.replace(/`([^`]+)`/g, "$1");
-  out = out.replace(/\*\*([^*]+)\*\*/g, "$1");
-  out = out.replace(/\*([^*]+)\*/g, "$1");
-  out = out.replace(/__([^_]+)__/g, "$1");
-  out = out.replace(/_([^_]+)_/g, "$1");
-  out = out.replace(/<\/?[^>]+(>|$)/g, "");
-  out = out.replace(/#+\s*/g, "");
-  return out.trim();
-}
-
-function buildShortSummaryFromReadme(markdown) {
-  if (!markdown) return null;
-  const lines = markdown.split(/\r?\n/);
-  const contentLines = [];
-
-  for (const raw of lines) {
-    let line = raw.trim();
-    if (!line) continue;
-    if (/^#{1,6}\s/.test(line)) continue;
-    if (/^>\s?/.test(line)) continue;
-    if (/^\[!\[/.test(line) || /^!\[/.test(line)) continue;
-    if (/^<!--/.test(line)) continue;
-    contentLines.push(line);
-    if (contentLines.length >= 3) break;
-  }
-
-  if (!contentLines.length) return null;
-
-  let text = contentLines.join(" ");
-  text = stripMarkdown(text);
-  if (!text) return null;
-
-  const maxLen = 220;
-  if (text.length > maxLen) {
-    text = text.slice(0, maxLen - 1);
-    const lastSpace = text.lastIndexOf(" ");
-    if (lastSpace > 60) {
-      text = text.slice(0, lastSpace);
-    }
-    text += "…";
-  }
-
-  return text;
-}
-
-/* ---------- Type & tags ---------- */
 
 function inferTypeFromGitHub(repo) {
   const name = (repo.name || "").toLowerCase();
@@ -192,13 +137,11 @@ function getTypeLabel(type) {
 function buildTagsBase(type) {
   const tags = [];
   if (type === "website") tags.push("web");
-  if (type === "mobile") tags.push("mobile");
-  if (type === "api") tags.push("api");
-  if (type === "school") tags.push("school");
+  if (type === "mobile")  tags.push("mobile");
+  if (type === "api")     tags.push("api");
+  if (type === "school")  tags.push("school");
   return tags;
 }
-
-/* ---------- Map GitHub repo → internal project ---------- */
 
 function mapRepoFromGitHub(repo) {
   const type = inferTypeFromGitHub(repo);
@@ -216,11 +159,9 @@ function mapRepoFromGitHub(repo) {
       : null,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null
+    thumbnailUrl: null  // only from projects.json for now
   };
 }
-
-/* ---------- Map projects.json entry → internal project ---------- */
 
 function mapEntryToProject(entry) {
   const type = inferTypeFromEntry(entry);
@@ -250,8 +191,6 @@ function mapEntryToProject(entry) {
   };
 }
 
-/* ---------- Filter / search ---------- */
-
 function matchesFilters(project) {
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
   if (state.languageFilter !== "all" && project.language !== state.languageFilter) return false;
@@ -272,7 +211,7 @@ function matchesFilters(project) {
   return true;
 }
 
-/* ---------- Modal for thumbnails ---------- */
+/* ---------- Modal ---------- */
 
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
@@ -405,7 +344,7 @@ function createProjectCard(project) {
   return card;
 }
 
-/* ---------- Render / filters ---------- */
+/* ---------- Render & UI ---------- */
 
 function renderProjects() {
   if (!gridEl) return;
@@ -524,74 +463,6 @@ function canCallApiNow() {
   return Date.now() > info.until;
 }
 
-/* ---------- README + thumbnails (only after successful API) ---------- */
-
-async function enhanceDescriptionsFromReadme() {
-  const tasks = repos.map(async (project) => {
-    try {
-      const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/README.md`;
-      const res = await fetch(url);
-      if (!res.ok) return;
-      const text = await res.text();
-      const summary = buildShortSummaryFromReadme(text);
-      if (summary) project.summary = summary;
-    } catch (e) {
-      console.error("README fetch failed for", project.rawName, e);
-    }
-  });
-
-  await Promise.all(tasks);
-  saveCache(repos);
-  renderProjects();
-}
-
-function getThumbnailCandidates(project) {
-  if (project.type === "website") {
-    return [
-      "logo.png",
-      "logo.svg",
-      "logo.jpg",
-      "banner.png",
-      "thumbnail.png",
-      "class-diagram.png",
-      "diagram.png"
-    ];
-  }
-  return [
-    "class-diagram.png",
-    "diagram.png",
-    "uml.png",
-    "logo.png",
-    "logo.jpg",
-    "thumbnail.png"
-  ];
-}
-
-async function findThumbnailForRepo(project) {
-  const candidates = getThumbnailCandidates(project);
-
-  for (const fileName of candidates) {
-    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${fileName}`;
-    try {
-      const res = await fetch(url);
-      if (res.ok) {
-        project.thumbnailUrl = url;
-        return;
-      }
-    } catch (e) {
-      console.error("Thumb fetch failed", project.rawName, fileName, e);
-    }
-  }
-}
-
-async function enhanceThumbnails() {
-  const subset = repos.slice(0, 40); // limit extra calls
-  const tasks = subset.map((project) => findThumbnailForRepo(project));
-  await Promise.all(tasks);
-  saveCache(repos);
-  renderProjects();
-}
-
 /* ---------- Fallback: projects.json ---------- */
 
 async function loadFromProjectsJson() {
@@ -626,7 +497,7 @@ async function loadRepos() {
   const cache = getCache();
   let usedCache = false;
 
-  // 1) If we have valid cache (not too old), use it and skip API.
+  // 1) Use cache if present
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
     repos = cache.projects;
@@ -634,14 +505,14 @@ async function loadRepos() {
     renderProjects();
     usedCache = true;
 
+    // If cache is fresh (< TTL), do NOT call API
     if (age < CACHE_TTL_MS) {
-      // cache is fresh -> don't call API at all
       return;
     }
-    // cache is old, we can still show it but we *may* refresh from API below
+    // Else: cache is old; we can still show it but may refresh below
   }
 
-  // 2) Decide if we are allowed to hit API (rate limit backoff)
+  // 2) Respect rate-limit backoff
   if (!canCallApiNow()) {
     console.warn("Skipping GitHub API call due to recent rate-limit; using cache or fallback.");
     if (!usedCache) {
@@ -672,26 +543,46 @@ async function loadRepos() {
         return;
       }
 
-      // other HTTP errors
+      // Other HTTP errors → fallback if no cache
       if (!usedCache) {
         await loadFromProjectsJson();
       }
       return;
     }
 
-    // Success: fresh data from GitHub
     const data = await res.json();
     repos = data
       .filter(r => !r.private)
       .map(mapRepoFromGitHub);
 
+    // Merge in extra info from projects.json (thumbnails, nicer descriptions) if names match
+    try {
+      const fallbackRes = await fetch(PROJECTS_URL);
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json();
+        if (Array.isArray(fallbackData)) {
+          const byName = new Map(
+            fallbackData.map(entry => [entry.name, mapEntryToProject(entry)])
+          );
+          repos = repos.map(p => {
+            const extra = byName.get(p.rawName);
+            if (!extra) return p;
+            return {
+              ...p,
+              summary: extra.summary || p.summary,
+              thumbnailUrl: extra.thumbnailUrl || p.thumbnailUrl,
+              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])]
+            };
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Could not merge data from projects.json:", e);
+    }
+
     saveCache(repos);
     initLanguageFilter();
     renderProjects();
-
-    // Enrich in background; they update cache + re-render
-    enhanceDescriptionsFromReadme().catch(console.error);
-    enhanceThumbnails().catch(console.error);
   } catch (err) {
     console.error("Network / fetch error while calling GitHub API:", err);
     if (!usedCache) {
