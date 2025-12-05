@@ -11,8 +11,7 @@ let repos = [];
 const state = {
   search: "",
   typeFilter: "all",
-  languageFilter: "all",
-  showSelfRepo: false   // default: hide "Projects" repo
+  languageFilter: "all"
 };
 
 const gridEl = document.getElementById("projectsGrid");
@@ -20,7 +19,6 @@ const emptyEl = document.getElementById("emptyState");
 const searchEl = document.getElementById("search");
 const languageSelectEl = document.getElementById("languageFilter");
 const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
-const showSelfRepoEl = document.getElementById("showSelfRepo");
 
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
@@ -45,6 +43,10 @@ const SPECIAL_WORDS = {
 };
 
 /* ---------- Helpers ---------- */
+
+function isSelfProjectsRepoName(name) {
+  return (name || "").toLowerCase() === "projects";
+}
 
 function prettifyName(raw) {
   if (!raw) return "";
@@ -281,11 +283,8 @@ function mapEntryToProject(entry) {
 /* ---------- Filter / search ---------- */
 
 function matchesFilters(project) {
-  const rawName = (project.rawName || "").toLowerCase();
-  const isSelfRepo = rawName === "projects";
-
-  // Hide "Projects" (this site) unless explicitly allowed
-  if (!state.showSelfRepo && isSelfRepo) return false;
+  const rawName = project.rawName || "";
+  if (isSelfProjectsRepoName(rawName)) return false; // never show self repo
 
   if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
 
@@ -504,13 +503,6 @@ function initFiltersAndSearch() {
       renderProjects();
     });
   }
-
-  if (showSelfRepoEl) {
-    showSelfRepoEl.addEventListener("change", () => {
-      state.showSelfRepo = showSelfRepoEl.checked;
-      renderProjects();
-    });
-  }
 }
 
 function initLanguageFilter() {
@@ -553,6 +545,11 @@ function getCache() {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.projects)) return null;
+
+    // Clean out self repo from cache as well
+    parsed.projects = parsed.projects.filter(
+      p => !isSelfProjectsRepoName(p.rawName)
+    );
     return parsed;
   } catch {
     return null;
@@ -562,7 +559,7 @@ function getCache() {
 function saveCache(projects) {
   try {
     const payload = {
-      projects,
+      projects: projects.filter(p => !isSelfProjectsRepoName(p.rawName)),
       fetchedAt: Date.now()
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
@@ -714,7 +711,11 @@ async function loadFromProjectsJson() {
     const res = await fetch(PROJECTS_URL);
     if (!res.ok) throw new Error(`projects.json HTTP ${res.status}`);
     const data = await res.json();
-    const projects = Array.isArray(data) ? data.map(mapEntryToProject) : [];
+    const projects = Array.isArray(data)
+      ? data
+          .filter(entry => !isSelfProjectsRepoName(entry.name))
+          .map(mapEntryToProject)
+      : [];
     repos = projects;
     initLanguageFilter();
     renderProjects();
@@ -745,7 +746,7 @@ async function loadRepos() {
   // 1) Use cache if present
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
-    repos = cache.projects;
+    repos = cache.projects.filter(p => !isSelfProjectsRepoName(p.rawName));
     console.log("Loaded projects from cache. Age (ms):", age);
     initLanguageFilter();
     renderProjects();
@@ -801,6 +802,7 @@ async function loadRepos() {
     const data = await res.json();
     repos = data
       .filter(r => !r.private)
+      .filter(r => !isSelfProjectsRepoName(r.name))
       .map(mapRepoFromGitHub);
 
     console.log(`Fetched ${repos.length} repos from GitHub API`);
@@ -812,7 +814,9 @@ async function loadRepos() {
         const fallbackData = await fallbackRes.json();
         if (Array.isArray(fallbackData)) {
           const byName = new Map(
-            fallbackData.map(entry => [entry.name, mapEntryToProject(entry)])
+            fallbackData
+              .filter(entry => !isSelfProjectsRepoName(entry.name))
+              .map(entry => [entry.name, mapEntryToProject(entry)])
           );
           repos = repos.map(p => {
             const extra = byName.get(p.rawName);
