@@ -314,23 +314,6 @@ body {
   font-size: 0.8rem;
 }
 
-/* Self repo toggle */
-
-.self-repo-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
-.self-repo-toggle input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
 /* Projects grid */
 
 .projects-grid {
