@@ -47,8 +47,10 @@ function prettifyName(raw) {
 
   const resultWords = lowerWords.map((word, idx) => {
     if (!word.length) return word;
+
     if (SPECIAL_WORDS[word]) return SPECIAL_WORDS[word];
     if (idx > 0 && SMALL_WORDS.has(word)) return word;
+
     return word.charAt(0).toUpperCase() + word.slice(1);
   });
 
@@ -111,14 +113,21 @@ function inferType(repo) {
   const lang = (repo.language || "").toLowerCase();
 
   if (repo.has_pages) return "website";
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
+
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) {
+    return "website";
+  }
 
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
     (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))
-  ) return "mobile";
+  ) {
+    return "mobile";
+  }
 
-  if (name.includes("api") || desc.includes("api")) return "api";
+  if (name.includes("api") || desc.includes("api")) {
+    return "api";
+  }
 
   if (
     desc.includes("assignment") ||
@@ -127,7 +136,9 @@ function inferType(repo) {
     desc.includes("final") ||
     desc.includes("cppls") ||
     desc.includes("devops")
-  ) return "school";
+  ) {
+    return "school";
+  }
 
   return "other";
 }
@@ -169,7 +180,8 @@ function mapRepo(repo) {
       : null,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null
+    thumbnailUrl: null,
+    thumbnailEmoji: null
   };
 }
 
@@ -211,6 +223,16 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
+function getEmojiForProject(project) {
+  switch (project.type) {
+    case "website": return "🌐";
+    case "mobile":  return "📱";
+    case "api":     return "🔌";
+    case "school":  return "🎓";
+    default:        return "🧪";
+  }
+}
+
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
@@ -218,19 +240,27 @@ function createProjectCard(project) {
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
 
-  if (project.thumbnailUrl) {
+  if (project.thumbnailUrl || project.thumbnailEmoji) {
     const thumbBtn = document.createElement("button");
     thumbBtn.className = "project-thumb";
     thumbBtn.type = "button";
 
-    const thumbImg = document.createElement("img");
-    thumbImg.src = project.thumbnailUrl;
-    thumbImg.alt = `${project.displayName} thumbnail`;
-    thumbBtn.appendChild(thumbImg);
+    if (project.thumbnailUrl) {
+      const thumbImg = document.createElement("img");
+      thumbImg.src = project.thumbnailUrl;
+      thumbImg.alt = `${project.displayName} thumbnail`;
+      thumbBtn.appendChild(thumbImg);
 
-    thumbBtn.addEventListener("click", () =>
-      openImageModal(project.thumbnailUrl, project.displayName)
-    );
+      thumbBtn.addEventListener("click", () =>
+        openImageModal(project.thumbnailUrl, project.displayName)
+      );
+    } else if (project.thumbnailEmoji) {
+      const emojiSpan = document.createElement("span");
+      emojiSpan.className = "project-thumb-emoji";
+      emojiSpan.textContent = project.thumbnailEmoji;
+      thumbBtn.appendChild(emojiSpan);
+      // no modal for emoji
+    }
 
     titleRow.appendChild(thumbBtn);
   }
@@ -402,28 +432,61 @@ async function findThumbnailForRepo(project) {
   try {
     const url = `https://api.github.com/repos/${GITHUB_USER}/${project.rawName}/contents/`;
     const res = await fetch(url);
-    if (!res.ok) return;
+    if (!res.ok) {
+      project.thumbnailEmoji = getEmojiForProject(project);
+      return;
+    }
 
     const items = await res.json();
-    if (!Array.isArray(items)) return;
+    if (!Array.isArray(items)) {
+      project.thumbnailEmoji = getEmojiForProject(project);
+      return;
+    }
 
-    const candidates = items.filter(item => {
+    const imageItems = items.filter(item => {
       if (item.type !== "file") return false;
       const lower = item.name.toLowerCase();
-      const isImage = /\.(png|jpe?g|gif|webp|svg)$/.test(lower);
-      const looksLikeDiagram = /(class|diagram|uml|arch|architecture)/.test(lower);
-      return isImage && looksLikeDiagram;
+      return /\.(png|jpe?g|gif|webp|svg|ico)$/.test(lower);
     });
 
-    if (!candidates.length) return;
+    if (!imageItems.length) {
+      project.thumbnailEmoji = getEmojiForProject(project);
+      return;
+    }
 
-    const pick = candidates[0];
-    const urlToUse = pick.download_url ||
-      `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${pick.path}`;
+    const diagramCandidates = imageItems.filter(item => {
+      const lower = item.name.toLowerCase();
+      return /(class|diagram|uml|arch|architecture)/.test(lower);
+    });
+
+    let chosen = null;
+
+    if (diagramCandidates.length) {
+      chosen = diagramCandidates[0];
+    } else {
+      const logoCandidates = imageItems.filter(item => {
+        const lower = item.name.toLowerCase();
+        return /(logo|icon|favicon|banner|hero|cover|thumbnail|thumb|screenshot|preview)/.test(lower);
+      });
+      if (logoCandidates.length) {
+        chosen = logoCandidates[0];
+      } else {
+        chosen = imageItems[0];
+      }
+    }
+
+    if (!chosen) {
+      project.thumbnailEmoji = getEmojiForProject(project);
+      return;
+    }
+
+    const urlToUse = chosen.download_url ||
+      `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${chosen.path}`;
 
     project.thumbnailUrl = urlToUse;
   } catch (e) {
     console.error("Thumbnail fetch failed for", project.rawName, e);
+    project.thumbnailEmoji = getEmojiForProject(project);
   }
 }
 
