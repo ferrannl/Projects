@@ -1,8 +1,6 @@
-// --- Config ---
 const GITHUB_USER = "ferrannl";
 const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`;
 
-// --- State ---
 let repos = [];
 const state = {
   search: "",
@@ -10,18 +8,14 @@ const state = {
   languageFilter: "all"
 };
 
-// --- DOM refs ---
 const gridEl = document.getElementById("projectsGrid");
 const emptyEl = document.getElementById("emptyState");
 const searchEl = document.getElementById("search");
 const languageSelectEl = document.getElementById("languageFilter");
-const typeChips = document.querySelectorAll(".chip[data-filter-type='type']);
+const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 
-// Image modal refs
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
-
-// --- Name prettifying ---
 
 const SMALL_WORDS = new Set([
   "voor", "van", "met",
@@ -30,7 +24,6 @@ const SMALL_WORDS = new Set([
   "in", "op", "aan", "bij"
 ]);
 
-// words that should keep a very specific casing
 const SPECIAL_WORDS = {
   ios: "iOS",
   android: "Android",
@@ -45,93 +38,50 @@ const SPECIAL_WORDS = {
 
 function prettifyName(raw) {
   if (!raw) return "";
-
-  // Replace separators with spaces
   let s = raw.replace(/[-_.]+/g, " ");
-
-  // Split camelCase: "myCoolRepo" -> "my Cool Repo"
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
-
-  // Normalize spaces
   s = s.replace(/\s+/g, " ").trim();
 
   const originalWords = s.split(" ");
   const lowerWords = s.toLowerCase().split(" ");
 
   const resultWords = lowerWords.map((word, idx) => {
-    const orig = originalWords[idx];
-
     if (!word.length) return word;
-
-    // 1) exact tech words like ios -> iOS, api -> API, etc.
-    if (SPECIAL_WORDS[word]) {
-      return SPECIAL_WORDS[word];
-    }
-
-    // 2) keep small Dutch words lowercase, except first word
-    if (idx > 0 && SMALL_WORDS.has(word)) {
-      return word;
-    }
-
-    // 3) normal Title Case
+    if (SPECIAL_WORDS[word]) return SPECIAL_WORDS[word];
+    if (idx > 0 && SMALL_WORDS.has(word)) return word;
     return word.charAt(0).toUpperCase() + word.slice(1);
   });
 
   return resultWords.join(" ");
 }
 
-// --- Helpers for README summary ---
-
 function stripMarkdown(text) {
   if (!text) return "";
   let out = text;
-
-  // Remove images ![alt](url)
   out = out.replace(/!\[[^\]]*]\([^)]*\)/g, "");
-
-  // Links [text](url) -> text
   out = out.replace(/\[([^\]]+)]\([^)]*\)/g, "$1");
-
-  // Inline code `code`
   out = out.replace(/`([^`]+)`/g, "$1");
-
-  // Bold / italic **text**, *text*, __text__, _text_
   out = out.replace(/\*\*([^*]+)\*\*/g, "$1");
   out = out.replace(/\*([^*]+)\*/g, "$1");
   out = out.replace(/__([^_]+)__/g, "$1");
   out = out.replace(/_([^_]+)_/g, "$1");
-
-  // Simple HTML tags
   out = out.replace(/<\/?[^>]+(>|$)/g, "");
-
-  // Heading hashes (if any left)
   out = out.replace(/#+\s*/g, "");
-
   return out.trim();
 }
 
-/**
- * Build a short, human-readable summary from README:
- * - skip headings / empty / badge lines
- * - take first 2–3 content lines
- * - strip markdown and hard-limit length
- */
 function buildShortSummaryFromReadme(markdown) {
   if (!markdown) return null;
-
   const lines = markdown.split(/\r?\n/);
   const contentLines = [];
 
   for (const raw of lines) {
     let line = raw.trim();
     if (!line) continue;
-
-    // Skip headings, quotes, badges, comments
     if (/^#{1,6}\s/.test(line)) continue;
     if (/^>\s?/.test(line)) continue;
     if (/^\[!\[/.test(line) || /^!\[/.test(line)) continue;
     if (/^<!--/.test(line)) continue;
-
     contentLines.push(line);
     if (contentLines.length >= 3) break;
   }
@@ -142,7 +92,7 @@ function buildShortSummaryFromReadme(markdown) {
   text = stripMarkdown(text);
   if (!text) return null;
 
-  const maxLen = 220; // keep this short
+  const maxLen = 220;
   if (text.length > maxLen) {
     text = text.slice(0, maxLen - 1);
     const lastSpace = text.lastIndexOf(" ");
@@ -155,35 +105,21 @@ function buildShortSummaryFromReadme(markdown) {
   return text;
 }
 
-// --- Type inference for each repo ---
-
 function inferType(repo) {
   const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  // Pages → website
   if (repo.has_pages) return "website";
+  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
 
-  // Typical website stack
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) {
-    return "website";
-  }
-
-  // Mobile apps
   if (
     ["swift", "java", "kotlin"].includes(lang) &&
     (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))
-  ) {
-    return "mobile";
-  }
+  ) return "mobile";
 
-  // APIs
-  if (name.includes("api") || desc.includes("api")) {
-    return "api";
-  }
+  if (name.includes("api") || desc.includes("api")) return "api";
 
-  // School / study vibe
   if (
     desc.includes("assignment") ||
     desc.includes("project") ||
@@ -191,9 +127,7 @@ function inferType(repo) {
     desc.includes("final") ||
     desc.includes("cppls") ||
     desc.includes("devops")
-  ) {
-    return "school";
-  }
+  ) return "school";
 
   return "other";
 }
@@ -210,26 +144,22 @@ function getTypeLabel(type) {
 
 function buildTags(repo, type) {
   const tags = [];
-
   if (repo.fork) tags.push("fork");
   if (repo.archived) tags.push("archived");
-
   if (type === "website") tags.push("web");
   if (type === "mobile") tags.push("mobile");
   if (type === "api") tags.push("api");
   if (type === "school") tags.push("school");
-
   return tags;
 }
 
-// Map GitHub repo JSON → internal object
 function mapRepo(repo) {
   const type = inferType(repo);
   const baseDesc = repo.description || "No description yet.";
 
   return {
-    rawName: repo.name,                    // original (for URLs / API)
-    displayName: prettifyName(repo.name),  // nice title for UI
+    rawName: repo.name,
+    displayName: prettifyName(repo.name),
     language: repo.language || "Various",
     type,
     tags: buildTags(repo, type),
@@ -237,26 +167,15 @@ function mapRepo(repo) {
     pagesUrl: repo.has_pages
       ? `https://${GITHUB_USER}.github.io/${repo.name}/`
       : null,
-
-    // description / summary fields
     baseDescription: baseDesc,
-    summary: baseDesc,     // will be replaced by README summary if possible
-
-    // thumbnail image url (class diagram etc.)
+    summary: baseDesc,
     thumbnailUrl: null
   };
 }
 
-// --- Filtering logic ---
-
 function matchesFilters(project) {
-  if (state.typeFilter !== "all" && project.type !== state.typeFilter) {
-    return false;
-  }
-
-  if (state.languageFilter !== "all" && project.language !== state.languageFilter) {
-    return false;
-  }
+  if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
+  if (state.languageFilter !== "all" && project.language !== state.languageFilter) return false;
 
   if (state.search) {
     const haystack = [
@@ -266,17 +185,13 @@ function matchesFilters(project) {
       project.language,
       project.type,
       ...(project.tags || [])
-    ]
-      .join(" ")
-      .toLowerCase();
+    ].join(" ").toLowerCase();
 
     if (!haystack.includes(state.search)) return false;
   }
 
   return true;
 }
-
-// --- Image modal helpers ---
 
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
@@ -296,17 +211,13 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
-// --- Card creation (short summary + optional thumbnail) ---
-
 function createProjectCard(project) {
   const card = document.createElement("article");
   card.className = "project-card";
 
-  // Title row
   const titleRow = document.createElement("div");
   titleRow.className = "project-title-row";
 
-  // Optional thumbnail (class diagram / uml image)
   if (project.thumbnailUrl) {
     const thumbBtn = document.createElement("button");
     thumbBtn.className = "project-thumb";
@@ -317,7 +228,9 @@ function createProjectCard(project) {
     thumbImg.alt = `${project.displayName} thumbnail`;
     thumbBtn.appendChild(thumbImg);
 
-    thumbBtn.addEventListener("click", () => openImageModal(project.thumbnailUrl, project.displayName));
+    thumbBtn.addEventListener("click", () =>
+      openImageModal(project.thumbnailUrl, project.displayName)
+    );
 
     titleRow.appendChild(thumbBtn);
   }
@@ -335,10 +248,8 @@ function createProjectCard(project) {
 
   titleBlock.appendChild(nameEl);
   titleBlock.appendChild(typePill);
-
   titleRow.appendChild(titleBlock);
 
-  // DESCRIPTION – just a tiny summary
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
@@ -347,7 +258,6 @@ function createProjectCard(project) {
   descEl.textContent = project.summary;
   descWrapper.appendChild(descEl);
 
-  // Meta row
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
@@ -365,7 +275,6 @@ function createProjectCard(project) {
     metaRow.appendChild(tagPill);
   });
 
-  // Links
   const linksRow = document.createElement("div");
   linksRow.className = "project-links";
 
@@ -387,7 +296,6 @@ function createProjectCard(project) {
     linksRow.appendChild(pagesLink);
   }
 
-  // Footer meta
   const footerMeta = document.createElement("div");
   footerMeta.className = "project-footer-meta";
   footerMeta.textContent =
@@ -406,11 +314,8 @@ function createProjectCard(project) {
   return card;
 }
 
-// --- Rendering ---
-
 function renderProjects() {
   if (!gridEl) return;
-
   gridEl.innerHTML = "";
 
   const filtered = repos.filter(matchesFilters);
@@ -431,10 +336,7 @@ function renderProjects() {
   });
 }
 
-// --- UI setup ---
-
 function initFiltersAndSearch() {
-  // Type chips
   typeChips.forEach(chip => {
     chip.addEventListener("click", () => {
       typeChips.forEach(c => c.classList.remove("chip-active"));
@@ -444,7 +346,6 @@ function initFiltersAndSearch() {
     });
   });
 
-  // Search
   if (searchEl) {
     searchEl.addEventListener("input", () => {
       state.search = searchEl.value.toLowerCase().trim();
@@ -453,7 +354,6 @@ function initFiltersAndSearch() {
   }
 }
 
-// Language dropdown
 function initLanguageFilter() {
   if (!languageSelectEl) return;
   languageSelectEl.innerHTML = "";
@@ -480,20 +380,15 @@ function initLanguageFilter() {
   });
 }
 
-// --- Enrich summaries from README ---
-
 async function enhanceDescriptionsFromReadme() {
   const tasks = repos.map(async (project) => {
     try {
       const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/README.md`;
       const res = await fetch(url);
-      if (!res.ok) return; // no README
-
+      if (!res.ok) return;
       const text = await res.text();
       const summary = buildShortSummaryFromReadme(text);
-      if (summary) {
-        project.summary = summary;
-      }
+      if (summary) project.summary = summary;
     } catch (e) {
       console.error("README fetch failed for", project.rawName, e);
     }
@@ -502,8 +397,6 @@ async function enhanceDescriptionsFromReadme() {
   await Promise.all(tasks);
   renderProjects();
 }
-
-// --- Find thumbnails (class diagrams) in repo root ---
 
 async function findThumbnailForRepo(project) {
   try {
@@ -540,8 +433,6 @@ async function enhanceThumbnails() {
   renderProjects();
 }
 
-// --- Load repos from GitHub ---
-
 async function loadRepos() {
   if (gridEl) {
     gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects from GitHub…</p>";
@@ -550,9 +441,7 @@ async function loadRepos() {
 
   try {
     const res = await fetch(API_URL);
-    if (!res.ok) {
-      throw new Error(`GitHub API error: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
     const data = await res.json();
 
     repos = data
@@ -562,14 +451,11 @@ async function loadRepos() {
     initLanguageFilter();
     renderProjects();
 
-    // then improve summaries + thumbnails in background
     enhanceDescriptionsFromReadme().catch(console.error);
     enhanceThumbnails().catch(console.error);
   } catch (err) {
     console.error(err);
-    if (gridEl) {
-      gridEl.innerHTML = "";
-    }
+    if (gridEl) gridEl.innerHTML = "";
     if (emptyEl) {
       emptyEl.hidden = false;
       emptyEl.textContent = "Could not load projects from GitHub (rate limit / network issue?).";
@@ -577,7 +463,6 @@ async function loadRepos() {
   }
 }
 
-// --- Init ---
 (function init() {
   initFiltersAndSearch();
   loadRepos();
