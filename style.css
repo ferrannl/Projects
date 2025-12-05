@@ -198,9 +198,9 @@ body {
 }
 
 .social-outlook {
-  background: radial-gradient(circle at 0 0, rgba(0, 120, 212, 0.3), transparent 60%),
+  background: radial-gradient(circle at 0 0, rgba(255, 150, 0, 0.3), transparent 60%),
               rgba(7, 10, 28, 0.95);
-  border-color: rgba(0, 120, 212, 0.85);
+  border-color: rgba(255, 150, 0, 0.85);
 }
 
 /* Controls */
