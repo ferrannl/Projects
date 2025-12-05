@@ -472,28 +472,55 @@ function canCallApiNow() {
 /* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
 
 function getThumbnailCandidates(project) {
-  // try to catch favicon.png, logo.jpg, etc., including nested images/ paths
+  // Root-level usual suspects
   const base = [
     "logo.png",
     "logo.jpg",
+    "logo.jpeg",
     "logo.svg",
     "favicon.png",
     "favicon.ico",
     "banner.png",
-    "hero.jpg",
+    "banner.jpg",
     "hero.png",
+    "hero.jpg",
     "screenshot.png",
-    "screenshot.jpg"
+    "screenshot.jpg",
+    "class-diagram.png",
+    "class-diagram.jpg",
+    "diagram.png",
+    "diagram.jpg",
+    "uml.png",
+    "uml.jpg",
+    "model.png",
+    "model.jpg"
   ];
 
+  // Common subfolders
   const nested = [
     "images/logo.png",
     "images/logo.jpg",
+    "images/logo.jpeg",
     "images/favicon.png",
+    "images/favicon.ico",
+    "images/class-diagram.png",
+    "images/diagram.png",
+    "images/uml.png",
+
     "img/logo.png",
     "img/logo.jpg",
+    "img/favicon.png",
+    "img/class-diagram.png",
+    "img/diagram.png",
+
     "assets/logo.png",
-    "assets/logo.jpg"
+    "assets/logo.jpg",
+    "assets/banner.png",
+    "assets/hero.png",
+
+    "public/logo.png",
+    "public/logo.jpg",
+    "public/favicon.png"
   ];
 
   return [...base, ...nested];
