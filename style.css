@@ -132,8 +132,7 @@ body {
   margin-bottom: 0;
 }
 
-/* Old site-intro class kept (unused, safe to ignore) */
-
+/* (Legacy class, safe) */
 .site-intro {
   margin: 0.1rem 0 0;
   max-width: 38rem;
@@ -801,12 +800,6 @@ body {
 .label-sub {
   font-size: 0.78rem;
   color: var(--text-muted);
-}
-
-.lang-gate-hint {
-  font-size: 0.78rem;
-  color: rgba(200, 203, 230, 0.85);
-  text-align: right;
 }
 
 /* small screens */
