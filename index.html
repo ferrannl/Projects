@@ -18,38 +18,38 @@
     <div class="lang-gate-title" id="langGateTitle">Choose your language</div>
     <div class="lang-gate-sub">
       Kies je taal · Wähle deine Sprache · Elige tu idioma
-      <small>You can change this later if the site gets more translations.</small>
+      <small>You can change this later with the language switcher at the top.</small>
     </div>
     <div class="lang-gate-buttons">
       <button class="btn-lang" data-lang="nl">
         <span class="flag">🇳🇱</span>
         <span class="label-main">Nederlands</span>
-        <span class="label-sub">Standaardtaal voor Ferran</span>
+        <span class="label-sub">Moedertaal: Nederlands (met een vleugje Brabant)</span>
       </button>
       <button class="btn-lang" data-lang="en">
         <span class="flag">🇬🇧</span>
         <span class="label-main">English</span>
-        <span class="label-sub">Good default for most visitors</span>
+        <span class="label-sub">Default choice if you don’t know what to pick</span>
       </button>
       <button class="btn-lang" data-lang="de">
         <span class="flag">🇩🇪</span>
         <span class="label-main">Deutsch</span>
-        <span class="label-sub">Für Gäste aus Deutschland</span>
+        <span class="label-sub">Für Nachbarn aus DE, AT und CH</span>
       </button>
       <button class="btn-lang" data-lang="pl">
         <span class="flag">🇵🇱</span>
         <span class="label-main">Polski</span>
-        <span class="label-sub">Dla odwiedzających z Polski</span>
+        <span class="label-sub">Dla znajomych z Polski i okolic</span>
       </button>
       <button class="btn-lang" data-lang="tr">
         <span class="flag">🇹🇷</span>
         <span class="label-main">Türkçe</span>
-        <span class="label-sub">Türkçe konuşan ziyaretçiler için</span>
+        <span class="label-sub">Merhaba! Türkçe okuyan, yazan dostlar için</span>
       </button>
       <button class="btn-lang" data-lang="es">
         <span class="flag">🇪🇸</span>
         <span class="label-main">Español</span>
-        <span class="label-sub">Para amigos de España y Canarias</span>
+        <span class="label-sub">Para colegas de España, Canarias y Latinoamérica</span>
       </button>
     </div>
     <div class="lang-gate-hint">
@@ -65,8 +65,25 @@
       <p class="site-subtitle" data-i18n="subtitle">
         All my programming &amp; coding projects in one place – websites, apps, school work, guides, APIs and more.
       </p>
+      <p class="site-intro">
+        Guy from the Netherlands (Utrecht / ’s-Hertogenbosch), <span id="ageValue"></span> years old.
+        I like rock bands, rap, videogames, videogame consoles and modding (hacking) consoles since I was 12 years old.
+        I’m really good at Call of Duty, Mario Kart, Kingdom Hearts and Guitar Hero.
+      </p>
     </div>
     <div class="header-actions">
+      <!-- Language switcher in header (top-right-ish) -->
+      <div class="header-lang-switcher">
+        <select id="uiLangSwitcher" aria-label="Interface language">
+          <option value="en">EN</option>
+          <option value="nl">NL</option>
+          <option value="de">DE</option>
+          <option value="pl">PL</option>
+          <option value="tr">TR</option>
+          <option value="es">ES</option>
+        </select>
+      </div>
+
       <a class="social-chip social-github" href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
         <span class="social-icon">
           <img src="./github_icon.png" alt="GitHub" />
