@@ -126,15 +126,6 @@ PHP-based marketplace project.
 
 ---
 
-### 📚 WEBS5 Bookstore (Workshop)
-
-Fork of a bookstore project used in a web development workshop.  
-- Repo: [WEBS5_WS_WK2_Bookstore](https://github.com/ferrannl/WEBS5_WS_WK2_Bookstore)  
-- Live: https://ferrannl.github.io/WEBS5_WS_WK2_Bookstore/  
-- Stack: `JavaScript`, `HTML`, `CSS`
-
----
-
 ### 🧪 CodePen Experiments
 
 A collection of CodePen-like experiments and tests.  
@@ -288,7 +279,6 @@ If you enable the workflow in `.github/workflows/update-readme.yml`, it will kee
 - [elegant-barbershop](https://github.com/ferrannl/elegant-barbershop) — Website suggestion for Elegant Barbershop
 - [CodePen](https://github.com/ferrannl/CodePen) — CodePen projects
 - [pso-wiiu-guide](https://github.com/ferrannl/pso-wiiu-guide) — HTML guide / documentation
-- [ps2-covers](https://github.com/ferrannl/ps2-covers) — PS2 Covers Collection (fork)
 - [Monsterzoo](https://github.com/ferrannl/Monsterzoo) — Eindopdracht_JavaScript
 - [meinlager](https://github.com/ferrannl/meinlager) — Website suggestion for Mein Lager
 - [Sudoku-Design-Patterns](https://github.com/ferrannl/Sudoku-Design-Patterns) — Sudoku + design patterns (C#)
@@ -303,7 +293,6 @@ If you enable the workflow in `.github/workflows/update-readme.yml`, it will kee
 - [Niks-voor-Niks](https://github.com/ferrannl/Niks-voor-Niks) — PHP marketplace project
 - [Imgur-App-iOS](https://github.com/ferrannl/Imgur-App-iOS) — iOS Imgur client
 - [Imgur-App-Android](https://github.com/ferrannl/Imgur-App-Android) — Android Imgur client
-- [WEBS5_WS_WK2_Bookstore](https://github.com/ferrannl/WEBS5_WS_WK2_Bookstore) — Bookstore workshop project (fork)
 - [AvanSync](https://github.com/ferrannl/AvanSync) — CPPLS2 final assignment
 - [Dimitri](https://github.com/ferrannl/Dimitri) — Software Architecture project
 - [Ecobit-Internship](https://github.com/ferrannl/Ecobit-Internship) — Internship code (C#)
