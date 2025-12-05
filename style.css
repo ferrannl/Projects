@@ -94,7 +94,45 @@ body {
   font-size: 0.95rem;
 }
 
-/* Small intro about Ferran */
+/* About Me block */
+
+.about-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 1.1rem 0 1rem;
+  max-width: 36rem;
+}
+
+.about-me {
+  background: rgba(11, 15, 32, 0.55);
+  padding: 1rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  max-width: 38rem;
+}
+
+.about-me h2 {
+  margin: 0 0 0.55rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(240, 242, 255, 0.96);
+}
+
+.about-me p {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(220, 224, 245, 0.92);
+}
+
+.about-me p:last-child {
+  margin-bottom: 0;
+}
+
+/* Old site-intro class kept (unused, safe to ignore) */
 
 .site-intro {
   margin: 0.1rem 0 0;
@@ -653,6 +691,14 @@ body {
 
   .social-links {
     width: 100%;
+  }
+
+  .about-divider {
+    max-width: 100%;
+  }
+
+  .about-me {
+    max-width: 100%;
   }
 }
 
