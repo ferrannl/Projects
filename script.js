@@ -15,7 +15,7 @@ const gridEl = document.getElementById("projectsGrid");
 const emptyEl = document.getElementById("emptyState");
 const searchEl = document.getElementById("search");
 const languageSelectEl = document.getElementById("languageFilter");
-const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
+const typeChips = document.querySelectorAll(".chip[data-filter-type='type']);
 
 // Image modal refs
 const imageModalEl = document.getElementById("imageModal");
@@ -29,6 +29,19 @@ const SMALL_WORDS = new Set([
   "de", "het", "een",
   "in", "op", "aan", "bij"
 ]);
+
+// words that should keep a very specific casing
+const SPECIAL_WORDS = {
+  ios: "iOS",
+  android: "Android",
+  api: "API",
+  rest: "REST",
+  http: "HTTP",
+  https: "HTTPS",
+  url: "URL",
+  ui: "UI",
+  ux: "UX"
+};
 
 function prettifyName(raw) {
   if (!raw) return "";
@@ -48,12 +61,19 @@ function prettifyName(raw) {
   const resultWords = lowerWords.map((word, idx) => {
     const orig = originalWords[idx];
 
-    // keep small words lowercase, except first word
+    if (!word.length) return word;
+
+    // 1) exact tech words like ios -> iOS, api -> API, etc.
+    if (SPECIAL_WORDS[word]) {
+      return SPECIAL_WORDS[word];
+    }
+
+    // 2) keep small Dutch words lowercase, except first word
     if (idx > 0 && SMALL_WORDS.has(word)) {
       return word;
     }
 
-    if (!word.length) return word;
+    // 3) normal Title Case
     return word.charAt(0).toUpperCase() + word.slice(1);
   });
 
@@ -318,7 +338,7 @@ function createProjectCard(project) {
 
   titleRow.appendChild(titleBlock);
 
-  // DESCRIPTION – just a tiny summary, no crazy stuff
+  // DESCRIPTION – just a tiny summary
   const descWrapper = document.createElement("div");
   descWrapper.className = "project-description-wrapper";
 
