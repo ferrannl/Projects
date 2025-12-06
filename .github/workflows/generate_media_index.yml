@@ -8,7 +8,6 @@ on:
       - ".github/workflows/generate-media-index.yml"
   workflow_dispatch:
   schedule:
-    # once a day, adjust if you want
     - cron: "0 3 * * *"
 
 jobs:
