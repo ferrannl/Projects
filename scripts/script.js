@@ -1209,8 +1209,8 @@ async function loadRepos() {
 let mediaItems = [];
 const mediaState = {
   search: "",
-  kind: "all",
-  format: "all"
+  kind: "all",   // all | image | video | audio
+  format: "all"  // extension or "all"
 };
 
 const mediaGridEl = document.getElementById("mediaGrid");
@@ -1225,32 +1225,98 @@ function getExtension(path) {
   return parts[parts.length - 1].toLowerCase();
 }
 
+/**
+ * Infer media type from path / extension if not present:
+ * - media/images/*  -> image
+ * - media/videos/*  -> video
+ * - media/audio/*   -> audio
+ * - else by known extensions
+ */
+function ensureMediaType(item) {
+  const result = { ...item };
+  if (result.type) return result;
+
+  const src = (result.src || "").toLowerCase();
+  const ext = getExtension(result.src);
+
+  if (src.includes("/images/")) {
+    result.type = "image";
+    return result;
+  }
+  if (src.includes("/videos/")) {
+    result.type = "video";
+    return result;
+  }
+  if (src.includes("/audio/")) {
+    result.type = "audio";
+    return result;
+  }
+
+  const imageExts = ["png", "jpg", "jpeg", "gif", "webp", "avif", "bmp"];
+  const videoExts = ["mp4", "webm", "mkv", "mov", "avi"];
+  const audioExts = ["mp3", "wav", "flac", "ogg", "m4a"];
+
+  if (imageExts.includes(ext)) {
+    result.type = "image";
+  } else if (videoExts.includes(ext)) {
+    result.type = "video";
+  } else if (audioExts.includes(ext)) {
+    result.type = "audio";
+  } else {
+    result.type = "image"; // shrug default
+  }
+
+  return result;
+}
+
+/**
+ * Build format options **based on current mediaState.kind**:
+ * - kind = all  -> include all formats
+ * - kind = image -> only extensions found on images
+ * - kind = video -> only video extensions
+ * - kind = audio -> only audio extensions
+ */
 function buildMediaFormatOptions() {
   if (!mediaFormatSelectEl) return;
 
   const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
 
   mediaFormatSelectEl.innerHTML = "";
+
   const optAll = document.createElement("option");
   optAll.value = "all";
   optAll.setAttribute("data-i18n", "mediaFormatAll");
   optAll.textContent = dict.mediaFormatAll || "All formats";
   mediaFormatSelectEl.appendChild(optAll);
 
+  // Filter items by current media type selection
+  let relevantItems = mediaItems;
+  if (mediaState.kind !== "all") {
+    relevantItems = mediaItems.filter((item) => item.type === mediaState.kind);
+  }
+
   const exts = Array.from(
     new Set(
-      mediaItems.map(item => getExtension(item.src)).filter(Boolean)
+      relevantItems
+        .map((item) => getExtension(item.src))
+        .filter(Boolean)
     )
   ).sort();
 
-  exts.forEach(ext => {
+  exts.forEach((ext) => {
     const opt = document.createElement("option");
     opt.value = ext;
     opt.textContent = ext.toUpperCase();
     mediaFormatSelectEl.appendChild(opt);
   });
+
+  // keep select value in sync with state
+  mediaFormatSelectEl.value = mediaState.format || "all";
 }
 
+/**
+ * Filter function for a media item against mediaState.
+ */
 function mediaMatches(item) {
   if (mediaState.kind !== "all" && item.type !== mediaState.kind) return false;
 
@@ -1333,7 +1399,7 @@ function renderMedia() {
 
   if (mediaEmptyEl) mediaEmptyEl.hidden = true;
 
-  filtered.forEach(item => {
+  filtered.forEach((item) => {
     const card = createMediaCard(item);
     mediaGridEl.appendChild(card);
   });
@@ -1347,8 +1413,13 @@ async function loadMediaIndex() {
       return;
     }
     const data = await res.json();
-    mediaItems = Array.isArray(data.items) ? data.items : [];
+    const rawItems = Array.isArray(data.items) ? data.items : [];
+
+    // Normalize & infer types from folder / extension
+    mediaItems = rawItems.map(ensureMediaType);
+
     console.log(`Loaded ${mediaItems.length} media items from media-index.json`);
+
     buildMediaFormatOptions();
     renderMedia();
   } catch (err) {
@@ -1357,11 +1428,15 @@ async function loadMediaIndex() {
 }
 
 function initMediaFilters() {
-  mediaKindButtons.forEach(btn => {
+  mediaKindButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      mediaKindButtons.forEach(b => b.classList.remove("chip-active"));
+      mediaKindButtons.forEach((b) => b.classList.remove("chip-active"));
       btn.classList.add("chip-active");
       mediaState.kind = btn.getAttribute("data-media-kind") || "all";
+
+      // reset format when type changes
+      mediaState.format = "all";
+      buildMediaFormatOptions();
       renderMedia();
     });
   });
@@ -1385,7 +1460,7 @@ const viewTabs = document.querySelectorAll(".view-tab");
 function setView(view) {
   currentView = view === "media" ? "media" : "projects";
 
-  viewTabs.forEach(tab => {
+  viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
     if (tabView === currentView) {
       tab.classList.add("view-tab-active");
@@ -1404,12 +1479,14 @@ function setView(view) {
   if (currentView === "projects") {
     renderProjects();
   } else {
+    // ensure format options are based on current kind whenever you enter Media view
+    buildMediaFormatOptions();
     renderMedia();
   }
 }
 
 function initViewSwitch() {
-  viewTabs.forEach(tab => {
+  viewTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       const view = tab.getAttribute("data-view");
       setView(view);
