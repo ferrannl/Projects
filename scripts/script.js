@@ -1306,7 +1306,6 @@ function buildMediaFormatOptions() {
     opt.textContent = ext.toUpperCase();
     mediaFormatSelectEl.appendChild(opt);
   });
-}
 
   // keep select value in sync with state
   mediaFormatSelectEl.value = mediaState.format || "all";
@@ -1405,23 +1404,55 @@ function renderMedia() {
 
 async function loadMediaIndex() {
   try {
-    const res = await fetch("./media/media-index.json", { cache: "no-store" });
-    if (!res.ok) {
-      console.warn("No media-index.json found or HTTP error:", res.status);
+    // Try both common filenames: media_index.json and media-index.json
+    const candidates = ["./media/media_index.json", "./media/media-index.json"];
+    let res = null;
+    let urlUsed = null;
+
+    for (const url of candidates) {
+      try {
+        const attempt = await fetch(url, { cache: "no-store" });
+        if (attempt.ok) {
+          res = attempt;
+          urlUsed = url;
+          break;
+        }
+      } catch {
+        // ignore and try next
+      }
+    }
+
+    if (!res) {
+      console.warn("No media index file found (media_index.json or media-index.json).");
       return;
     }
+
     const data = await res.json();
-    const rawItems = Array.isArray(data.items) ? data.items : [];
 
-    // Normalize & infer types from folder / extension
-    mediaItems = rawItems.map(ensureMediaType);
+    let rawItems;
+    if (Array.isArray(data)) {
+      rawItems = data;
+    } else if (Array.isArray(data.items)) {
+      rawItems = data.items;
+    } else {
+      console.warn("Media index file has unexpected shape:", data);
+      rawItems = [];
+    }
 
-    console.log(`Loaded ${mediaItems.length} media items from media-index.json`);
+    mediaItems = rawItems.map((item) => {
+      // accept either `src` or `path`
+      if (!item.src && item.path) {
+        return ensureMediaType({ ...item, src: item.path });
+      }
+      return ensureMediaType(item);
+    });
+
+    console.log(`Loaded ${mediaItems.length} media items from ${urlUsed}`);
 
     buildMediaFormatOptions();
     renderMedia();
   } catch (err) {
-    console.error("Error loading media-index.json:", err);
+    console.error("Error loading media index:", err);
   }
 }
 
@@ -1451,7 +1482,6 @@ function initMediaFilters() {
     });
   }
 }
-/* ---------- View switching (Projects vs Media) ---------- */
 
 /* ---------- View switching (Projects vs Media) ---------- */
 
@@ -1479,10 +1509,8 @@ function setView(view) {
   if (projectsViewEl) projectsViewEl.hidden = currentView !== "projects";
   if (mediaViewEl) mediaViewEl.hidden = currentView !== "media";
 
-  // 🔹 Filters: only show project filters on Projects
+  // Filters visibility
   if (projectFiltersEl) projectFiltersEl.hidden = currentView !== "projects";
-
-  // 🔹 Filters: only show media filters on Media
   if (mediaFiltersEl) mediaFiltersEl.hidden = currentView !== "media";
 
   // Update search placeholder for the active view
@@ -1492,7 +1520,6 @@ function setView(view) {
   if (currentView === "projects") {
     renderProjects();
   } else {
-    // Make sure format options are rebuilt when entering Media
     buildMediaFormatOptions();
     renderMedia();
   }
