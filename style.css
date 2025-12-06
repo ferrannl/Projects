@@ -99,10 +99,6 @@ body {
   max-width: 32rem;
 }
 
-.header-main-right {
-  flex-shrink: 0;
-}
-
 .site-title-block h1 {
   font-size: clamp(1.9rem, 3.5vw, 2.4rem);
   margin: 0;
@@ -116,7 +112,49 @@ body {
   font-size: 0.95rem;
 }
 
-/* Avatar (top right) */
+/* About Me block (with avatar) */
+
+.about-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 1.1rem 0 1rem;
+  max-width: 36rem;
+}
+
+.about-me {
+  background: rgba(11, 15, 32, 0.55);
+  padding: 1rem 1.1rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  max-width: 38rem;
+}
+
+.about-me-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.about-me h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(240, 242, 255, 0.96);
+}
+
+.about-me p {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(220, 224, 245, 0.92);
+}
+
+/* Avatar inside About Me */
 
 .about-avatar-wrap {
   width: 90px;
@@ -130,6 +168,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .about-avatar {
@@ -139,40 +178,6 @@ body {
   border: 2px solid rgba(5, 7, 20, 0.95);
   object-fit: cover;
   background: #111;
-}
-
-/* About Me block (under title + avatar) */
-
-.about-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 1.1rem 0 1rem;
-  max-width: 36rem;
-}
-
-.about-me {
-  background: rgba(11, 15, 32, 0.55);
-  padding: 1rem 1.1rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px);
-  max-width: 38rem;
-}
-
-.about-me h2 {
-  margin: 0 0 0.35rem;
-  font-size: 1.1rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(240, 242, 255, 0.96);
-}
-
-.about-me p {
-  margin: 0 0 0.35rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: rgba(220, 224, 245, 0.92);
 }
 
 /* Right block: language + socials */
@@ -398,6 +403,24 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgba(163, 166, 192, 0.9);
+}
+
+/* Code language label with </> */
+
+.code-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.code-brackets {
+  font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.85rem;
+  padding: 0.05rem 0.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(10, 15, 35, 0.9);
+  color: rgba(193, 232, 255, 0.95);
 }
 
 .chip {
@@ -738,11 +761,6 @@ body {
     padding: 1.1rem 1.2rem;
   }
 
-  .header-main-row {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
   .about-divider {
     max-width: 100%;
   }
@@ -758,8 +776,13 @@ body {
     align-items: flex-start;
   }
 
-  .header-main-right {
-    align-self: flex-end;
+  .about-me-header {
+    align-items: flex-start;
+  }
+
+  .about-avatar-wrap {
+    width: 80px;
+    height: 80px;
   }
 }
 
