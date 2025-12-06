@@ -1,4 +1,4 @@
-/* ---------- Language / i18n + live age ---------- */
+// ---------- Language / i18n + live age ----------
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
