@@ -179,7 +179,7 @@ function getAgeParts(now = new Date()) {
     d -= 1;
   }
   if (d < 0) {
-    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0); // last day of previous month
+    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     d += prevMonth.getDate();
     m -= 1;
   }
@@ -215,7 +215,7 @@ function applyTranslations(lang) {
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    if (!key || key === "aboutP1") return; // aboutP1 handled separately
+    if (!key || key === "aboutP1") return;
     const value = dict[key];
     if (typeof value === "string") {
       el.textContent = value;
@@ -233,8 +233,24 @@ function updateLangLabel(lang) {
   labelEl.textContent = name;
 }
 
-/* Will be defined later, but function declarations are hoisted */
-function updateSearchAndLanguagePlaceholder(lang) {}
+function updateSearchAndLanguagePlaceholder(lang) {
+  const dict = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
+  const searchEl = document.getElementById("search");
+  const languageSelectEl = document.getElementById("languageFilter");
+
+  if (searchEl && dict.searchPlaceholder) {
+    searchEl.placeholder = dict.searchPlaceholder;
+  }
+
+  if (languageSelectEl && languageSelectEl.options && languageSelectEl.options.length) {
+    const firstOpt =
+      languageSelectEl.querySelector('option[value="all"]') ||
+      languageSelectEl.options[0];
+    if (firstOpt && dict.languagesAll) {
+      firstOpt.textContent = dict.languagesAll;
+    }
+  }
+}
 
 function setLanguage(lang) {
   if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
@@ -286,7 +302,6 @@ function setupLanguageUI() {
     });
   }
 
-  // keep age ticking (every second, so seconds visibly move)
   updateAgeInAbout();
   setInterval(updateAgeInAbout, 1000);
 }
@@ -301,8 +316,8 @@ const PROJECTS_URL = "./projects.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
-const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
-const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
+const CACHE_TTL_MS = 1000 * 60 * 30;
+const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60;
 
 let repos = [];
 const state = {
@@ -339,8 +354,6 @@ const SPECIAL_WORDS = {
   ux: "UX"
 };
 
-/* ---------- Helpers ---------- */
-
 function isSelfProjectsRepoName(name) {
   return (name || "").toLowerCase() === "projects";
 }
@@ -376,10 +389,6 @@ function prettifyName(raw) {
     .join(" ");
 }
 
-/**
- * Choose main type, with explicit priority.
- * NOTE: "game" is only set from projects.json tags, not from raw heuristics.
- */
 function choosePrimaryType(types) {
   if (!types || !types.length) return "other";
   const order = ["website", "mobile", "game", "api", "school", "other"];
@@ -387,10 +396,7 @@ function choosePrimaryType(types) {
   return found || types[0];
 }
 
-/**
- * Heuristics for GitHub repos (API response).
- * IMPORTANT: we do NOT auto-guess "game" here anymore to avoid mislabeling.
- */
+/* Heuristic for GitHub repos – NO game detection here */
 function inferTypesFromGitHub(repo) {
   const types = [];
   const name = (repo.name || "").toLowerCase();
@@ -433,10 +439,7 @@ function inferTypesFromGitHub(repo) {
   return [...new Set(types)];
 }
 
-/**
- * Heuristics for entries in projects.json.
- * Here we allow explicit "game" via tags: ["game"] or ["games"].
- */
+/* Heuristic for projects.json entries – here we allow explicit game via tags */
 function inferTypesFromEntry(entry) {
   const types = [];
   const lang = (entry.language || "").toLowerCase();
@@ -446,7 +449,6 @@ function inferTypesFromEntry(entry) {
     ? entry.tags.map(t => (t || "").toLowerCase())
     : [];
 
-  // Explicit "game" via tags – ONLY way to become type game
   if (tagsLower.includes("game") || tagsLower.includes("games")) {
     types.push("game");
   }
@@ -456,6 +458,7 @@ function inferTypesFromEntry(entry) {
     name.includes("android") || desc.includes("android") ||
     name.includes("ios") || desc.includes("ios");
   const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
+
   const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
@@ -566,8 +569,6 @@ function computeLanguages(primaryLang, rawName, desc, typeOrTypes) {
   return unique.slice(0, 3);
 }
 
-/* ---------- Map GitHub repo → internal ---------- */
-
 function mapRepoFromGitHub(repo) {
   const types = inferTypesFromGitHub(repo);
   const primaryType = choosePrimaryType(types);
@@ -603,8 +604,6 @@ function mapRepoFromGitHub(repo) {
     thumbnailUrl: null
   };
 }
-
-/* ---------- Map projects.json entry → internal ---------- */
 
 function mapEntryToProject(entry) {
   const types = inferTypesFromEntry(entry);
@@ -694,7 +693,7 @@ function matchesFilters(project) {
   return true;
 }
 
-/* ---------- Modal ---------- */
+/* ---------- Project modal ---------- */
 
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
@@ -714,7 +713,7 @@ if (imageModalEl) {
   imageModalEl.addEventListener("click", closeImageModal);
 }
 
-/* ---------- Cards ---------- */
+/* ---------- Project cards ---------- */
 
 function createProjectCard(project) {
   const card = document.createElement("article");
@@ -845,9 +844,7 @@ function renderProjects() {
   let filtered = repos.filter(matchesFilters);
 
   if (!filtered.length) {
-    if (emptyEl) {
-      emptyEl.hidden = false;
-    }
+    if (emptyEl) emptyEl.hidden = false;
     return;
   }
 
@@ -919,7 +916,6 @@ function initLanguageFilter() {
     renderProjects();
   });
 
-  // make sure "All languages" is correct after building options
   updateSearchAndLanguagePlaceholder(currentLang);
 }
 
@@ -1023,7 +1019,6 @@ async function findThumbnailForRepo(project) {
       try {
         const res = await fetch(url);
         if (res.ok) {
-          console.log(`Found thumbnail for ${project.rawName}: ${url}`);
           project.thumbnailUrl = url;
           return;
         }
@@ -1032,13 +1027,10 @@ async function findThumbnailForRepo(project) {
       }
     }
   }
-
-  console.log(`No thumbnail found for ${project.rawName}`);
 }
 
 async function enhanceThumbnails() {
   const subset = repos.slice(0, 60);
-  console.log(`Enhancing thumbnails for ${subset.length} projects...`);
   const tasks = subset.map(project => findThumbnailForRepo(project));
   await Promise.all(tasks);
   saveCache(repos);
@@ -1069,7 +1061,6 @@ async function checkLiveSite(project) {
 }
 
 async function verifyLiveSites() {
-  console.log("Verifying live sites for projects with pagesUrl...");
   const tasks = repos
     .filter(p => p.pagesUrl)
     .map(p => checkLiveSite(p));
@@ -1099,30 +1090,204 @@ async function loadFromProjectsJson() {
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
     if (gridEl) gridEl.innerHTML = "";
-    if (emptyEl) {
-      emptyEl.hidden = false;
-    }
+    if (emptyEl) emptyEl.hidden = false;
   }
 }
 
-/* ---------- Search + language placeholders helper ---------- */
+/* ---------- Media wall ---------- */
 
-function updateSearchAndLanguagePlaceholder(lang) {
-  const dict = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
+const MEDIA_INDEX_URL = "./media/media-index.json";
+let mediaItems = [];
+let mediaFilter = "all";
 
-  if (searchEl && dict.searchPlaceholder) {
-    searchEl.placeholder = dict.searchPlaceholder;
+const mediaGridEl = document.getElementById("mediaGrid");
+const mediaEmptyEl = document.getElementById("mediaEmpty");
+const mediaFilterButtons = document.querySelectorAll(".media-chip");
+const projectsViewEl = document.getElementById("projectsView");
+const mediaViewEl = document.getElementById("mediaView");
+const navTabs = document.querySelectorAll(".nav-tab[data-view]");
+
+const mediaModalEl = document.getElementById("mediaModal");
+const mediaModalContentEl = document.getElementById("mediaModalContent");
+const mediaModalCloseEl = document.getElementById("mediaModalClose");
+
+function setActiveView(view) {
+  if (!projectsViewEl || !mediaViewEl) return;
+
+  if (view === "media") {
+    projectsViewEl.hidden = true;
+    mediaViewEl.hidden = false;
+  } else {
+    projectsViewEl.hidden = false;
+    mediaViewEl.hidden = true;
   }
 
-  if (languageSelectEl && languageSelectEl.options && languageSelectEl.options.length) {
-    const firstOpt =
-      languageSelectEl.querySelector('option[value="all"]') ||
-      languageSelectEl.options[0];
-    if (firstOpt && dict.languagesAll) {
-      firstOpt.textContent = dict.languagesAll;
+  navTabs.forEach(tab => {
+    tab.classList.toggle("nav-tab-active", tab.getAttribute("data-view") === view);
+  });
+}
+
+navTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    const view = tab.getAttribute("data-view") || "projects";
+    setActiveView(view);
+  });
+});
+
+function openMediaModal(item) {
+  if (!mediaModalEl || !mediaModalContentEl) return;
+  mediaModalContentEl.innerHTML = "";
+
+  if (item.type === "image") {
+    const img = document.createElement("img");
+    img.src = item.src;
+    img.alt = item.title || "";
+    mediaModalContentEl.appendChild(img);
+  } else if (item.type === "video") {
+    const video = document.createElement("video");
+    video.src = item.src;
+    video.controls = true;
+    video.autoplay = true;
+    mediaModalContentEl.appendChild(video);
+  } else if (item.type === "audio") {
+    const wrapper = document.createElement("div");
+    const title = document.createElement("p");
+    title.textContent = item.title || item.src;
+    title.style.marginBottom = "0.5rem";
+    const audio = document.createElement("audio");
+    audio.src = item.src;
+    audio.controls = true;
+    wrapper.appendChild(title);
+    wrapper.appendChild(audio);
+    mediaModalContentEl.appendChild(wrapper);
+  }
+
+  mediaModalEl.hidden = false;
+}
+
+function closeMediaModal() {
+  if (!mediaModalEl || !mediaModalContentEl) return;
+  mediaModalContentEl.innerHTML = "";
+  mediaModalEl.hidden = true;
+}
+
+if (mediaModalEl) {
+  mediaModalEl.addEventListener("click", (e) => {
+    if (e.target === mediaModalEl) {
+      closeMediaModal();
     }
+  });
+}
+if (mediaModalCloseEl) {
+  mediaModalCloseEl.addEventListener("click", closeMediaModal);
+}
+
+function createMediaCard(item) {
+  const card = document.createElement("article");
+  card.className = "media-card";
+
+  const thumbWrap = document.createElement("div");
+  thumbWrap.className = "media-thumb-wrap";
+
+  const badge = document.createElement("span");
+  badge.className = "media-type-badge";
+  badge.textContent =
+    item.type === "image" ? "IMG" :
+    item.type === "video" ? "VID" :
+    item.type === "audio" ? "AUD" :
+    "FILE";
+  thumbWrap.appendChild(badge);
+
+  if (item.type === "image") {
+    const img = document.createElement("img");
+    img.src = item.src;
+    img.alt = item.title || "";
+    thumbWrap.appendChild(img);
+  } else if (item.type === "video") {
+    const video = document.createElement("video");
+    video.src = item.src;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    thumbWrap.appendChild(video);
+  } else if (item.type === "audio") {
+    const img = document.createElement("img");
+    img.src = item.thumbnail || "https://via.placeholder.com/300x200?text=AUDIO";
+    img.alt = item.title || "";
+    thumbWrap.appendChild(img);
+  } else {
+    const img = document.createElement("img");
+    img.src = item.thumbnail || "https://via.placeholder.com/300x200?text=FILE";
+    img.alt = item.title || "";
+    thumbWrap.appendChild(img);
+  }
+
+  const body = document.createElement("div");
+  body.className = "media-card-body";
+
+  const title = document.createElement("p");
+  title.className = "media-card-title";
+  title.textContent = item.title || item.src;
+  body.appendChild(title);
+
+  const sub = document.createElement("p");
+  sub.className = "media-card-sub";
+  sub.textContent = item.src;
+  body.appendChild(sub);
+
+  card.appendChild(thumbWrap);
+  card.appendChild(body);
+
+  card.addEventListener("click", () => openMediaModal(item));
+
+  return card;
+}
+
+function renderMedia() {
+  if (!mediaGridEl) return;
+  mediaGridEl.innerHTML = "";
+
+  let filtered = mediaItems;
+  if (mediaFilter !== "all") {
+    filtered = mediaItems.filter(i => i.type === mediaFilter);
+  }
+
+  if (!filtered.length) {
+    if (mediaEmptyEl) mediaEmptyEl.hidden = false;
+    return;
+  }
+  if (mediaEmptyEl) mediaEmptyEl.hidden = true;
+
+  filtered.forEach(item => {
+    const card = createMediaCard(item);
+    mediaGridEl.appendChild(card);
+  });
+}
+
+async function loadMedia() {
+  try {
+    const res = await fetch(MEDIA_INDEX_URL);
+    if (!res.ok) {
+      console.warn("media-index.json not found / HTTP error", res.status);
+      return;
+    }
+    const data = await res.json();
+    mediaItems = Array.isArray(data.items) ? data.items : [];
+    renderMedia();
+  } catch (err) {
+    console.error("Error loading media-index.json:", err);
   }
 }
+
+mediaFilterButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    mediaFilterButtons.forEach(b => b.classList.remove("media-chip-active"));
+    btn.classList.add("media-chip-active");
+    mediaFilter = btn.getAttribute("data-media-filter") || "all";
+    renderMedia();
+  });
+});
 
 /* ---------- Main loader ---------- */
 
@@ -1138,7 +1303,6 @@ async function loadRepos() {
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
     repos = cache.projects.filter(p => !isSelfProjectsRepoName(p.rawName));
-    console.log("Loaded projects from cache. Age (ms):", age);
     initLanguageFilter();
     renderProjects();
     usedCache = true;
@@ -1152,7 +1316,6 @@ async function loadRepos() {
   }
 
   if (!canCallApiNow()) {
-    console.warn("Skipping GitHub API call due to recent rate-limit; using cache or fallback.");
     if (!usedCache) {
       await loadFromProjectsJson();
     }
@@ -1169,8 +1332,6 @@ async function loadRepos() {
       } catch {
         body = "";
       }
-
-      console.error("GitHub API error:", res.status, res.statusText, body.slice(0, 200));
 
       if (res.status === 403 && /rate limit/i.test(body)) {
         setRateLimited();
@@ -1191,8 +1352,6 @@ async function loadRepos() {
       .filter(r => !r.private)
       .filter(r => !isSelfProjectsRepoName(r.name))
       .map(mapRepoFromGitHub);
-
-    console.log(`Fetched ${repos.length} repos from GitHub API`);
 
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
@@ -1239,7 +1398,7 @@ async function loadRepos() {
 /* ---------- Init ---------- */
 
 (function init() {
-  console.log("Initializing Ferran Projects page…");
   initFiltersAndSearch();
   loadRepos();
+  loadMedia(); // load media wall index
 })();
