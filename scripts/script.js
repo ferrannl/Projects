@@ -1451,6 +1451,8 @@ function initMediaFilters() {
 
 /* ---------- View switching (Projects vs Media) ---------- */
 
+/* ---------- View switching (Projects vs Media) ---------- */
+
 const projectsViewEl = document.getElementById("projectsView");
 const mediaViewEl = document.getElementById("mediaView");
 const projectFiltersEl = document.getElementById("projectFilters");
@@ -1458,8 +1460,10 @@ const mediaFiltersEl = document.getElementById("mediaFilters");
 const viewTabs = document.querySelectorAll(".view-tab");
 
 function setView(view) {
+  // "projects" or "media"
   currentView = view === "media" ? "media" : "projects";
 
+  // Active state on tabs
   viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
     if (tabView === currentView) {
@@ -1469,17 +1473,24 @@ function setView(view) {
     }
   });
 
+  // Main content sections
   if (projectsViewEl) projectsViewEl.hidden = currentView !== "projects";
   if (mediaViewEl) mediaViewEl.hidden = currentView !== "media";
+
+  // 🔹 Filters: only show project filters on Projects
   if (projectFiltersEl) projectFiltersEl.hidden = currentView !== "projects";
+
+  // 🔹 Filters: only show media filters on Media
   if (mediaFiltersEl) mediaFiltersEl.hidden = currentView !== "media";
 
+  // Update search placeholder for the active view
   updateSearchPlaceholderForView();
 
+  // Re-render the correct list
   if (currentView === "projects") {
     renderProjects();
   } else {
-    // ensure format options are based on current kind whenever you enter Media view
+    // Make sure format options are rebuilt when entering Media
     buildMediaFormatOptions();
     renderMedia();
   }
@@ -1500,7 +1511,7 @@ function initViewSwitch() {
 /* ---------- Init ---------- */
 
 (function init() {
-  console.log("Initializing Ferran Projects + Media Wall page…");
+  console.log("Initializing Ferran Projects + Media page…");
   setupLanguageUI();
   initFiltersAndSearch();
   initMediaFilters();
