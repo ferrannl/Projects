@@ -274,31 +274,35 @@ This block is meant to be automatically updated by a GitHub Action that syncs wi
 If you enable the workflow in `.github/workflows/update-readme.yml`, it will keep this list in sync.
 
 <!-- PROJECTS-LIST:START -->
-- [Projects](https://github.com/ferrannl/Projects) — All my repositories centralized
-- [Cafeteria-Churreria-San-Pedro](https://github.com/ferrannl/Cafeteria-Churreria-San-Pedro) — Cafeteria Churreria San Pedro
+- [Address-Distance-Calculator](https://github.com/ferrannl/Address-Distance-Calculator) — Address Distance Calculator C# ASP.NET Core Web API for creating, reading, updating and deleting addresses, and calculating the distance in kilometers between Dutch addresses using the Bing Maps REST API and GeoCoordinatePortable.  .NET 5 · ASP.NET Core Web API · Entity Framework Core · SQLite · Bing Maps REST Locations API
+- [AvanSync](https://github.com/ferrannl/AvanSync) — AvanSync is a C++ client–server application that demonstrates core concepts from the CPPLS2 course: networking, concurrency, modular design and unit testing. The repository is structured as a Visual Studio solution with three main projects:
+- [Broadway-Boogie-Weggie](https://github.com/ferrannl/Broadway-Boogie-Weggie) — School assignment Advanced Algorithms – a desktop application that demonstrates and visualizes different algorithms, built with C# .NET and WPF.
+- [Cafeteria-Churreria-San-Pedro](https://github.com/ferrannl/Cafeteria-Churreria-San-Pedro) — Website for Cafeteria Churreria San Pedro in Tenerife
+- [CodePen](https://github.com/ferrannl/CodePen) — Small CodePen project - Spinning DJ table with CSS/JS
+- [DevOps](https://github.com/ferrannl/DevOps) — DevOps project that ties together a small API, frontend and a full Docker-based infrastructure with reverse proxying, monitoring and CI/CD.
+- [Dimitri](https://github.com/ferrannl/Dimitri) — This repository contains the code and configuration for the Dimitri project, created as part of a software-architecture course. The focus of the project is on clean modular design, separation of concerns and applying common architectural patterns in C++.
+- [Ecobit-Internship](https://github.com/ferrannl/Ecobit-Internship) — A C#/.NET multi-project solution created as part of a third-year internship at Ecobit (Nijmegen). The project showcases a layered architecture with separation between UI, Domain, and Database logic.
 - [elegant-barbershop](https://github.com/ferrannl/elegant-barbershop) — Website suggestion for Elegant Barbershop
-- [CodePen](https://github.com/ferrannl/CodePen) — CodePen projects
-- [pso-wiiu-guide](https://github.com/ferrannl/pso-wiiu-guide) — HTML guide / documentation
-- [Monsterzoo](https://github.com/ferrannl/Monsterzoo) — Eindopdracht_JavaScript
+- [Flat-Galaxy-Society](https://github.com/ferrannl/Flat-Galaxy-Society) — Flat Galaxy Society is a C#/.NET project that models this alternative universe. It was created as an Advanced Design Patterns assignment and demonstrates clean architecture, object-oriented modeling, and test-driven development inside a playful, fictional domain.
+- [Image-Compare-API](https://github.com/ferrannl/Image-Compare-API) — Node.js REST API that compares the similarity between images using the Imagga image recognition service.  This project was originally built as a Cloud Services assignment
+- [Imgur-App-Android](https://github.com/ferrannl/Imgur-App-Android) — Android Imgur client built in Java as the final assignment (“Eindopdracht”) for a Mobile Development Android course. The app demonstrates consuming a REST API, working with lists and detail views, and following common Android architecture patterns.
+- [Imgur-App-iOS](https://github.com/ferrannl/Imgur-App-iOS) — Simple native Imgur client for iOS, written in Swift. This project was created as an educational / exam assignment and demonstrates how to consume the Imgur API, display image feeds, and present image details in a clean UIKit app.
+- [kmintapp](https://github.com/ferrannl/kmintapp) — kmintapp is a C++ application built on top of a reusable simulation framework (libkmint). It is an agent-based 2D simulation: autonomous entities move around a world, make decisions based on their environment, and interact according to simple rules. The project was built as an educational / course assignment
+- [Kolonisten-van-Catan](https://github.com/ferrannl/Kolonisten-van-Catan) — A Java implementation of (parts of) The Settlers of Catan, created as a project for Informatics 1 – Group I. This is an Eclipse-based project focused on practicing object-oriented programming, teamwork, and Git workflows.
+- [Linear-Algebra](https://github.com/ferrannl/Linear-Algebra) — Linear Algebra – Space Simulation (IIIN-LINAL) Linal Eindopdracht for the course Lineaire Algebra (IIIN-LINAL) Made using C++ and SDL. Author: Ferran Hendriks
 - [meinlager](https://github.com/ferrannl/meinlager) — Website suggestion for Mein Lager
-- [Sudoku-Design-Patterns](https://github.com/ferrannl/Sudoku-Design-Patterns) — Sudoku + design patterns (C#)
-- [Linear-Algebra](https://github.com/ferrannl/Linear-Algebra) — Lineaire Algebra code
-- [Speuren-met-Krul-2020](https://github.com/ferrannl/Speuren-met-Krul-2020) — C++ assignment
-- [Speuren-met-Krul-2021](https://github.com/ferrannl/Speuren-met-Krul-2021) — C++ assignment
-- [Study-Mate](https://github.com/ferrannl/Study-Mate) — PHP final assignment
-- [Address-Distance-Calculator](https://github.com/ferrannl/Address-Distance-Calculator) — .NET/C# API case
-- [Broadway-Boogie-Weggie](https://github.com/ferrannl/Broadway-Boogie-Weggie) — C# project
-- [Image-Compare-API](https://github.com/ferrannl/Image-Compare-API) — NodeJS REST API for image similarity
-- [DevOps](https://github.com/ferrannl/DevOps) — DevOps project (TypeScript)
-- [Niks-voor-Niks](https://github.com/ferrannl/Niks-voor-Niks) — PHP marketplace project
-- [Imgur-App-iOS](https://github.com/ferrannl/Imgur-App-iOS) — iOS Imgur client
-- [Imgur-App-Android](https://github.com/ferrannl/Imgur-App-Android) — Android Imgur client
-- [AvanSync](https://github.com/ferrannl/AvanSync) — CPPLS2 final assignment
-- [Dimitri](https://github.com/ferrannl/Dimitri) — Software Architecture project
-- [Ecobit-Internship](https://github.com/ferrannl/Ecobit-Internship) — Internship code (C#)
-- [Munchkin](https://github.com/ferrannl/Munchkin) — Munchkin website assignment
-- [Kolonisten-van-Catan](https://github.com/ferrannl/Kolonisten-van-Catan) — Catan project (Java)
+- [Monsterzoo](https://github.com/ferrannl/Monsterzoo) — Monsterzoo is a small browser-based JavaScript game built as an Eindopdracht JavaScript (final assignment). You manage a zoo full of monsters: create them, customize them, place them on different fields, and move or delete them while dealing with changing weather conditions.
+- [Munchkin](https://github.com/ferrannl/Munchkin) — We have made this website as an assignment from Avans Hogeschool in 's-Hertogenbosch. copyright 2017 © Ferran Hendiks & Xia de Visser
+- [Niks-voor-Niks](https://github.com/ferrannl/Niks-voor-Niks) — Niks voor Niks is a local trade marketplace where members of a trade ring can offer and request products and services using their own virtual currency called Niksen.  This application was originally built as a school project for a real client, following Scrum / agile practices, and implemented as a full-featured Laravel 7 web application.
+- [Projects](https://github.com/ferrannl/Projects) — All my repositories centralized
+- [pso-wiiu-guide](https://github.com/ferrannl/pso-wiiu-guide) — Guide how to setup and play Phantasy Star Online EPI+II on WiiU
+- [Speuren-met-Krul-2020](https://github.com/ferrannl/Speuren-met-Krul-2020) — A C++ console application that follows a chain of online clues, fetches and interprets a custom mini-language called Krul, and ultimately reveals a hidden secret message. This project was created as the CPPLS1 final project (Eindopdracht).
+- [Speuren-met-Krul-2021](https://github.com/ferrannl/Speuren-met-Krul-2021) — C++ console application created in 2021 as part of a school assignment by Ferran Hendriks (2130858).
+- [Study-Mate](https://github.com/ferrannl/Study-Mate) — Study-Mate is a Laravel 7 web application that lets you manage everything around a school or course program in one place: courses, teachers, exams and grades (CRUD). It was built as a final assignment (Eindopdracht) to practice full-stack Laravel development.
+- [Sudoku-Design-Patterns](https://github.com/ferrannl/Sudoku-Design-Patterns) — A comprehensive Sudoku application built in C# as an exercise in object-oriented design and classic design patterns. You can solve Sudokus, use hints, and play different variants (classic, other grid sizes, Samurai, Jigsaw).
+- [VideoShare](https://github.com/ferrannl/VideoShare) — ASP.NET Core & Entity Framework Core solution for a layered video sharing web application.
 <!-- PROJECTS-LIST:END -->
+
 
 ---
 
