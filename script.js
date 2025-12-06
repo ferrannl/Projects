@@ -1,3 +1,216 @@
+/* ---------- Language / i18n ---------- */
+
+const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
+const DEFAULT_LANG = "nl";
+const LANG_STORAGE_KEY = "ferranProjectsLang";
+const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
+
+const LANGUAGE_NAMES = {
+  nl: "Nederlands",
+  en: "English",
+  de: "Deutsch",
+  pl: "Polski",
+  tr: "Türkçe",
+  es: "Español"
+};
+
+const TRANSLATIONS = {
+  en: {
+    subtitle:
+      "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
+    aboutTitle: "About Me",
+    aboutP1:
+      "Hey 👋🏻 Ferran here. I am a Dutch developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools and putting everything together on this page.",
+    aboutP2:
+      "In my free time I enjoy inline skating, ice skating, longboarding, skateboarding, cycling and going for small walks. I also like rock, rap and electronic music, videogames and modding game consoles, something I started doing when I was about 12 years old.",
+    filterTypeLabel: "Type",
+    typeAll: "All",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "School / Study",
+    typeOther: "Other",
+    filterLanguageLabel: "Language",
+    emptyState: "No projects match your search/filter. Try another search term.",
+    footerBuiltWith: "Built with ♥ by Ferran",
+    footerViewOnPages: "View this site on GitHub Pages"
+  },
+  nl: {
+    subtitle:
+      "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
+    aboutTitle: "Over mij",
+    aboutP1:
+      "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools en verzamel alles op deze pagina.",
+    aboutP2:
+      "In mijn vrije tijd skate ik graag (inline en op ijs), longboard ik, fiets ik en maak ik kleine wandelingen. Ik ben fan van rock, rap en elektronische muziek, videogames en het modden van spelconsoles, iets wat ik ben gaan doen rond mijn twaalfde.",
+    filterTypeLabel: "Type",
+    typeAll: "Alles",
+    typeWebsite: "Websites",
+    typeMobile: "Mobiel",
+    typeApi: "API’s / Backend",
+    typeSchool: "School / Studie",
+    typeOther: "Overig",
+    filterLanguageLabel: "Taal",
+    emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+    footerBuiltWith: "Gemaakt met ♥ door Ferran",
+    footerViewOnPages: "Bekijk deze site op GitHub Pages"
+  },
+  de: {
+    subtitle:
+      "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
+    aboutTitle: "Über mich",
+    aboutP1:
+      "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die ich hier sammle.",
+    aboutP2:
+      "In meiner Freizeit fahre ich gerne Inline-Skates, Eislaufe, longboarde, skate und fahre Rad. Außerdem mag ich Rock, Rap und elektronische Musik, Videospiele und das Modden von Konsolen – damit habe ich ungefähr mit 12 angefangen.",
+    filterTypeLabel: "Typ",
+    typeAll: "Alle",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "Schule / Studium",
+    typeOther: "Sonstiges",
+    filterLanguageLabel: "Sprache",
+    emptyState: "Keine Projekte für diese Suche oder Filter. Bitte etwas anderes versuchen.",
+    footerBuiltWith: "Mit ♥ erstellt von Ferran",
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
+  },
+  pl: {
+    subtitle:
+      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, zadania ze szkoły, poradniki, API i więcej.",
+    aboutTitle: "O mnie",
+    aboutP1:
+      "Cześć 👋🏻 tu Ferran. Jestem holenderskim deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia i zbieram je tutaj.",
+    aboutP2:
+      "W wolnym czasie jeżdżę na rolkach, łyżwach, longboardzie i rowerze oraz chodzę na krótkie spacery. Lubię rock, rap, elektronikę, gry wideo i modyfikowanie konsol – zacząłem mniej więcej w wieku 12 lat.",
+    filterTypeLabel: "Typ",
+    typeAll: "Wszystko",
+    typeWebsite: "Strony WWW",
+    typeMobile: "Mobilne",
+    typeApi: "API / Backend",
+    typeSchool: "Szkoła / Studia",
+    typeOther: "Inne",
+    filterLanguageLabel: "Język",
+    emptyState: "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
+    footerBuiltWith: "Stworzone z ♥ przez Ferrana",
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
+  },
+  tr: {
+    subtitle:
+      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
+    aboutTitle: "Hakkımda",
+    aboutP1:
+      "Selam 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı bir geliştiriciyim. Web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum ve hepsini burada topluyorum.",
+    aboutP2:
+      "Boş zamanlarımda paten, buz pateni, longboard ve bisiklet sürmeyi, kısa yürüyüşler yapmayı seviyorum. Rock, rap ve elektronik müzik, video oyunları ve oyun konsollarını modlamak da hoşuma gidiyor – buna yaklaşık 12 yaşında başladım.",
+    filterTypeLabel: "Tür",
+    typeAll: "Tümü",
+    typeWebsite: "Web siteleri",
+    typeMobile: "Mobil",
+    typeApi: "API / Backend",
+    typeSchool: "Okul / Eğitim",
+    typeOther: "Diğer",
+    filterLanguageLabel: "Dil",
+    emptyState: "Bu arama / filtre ile eşleşen proje yok. Başka bir şey dene.",
+    footerBuiltWith: "♥ ile geliştirildi – Ferran",
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
+  },
+  es: {
+    subtitle:
+      "Todos mis proyectos de programación en un solo lugar: webs, apps, trabajos de estudio, guías, APIs y más.",
+    aboutTitle: "Sobre mí",
+    aboutP1:
+      "Hola 👋🏻 soy Ferran. Desarrollador holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas y juntarlo todo en esta página.",
+    aboutP2:
+      "En mi tiempo libre patino en línea, sobre hielo, hago longboard, voy en bici y doy paseos cortos. Me gustan el rock, el rap, la música electrónica, los videojuegos y modificar consolas, algo que empecé a hacer sobre los 12 años.",
+    filterTypeLabel: "Tipo",
+    typeAll: "Todo",
+    typeWebsite: "Webs",
+    typeMobile: "Móvil",
+    typeApi: "APIs / Backend",
+    typeSchool: "Escuela / Estudio",
+    typeOther: "Otros",
+    filterLanguageLabel: "Idioma",
+    emptyState: "No hay proyectos para esta búsqueda o filtros. Prueba con otros términos.",
+    footerBuiltWith: "Hecho con ♥ por Ferran",
+    footerViewOnPages: "Ver este sitio en GitHub Pages"
+  }
+};
+
+function applyTranslations(lang) {
+  const dict = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (!key) return;
+    const value = dict[key];
+    if (typeof value === "string") {
+      el.textContent = value;
+    }
+  });
+}
+
+function updateLangLabel(lang) {
+  const labelEl = document.getElementById("uiLangLabel");
+  if (!labelEl) return;
+  const name = LANGUAGE_NAMES[lang] || LANGUAGE_NAMES[DEFAULT_LANG];
+  labelEl.textContent = name;
+}
+
+function setLanguage(lang) {
+  if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
+  localStorage.setItem(LANG_STORAGE_KEY, lang);
+  document.documentElement.lang = lang;
+  updateLangLabel(lang);
+  applyTranslations(lang);
+}
+
+function setupLanguageUI() {
+  const langGateEl = document.getElementById("langGate");
+  const gateButtons = document.querySelectorAll(".btn-lang[data-lang]");
+  const uiLangButton = document.getElementById("uiLangButton");
+
+  let saved = localStorage.getItem(LANG_STORAGE_KEY);
+  if (!saved || !SUPPORTED_LANGS.includes(saved)) {
+    saved = DEFAULT_LANG;
+  }
+  setLanguage(saved);
+
+  const hasSeenGate = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
+  if (!hasSeenGate && langGateEl) {
+    langGateEl.hidden = false;
+  } else if (langGateEl) {
+    langGateEl.hidden = true;
+  }
+
+  gateButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      setLanguage(lang);
+      if (langGateEl) langGateEl.hidden = true;
+      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+    });
+  });
+
+  if (uiLangButton && langGateEl) {
+    uiLangButton.addEventListener("click", () => {
+      langGateEl.hidden = false;
+    });
+  }
+
+  if (langGateEl) {
+    langGateEl.addEventListener("click", (e) => {
+      if (e.target === langGateEl) {
+        langGateEl.hidden = true;
+      }
+    });
+  }
+}
+
+setupLanguageUI();
+
+/* ---------- Projects logic (GitHub + projects.json) ---------- */
+
 const GITHUB_USER = "ferrannl";
 const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`;
 const PROJECTS_URL = "./projects.json";
@@ -23,16 +236,6 @@ const typeChips = document.querySelectorAll(".chip[data-filter-type='type']");
 const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
 
-const langGateEl = document.getElementById("langGate");
-const langGateButtons = document.querySelectorAll(".btn-lang");
-
-const uiLangRoot = document.getElementById("uiLangSwitcherRoot");
-const uiLangButton = document.getElementById("uiLangButton");
-const uiLangLabel = document.getElementById("uiLangLabel");
-const uiLangList = document.getElementById("uiLangList");
-
-let currentLang = "en";
-
 const SMALL_WORDS = new Set([
   "voor", "van", "met",
   "en", "of",
@@ -51,239 +254,6 @@ const SPECIAL_WORDS = {
   ui: "UI",
   ux: "UX"
 };
-
-/* ---------- i18n dictionary ---------- */
-
-const I18N = {
-  en: {
-    subtitle: "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
-    aboutTitle: "About Me",
-    aboutP1: "Hey 👋🏻 Ferran here. I am a Dutch developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools and putting everything together on this page.",
-    aboutP2: "In my free time I enjoy inline skating, ice skating, longboarding and cycling. I also like rock, rap and electronic music, videogames and modding game consoles, something I started doing when I was about 12 years old.",
-    filterTypeLabel: "Type",
-    typeAll: "All",
-    typeWebsite: "Websites",
-    typeMobile: "Mobile",
-    typeApi: "APIs / Backend",
-    typeSchool: "School / Study",
-    typeOther: "Other",
-    filterLanguageLabel: "Language",
-    emptyState: "No projects match your search/filter. Try another search term.",
-    footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages",
-    searchPlaceholder: "Search by name, description, language or tag…"
-  },
-  nl: {
-    subtitle: "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, gidsen, API’s en meer.",
-    aboutTitle: "Over mij",
-    aboutP1: "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools en zet alles op deze pagina bij elkaar.",
-    aboutP2: "In mijn vrije tijd skate ik graag (inline en op ijs), longboard ik en fiets ik veel. Ik hou van rock, rap en elektronische muziek, videogames en het modden van gameconsoles, iets wat ik al doe sinds ik ongeveer 12 was.",
-    filterTypeLabel: "Type",
-    typeAll: "Alles",
-    typeWebsite: "Websites",
-    typeMobile: "Mobiel",
-    typeApi: "API’s / Backend",
-    typeSchool: "School / Studie",
-    typeOther: "Overig",
-    filterLanguageLabel: "Taal",
-    emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer een andere term.",
-    footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages",
-    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…"
-  },
-  de: {
-    subtitle: "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienarbeiten, Guides, APIs und mehr.",
-    aboutTitle: "Über mich",
-    aboutP1: "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die ich hier sammle.",
-    aboutP2: "In meiner Freizeit fahre ich gerne Inline-Skates, Eislaufe, Longboard und Fahrrad. Ich mag Rock, Rap und elektronische Musik, Videospiele und das Modden von Konsolen – damit habe ich mit etwa 12 Jahren angefangen.",
-    filterTypeLabel: "Typ",
-    typeAll: "Alle",
-    typeWebsite: "Websites",
-    typeMobile: "Mobile Apps",
-    typeApi: "APIs / Backend",
-    typeSchool: "Studium / Schule",
-    typeOther: "Sonstiges",
-    filterLanguageLabel: "Sprache",
-    emptyState: "Keine Projekte gefunden. Suchbegriff oder Filter ändern.",
-    footerBuiltWith: "Mit ♥ gebaut von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
-    searchPlaceholder: "Suche nach Name, Beschreibung, Sprache oder Tag…"
-  },
-  es: {
-    subtitle: "Todos mis proyectos de programación y código en un solo lugar: webs, apps, trabajos de estudio, guías, APIs y más.",
-    aboutTitle: "Sobre mí",
-    aboutP1: "Hey 👋🏻 soy Ferran. Desarrollador holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas y reunirlo todo en esta página.",
-    aboutP2: "En mi tiempo libre me gusta patinar en línea, patinar sobre hielo, ir en longboard y en bici. También me gustan el rock, el rap, la música electrónica, los videojuegos y el modding de consolas, algo que empecé a hacer sobre los 12 años.",
-    filterTypeLabel: "Tipo",
-    typeAll: "Todo",
-    typeWebsite: "Webs",
-    typeMobile: "Móvil",
-    typeApi: "APIs / Backend",
-    typeSchool: "Escuela / Estudios",
-    typeOther: "Otros",
-    filterLanguageLabel: "Idioma",
-    emptyState: "No hay proyectos que coincidan con tu búsqueda o filtros. Prueba con otro término.",
-    footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages",
-    searchPlaceholder: "Busca por nombre, descripción, idioma o tag…"
-  },
-  pl: {
-    subtitle: "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty ze studiów, poradniki, API i więcej.",
-    aboutTitle: "O mnie",
-    aboutP1: "Hej 👋🏻 tu Ferran. Holenderski developer z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia i zbierać je tutaj.",
-    aboutP2: "W wolnym czasie lubię rolki, łyżwy, longboard i jazdę na rowerze. Lubię rock, rap, elektronikę, gry wideo i modowanie konsol – robię to mniej więcej od 12 roku życia.",
-    filterTypeLabel: "Typ",
-    typeAll: "Wszystko",
-    typeWebsite: "Strony WWW",
-    typeMobile: "Mobile",
-    typeApi: "API / Backend",
-    typeSchool: "Szkoła / Studia",
-    typeOther: "Inne",
-    filterLanguageLabel: "Język",
-    emptyState: "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
-    footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
-    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…"
-  },
-  tr: {
-    subtitle: "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
-    aboutTitle: "Hakkımda",
-    aboutP1: "Hey 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’lu Hollandalı bir geliştiriciyim. Web siteleri, uygulamalar ve küçük araçlar yazıp hepsini bu sayfada topluyorum.",
-    aboutP2: "Boş zamanlarımda paten kaymayı, buz pateni yapmayı, longboard ve bisiklete binmeyi seviyorum. Rock, rap ve elektronik müzik, video oyunları ve 12 yaşımdan beri oyun konsollarını modlamak da ilgi alanlarım.",
-    filterTypeLabel: "Tür",
-    typeAll: "Hepsi",
-    typeWebsite: "Web siteleri",
-    typeMobile: "Mobil",
-    typeApi: "API / Backend",
-    typeSchool: "Okul / Eğitim",
-    typeOther: "Diğer",
-    filterLanguageLabel: "Dil",
-    emptyState: "Bu arama / filtrelerle eşleşen proje yok. Başka bir terim dene.",
-    footerBuiltWith: "♥ ile Ferran tarafından yapıldı",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde gör",
-    searchPlaceholder: "İsme, açıklamaya, dile veya taga göre ara…"
-  }
-};
-
-/* ---------- Language helpers ---------- */
-
-function applyLanguage(lang) {
-  const dict = I18N[lang] || I18N.en;
-  currentLang = lang;
-  document.documentElement.lang = lang;
-
-  // Text nodes with data-i18n
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (key && dict[key]) {
-      el.textContent = dict[key];
-    }
-  });
-
-  // Search placeholder
-  if (searchEl && dict.searchPlaceholder) {
-    searchEl.placeholder = dict.searchPlaceholder;
-  }
-
-  // Empty state text
-  if (emptyEl && dict.emptyState) {
-    emptyEl.textContent = dict.emptyState;
-  }
-}
-
-function updateLangSwitcherUI(lang) {
-  const labelMap = {
-    en: "English",
-    nl: "Nederlands",
-    de: "Deutsch",
-    es: "Español",
-    pl: "Polski",
-    tr: "Türkçe"
-  };
-  if (uiLangLabel) {
-    uiLangLabel.textContent = labelMap[lang] || labelMap.en;
-  }
-  if (uiLangList) {
-    const options = uiLangList.querySelectorAll(".lang-option");
-    options.forEach(opt => {
-      const code = opt.getAttribute("data-lang");
-      const selected = code === lang;
-      opt.classList.toggle("is-selected", selected);
-      opt.setAttribute("aria-selected", selected ? "true" : "false");
-    });
-  }
-}
-
-function setLanguage(lang, opts = {}) {
-  const { persist = true } = opts;
-  const safeLang = I18N[lang] ? lang : "en";
-  applyLanguage(safeLang);
-  updateLangSwitcherUI(safeLang);
-  if (persist) {
-    try {
-      localStorage.setItem("uiLang", safeLang);
-    } catch {
-      // ignore
-    }
-  }
-  // Hide gate if visible
-  if (langGateEl) langGateEl.hidden = true;
-}
-
-function initLanguageSystem() {
-  // Gate buttons
-  if (langGateButtons && langGateButtons.length) {
-    langGateButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const lang = btn.getAttribute("data-lang") || "en";
-        setLanguage(lang, { persist: true });
-      });
-    });
-  }
-
-  // Header custom dropdown
-  if (uiLangRoot && uiLangButton && uiLangList) {
-    uiLangButton.addEventListener("click", () => {
-      const isOpen = uiLangRoot.classList.contains("open");
-      uiLangRoot.classList.toggle("open", !isOpen);
-      uiLangButton.setAttribute("aria-expanded", !isOpen ? "true" : "false");
-    });
-
-    uiLangList.addEventListener("click", (e) => {
-      const li = e.target.closest(".lang-option");
-      if (!li) return;
-      const lang = li.getAttribute("data-lang") || "en";
-      setLanguage(lang, { persist: true });
-      uiLangRoot.classList.remove("open");
-      uiLangButton.setAttribute("aria-expanded", "false");
-    });
-
-    // Close on outside click
-    document.addEventListener("click", (e) => {
-      if (!uiLangRoot.classList.contains("open")) return;
-      if (!uiLangRoot.contains(e.target)) {
-        uiLangRoot.classList.remove("open");
-        uiLangButton.setAttribute("aria-expanded", "false");
-      }
-    });
-  }
-
-  // Initial language (from localStorage or EN)
-  let stored = null;
-  try {
-    stored = localStorage.getItem("uiLang");
-  } catch {
-    stored = null;
-  }
-  const initialLang = stored && I18N[stored] ? stored : "en";
-
-  setLanguage(initialLang, { persist: !stored });
-
-  // Only show gate for first visit (no stored language)
-  if (!stored && langGateEl) {
-    langGateEl.hidden = false;
-  }
-}
 
 /* ---------- Helpers ---------- */
 
@@ -707,7 +677,7 @@ function renderProjects() {
   if (!filtered.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
-      // text is already handled by i18n
+      // text already handled by i18n
     }
     return;
   }
@@ -836,7 +806,8 @@ function canCallApiNow() {
   return Date.now() > info.until;
 }
 
-/* ---------- Thumbnail autodetect ---------- */
+/* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
+/* logo.* has highest priority; if not found, fall back to banner/screenshot/etc. */
 
 const thumbnailCandidates = [
   // HIGH PRIORITY: logos first
@@ -968,8 +939,7 @@ async function loadFromProjectsJson() {
     if (gridEl) gridEl.innerHTML = "";
     if (emptyEl) {
       emptyEl.hidden = false;
-      emptyEl.textContent =
-        I18N[currentLang]?.emptyState || I18N.en.emptyState;
+      // text handled by i18n
     }
   }
 }
@@ -1093,7 +1063,6 @@ async function loadRepos() {
 
 (function init() {
   console.log("Initializing Ferran Projects page…");
-  initLanguageSystem();      // NEW: set UI language + gate + switcher
   initFiltersAndSearch();
   loadRepos();
 })();
