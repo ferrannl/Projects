@@ -77,24 +77,28 @@
 
       <hr class="about-divider">
 
-      <!-- About Me block: title + avatar on one row, text underneath -->
+      <!-- About Me block: text left, avatar right; all texts use i18n keys -->
       <section class="about-me" data-i18n-block="about">
-        <div class="about-me-header">
-          <h2 data-i18n="aboutTitle">About Me</h2>
-          <div class="about-avatar-wrap">
-            <!-- Put profile.jpg next to index.html -->
-            <img src="./profile.jpg" alt="Ferran" class="about-avatar">
+        <div class="about-me-content">
+          <div class="about-me-left">
+            <h2 data-i18n="aboutTitle">About Me</h2>
+            <p data-i18n="aboutP1">
+              Hey 👋🏻 Ferran here. I am a Dutch developer from Utrecht / 's-Hertogenbosch.
+              I like building websites, apps and small tools and putting everything together on this page.
+            </p>
+            <p data-i18n="aboutP2">
+              In my free time I enjoy inline skating, ice skating, longboarding, skateboarding, cycling and going for small walks.
+              I also like rock, rap and electronic music, videogames and modding game consoles, something I started doing when I was about 12 years old.
+            </p>
+          </div>
+
+          <div class="about-me-right">
+            <div class="about-avatar-wrap">
+              <!-- Put profile.jpg next to index.html -->
+              <img src="./profile.jpg" alt="Ferran" class="about-avatar">
+            </div>
           </div>
         </div>
-
-        <p data-i18n="aboutP1">
-          Hey 👋🏻 Ferran here. I am a Dutch developer from Utrecht / 's-Hertogenbosch.
-          I like building websites, apps and small tools and putting everything together on this page.
-        </p>
-        <p data-i18n="aboutP2">
-          In my free time I enjoy inline skating, ice skating, longboarding, skateboarding, cycling and going for small walks.
-          I also like rock, rap and electronic music, videogames and modding game consoles, something I started doing when I was about 12 years old.
-        </p>
       </section>
     </div>
 
