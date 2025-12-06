@@ -1,5 +1,8 @@
 name: Generate media index
 
+permissions:
+  contents: write
+
 on:
   push:
     paths:
@@ -7,7 +10,7 @@ on:
       - "scripts/generate_media_index.py"
       - ".github/workflows/generate-media-index.yml"
   workflow_dispatch:
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
