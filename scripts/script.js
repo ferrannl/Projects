@@ -38,7 +38,7 @@ const TRANSLATIONS = {
       "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
     aboutTitle: "About Me",
     aboutP1:
-      "Hey 👋🏻 Ferran ({age}) here. I am a Dutch developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
+      "Hey 👋🏻 Ferran ({age}) here. I am a Dutch 🇳🇱 developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
     tabProjects: "Projects",
     tabMedia: "Media",
@@ -70,7 +70,7 @@ const TRANSLATIONS = {
       "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
     aboutTitle: "Over mij",
     aboutP1:
-      "Hey 👋🏻 Ferran ({age}) hier. Ik ben een Nederlandse developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
+      "Hey 👋🏻 Ferran ({age}) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
@@ -103,7 +103,7 @@ const TRANSLATIONS = {
       "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
     aboutTitle: "Über mich",
     aboutP1:
-      "Hey 👋🏻 hier ist Ferran ({age}). Ich bin ein niederländischer Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die mir und anderen helfen.",
+      "Hey 👋🏻 hier ist Ferran ({age}). Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die mir und anderen helfen.",
     aboutP2: "",
     tabProjects: "Projekte",
     tabMedia: "Medien",
@@ -136,7 +136,7 @@ const TRANSLATIONS = {
       "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, zadania ze szkoły, poradniki, API i więcej.",
     aboutTitle: "O mnie",
     aboutP1:
-      "Cześć 👋🏻 tu Ferran ({age}). Jestem holenderskim deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia, które pomagają mnie i innym.",
+      "Cześć 👋🏻 tu Ferran ({age}). Jestem holenderskim 🇳🇱 deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia, które pomagają mnie i innym.",
     aboutP2: "",
     tabProjects: "Projekty",
     tabMedia: "Media",
@@ -169,7 +169,7 @@ const TRANSLATIONS = {
       "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
     aboutTitle: "Hakkımda",
     aboutP1:
-      "Selam 👋🏻 ben Ferran ({age}). Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı bir geliştiriciyim. Kendime ve başkalarına yardımcı olan web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
+      "Selam 👋🏻 ben Ferran ({age}). Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir geliştiriciyim. Kendime ve başkalarına yardımcı olan web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
     aboutP2: "",
     tabProjects: "Projeler",
     tabMedia: "Medya",
@@ -203,7 +203,7 @@ const TRANSLATIONS = {
       "Todos mis proyectos de programación en un solo lugar: webs, apps, trabajos de estudio, guías, APIs y más.",
     aboutTitle: "Sobre mí",
     aboutP1:
-      "Hola 👋🏻 soy Ferran ({age}). Desarrollador holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas que ayudan a mí y a otras personas.",
+      "Hola 👋🏻 soy Ferran ({age}). Soy un desarrollador holandés 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas que ayudan a mí y a otras personas.",
     aboutP2: "",
     tabProjects: "Proyectos",
     tabMedia: "Media",
@@ -1445,8 +1445,6 @@ function createMediaCard(item) {
     video.controls = true;
     video.preload = "metadata";
     video.playsInline = true;
-    // you *can* add this if you want to discourage download:
-    // video.controlsList = "nodownload";
     thumb.appendChild(video);
 
   // 🎧 AUDIO: full controls, metadata preload
@@ -1478,7 +1476,6 @@ function createMediaCard(item) {
     metaRow.appendChild(extPill);
   }
 
-  // 🔗 Fancy: little "Open file" button using your existing button style
   const actionsRow = document.createElement("div");
   actionsRow.className = "project-links"; // reuse project-links styling
 
@@ -1523,14 +1520,12 @@ async function loadMediaIndex() {
     // Try both common filenames: media_index.json and media-index.json
     const candidates = ["media/media_index.json", "media/media-index.json"];
     let res = null;
-    let urlUsed = null;
 
     for (const url of candidates) {
       try {
         const attempt = await fetch(url, { cache: "no-store" });
         if (attempt.ok) {
           res = attempt;
-          urlUsed = url;
           break;
         }
       } catch (e) {
@@ -1615,7 +1610,7 @@ function setView(view) {
   const showingProjects = currentView === "projects";
   const showingMedia = !showingProjects;
 
-  // Tabs active state
+  // Active state on tabs
   viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
     if (tabView === currentView) {
@@ -1625,33 +1620,26 @@ function setView(view) {
     }
   });
 
-  // ==== MAIN SECTIONS ====
+  // Views
   if (projectsViewEl) {
     projectsViewEl.hidden = !showingProjects;
-    projectsViewEl.style.display = showingProjects ? "" : "none";
   }
   if (mediaViewEl) {
     mediaViewEl.hidden = !showingMedia;
-    mediaViewEl.style.display = showingMedia ? "" : "none";
   }
 
-  // ==== FILTER ROWS ====
-  // 👉 Projects: TYPE + TAAL
+  // Filters: Projects -> TYPE + TAAL, Media -> MEDIA TYPE + BESTANDSTYPE
   if (projectFiltersEl) {
     projectFiltersEl.hidden = !showingProjects;
-    projectFiltersEl.style.display = showingProjects ? "flex" : "none";
   }
-
-  // 👉 Media: MEDIA TYPE + BESTANDSTYPE
   if (mediaFiltersEl) {
     mediaFiltersEl.hidden = !showingMedia;
-    mediaFiltersEl.style.display = showingMedia ? "flex" : "none";
   }
 
-  // Search placeholder updaten
+  // Search placeholder
   updateSearchPlaceholderForView();
 
-  // Juiste lijst renderen
+  // Render correct list
   if (showingProjects) {
     renderProjects();
   } else {
