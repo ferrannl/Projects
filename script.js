@@ -19,6 +19,7 @@ const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // month 7 = August
 
 let currentLang = DEFAULT_LANG;
 
+// Units per language
 const AGE_UNITS = {
   nl: { y: "j",  m: "mnd", d: "d",  h: "u",   min: "min", s: "s" },
   en: { y: "y",  m: "mo",  d: "d",  h: "h",   min: "m",   s: "s" },
@@ -46,7 +47,9 @@ const TRANSLATIONS = {
     filterLanguageLabel: "Language",
     emptyState: "No projects match your search/filter. Try another search term.",
     footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages"
+    footerViewOnPages: "View this site on GitHub Pages",
+    searchPlaceholder: "Search by name, description, language or tag…",
+    languagesAll: "All languages"
   },
   nl: {
     subtitle:
@@ -65,7 +68,9 @@ const TRANSLATIONS = {
     filterLanguageLabel: "Taal",
     emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages"
+    footerViewOnPages: "Bekijk deze site op GitHub Pages",
+    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
+    languagesAll: "Alle talen"
   },
   de: {
     subtitle:
@@ -84,7 +89,9 @@ const TRANSLATIONS = {
     filterLanguageLabel: "Sprache",
     emptyState: "Keine Projekte für diese Suche oder Filter. Bitte etwas anderes versuchen.",
     footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
+    searchPlaceholder: "Nach Name, Beschreibung, Sprache oder Tag suchen…",
+    languagesAll: "Alle Sprachen"
   },
   pl: {
     subtitle:
@@ -103,7 +110,9 @@ const TRANSLATIONS = {
     filterLanguageLabel: "Język",
     emptyState: "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
+    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
+    languagesAll: "Wszystkie języki"
   },
   tr: {
     subtitle:
@@ -122,7 +131,9 @@ const TRANSLATIONS = {
     filterLanguageLabel: "Dil",
     emptyState: "Bu arama / filtre ile eşleşen proje yok. Başka bir şey dene.",
     footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
+    searchPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…",
+    languagesAll: "Tüm diller"
   },
   es: {
     subtitle:
@@ -141,7 +152,9 @@ const TRANSLATIONS = {
     filterLanguageLabel: "Idioma",
     emptyState: "No hay proyectos para esta búsqueda o filtros. Prueba con otros términos.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages"
+    footerViewOnPages: "Ver este sitio en GitHub Pages",
+    searchPlaceholder: "Buscar por nombre, descripción, idioma o etiqueta…",
+    languagesAll: "Todos los idiomas"
   }
 };
 
@@ -166,7 +179,7 @@ function getAgeParts(now = new Date()) {
     d -= 1;
   }
   if (d < 0) {
-    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0); // last day of previous month
     d += prevMonth.getDate();
     m -= 1;
   }
@@ -202,7 +215,7 @@ function applyTranslations(lang) {
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    if (!key || key === "aboutP1") return;
+    if (!key || key === "aboutP1") return; // aboutP1 handled separately
     const value = dict[key];
     if (typeof value === "string") {
       el.textContent = value;
@@ -220,12 +233,16 @@ function updateLangLabel(lang) {
   labelEl.textContent = name;
 }
 
+/* Will be defined later, but function declarations are hoisted */
+function updateSearchAndLanguagePlaceholder(lang) {}
+
 function setLanguage(lang) {
   if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
   localStorage.setItem(LANG_STORAGE_KEY, lang);
   document.documentElement.lang = lang;
   updateLangLabel(lang);
   applyTranslations(lang);
+  updateSearchAndLanguagePlaceholder(lang);
 }
 
 function setupLanguageUI() {
@@ -269,6 +286,7 @@ function setupLanguageUI() {
     });
   }
 
+  // keep age ticking (every second, so seconds visibly move)
   updateAgeInAbout();
   setInterval(updateAgeInAbout, 1000);
 }
@@ -372,14 +390,10 @@ function inferTypesFromGitHub(repo) {
   const lang = (repo.language || "").toLowerCase();
 
   const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
-
   const looksMobileText =
     name.includes("android") || desc.includes("android") ||
     name.includes("ios") || desc.includes("ios");
-
-  // java deliberately NOT treated as "mobile"
-  const looksMobileLang = ["swift", "kotlin"].includes(lang);
-
+  const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
   const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
@@ -404,20 +418,6 @@ function inferTypesFromGitHub(repo) {
     types.push("school");
   }
 
-  // manual overrides
-
-  if (name.includes("sudoku")) {
-    types.push("school");
-  }
-
-  if (name.includes("linear") && name.includes("algebra")) {
-    types.push("school");
-  }
-
-  if (name.includes("videoshare") || name.includes("video-share")) {
-    types.push("api");
-  }
-
   if (!types.length) {
     types.push("other");
   }
@@ -432,13 +432,10 @@ function inferTypesFromEntry(entry) {
   const desc = (entry.description || "").toLowerCase();
 
   const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
-
   const looksMobileText =
     name.includes("android") || desc.includes("android") ||
     name.includes("ios") || desc.includes("ios");
-
-  const looksMobileLang = ["swift", "kotlin"].includes(lang);
-
+  const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
   const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
@@ -461,18 +458,6 @@ function inferTypesFromEntry(entry) {
 
   if (seemsSchool) {
     types.push("school");
-  }
-
-  if (name.includes("sudoku")) {
-    types.push("school");
-  }
-
-  if (name.includes("linear") && name.includes("algebra")) {
-    types.push("school");
-  }
-
-  if (name.includes("videoshare") || name.includes("video-share")) {
-    types.push("api");
   }
 
   if (!types.length) {
@@ -553,50 +538,6 @@ function computeLanguages(primaryLang, rawName, desc, typeOrTypes) {
   return unique.slice(0, 3);
 }
 
-/* ---------- Game detection from README ---------- */
-
-function textLooksLikeGame(text) {
-  const s = (text || "").toLowerCase();
-
-  const strongKeywords = [
-    "game",
-    "video game",
-    "videogame",
-    "board game",
-    "card game",
-    "multiplayer",
-    "singleplayer",
-    "single-player",
-    "score",
-    "highscore",
-    "high score",
-    "level",
-    "levels",
-    "enemy",
-    "enemies",
-    "player",
-    "players",
-    "lives",
-    "health bar",
-    "hp"
-  ];
-
-  const gameNames = [
-    "sudoku",
-    "catan",
-    "settlers of catan",
-    "tetris",
-    "pong",
-    "snake",
-    "dimitri"
-  ];
-
-  if (strongKeywords.some(k => s.includes(k))) return true;
-  if (gameNames.some(k => s.includes(k))) return true;
-
-  return false;
-}
-
 /* ---------- Map GitHub repo → internal ---------- */
 
 function mapRepoFromGitHub(repo) {
@@ -654,7 +595,7 @@ function mapEntryToProject(entry) {
   tagsFromType = [...new Set(tagsFromType)];
 
   const extraTags = entry.tags ? entry.tags : [];
-  let mergedTags = [...new Set([...tagsFromType, ...extraTags])];
+  const mergedTags = [...new Set([...tagsFromType, ...extraTags])];
 
   let thumbnailUrl = null;
   if (entry.thumbnailUrl && entry.thumbnailUrl.trim()) {
@@ -920,9 +861,11 @@ function initLanguageFilter() {
   if (!languageSelectEl) return;
   languageSelectEl.innerHTML = "";
 
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
+
   const allOption = document.createElement("option");
   allOption.value = "all";
-  allOption.textContent = "All languages";
+  allOption.textContent = dict.languagesAll || "All languages";
   languageSelectEl.appendChild(allOption);
 
   const languages = Array.from(
@@ -946,6 +889,9 @@ function initLanguageFilter() {
     state.languageFilter = languageSelectEl.value;
     renderProjects();
   });
+
+  // make sure "All languages" is correct after building options
+  updateSearchAndLanguagePlaceholder(currentLang);
 }
 
 /* ---------- Cache helpers ---------- */
@@ -1104,57 +1050,6 @@ async function verifyLiveSites() {
   renderProjects();
 }
 
-/* ---------- Game tags from README ---------- */
-
-async function markGameFromReadme(project) {
-  const rawName = project.rawName || "";
-
-  // Dimitri is definitely a game
-  if (/dimitri/i.test(rawName)) {
-    project.tags = [...new Set([...(project.tags || []), "game"])];
-    return;
-  }
-
-  if (project.tags && project.tags.includes("game")) {
-    return;
-  }
-
-  const quickText = `${rawName} ${project.baseDescription || project.summary || ""}`;
-  if (textLooksLikeGame(quickText)) {
-    project.tags = [...new Set([...(project.tags || []), "game"])];
-    return;
-  }
-
-  const candidates = [
-    `https://raw.githubusercontent.com/${GITHUB_USER}/${rawName}/HEAD/README.md`,
-    `https://raw.githubusercontent.com/${GITHUB_USER}/${rawName}/HEAD/Readme.md`,
-    `https://raw.githubusercontent.com/${GITHUB_USER}/${rawName}/HEAD/readme.md`
-  ];
-
-  for (const url of candidates) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
-
-      const text = await res.text();
-      if (textLooksLikeGame(text)) {
-        project.tags = [...new Set([...(project.tags || []), "game"])];
-      }
-      return;
-    } catch (err) {
-      console.warn(`Error reading README for ${rawName} at ${url}`, err);
-    }
-  }
-}
-
-async function enhanceGameTagsFromReadme() {
-  console.log("Enhancing game tags based on README...");
-  const tasks = repos.map(p => markGameFromReadme(p));
-  await Promise.all(tasks);
-  saveCache(repos);
-  renderProjects();
-}
-
 /* ---------- Fallback: projects.json ---------- */
 
 async function loadFromProjectsJson() {
@@ -1172,12 +1067,30 @@ async function loadFromProjectsJson() {
     renderProjects();
     await verifyLiveSites();
     await enhanceThumbnails();
-    await enhanceGameTagsFromReadme();
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
     if (gridEl) gridEl.innerHTML = "";
     if (emptyEl) {
       emptyEl.hidden = false;
+    }
+  }
+}
+
+/* ---------- Search + language placeholders helper ---------- */
+
+function updateSearchAndLanguagePlaceholder(lang) {
+  const dict = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
+
+  if (searchEl && dict.searchPlaceholder) {
+    searchEl.placeholder = dict.searchPlaceholder;
+  }
+
+  if (languageSelectEl && languageSelectEl.options && languageSelectEl.options.length) {
+    const firstOpt =
+      languageSelectEl.querySelector('option[value="all"]') ||
+      languageSelectEl.options[0];
+    if (firstOpt && dict.languagesAll) {
+      firstOpt.textContent = dict.languagesAll;
     }
   }
 }
@@ -1203,7 +1116,6 @@ async function loadRepos() {
 
     verifyLiveSites();
     enhanceThumbnails();
-    enhanceGameTagsFromReadme();
 
     if (age < CACHE_TTL_MS) {
       return;
@@ -1284,7 +1196,6 @@ async function loadRepos() {
     renderProjects();
     await verifyLiveSites();
     await enhanceThumbnails();
-    await enhanceGameTagsFromReadme();
   } catch (err) {
     console.error("Network / fetch error while calling GitHub API:", err);
     if (!usedCache) {
