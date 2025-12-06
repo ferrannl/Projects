@@ -445,7 +445,6 @@ function computeLanguages(primaryLang, rawName, desc, typeOrTypes) {
   } else if (l === "css") {
     langs.push("CSS", "HTML", "JavaScript");
   } else if (l === "javascript") {
-    // if any of types is website, we assume a front-end stack
     const types = Array.isArray(typeOrTypes) ? typeOrTypes : [typeOrTypes];
     const hasWebsite = types.includes("website");
     if (hasWebsite) {
@@ -500,15 +499,14 @@ function mapRepoFromGitHub(repo) {
     languages,
     types,
     primaryType,
-    // keep .type for backwards compatibility / simpler usage
     type: primaryType,
     tags,
     githubUrl: repo.html_url,
     pagesUrl,
-    hasLiveSite: !!pagesUrl, // will be verified later
+    hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null  // may be filled from projects.json or auto-detect
+    thumbnailUrl: null
   };
 }
 
@@ -553,7 +551,7 @@ function mapEntryToProject(entry) {
     tags: mergedTags,
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
     pagesUrl,
-    hasLiveSite: !!pagesUrl, // will be verified later
+    hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
     thumbnailUrl
@@ -564,9 +562,8 @@ function mapEntryToProject(entry) {
 
 function matchesFilters(project) {
   const rawName = project.rawName || "";
-  if (isSelfProjectsRepoName(rawName)) return false; // never show self repo
+  if (isSelfProjectsRepoName(rawName)) return false;
 
-  // Ensure we have a types array even for old cached data
   const projectTypes = project.types && project.types.length
     ? project.types
     : (project.type ? [project.type] : []);
@@ -684,7 +681,6 @@ function createProjectCard(project) {
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
-  // Languages (show up to 3)
   const langList = project.languages && project.languages.length
     ? project.languages
     : (project.language ? [project.language] : []);
@@ -697,7 +693,6 @@ function createProjectCard(project) {
     metaRow.appendChild(langPill);
   });
 
-  // Tags
   (project.tags || []).forEach(tag => {
     const tagPill = document.createElement("span");
     tagPill.className = "meta-pill tag-pill";
@@ -757,14 +752,12 @@ function renderProjects() {
   if (!filtered.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
-      // text already handled by i18n
     }
     return;
   }
 
   if (emptyEl) emptyEl.hidden = true;
 
-  // Sort: live sites first, then alphabetically by displayName
   filtered = filtered.slice().sort((a, b) => {
     const aLive = a.hasLiveSite && a.pagesUrl ? 1 : 0;
     const bLive = b.hasLiveSite && b.pagesUrl ? 1 : 0;
@@ -839,7 +832,6 @@ function getCache() {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.projects)) return null;
 
-    // Clean out self repo from cache as well
     parsed.projects = parsed.projects.filter(
       p => !isSelfProjectsRepoName(p.rawName)
     );
@@ -887,25 +879,17 @@ function canCallApiNow() {
 }
 
 /* ---------- Thumbnail autodetect (raw.githubusercontent.com) ---------- */
-/* logo.* has highest priority; if not found, fall back to banner/screenshot/etc. */
 
 const thumbnailCandidates = [
-  // HIGH PRIORITY: logos first
   "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
-
-  // Website / app style images
   "banner.png", "banner.jpg",
   "screenshot.png", "screenshot.jpg",
   "screenshot-1.png", "screenshot-1.jpg",
   "hero.png", "hero.jpg",
   "thumbnail.png", "thumbnail.jpg",
   "cover.png", "cover.jpg",
-
-  // Icons & favicons
   "favicon.png", "favicon.jpg", "favicon.ico",
   "icon.png", "icon.jpg",
-
-  // Diagrams and model images
   "NewClassDiagram.png", "NewClassDiagram.jpg",
   "OldClassDiagram.png", "OldClassDiagram.jpg",
   "SequenceDiagram.png", "SequenceDiagram.jpg",
@@ -918,7 +902,7 @@ const thumbnailCandidates = [
 ];
 
 const thumbnailFolders = [
-  "",          // root
+  "",
   "images",
   "img",
   "media",
@@ -927,7 +911,6 @@ const thumbnailFolders = [
 ];
 
 async function findThumbnailForRepo(project) {
-  // If projects.json already defined an explicit thumbnail, leave it
   if (project.thumbnailUrl) {
     return;
   }
@@ -938,7 +921,7 @@ async function findThumbnailForRepo(project) {
       const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${project.rawName}/HEAD/${path}`;
 
       try {
-        const res = await fetch(url); // GET instead of HEAD
+        const res = await fetch(url);
         if (res.ok) {
           console.log(`Found thumbnail for ${project.rawName}: ${url}`);
           project.thumbnailUrl = url;
@@ -954,7 +937,6 @@ async function findThumbnailForRepo(project) {
 }
 
 async function enhanceThumbnails() {
-  // To avoid hammering GitHub: only probe a subset per page load
   const subset = repos.slice(0, 60);
   console.log(`Enhancing thumbnails for ${subset.length} projects...`);
   const tasks = subset.map(project => findThumbnailForRepo(project));
@@ -1019,7 +1001,6 @@ async function loadFromProjectsJson() {
     if (gridEl) gridEl.innerHTML = "";
     if (emptyEl) {
       emptyEl.hidden = false;
-      // text handled by i18n
     }
   }
 }
@@ -1035,7 +1016,6 @@ async function loadRepos() {
   const cache = getCache();
   let usedCache = false;
 
-  // 1) Use cache if present
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
     repos = cache.projects.filter(p => !isSelfProjectsRepoName(p.rawName));
@@ -1044,17 +1024,14 @@ async function loadRepos() {
     renderProjects();
     usedCache = true;
 
-    // Run verification and thumbnail enhancement even when cache is "fresh"
     verifyLiveSites();
     enhanceThumbnails();
 
     if (age < CACHE_TTL_MS) {
       return;
     }
-    // else: cache old, we may refresh below
   }
 
-  // 2) Respect rate-limit backoff
   if (!canCallApiNow()) {
     console.warn("Skipping GitHub API call due to recent rate-limit; using cache or fallback.");
     if (!usedCache) {
@@ -1063,7 +1040,6 @@ async function loadRepos() {
     return;
   }
 
-  // 3) Try GitHub API
   try {
     const res = await fetch(API_URL);
 
@@ -1099,7 +1075,6 @@ async function loadRepos() {
 
     console.log(`Fetched ${repos.length} repos from GitHub API`);
 
-    // Merge projects.json extras (thumbnails, better descriptions) if available
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
       if (fallbackRes.ok) {
