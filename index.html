@@ -62,83 +62,87 @@
 </div>
 
 <div class="app">
-<header class="site-header">
+  <header class="site-header">
+    <div class="site-title-block">
+      <div class="header-main-row">
+        <div class="header-main-left">
+          <h1>Ferran’s Projects</h1>
 
-  <!-- TOP ROW: Title left + Language button right -->
-  <div class="header-top-row">
-    <h1>Ferran’s Projects</h1>
-
-    <button
-      type="button"
-      class="lang-switch-btn"
-      id="uiLangButton"
-    >
-      <span class="lang-btn-icon" aria-hidden="true">🌐</span>
-      <span class="lang-btn-label" id="uiLangLabel">Nederlands</span>
-    </button>
-  </div>
-
-  <!-- Subtitle below both -->
-  <p class="site-subtitle" data-i18n="subtitle">
-    All my programming &amp; coding projects in one place – websites, apps, school work, guides, APIs and more.
-  </p>
-
-  <hr class="about-divider">
-
-    <!-- ABOUT ME BLOCK -->
-    <section class="about-me" data-i18n-block="about">
-      <div class="about-me-content">
-        <div class="about-me-left">
-          <h2 data-i18n="aboutTitle">About Me</h2>
-
-          <!-- p1: only real text lives here -->
-          <p data-i18n="aboutP1">
-            Hey 👋🏻 Ferran (age placeholder) here. I am a Dutch developer from Utrecht / 's-Hertogenbosch.
-            I like building websites, apps and small tools to help myself and others.
+          <p class="site-subtitle" data-i18n="subtitle">
+            All my programming &amp; coding projects in one place – websites, apps, school work, guides, APIs and more.
           </p>
-
-          <!-- p2: kept empty on purpose so you can add a sidenote later -->
-          <p data-i18n="aboutP2"></p>
         </div>
 
-        <div class="about-me-right">
-          <div class="about-avatar-wrap">
-            <img src="./profile.jpg" alt="Ferran" class="about-avatar">
-          </div>
+        <!-- NEW: right side of title row, JUST the language selector -->
+        <div class="header-main-right">
+          <button
+            type="button"
+            class="lang-switch-btn"
+            id="uiLangButton"
+          >
+            <span class="lang-btn-icon" aria-hidden="true">🌐</span>
+            <span class="lang-btn-label" id="uiLangLabel">Nederlands</span>
+          </button>
         </div>
       </div>
-    </section>
-  </div>
 
-  <div class="header-actions">
-    <a class="social-chip social-github" href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
-      <span class="social-icon">
-        <img src="./github_icon.png" alt="GitHub" />
-      </span>
-      <span class="social-label">GitHub</span>
-    </a>
-    <div class="social-links">
-      <a class="social-chip social-instagram" href="https://instagram.com/kadaver_ig" target="_blank" rel="noopener noreferrer">
-        <span class="social-icon">
-          <img src="./instagram_icon.png" alt="Instagram" />
-        </span>
-        <span class="social-label">Instagram</span>
-      </a>
-      <a class="social-chip social-linkedin" href="https://nl.linkedin.com/in/fhendriksnl" target="_blank" rel="noopener noreferrer">
-        <span class="social-icon">
-          <img src="./linkedin_icon.png" alt="LinkedIn" />
-        </span>
-        <span class="social-label">LinkedIn</span>
-      </a>
-      <a class="social-chip social-outlook" href="mailto:ferranhendriks2@hotmail.com">
-        <span class="social-icon">
-          <img src="./outlook_icon.png" alt="Outlook / Email" />
-        </span>
-        <span class="social-label">Outlook / Email</span>
-      </a>
+      <hr class="about-divider">
+
+      <!-- ABOUT ME BLOCK -->
+      <section class="about-me" data-i18n-block="about">
+        <div class="about-me-content">
+          <div class="about-me-left">
+            <h2 data-i18n="aboutTitle">About Me</h2>
+
+            <!-- p1: only real text lives here -->
+            <p data-i18n="aboutP1">
+              Hey 👋🏻 Ferran (age placeholder) here. I am a Dutch developer from Utrecht / 's-Hertogenbosch.
+              I like building websites, apps and small tools to help myself and others.
+            </p>
+
+            <!-- p2: kept empty on purpose so you can add a sidenote later -->
+            <p data-i18n="aboutP2"></p>
+          </div>
+
+          <div class="about-me-right">
+            <div class="about-avatar-wrap">
+              <img src="./profile.jpg" alt="Ferran" class="about-avatar">
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
-</header>
+
+    <div class="header-actions">
+      <!-- Language button is NO LONGER here, so pills stay clean -->
+      <a class="social-chip social-github" href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
+        <span class="social-icon">
+          <img src="./github_icon.png" alt="GitHub" />
+        </span>
+        <span class="social-label">GitHub</span>
+      </a>
+      <div class="social-links">
+        <a class="social-chip social-instagram" href="https://instagram.com/kadaver_ig" target="_blank" rel="noopener noreferrer">
+          <span class="social-icon">
+            <img src="./instagram_icon.png" alt="Instagram" />
+          </span>
+          <span class="social-label">Instagram</span>
+        </a>
+        <a class="social-chip social-linkedin" href="https://nl.linkedin.com/in/fhendriksnl" target="_blank" rel="noopener noreferrer">
+          <span class="social-icon">
+            <img src="./linkedin_icon.png" alt="LinkedIn" />
+          </span>
+          <span class="social-label">LinkedIn</span>
+        </a>
+        <a class="social-chip social-outlook" href="mailto:ferranhendriks2@hotmail.com">
+          <span class="social-icon">
+            <img src="./outlook_icon.png" alt="Outlook / Email" />
+          </span>
+          <span class="social-label">Outlook / Email</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
   <section class="controls">
     <div class="search-block">
@@ -159,7 +163,7 @@
 
       <div class="filter-group">
         <span class="filter-label code-label">
-          
+          <span class="code-brackets">&lt;/&gt;</span>
           <span data-i18n="filterLanguageLabel">Language</span>
         </span>
         <select id="languageFilter">
