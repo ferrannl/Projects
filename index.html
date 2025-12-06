@@ -67,22 +67,20 @@
       <div class="header-main-row">
         <div class="header-main-left">
           <h1>Ferran’s Projects</h1>
-
           <p class="site-subtitle" data-i18n="subtitle">
             All my programming &amp; coding projects in one place – websites, apps, school work, guides, APIs and more.
           </p>
         </div>
 
-        <div class="header-main-right">
-          <button
-            type="button"
-            class="lang-switch-btn"
-            id="uiLangButton"
-          >
-            <span class="lang-btn-icon" aria-hidden="true">🌐</span>
-            <span class="lang-btn-label" id="uiLangLabel">Nederlands</span>
-          </button>
-        </div>
+        <!-- Language switch button top right -->
+        <button
+          type="button"
+          class="lang-switch-btn"
+          id="uiLangButton"
+        >
+          <span class="lang-btn-icon" aria-hidden="true">🌐</span>
+          <span class="lang-btn-label" id="uiLangLabel">Nederlands</span>
+        </button>
       </div>
 
       <hr class="about-divider">
@@ -142,6 +140,12 @@
     </div>
   </header>
 
+  <!-- Simple nav between Projects and Media Wall -->
+  <nav class="top-nav">
+    <button class="nav-tab nav-tab-active" data-view="projects">Projects</button>
+    <button class="nav-tab" data-view="media">Media Wall</button>
+  </nav>
+
   <section class="controls">
     <div class="search-block">
       <label for="search" class="sr-only">Search projects</label>
@@ -156,11 +160,13 @@
         <button class="chip" data-filter-type="type" data-filter-value="mobile" data-i18n="typeMobile">Mobile</button>
         <button class="chip" data-filter-type="type" data-filter-value="api" data-i18n="typeApi">APIs / Backend</button>
         <button class="chip" data-filter-type="type" data-filter-value="school" data-i18n="typeSchool">School / Study</button>
+        <button class="chip" data-filter-type="type" data-filter-value="game">Game</button>
         <button class="chip" data-filter-type="type" data-filter-value="other" data-i18n="typeOther">Other</button>
       </div>
 
       <div class="filter-group">
         <span class="filter-label code-label">
+          <span class="code-brackets">&lt;/&gt;</span>
           <span data-i18n="filterLanguageLabel">Language</span>
         </span>
         <select id="languageFilter">
@@ -171,13 +177,39 @@
   </section>
 
   <main>
-    <section id="projectsGrid" class="projects-grid" aria-live="polite">
-      <!-- Cards injected by script.js -->
+    <!-- PROJECTS VIEW -->
+    <section id="projectsView">
+      <section id="projectsGrid" class="projects-grid" aria-live="polite">
+        <!-- Cards injected by script.js -->
+      </section>
+
+      <div id="emptyState" class="empty-state" hidden data-i18n="emptyState">
+        No projects match your search/filter. Try another search term.
+      </div>
     </section>
 
-    <div id="emptyState" class="empty-state" hidden data-i18n="emptyState">
-      No projects match your search/filter. Try another search term.
-    </div>
+    <!-- MEDIA WALL VIEW -->
+    <section id="mediaView" class="media-view" hidden>
+      <h2 class="media-title">Media Wall</h2>
+      <p class="media-subtitle">
+        All my random wallpapers, app screenshots, demo videos and audio bits – straight from <code>/media</code>.
+      </p>
+
+      <div class="media-filters">
+        <button class="media-chip media-chip-active" data-media-filter="all">All</button>
+        <button class="media-chip" data-media-filter="image">Images</button>
+        <button class="media-chip" data-media-filter="video">Videos</button>
+        <button class="media-chip" data-media-filter="audio">Audio</button>
+      </div>
+
+      <div id="mediaGrid" class="media-grid">
+        <!-- media cards injected by script.js -->
+      </div>
+
+      <div id="mediaEmpty" class="empty-state" hidden>
+        No media found for this filter.
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -192,9 +224,17 @@
   </footer>
 </div>
 
-<!-- Fullscreen image modal -->
+<!-- Fullscreen image modal (for project thumbs) -->
 <div id="imageModal" class="image-modal" hidden>
   <img id="imageModalImg" class="image-modal-img" alt="">
+</div>
+
+<!-- Fullscreen media viewer (videos/images) -->
+<div id="mediaModal" class="image-modal" hidden>
+  <div class="media-modal-inner">
+    <button class="media-modal-close" id="mediaModalClose" type="button">✕</button>
+    <div id="mediaModalContent"></div>
+  </div>
 </div>
 
 <noscript>
