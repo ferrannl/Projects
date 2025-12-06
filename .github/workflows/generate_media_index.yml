@@ -1,34 +1,39 @@
 name: Generate media index
 
-permissions:
-  contents: write
-
 on:
   push:
     paths:
-      - "media/**"
-      - "scripts/generate_media_index.py"
-      - ".github/workflows/generate-media-index.yml"
+      - 'media/**'
+      - 'generate_media_index.py'
+      - '.github/workflows/generate-media-index.yml'
   workflow_dispatch:
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Check out repo
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
-      - name: Generate media-index.json
-        run: python scripts/generate_media_index.py
+      - name: Generate media index JSON
+        run: python generate_media_index.py
 
-      - name: Commit and push media-index.json
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update media/media-index.json"
-          file_pattern: "media/media-index.json"
+      - name: Commit and push updated media index
+        run: |
+          if git diff --quiet media/media-index.json media/media_index.json; then
+            echo "No changes in media index."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add media/media-index.json media/media_index.json
+          git commit -m "Update media index"
+          git push
