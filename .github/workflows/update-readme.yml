@@ -1,76 +1,100 @@
 name: Update README projects list
 
 on:
-  schedule:
-    # Every Monday at 06:00 UTC – tweak as you like
-    - cron: "0 6 * * 1"
   workflow_dispatch:
+  schedule:
+    # update once a day – change if you want
+    - cron: "0 4 * * *"
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Check out repo
         uses: actions/checkout@v4
 
-      - name: Generate projects list in README
+      - name: Update projects list in README
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const username = 'ferrannl';
+            const fs = require("fs");
+            const path = require("path");
 
-            // Fetch up to 100 public repos, sorted by last update
-            const { data: repos } = await github.rest.repos.listForUser({
-              username,
-              per_page: 100,
-              sort: 'updated'
-            });
+            const owner = context.repo.owner;
 
+            // 1) Fetch all public repos for this user
+            const allRepos = await github.paginate(
+              github.rest.repos.listForUser,
+              {
+                username: owner,
+                per_page: 100,
+                sort: "full_name",
+                direction: "asc",
+              }
+            );
+
+            // Filter out forks and maybe other stuff you don't want
+            const repos = allRepos.filter(r => !r.fork);
+
+            // 2) Build markdown list
             const lines = repos.map(r => {
-              const desc = (r.description || '').trim();
-              const descPart = desc ? ` — ${desc}` : '';
-              return `- [${r.name}](${r.html_url})${descPart}`;
+              const name = r.name;
+              const url = r.html_url;
+              const desc = (r.description || "").replace(/\r?\n/g, " ").trim();
+              const descPart = desc ? ` — ${desc}` : "";
+              return `- [${name}](${url})${descPart}`;
             });
 
-            const fs = require('fs');
-            const path = 'README.md';
-            const startMarker = '<!-- PROJECTS-LIST:START -->';
-            const endMarker = '<!-- PROJECTS-LIST:END -->';
+            const block = [
+              "<!-- PROJECTS-LIST:START -->",
+              ...lines,
+              "<!-- PROJECTS-LIST:END -->",
+              ""
+            ].join("\n");
 
-            const readme = fs.readFileSync(path, 'utf8');
+            // 3) Read README and replace block
+            const readmePath = path.join(process.cwd(), "README.md");
+            let readme = fs.readFileSync(readmePath, "utf8");
 
-            if (!readme.includes(startMarker) || !readme.includes(endMarker)) {
-              core.setFailed('Could not find PROJECTS-LIST markers in README.md');
+            const startTag = "<!-- PROJECTS-LIST:START -->";
+            const endTag = "<!-- PROJECTS-LIST:END -->";
+
+            const startIndex = readme.indexOf(startTag);
+            const endIndex = readme.indexOf(endTag);
+
+            if (startIndex === -1 || endIndex === -1) {
+              core.setFailed("PROJECTS-LIST markers not found in README.md");
               return;
             }
 
-            const before = readme.split(startMarker)[0];
-            const after = readme.split(endMarker)[1];
+            const before = readme.slice(0, startIndex);
+            const after = readme.slice(endIndex + endTag.length);
+            const nextReadme = before + block + after;
 
-            const newContent = [
-              before,
-              startMarker,
-              lines.join('\n'),
-              endMarker,
-              after
-            ].join('\n');
+            if (nextReadme === readme) {
+              core.info("README.md already up to date, no changes.");
+              return;
+            }
 
-            fs.writeFileSync(path, newContent);
+            fs.writeFileSync(readmePath, nextReadme, "utf8");
 
-      - name: Commit and push changes
-        run: |
-          if git diff --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add README.md
-          git commit -m "chore: update projects list"
-          git push
+            // 4) Commit
+            await github.rest.repos.createOrUpdateFileContents({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: "README.md",
+              message: "chore: auto-update projects list in README",
+              content: Buffer.from(nextReadme, "utf8").toString("base64"),
+              sha: (
+                await github.rest.repos.getContent({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  path: "README.md",
+                })
+              ).data.sha,
+            });
