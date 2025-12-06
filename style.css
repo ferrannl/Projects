@@ -125,7 +125,7 @@ body {
   max-width: 36rem;
 }
 
-/* About Me section: card with horizontal layout */
+/* About Me section */
 
 .about-me {
   background: rgba(11, 15, 32, 0.55);
@@ -165,7 +165,7 @@ body {
   line-height: 1.5;
 }
 
-/* Avatar column */
+/* Avatar */
 
 .about-me-right {
   flex-shrink: 0;
@@ -316,7 +316,7 @@ body {
   z-index: 1;
 }
 
-/* Per-platform flavor */
+/* Per-platform */
 
 .social-github {
   background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 60%),
@@ -419,8 +419,6 @@ body {
   color: rgba(163, 166, 192, 0.9);
 }
 
-/* Code language label with </> */
-
 .code-label {
   display: inline-flex;
   align-items: center;
@@ -520,7 +518,7 @@ body {
   margin-bottom: 0.35rem;
 }
 
-/* Thumbnail (image or placeholder) */
+/* Thumbnail */
 
 .project-thumb {
   width: 52px;
@@ -588,7 +586,7 @@ body {
   align-self: flex-start;
 }
 
-/* Descriptions – short summary only */
+/* Description */
 
 .project-description-wrapper {
   margin: 0.1rem 0 0.4rem;
@@ -759,7 +757,7 @@ body {
   border: 0;
 }
 
-/* Responsive tweaks */
+/* Responsive */
 
 @media (max-width: 800px) {
   .site-header {
