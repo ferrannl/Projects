@@ -1294,20 +1294,20 @@ function buildMediaFormatOptions() {
   const exts = Array.from(
     new Set(
       mediaItems
-        .filter(item => targetKind === "all" || item.type === targetKind)
-        .map(item => getExtension(item.src))
+        .filter((item) => targetKind === "all" || item.type === targetKind)
+        .map((item) => getExtension(item.src))
         .filter(Boolean)
     )
   ).sort();
 
-  exts.forEach(ext => {
+  exts.forEach((ext) => {
     const opt = document.createElement("option");
     opt.value = ext;
     opt.textContent = ext.toUpperCase();
     mediaFormatSelectEl.appendChild(opt);
   });
 
-  // keep select value in sync with state
+  // ✅ keep select value in sync with state
   mediaFormatSelectEl.value = mediaState.format || "all";
 }
 
