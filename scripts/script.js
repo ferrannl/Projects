@@ -1421,28 +1421,47 @@ function createMediaCard(item) {
   const thumb = document.createElement("div");
   thumb.className = "media-thumb";
 
+  const ext = getExtension(item.src);
+  const titleText = item.title || item.src;
+
+  // 🖼 IMAGE: clickable -> fullscreen modal
   if (item.type === "image") {
+    thumb.classList.add("media-thumb-clickable");
+
     const img = document.createElement("img");
     img.src = item.src;
-    img.alt = item.title || "";
+    img.alt = titleText;
     thumb.appendChild(img);
+
+    // reuse the existing imageModal used for project thumbnails
+    thumb.addEventListener("click", () => {
+      openImageModal(item.src, titleText);
+    });
+
+  // 🎬 VIDEO: full browser controls, metadata preload
   } else if (item.type === "video") {
     const video = document.createElement("video");
     video.src = item.src;
     video.controls = true;
+    video.preload = "metadata";
     video.playsInline = true;
+    // you *can* add this if you want to discourage download:
+    // video.controlsList = "nodownload";
     thumb.appendChild(video);
+
+  // 🎧 AUDIO: full controls, metadata preload
   } else if (item.type === "audio") {
     thumb.classList.add("media-thumb-audio");
     const audio = document.createElement("audio");
     audio.src = item.src;
     audio.controls = true;
+    audio.preload = "metadata";
     thumb.appendChild(audio);
   }
 
   const titleEl = document.createElement("p");
   titleEl.className = "media-title";
-  titleEl.textContent = item.title || item.src;
+  titleEl.textContent = titleText;
 
   const metaRow = document.createElement("div");
   metaRow.className = "media-meta-row";
@@ -1452,7 +1471,6 @@ function createMediaCard(item) {
   kindPill.textContent = item.type;
   metaRow.appendChild(kindPill);
 
-  const ext = getExtension(item.src);
   if (ext) {
     const extPill = document.createElement("span");
     extPill.className = "media-pill";
@@ -1460,9 +1478,23 @@ function createMediaCard(item) {
     metaRow.appendChild(extPill);
   }
 
+  // 🔗 Fancy: little "Open file" button using your existing button style
+  const actionsRow = document.createElement("div");
+  actionsRow.className = "project-links"; // reuse project-links styling
+
+  const openFileLink = document.createElement("a");
+  openFileLink.className = "project-link-btn";
+  openFileLink.href = item.src;
+  openFileLink.target = "_blank";
+  openFileLink.rel = "noopener noreferrer";
+  openFileLink.textContent = "Open file";
+
+  actionsRow.appendChild(openFileLink);
+
   card.appendChild(thumb);
   card.appendChild(titleEl);
   card.appendChild(metaRow);
+  card.appendChild(actionsRow);
 
   return card;
 }
