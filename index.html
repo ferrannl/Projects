@@ -6,11 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
         content="Overview of all projects by Ferran (ferrannl) – web, mobile, APIs, school assignments and more.">
+
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
 
-  <!-- Moved to css/ -->
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -75,7 +75,6 @@
           </p>
         </div>
 
-        <!-- Language switch in the top-right next to the title block -->
         <div class="header-main-right">
           <button
             type="button"
@@ -108,8 +107,7 @@
 
           <div class="about-me-right">
             <div class="about-avatar-wrap">
-              <!-- moved to images/ -->
-              <img src="./images/profile.jpg" alt="Ferran" class="about-avatar">
+              <img src="images/profile.jpg" alt="Ferran" class="about-avatar">
             </div>
           </div>
         </div>
@@ -120,28 +118,28 @@
       <div class="social-links">
         <a class="social-chip social-github" href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
           <span class="social-icon">
-            <img src="./images/github_icon.png" alt="GitHub" />
+            <img src="images/github_icon.png" alt="GitHub" />
           </span>
           <span class="social-label">GitHub</span>
         </a>
 
         <a class="social-chip social-instagram" href="https://instagram.com/kadaver_ig" target="_blank" rel="noopener noreferrer">
           <span class="social-icon">
-            <img src="./images/instagram_icon.png" alt="Instagram" />
+            <img src="images/instagram_icon.png" alt="Instagram" />
           </span>
           <span class="social-label">Instagram</span>
         </a>
 
         <a class="social-chip social-linkedin" href="https://nl.linkedin.com/in/fhendriksnl" target="_blank" rel="noopener noreferrer">
           <span class="social-icon">
-            <img src="./images/linkedin_icon.png" alt="LinkedIn" />
+            <img src="images/linkedin_icon.png" alt="LinkedIn" />
           </span>
           <span class="social-label">LinkedIn</span>
         </a>
 
         <a class="social-chip social-outlook" href="mailto:ferranhendriks2@hotmail.com">
           <span class="social-icon">
-            <img src="./images/outlook_icon.png" alt="Outlook / Email" />
+            <img src="images/outlook_icon.png" alt="Outlook / Email" />
           </span>
           <span class="social-label">Outlook / Email</span>
         </a>
@@ -158,10 +156,13 @@
 
     <div class="search-block">
       <label for="search" class="sr-only">Search</label>
-      <input id="search" type="search" placeholder="Search by name, description, language or tag…">
+      <input
+        id="search"
+        type="search"
+        placeholder="Search by name, description, language or tag…">
     </div>
 
-    <!-- PROJECT FILTERS (Type + Language) -->
+    <!-- PROJECT FILTERS -->
     <div class="filters" id="projectFilters">
       <div class="filter-group">
         <span class="filter-label" data-i18n="filterTypeLabel">Type</span>
@@ -183,7 +184,7 @@
       </div>
     </div>
 
-    <!-- MEDIA FILTERS (shown only in Media Wall view) -->
+    <!-- MEDIA FILTERS -->
     <div class="filters filters-media" id="mediaFilters" hidden>
       <div class="filter-group">
         <span class="filter-label" data-i18n="mediaTypeLabel">Media type</span>
@@ -206,7 +207,7 @@
     <!-- PROJECTS VIEW -->
     <section id="projectsView">
       <section id="projectsGrid" class="projects-grid" aria-live="polite">
-        <!-- Cards injected by script.js -->
+        <!-- Cards injected by projects.js -->
       </section>
 
       <div id="emptyState" class="empty-state" hidden data-i18n="emptyState">
@@ -214,10 +215,10 @@
       </div>
     </section>
 
-    <!-- MEDIA WALL VIEW -->
+    <!-- MEDIA VIEW -->
     <section id="mediaView" hidden>
       <section id="mediaGrid" class="media-grid" aria-live="polite">
-        <!-- Media cards injected by script.js -->
+        <!-- Media cards injected by media-wall.js -->
       </section>
 
       <div id="mediaEmptyState" class="empty-state" hidden data-i18n="mediaEmptyState">
@@ -238,7 +239,7 @@
   </footer>
 </div>
 
-<!-- Fullscreen image modal (used for project thumbnails) -->
+<!-- Fullscreen image modal -->
 <div id="imageModal" class="image-modal" hidden>
   <img id="imageModalImg" class="image-modal-img" alt="">
 </div>
@@ -252,7 +253,7 @@
   </p>
 </noscript>
 
-<!-- Moved JS into scripts/ -->
-<script src="./scripts/script.js"></script>
+<!-- ES module entrypoint -->
+<script type="module" src="scripts/main.js"></script>
 </body>
 </html>
