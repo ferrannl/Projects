@@ -1,1 +1,52 @@
-
+{
+  "items": [
+    {
+      "src": "media/media-index.json",
+      "title": "media-index",
+      "type": "other",
+      "ext": "json",
+      "size": 1,
+      "modified": "2025-12-06T19:12:14.143615"
+    },
+    {
+      "src": "media/videos/just-brabant-things.mp4",
+      "title": "just-brabant-things",
+      "type": "video",
+      "ext": "mp4",
+      "size": 1,
+      "modified": "2025-12-06T19:12:14.148615"
+    },
+    {
+      "src": "media/videos/de computer.mp4",
+      "title": "de computer",
+      "type": "video",
+      "ext": "mp4",
+      "size": 2973440,
+      "modified": "2025-12-06T19:12:14.148615"
+    },
+    {
+      "src": "media/images/Lost woods tab.png",
+      "title": "Lost woods tab",
+      "type": "image",
+      "ext": "png",
+      "size": 357187,
+      "modified": "2025-12-06T19:12:14.140615"
+    },
+    {
+      "src": "media/images/Zeldas lullaby tab.jpg",
+      "title": "Zeldas lullaby tab",
+      "type": "image",
+      "ext": "jpg",
+      "size": 608032,
+      "modified": "2025-12-06T19:12:14.143615"
+    },
+    {
+      "src": "media/audio/Nightcore - MANA (Dedicated to PikalexNL).mp3",
+      "title": "Nightcore - MANA (Dedicated to PikalexNL)",
+      "type": "audio",
+      "ext": "mp3",
+      "size": 3618336,
+      "modified": "2025-12-06T19:12:14.138614"
+    }
+  ]
+}
