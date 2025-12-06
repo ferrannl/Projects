@@ -1,7 +1,1 @@
-{
-  "items": [
-    { "type": "image", "src": "media/images/my-cool-wallpaper.png", "title": "Cool wallpaper" },
-    { "type": "video", "src": "media/videos/demo-app.mp4", "title": "App demo" },
-    { "type": "audio", "src": "media/audio/lofi-track.mp3", "title": "Lofi track" }
-  ]
-}
+
