@@ -219,7 +219,7 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Formato",
     mediaFormatAll: "Todos los formatos",
     emptyState: "No hay proyectos para esta búsqueda o filtros. Prueba con otros términos.",
-    mediaEmptyState: "No hay medios para esta búsqueda o filtros.",
+    mediaEmptyState: "No hay medios para estos filtros.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
     footerViewOnPages: "Ver este sitio en GitHub Pages"
   }
@@ -235,27 +235,15 @@ function getAgeParts(now = new Date()) {
   let min = now.getMinutes() - BIRTH_DATE.getMinutes();
   let s = now.getSeconds() - BIRTH_DATE.getSeconds();
 
-  if (s < 0) {
-    s += 60;
-    min -= 1;
-  }
-  if (min < 0) {
-    min += 60;
-    h -= 1;
-  }
-  if (h < 0) {
-    h += 24;
-    d -= 1;
-  }
+  if (s < 0) { s += 60; min -= 1; }
+  if (min < 0) { min += 60; h -= 1; }
+  if (h < 0) { h += 24; d -= 1; }
   if (d < 0) {
     const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     d += prevMonth.getDate();
     m -= 1;
   }
-  if (m < 0) {
-    m += 12;
-    y -= 1;
-  }
+  if (m < 0) { m += 12; y -= 1; }
 
   return { y, m, d, h, min, s };
 }
@@ -270,10 +258,8 @@ function updateAgeInAbout() {
   const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
   const tmpl = dict.aboutP1;
   if (!tmpl) return;
-
   const ageStr = formatAge(getAgeParts(), currentLang);
   const text = tmpl.replace("{age}", ageStr);
-
   document.querySelectorAll('[data-i18n="aboutP1"]').forEach((el) => {
     el.textContent = text;
   });
@@ -368,7 +354,7 @@ function setupLanguageUI() {
     });
   }
 
-  // keep age ticking (every second, so seconds visibly move)
+  // keep age ticking (every second)
   updateAgeInAbout();
   setInterval(updateAgeInAbout, 1000);
 }
@@ -480,26 +466,11 @@ function inferTypesFromGitHub(repo) {
     desc.includes("cppls") ||
     desc.includes("devops");
 
-  if (repo.has_pages || looksWebLang) {
-    types.push("website");
-  }
-
-  if (looksMobileText || looksMobileLang) {
-    types.push("mobile");
-  }
-
-  if (name.includes("api") || desc.includes("api")) {
-    types.push("api");
-  }
-
-  if (seemsSchool) {
-    types.push("school");
-  }
-
-  if (!types.length) {
-    types.push("other");
-  }
-
+  if (repo.has_pages || looksWebLang) types.push("website");
+  if (looksMobileText || looksMobileLang) types.push("mobile");
+  if (name.includes("api") || desc.includes("api")) types.push("api");
+  if (seemsSchool) types.push("school");
+  if (!types.length) types.push("other");
   return [...new Set(types)];
 }
 
@@ -522,26 +493,11 @@ function inferTypesFromEntry(entry) {
     desc.includes("cppls") ||
     desc.includes("devops");
 
-  if (looksWebLang) {
-    types.push("website");
-  }
-
-  if (looksMobileText || looksMobileLang) {
-    types.push("mobile");
-  }
-
-  if (name.includes("api") || desc.includes("api")) {
-    types.push("api");
-  }
-
-  if (seemsSchool) {
-    types.push("school");
-  }
-
-  if (!types.length) {
-    types.push("other");
-  }
-
+  if (looksWebLang) types.push("website");
+  if (looksMobileText || looksMobileLang) types.push("mobile");
+  if (name.includes("api") || desc.includes("api")) types.push("api");
+  if (seemsSchool) types.push("school");
+  if (!types.length) types.push("other");
   return [...new Set(types)];
 }
 
@@ -1058,9 +1014,7 @@ const thumbnailFolders = [
 ];
 
 async function findThumbnailForRepo(project) {
-  if (project.thumbnailUrl) {
-    return;
-  }
+  if (project.thumbnailUrl) return;
 
   for (const folder of thumbnailFolders) {
     for (const file of thumbnailCandidates) {
@@ -1146,9 +1100,7 @@ async function loadFromProjectsJson() {
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
     if (gridEl) gridEl.innerHTML = "";
-    if (emptyEl) {
-      emptyEl.hidden = false;
-    }
+    if (emptyEl) emptyEl.hidden = false;
   }
 }
 
@@ -1192,25 +1144,16 @@ async function loadRepos() {
 
     if (!res.ok) {
       let body = "";
-      try {
-        body = await res.text();
-      } catch {
-        body = "";
-      }
-
+      try { body = await res.text(); } catch { body = ""; }
       console.error("GitHub API error:", res.status, res.statusText, body.slice(0, 200));
 
       if (res.status === 403 && /rate limit/i.test(body)) {
         setRateLimited();
-        if (!usedCache) {
-          await loadFromProjectsJson();
-        }
+        if (!usedCache) await loadFromProjectsJson();
         return;
       }
 
-      if (!usedCache) {
-        await loadFromProjectsJson();
-      }
+      if (!usedCache) await loadFromProjectsJson();
       return;
     }
 
@@ -1309,9 +1252,7 @@ function buildMediaFormatOptions() {
 }
 
 function mediaMatches(item) {
-  if (mediaState.kind !== "all" && item.type !== mediaState.kind) {
-    return false;
-  }
+  if (mediaState.kind !== "all" && item.type !== mediaState.kind) return false;
 
   if (mediaState.format !== "all") {
     const ext = getExtension(item.src);
@@ -1453,18 +1394,10 @@ function setView(view) {
     }
   });
 
-  if (projectsViewEl) {
-    projectsViewEl.hidden = currentView !== "projects";
-  }
-  if (mediaViewEl) {
-    mediaViewEl.hidden = currentView !== "media";
-  }
-  if (projectFiltersEl) {
-    projectFiltersEl.hidden = currentView !== "projects";
-  }
-  if (mediaFiltersEl) {
-    mediaFiltersEl.hidden = currentView !== "media";
-  }
+  if (projectsViewEl) projectsViewEl.hidden = currentView !== "projects";
+  if (mediaViewEl) mediaViewEl.hidden = currentView !== "media";
+  if (projectFiltersEl) projectFiltersEl.hidden = currentView !== "projects";
+  if (mediaFiltersEl) mediaFiltersEl.hidden = currentView !== "media";
 
   updateSearchPlaceholderForView();
 
