@@ -99,7 +99,6 @@ body {
   max-width: 32rem;
 }
 
-/* optional but nice so button doesn't shrink weirdly */
 .header-main-right {
   flex-shrink: 0;
 }
@@ -195,7 +194,7 @@ body {
   background: #111;
 }
 
-/* Right block: language + socials */
+/* Right block: socials */
 
 .header-actions {
   display: flex;
@@ -242,7 +241,7 @@ body {
   font-size: 0.8rem;
 }
 
-/* Social links (including GitHub) */
+/* Social links */
 
 .social-links {
   display: flex;
@@ -633,6 +632,8 @@ body {
 .meta-pill.tag-pill {
   border-style: dashed;
 }
+
+/* Links */
 
 .project-links {
   display: flex;
