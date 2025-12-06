@@ -1615,7 +1615,7 @@ function setView(view) {
   const showingProjects = currentView === "projects";
   const showingMedia = !showingProjects;
 
-  // Active state on tabs
+  // Tabs active state
   viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
     if (tabView === currentView) {
@@ -1625,29 +1625,33 @@ function setView(view) {
     }
   });
 
-  // 🔁 Hoofd-secties tonen/verbergen via `hidden`
+  // ==== MAIN SECTIONS ====
   if (projectsViewEl) {
     projectsViewEl.hidden = !showingProjects;
+    projectsViewEl.style.display = showingProjects ? "" : "none";
   }
   if (mediaViewEl) {
     mediaViewEl.hidden = !showingMedia;
+    mediaViewEl.style.display = showingMedia ? "" : "none";
   }
 
-  // 🔁 Filters ook via `hidden`
+  // ==== FILTER ROWS ====
   // 👉 Projects: TYPE + TAAL
   if (projectFiltersEl) {
     projectFiltersEl.hidden = !showingProjects;
+    projectFiltersEl.style.display = showingProjects ? "flex" : "none";
   }
 
   // 👉 Media: MEDIA TYPE + BESTANDSTYPE
   if (mediaFiltersEl) {
     mediaFiltersEl.hidden = !showingMedia;
+    mediaFiltersEl.style.display = showingMedia ? "flex" : "none";
   }
 
-  // Placeholder van de zoekbalk updaten
+  // Search placeholder updaten
   updateSearchPlaceholderForView();
 
-  // Correcte lijst opnieuw renderen
+  // Juiste lijst renderen
   if (showingProjects) {
     renderProjects();
   } else {
