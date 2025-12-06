@@ -1289,26 +1289,24 @@ function buildMediaFormatOptions() {
   optAll.textContent = dict.mediaFormatAll || "All formats";
   mediaFormatSelectEl.appendChild(optAll);
 
-  // Filter items by current media type selection
-  let relevantItems = mediaItems;
-  if (mediaState.kind !== "all") {
-    relevantItems = mediaItems.filter((item) => item.type === mediaState.kind);
-  }
+  const targetKind = mediaState.kind || "all";
 
   const exts = Array.from(
     new Set(
-      relevantItems
-        .map((item) => getExtension(item.src))
+      mediaItems
+        .filter(item => targetKind === "all" || item.type === targetKind)
+        .map(item => getExtension(item.src))
         .filter(Boolean)
     )
   ).sort();
 
-  exts.forEach((ext) => {
+  exts.forEach(ext => {
     const opt = document.createElement("option");
     opt.value = ext;
     opt.textContent = ext.toUpperCase();
     mediaFormatSelectEl.appendChild(opt);
   });
+}
 
   // keep select value in sync with state
   mediaFormatSelectEl.value = mediaState.format || "all";
@@ -1428,14 +1426,19 @@ async function loadMediaIndex() {
 }
 
 function initMediaFilters() {
-  mediaKindButtons.forEach((btn) => {
+  mediaKindButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      mediaKindButtons.forEach((b) => b.classList.remove("chip-active"));
+      mediaKindButtons.forEach(b => b.classList.remove("chip-active"));
       btn.classList.add("chip-active");
+
       mediaState.kind = btn.getAttribute("data-media-kind") || "all";
 
-      // reset format when type changes
+      // reset format filter to "all" whenever kind changes
       mediaState.format = "all";
+      if (mediaFormatSelectEl) {
+        mediaFormatSelectEl.value = "all";
+      }
+
       buildMediaFormatOptions();
       renderMedia();
     });
@@ -1448,7 +1451,6 @@ function initMediaFilters() {
     });
   }
 }
-
 /* ---------- View switching (Projects vs Media) ---------- */
 
 /* ---------- View switching (Projects vs Media) ---------- */
