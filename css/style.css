@@ -354,33 +354,45 @@ body {
 
 /* Tabs */
 
+/* Slider-style toggle for Projects / Media */
 .view-switch {
   display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(4, 7, 24, 0.9);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
 }
 
 .view-tab {
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
-  background: rgba(10, 15, 35, 0.75);
+  flex: 1 1 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
   color: var(--text-muted);
   font-size: 0.8rem;
-  padding: 0.35rem 0.9rem;
+  padding: 0.4rem 1.2rem;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast),
-              border-color var(--transition-fast), transform var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.view-tab + .view-tab {
+  margin-left: 2px; /* small gap inside pill */
 }
 
 .view-tab:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-1px);
 }
 
 .view-tab-active {
-  background: linear-gradient(135deg, rgba(255, 75, 129, 0.18), rgba(75, 195, 255, 0.25));
-  border-color: rgba(255, 75, 129, 0.7);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 75, 129, 0.28),
+    rgba(75, 195, 255, 0.32)
+  );
   color: var(--text);
 }
 
