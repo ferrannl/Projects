@@ -1,78 +1,93 @@
 #!/usr/bin/env python3
+"""
+Scan ./media for image / video / audio files and write media/media-index.json
+
+The JSON shape matches what scripts/script.js expects:
+
+{
+  "items": [
+    {
+      "src": "media/some-folder/file.jpg",
+      "type": "image" | "video" | "audio",
+      "title": "File name without extension"
+    },
+    ...
+  ]
+}
+"""
+
 import json
 import os
 from pathlib import Path
 
-# Root of the repo (this script lives in `scripts/`)
-REPO_ROOT = Path(__file__).resolve().parent.parent
-MEDIA_ROOT = REPO_ROOT / "media"
-OUTPUT_FILE = MEDIA_ROOT / "media-index.json"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MEDIA_DIR = REPO_ROOT / "media"
+OUTPUT_FILE = MEDIA_DIR / "media-index.json"
 
-# File type mapping
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
-VIDEO_EXTS = {".mp4", ".webm", ".mov", ".m4v"}
+VIDEO_EXTS = {".mp4", ".webm", ".mov", ".mkv"}
 AUDIO_EXTS = {".mp3", ".wav", ".ogg", ".flac", ".m4a"}
 
-def detect_type(path: Path) -> str | None:
-  ext = path.suffix.lower()
-  if ext in IMAGE_EXTS:
-    return "image"
-  if ext in VIDEO_EXTS:
-    return "video"
-  if ext in AUDIO_EXTS:
-    return "audio"
-  return None
+
+def detect_type(ext: str) -> str | None:
+    ext = ext.lower()
+    if ext in IMAGE_EXTS:
+        return "image"
+    if ext in VIDEO_EXTS:
+        return "video"
+    if ext in AUDIO_EXTS:
+        return "audio"
+    return None
+
 
 def build_title(path: Path) -> str:
-  """Use file name (without extension) as title."""
-  name = path.stem
-  # Replace separators with spaces, basic prettify
-  name = name.replace("_", " ").replace("-", " ")
-  return name.strip() or path.name
+    """Nice readable title from filename (no extension, replace -/_ with spaces, capitalize)."""
+    name = path.stem
+    name = name.replace("_", " ").replace("-", " ")
+    # collapse multiple spaces
+    name = " ".join(name.split())
+    if not name:
+        return str(path.name)
+    return name[0].upper() + name[1:]
+
 
 def main() -> None:
-  if not MEDIA_ROOT.exists():
-    print(f"[generate_media_index] No 'media' folder found at {MEDIA_ROOT}")
-    return
+    if not MEDIA_DIR.exists():
+        print(f"[generate_media_index] media folder not found: {MEDIA_DIR}")
+        OUTPUT_FILE.write_text(json.dumps({"items": []}, indent=2, ensure_ascii=False))
+        return
 
-  items = []
+    items: list[dict] = []
 
-  for root, dirs, files in os.walk(MEDIA_ROOT):
-    root_path = Path(root)
-    for filename in files:
-      file_path = root_path / filename
+    for root, _, files in os.walk(MEDIA_DIR):
+        for filename in files:
+            p = Path(root) / filename
+            ext = p.suffix.lower()
+            media_type = detect_type(ext)
+            if not media_type:
+                # skip unknown types (e.g. .json, .txt)
+                continue
 
-      # Skip the index file itself
-      if file_path.name == "media-index.json":
-        continue
+            # path relative to repo root, so script.js can just use item.src directly
+            rel_path = p.relative_to(REPO_ROOT).as_posix()
 
-      file_type = detect_type(file_path)
-      if file_type is None:
-        # Skip unsupported types
-        continue
+            item = {
+                "src": rel_path,        # e.g. "media/photos/foo.jpg"
+                "type": media_type,     # "image" | "video" | "audio"
+                "title": build_title(p) # "Foo", "Holiday 2024", etc.
+            }
+            items.append(item)
 
-      # Path relative to media/ (so subfolders work too)
-      rel_path = file_path.relative_to(MEDIA_ROOT)
-      # src is "media/..." relative to index.html
-      src = f"media/{rel_path.as_posix()}"
+    data = {"items": sorted(items, key=lambda x: x["src"].lower())}
 
-      item = {
-        "src": src,
-        "type": file_type,
-        "title": build_title(file_path)
-      }
-      items.append(item)
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_FILE.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False),
+        encoding="utf-8"
+    )
 
-  # Sort by src for stable output
-  items.sort(key=lambda x: x["src"])
+    print(f"[generate_media_index] Wrote {len(items)} items to {OUTPUT_FILE}")
 
-  data = {"items": items}
-
-  OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-  with OUTPUT_FILE.open("w", encoding="utf-8") as f:
-    json.dump(data, f, ensure_ascii=False, indent=2)
-
-  print(f"[generate_media_index] Wrote {len(items)} items to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
-  main()
+    main()
