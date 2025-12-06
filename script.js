@@ -1,4 +1,4 @@
-// ---------- Language / i18n + live age ----------
+/* ---------- Language / i18n + live age ---------- */
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
@@ -19,7 +19,6 @@ const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // month 7 = August
 
 let currentLang = DEFAULT_LANG;
 
-// Units per language
 const AGE_UNITS = {
   nl: { y: "j",  m: "mnd", d: "d",  h: "u",   min: "min", s: "s" },
   en: { y: "y",  m: "mo",  d: "d",  h: "h",   min: "m",   s: "s" },
@@ -167,7 +166,7 @@ function getAgeParts(now = new Date()) {
     d -= 1;
   }
   if (d < 0) {
-    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0); // last day of previous month
+    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     d += prevMonth.getDate();
     m -= 1;
   }
@@ -203,7 +202,7 @@ function applyTranslations(lang) {
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    if (!key || key === "aboutP1") return; // aboutP1 handled separately
+    if (!key || key === "aboutP1") return;
     const value = dict[key];
     if (typeof value === "string") {
       el.textContent = value;
@@ -270,7 +269,6 @@ function setupLanguageUI() {
     });
   }
 
-  // keep age ticking (every second, so seconds visibly move)
   updateAgeInAbout();
   setInterval(updateAgeInAbout, 1000);
 }
@@ -374,10 +372,14 @@ function inferTypesFromGitHub(repo) {
   const lang = (repo.language || "").toLowerCase();
 
   const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
+
   const looksMobileText =
     name.includes("android") || desc.includes("android") ||
     name.includes("ios") || desc.includes("ios");
-  const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
+
+  // java deliberately NOT treated as "mobile"
+  const looksMobileLang = ["swift", "kotlin"].includes(lang);
+
   const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
@@ -402,6 +404,20 @@ function inferTypesFromGitHub(repo) {
     types.push("school");
   }
 
+  // manual overrides
+
+  if (name.includes("sudoku")) {
+    types.push("school");
+  }
+
+  if (name.includes("linear") && name.includes("algebra")) {
+    types.push("school");
+  }
+
+  if (name.includes("videoshare") || name.includes("video-share")) {
+    types.push("api");
+  }
+
   if (!types.length) {
     types.push("other");
   }
@@ -416,10 +432,13 @@ function inferTypesFromEntry(entry) {
   const desc = (entry.description || "").toLowerCase();
 
   const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
+
   const looksMobileText =
     name.includes("android") || desc.includes("android") ||
     name.includes("ios") || desc.includes("ios");
-  const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
+
+  const looksMobileLang = ["swift", "kotlin"].includes(lang);
+
   const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
@@ -442,6 +461,18 @@ function inferTypesFromEntry(entry) {
 
   if (seemsSchool) {
     types.push("school");
+  }
+
+  if (name.includes("sudoku")) {
+    types.push("school");
+  }
+
+  if (name.includes("linear") && name.includes("algebra")) {
+    types.push("school");
+  }
+
+  if (name.includes("videoshare") || name.includes("video-share")) {
+    types.push("api");
   }
 
   if (!types.length) {
@@ -522,6 +553,50 @@ function computeLanguages(primaryLang, rawName, desc, typeOrTypes) {
   return unique.slice(0, 3);
 }
 
+/* ---------- Game detection from README ---------- */
+
+function textLooksLikeGame(text) {
+  const s = (text || "").toLowerCase();
+
+  const strongKeywords = [
+    "game",
+    "video game",
+    "videogame",
+    "board game",
+    "card game",
+    "multiplayer",
+    "singleplayer",
+    "single-player",
+    "score",
+    "highscore",
+    "high score",
+    "level",
+    "levels",
+    "enemy",
+    "enemies",
+    "player",
+    "players",
+    "lives",
+    "health bar",
+    "hp"
+  ];
+
+  const gameNames = [
+    "sudoku",
+    "catan",
+    "settlers of catan",
+    "tetris",
+    "pong",
+    "snake",
+    "dimitri"
+  ];
+
+  if (strongKeywords.some(k => s.includes(k))) return true;
+  if (gameNames.some(k => s.includes(k))) return true;
+
+  return false;
+}
+
 /* ---------- Map GitHub repo → internal ---------- */
 
 function mapRepoFromGitHub(repo) {
@@ -579,7 +654,7 @@ function mapEntryToProject(entry) {
   tagsFromType = [...new Set(tagsFromType)];
 
   const extraTags = entry.tags ? entry.tags : [];
-  const mergedTags = [...new Set([...tagsFromType, ...extraTags])];
+  let mergedTags = [...new Set([...tagsFromType, ...extraTags])];
 
   let thumbnailUrl = null;
   if (entry.thumbnailUrl && entry.thumbnailUrl.trim()) {
@@ -1029,6 +1104,57 @@ async function verifyLiveSites() {
   renderProjects();
 }
 
+/* ---------- Game tags from README ---------- */
+
+async function markGameFromReadme(project) {
+  const rawName = project.rawName || "";
+
+  // Dimitri is definitely a game
+  if (/dimitri/i.test(rawName)) {
+    project.tags = [...new Set([...(project.tags || []), "game"])];
+    return;
+  }
+
+  if (project.tags && project.tags.includes("game")) {
+    return;
+  }
+
+  const quickText = `${rawName} ${project.baseDescription || project.summary || ""}`;
+  if (textLooksLikeGame(quickText)) {
+    project.tags = [...new Set([...(project.tags || []), "game"])];
+    return;
+  }
+
+  const candidates = [
+    `https://raw.githubusercontent.com/${GITHUB_USER}/${rawName}/HEAD/README.md`,
+    `https://raw.githubusercontent.com/${GITHUB_USER}/${rawName}/HEAD/Readme.md`,
+    `https://raw.githubusercontent.com/${GITHUB_USER}/${rawName}/HEAD/readme.md`
+  ];
+
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+
+      const text = await res.text();
+      if (textLooksLikeGame(text)) {
+        project.tags = [...new Set([...(project.tags || []), "game"])];
+      }
+      return;
+    } catch (err) {
+      console.warn(`Error reading README for ${rawName} at ${url}`, err);
+    }
+  }
+}
+
+async function enhanceGameTagsFromReadme() {
+  console.log("Enhancing game tags based on README...");
+  const tasks = repos.map(p => markGameFromReadme(p));
+  await Promise.all(tasks);
+  saveCache(repos);
+  renderProjects();
+}
+
 /* ---------- Fallback: projects.json ---------- */
 
 async function loadFromProjectsJson() {
@@ -1046,6 +1172,7 @@ async function loadFromProjectsJson() {
     renderProjects();
     await verifyLiveSites();
     await enhanceThumbnails();
+    await enhanceGameTagsFromReadme();
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
     if (gridEl) gridEl.innerHTML = "";
@@ -1076,6 +1203,7 @@ async function loadRepos() {
 
     verifyLiveSites();
     enhanceThumbnails();
+    enhanceGameTagsFromReadme();
 
     if (age < CACHE_TTL_MS) {
       return;
@@ -1156,6 +1284,7 @@ async function loadRepos() {
     renderProjects();
     await verifyLiveSites();
     await enhanceThumbnails();
+    await enhanceGameTagsFromReadme();
   } catch (err) {
     console.error("Network / fetch error while calling GitHub API:", err);
     if (!usedCache) {
