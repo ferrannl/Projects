@@ -200,6 +200,13 @@ body {
   flex: 0 0 auto;
 }
 
+.header-top-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* Language button */
 
 .lang-switch-btn {
