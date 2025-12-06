@@ -765,6 +765,18 @@ body {
   max-height: 180px;
 }
 
+.media-thumb-clickable {
+  cursor: zoom-in;
+}
+
+.media-thumb-clickable img {
+  transition: transform 160ms ease-out;
+}
+
+.media-thumb-clickable:hover img {
+  transform: scale(1.02);
+}
+
 .media-thumb img,
 .media-thumb video {
   width: 100%;
