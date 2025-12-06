@@ -1,10 +1,9 @@
-/* ---------- Language / i18n + live age ---------- */
+/* ---------- Global view + language ---------- */
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
-
 const LANGUAGE_NAMES = {
   nl: "Nederlands",
   en: "English",
@@ -14,9 +13,11 @@ const LANGUAGE_NAMES = {
   es: "Español"
 };
 
+// which tab is active: "projects" or "media"
+let currentView = "projects";
+
 // Birthday: 15-08-1999 23:10 local (Amsterdam time)
 const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // month 7 = August
-
 let currentLang = DEFAULT_LANG;
 
 // Units per language
@@ -37,6 +38,10 @@ const TRANSLATIONS = {
     aboutP1:
       "Hey 👋🏻 Ferran ({age}) here. I am a Dutch developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
+    tabProjects: "Projects",
+    tabMedia: "Media Wall",
+    searchProjectsPlaceholder: "Search by name, description, language or tag…",
+    searchMediaPlaceholder: "Search media by title, filename or type…",
     filterTypeLabel: "Type",
     typeAll: "All",
     typeWebsite: "Websites",
@@ -45,11 +50,18 @@ const TRANSLATIONS = {
     typeSchool: "School / Study",
     typeOther: "Other",
     filterLanguageLabel: "Language",
+    languageFilterAll: "All languages",
+    mediaTypeLabel: "Media type",
+    mediaKindAll: "All",
+    mediaKindImages: "Images",
+    mediaKindVideos: "Videos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Format",
+    mediaFormatAll: "All formats",
     emptyState: "No projects match your search/filter. Try another search term.",
+    mediaEmptyState: "No media match your search/filter. Try another search term.",
     footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages",
-    searchPlaceholder: "Search by name, description, language or tag…",
-    languagesAll: "All languages"
+    footerViewOnPages: "View this site on GitHub Pages"
   },
   nl: {
     subtitle:
@@ -58,6 +70,10 @@ const TRANSLATIONS = {
     aboutP1:
       "Hey 👋🏻 Ferran ({age}) hier. Ik ben een Nederlandse developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
+    tabProjects: "Projecten",
+    tabMedia: "Media Wall",
+    searchProjectsPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
+    searchMediaPlaceholder: "Zoek media op titel, bestandsnaam of type…",
     filterTypeLabel: "Type",
     typeAll: "Alles",
     typeWebsite: "Websites",
@@ -66,11 +82,18 @@ const TRANSLATIONS = {
     typeSchool: "School / Studie",
     typeOther: "Overig",
     filterLanguageLabel: "Taal",
+    languageFilterAll: "Alle talen",
+    mediaTypeLabel: "Media type",
+    mediaKindAll: "Alles",
+    mediaKindImages: "Afbeeldingen",
+    mediaKindVideos: "Video’s",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Bestandstype",
+    mediaFormatAll: "Alle formaten",
     emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+    mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages",
-    searchPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
-    languagesAll: "Alle talen"
+    footerViewOnPages: "Bekijk deze site op GitHub Pages"
   },
   de: {
     subtitle:
@@ -79,6 +102,10 @@ const TRANSLATIONS = {
     aboutP1:
       "Hey 👋🏻 hier ist Ferran ({age}). Ich bin ein niederländischer Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die mir und anderen helfen.",
     aboutP2: "",
+    tabProjects: "Projekte",
+    tabMedia: "Media Wall",
+    searchProjectsPlaceholder: "Suche nach Name, Beschreibung, Sprache oder Tag…",
+    searchMediaPlaceholder: "Suche Medien nach Titel, Dateiname oder Typ…",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
     typeWebsite: "Websites",
@@ -87,11 +114,18 @@ const TRANSLATIONS = {
     typeSchool: "Schule / Studium",
     typeOther: "Sonstiges",
     filterLanguageLabel: "Sprache",
+    languageFilterAll: "Alle Sprachen",
+    mediaTypeLabel: "Medientyp",
+    mediaKindAll: "Alle",
+    mediaKindImages: "Bilder",
+    mediaKindVideos: "Videos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Format",
+    mediaFormatAll: "Alle Formate",
     emptyState: "Keine Projekte für diese Suche oder Filter. Bitte etwas anderes versuchen.",
+    mediaEmptyState: "Keine Medien für diese Suche oder Filter.",
     footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
-    searchPlaceholder: "Nach Name, Beschreibung, Sprache oder Tag suchen…",
-    languagesAll: "Alle Sprachen"
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
   },
   pl: {
     subtitle:
@@ -100,6 +134,10 @@ const TRANSLATIONS = {
     aboutP1:
       "Cześć 👋🏻 tu Ferran ({age}). Jestem holenderskim deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia, które pomagają mnie i innym.",
     aboutP2: "",
+    tabProjects: "Projekty",
+    tabMedia: "Media Wall",
+    searchProjectsPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
+    searchMediaPlaceholder: "Szukaj mediów po tytule, nazwie pliku lub typie…",
     filterTypeLabel: "Typ",
     typeAll: "Wszystko",
     typeWebsite: "Strony WWW",
@@ -108,11 +146,18 @@ const TRANSLATIONS = {
     typeSchool: "Szkoła / Studia",
     typeOther: "Inne",
     filterLanguageLabel: "Język",
+    languageFilterAll: "Wszystkie języki",
+    mediaTypeLabel: "Typ mediów",
+    mediaKindAll: "Wszystko",
+    mediaKindImages: "Obrazy",
+    mediaKindVideos: "Wideo",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Format",
+    mediaFormatAll: "Wszystkie formaty",
     emptyState: "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
+    mediaEmptyState: "Brak mediów dla tych filtrów.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
-    searchPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
-    languagesAll: "Wszystkie języki"
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
   },
   tr: {
     subtitle:
@@ -121,6 +166,10 @@ const TRANSLATIONS = {
     aboutP1:
       "Selam 👋🏻 ben Ferran ({age}). Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı bir geliştiriciyim. Kendime ve başkalarına yardımcı olan web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
     aboutP2: "",
+    tabProjects: "Projeler",
+    tabMedia: "Media Wall",
+    searchProjectsPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…",
+    searchMediaPlaceholder: "Medya için başlık, dosya adı veya türe göre ara…",
     filterTypeLabel: "Tür",
     typeAll: "Tümü",
     typeWebsite: "Web siteleri",
@@ -129,11 +178,18 @@ const TRANSLATIONS = {
     typeSchool: "Okul / Eğitim",
     typeOther: "Diğer",
     filterLanguageLabel: "Dil",
+    languageFilterAll: "Tüm diller",
+    mediaTypeLabel: "Medya türü",
+    mediaKindAll: "Tümü",
+    mediaKindImages: "Görseller",
+    mediaKindVideos: "Videolar",
+    mediaKindAudio: "Ses",
+    mediaFormatLabel: "Biçim",
+    mediaFormatAll: "Tüm biçimler",
     emptyState: "Bu arama / filtre ile eşleşen proje yok. Başka bir şey dene.",
+    mediaEmptyState: "Bu arama / filtre ile eşleşen medya yok.",
     footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
-    searchPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…",
-    languagesAll: "Tüm diller"
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
   },
   es: {
     subtitle:
@@ -142,6 +198,10 @@ const TRANSLATIONS = {
     aboutP1:
       "Hola 👋🏻 soy Ferran ({age}). Desarrollador holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas que ayudan a mí y a otras personas.",
     aboutP2: "",
+    tabProjects: "Proyectos",
+    tabMedia: "Media Wall",
+    searchProjectsPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…",
+    searchMediaPlaceholder: "Busca medios por título, archivo o tipo…",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
     typeWebsite: "Webs",
@@ -150,13 +210,22 @@ const TRANSLATIONS = {
     typeSchool: "Escuela / Estudio",
     typeOther: "Otros",
     filterLanguageLabel: "Idioma",
+    languageFilterAll: "Todos los idiomas",
+    mediaTypeLabel: "Tipo de media",
+    mediaKindAll: "Todo",
+    mediaKindImages: "Imágenes",
+    mediaKindVideos: "Vídeos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Formato",
+    mediaFormatAll: "Todos los formatos",
     emptyState: "No hay proyectos para esta búsqueda o filtros. Prueba con otros términos.",
+    mediaEmptyState: "No hay medios para esta búsqueda o filtros.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages",
-    searchPlaceholder: "Buscar por nombre, descripción, idioma o etiqueta…",
-    languagesAll: "Todos los idiomas"
+    footerViewOnPages: "Ver este sitio en GitHub Pages"
   }
 };
+
+/* ---------- Age calculation ---------- */
 
 function getAgeParts(now = new Date()) {
   let y = now.getFullYear() - BIRTH_DATE.getFullYear();
@@ -210,12 +279,14 @@ function updateAgeInAbout() {
   });
 }
 
+/* ---------- i18n ---------- */
+
 function applyTranslations(lang) {
   const dict = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    if (!key || key === "aboutP1") return;
+    if (!key || key === "aboutP1") return; // aboutP1 handled separately
     const value = dict[key];
     if (typeof value === "string") {
       el.textContent = value;
@@ -224,6 +295,7 @@ function applyTranslations(lang) {
 
   currentLang = lang;
   updateAgeInAbout();
+  updateSearchPlaceholderForView();
 }
 
 function updateLangLabel(lang) {
@@ -233,22 +305,15 @@ function updateLangLabel(lang) {
   labelEl.textContent = name;
 }
 
-function updateSearchAndLanguagePlaceholder(lang) {
-  const dict = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
+function updateSearchPlaceholderForView() {
   const searchEl = document.getElementById("search");
-  const languageSelectEl = document.getElementById("languageFilter");
-
-  if (searchEl && dict.searchPlaceholder) {
-    searchEl.placeholder = dict.searchPlaceholder;
-  }
-
-  if (languageSelectEl && languageSelectEl.options && languageSelectEl.options.length) {
-    const firstOpt =
-      languageSelectEl.querySelector('option[value="all"]') ||
-      languageSelectEl.options[0];
-    if (firstOpt && dict.languagesAll) {
-      firstOpt.textContent = dict.languagesAll;
-    }
+  if (!searchEl) return;
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
+  const key = currentView === "projects"
+    ? "searchProjectsPlaceholder"
+    : "searchMediaPlaceholder";
+  if (dict[key]) {
+    searchEl.placeholder = dict[key];
   }
 }
 
@@ -258,8 +323,9 @@ function setLanguage(lang) {
   document.documentElement.lang = lang;
   updateLangLabel(lang);
   applyTranslations(lang);
-  updateSearchAndLanguagePlaceholder(lang);
 }
+
+/* ---------- Language UI + gate ---------- */
 
 function setupLanguageUI() {
   const langGateEl = document.getElementById("langGate");
@@ -302,11 +368,10 @@ function setupLanguageUI() {
     });
   }
 
+  // keep age ticking (every second, so seconds visibly move)
   updateAgeInAbout();
   setInterval(updateAgeInAbout, 1000);
 }
-
-setupLanguageUI();
 
 /* ---------- Projects logic (GitHub + projects.json) ---------- */
 
@@ -316,8 +381,8 @@ const PROJECTS_URL = "./projects.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
-const CACHE_TTL_MS = 1000 * 60 * 30;
-const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60;
+const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
+const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
 
 let repos = [];
 const state = {
@@ -391,12 +456,11 @@ function prettifyName(raw) {
 
 function choosePrimaryType(types) {
   if (!types || !types.length) return "other";
-  const order = ["website", "mobile", "game", "api", "school", "other"];
+  const order = ["website", "mobile", "api", "school", "other"];
   const found = order.find(t => types.includes(t));
   return found || types[0];
 }
 
-/* Heuristic for GitHub repos – NO game detection here */
 function inferTypesFromGitHub(repo) {
   const types = [];
   const name = (repo.name || "").toLowerCase();
@@ -439,37 +503,24 @@ function inferTypesFromGitHub(repo) {
   return [...new Set(types)];
 }
 
-/* Heuristic for projects.json entries – here we allow explicit game via tags */
 function inferTypesFromEntry(entry) {
   const types = [];
   const lang = (entry.language || "").toLowerCase();
   const name = (entry.name || "").toLowerCase();
   const desc = (entry.description || "").toLowerCase();
-  const tagsLower = Array.isArray(entry.tags)
-    ? entry.tags.map(t => (t || "").toLowerCase())
-    : [];
-
-  if (tagsLower.includes("game") || tagsLower.includes("games")) {
-    types.push("game");
-  }
 
   const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
   const looksMobileText =
     name.includes("android") || desc.includes("android") ||
     name.includes("ios") || desc.includes("ios");
   const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
-
   const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
     desc.includes("internship") ||
     desc.includes("final") ||
     desc.includes("cppls") ||
-    desc.includes("devops") ||
-    tagsLower.includes("school") ||
-    tagsLower.includes("study") ||
-    tagsLower.includes("uni") ||
-    tagsLower.includes("university");
+    desc.includes("devops");
 
   if (looksWebLang) {
     types.push("website");
@@ -479,7 +530,7 @@ function inferTypesFromEntry(entry) {
     types.push("mobile");
   }
 
-  if (name.includes("api") || desc.includes("api") || tagsLower.includes("api")) {
+  if (name.includes("api") || desc.includes("api")) {
     types.push("api");
   }
 
@@ -500,7 +551,6 @@ function getTypeLabel(type) {
     case "mobile":  return "Mobile App";
     case "api":     return "API / Backend";
     case "school":  return "School / Study";
-    case "game":    return "Game";
     default:        return "Other";
   }
 }
@@ -517,9 +567,6 @@ function buildTagsBase(type, language) {
     if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
       tags.push("web");
     }
-  }
-  if (type === "game") {
-    tags.push("game");
   }
 
   return tags;
@@ -651,9 +698,9 @@ function mapEntryToProject(entry) {
   };
 }
 
-/* ---------- Filter / search ---------- */
+/* ---------- Filter / search (projects) ---------- */
 
-function matchesFilters(project) {
+function matchesProjectFilters(project) {
   const rawName = project.rawName || "";
   if (isSelfProjectsRepoName(rawName)) return false;
 
@@ -662,9 +709,7 @@ function matchesFilters(project) {
     : (project.type ? [project.type] : []);
 
   if (state.typeFilter !== "all") {
-    if (!projectTypes.includes(state.typeFilter)) {
-      return false;
-    }
+    if (!projectTypes.includes(state.typeFilter)) return false;
   }
 
   if (state.languageFilter !== "all") {
@@ -693,7 +738,7 @@ function matchesFilters(project) {
   return true;
 }
 
-/* ---------- Project modal ---------- */
+/* ---------- Modal ---------- */
 
 function openImageModal(url, alt) {
   if (!imageModalEl || !imageModalImgEl) return;
@@ -823,7 +868,6 @@ function createProjectCard(project) {
     mainFooterType === "website" ? "Front-end / website project" :
     mainFooterType === "mobile" ? "Mobile client app" :
     mainFooterType === "api"    ? "Backend / API project" :
-    mainFooterType === "game"   ? "Game / interactive project" :
                                   "Misc project";
 
   card.appendChild(titleRow);
@@ -835,13 +879,13 @@ function createProjectCard(project) {
   return card;
 }
 
-/* ---------- Render & UI ---------- */
+/* ---------- Render projects ---------- */
 
 function renderProjects() {
   if (!gridEl) return;
   gridEl.innerHTML = "";
 
-  let filtered = repos.filter(matchesFilters);
+  let filtered = repos.filter(matchesProjectFilters);
 
   if (!filtered.length) {
     if (emptyEl) emptyEl.hidden = false;
@@ -865,6 +909,8 @@ function renderProjects() {
   });
 }
 
+/* ---------- Filters + search (UI hooks) ---------- */
+
 function initFiltersAndSearch() {
   typeChips.forEach(chip => {
     chip.addEventListener("click", () => {
@@ -877,8 +923,14 @@ function initFiltersAndSearch() {
 
   if (searchEl) {
     searchEl.addEventListener("input", () => {
-      state.search = searchEl.value.toLowerCase().trim();
-      renderProjects();
+      const q = searchEl.value.toLowerCase().trim();
+      if (currentView === "projects") {
+        state.search = q;
+        renderProjects();
+      } else {
+        mediaState.search = q;
+        renderMedia();
+      }
     });
   }
 }
@@ -891,7 +943,8 @@ function initLanguageFilter() {
 
   const allOption = document.createElement("option");
   allOption.value = "all";
-  allOption.textContent = dict.languagesAll || "All languages";
+  allOption.setAttribute("data-i18n", "languageFilterAll");
+  allOption.textContent = dict.languageFilterAll || "All languages";
   languageSelectEl.appendChild(allOption);
 
   const languages = Array.from(
@@ -915,8 +968,6 @@ function initLanguageFilter() {
     state.languageFilter = languageSelectEl.value;
     renderProjects();
   });
-
-  updateSearchAndLanguagePlaceholder(currentLang);
 }
 
 /* ---------- Cache helpers ---------- */
@@ -1019,6 +1070,7 @@ async function findThumbnailForRepo(project) {
       try {
         const res = await fetch(url);
         if (res.ok) {
+          console.log(`Found thumbnail for ${project.rawName}: ${url}`);
           project.thumbnailUrl = url;
           return;
         }
@@ -1027,10 +1079,13 @@ async function findThumbnailForRepo(project) {
       }
     }
   }
+
+  console.log(`No thumbnail found for ${project.rawName}`);
 }
 
 async function enhanceThumbnails() {
   const subset = repos.slice(0, 60);
+  console.log(`Enhancing thumbnails for ${subset.length} projects...`);
   const tasks = subset.map(project => findThumbnailForRepo(project));
   await Promise.all(tasks);
   saveCache(repos);
@@ -1061,6 +1116,7 @@ async function checkLiveSite(project) {
 }
 
 async function verifyLiveSites() {
+  console.log("Verifying live sites for projects with pagesUrl...");
   const tasks = repos
     .filter(p => p.pagesUrl)
     .map(p => checkLiveSite(p));
@@ -1090,206 +1146,13 @@ async function loadFromProjectsJson() {
   } catch (err) {
     console.error("Error loading projects.json fallback:", err);
     if (gridEl) gridEl.innerHTML = "";
-    if (emptyEl) emptyEl.hidden = false;
-  }
-}
-
-/* ---------- Media wall ---------- */
-
-const MEDIA_INDEX_URL = "./media/media-index.json";
-let mediaItems = [];
-let mediaFilter = "all";
-
-const mediaGridEl = document.getElementById("mediaGrid");
-const mediaEmptyEl = document.getElementById("mediaEmpty");
-const mediaFilterButtons = document.querySelectorAll(".media-chip");
-const projectsViewEl = document.getElementById("projectsView");
-const mediaViewEl = document.getElementById("mediaView");
-const navTabs = document.querySelectorAll(".nav-tab[data-view]");
-
-const mediaModalEl = document.getElementById("mediaModal");
-const mediaModalContentEl = document.getElementById("mediaModalContent");
-const mediaModalCloseEl = document.getElementById("mediaModalClose");
-
-function setActiveView(view) {
-  if (!projectsViewEl || !mediaViewEl) return;
-
-  if (view === "media") {
-    projectsViewEl.hidden = true;
-    mediaViewEl.hidden = false;
-  } else {
-    projectsViewEl.hidden = false;
-    mediaViewEl.hidden = true;
-  }
-
-  navTabs.forEach(tab => {
-    tab.classList.toggle("nav-tab-active", tab.getAttribute("data-view") === view);
-  });
-}
-
-navTabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    const view = tab.getAttribute("data-view") || "projects";
-    setActiveView(view);
-  });
-});
-
-function openMediaModal(item) {
-  if (!mediaModalEl || !mediaModalContentEl) return;
-  mediaModalContentEl.innerHTML = "";
-
-  if (item.type === "image") {
-    const img = document.createElement("img");
-    img.src = item.src;
-    img.alt = item.title || "";
-    mediaModalContentEl.appendChild(img);
-  } else if (item.type === "video") {
-    const video = document.createElement("video");
-    video.src = item.src;
-    video.controls = true;
-    video.autoplay = true;
-    mediaModalContentEl.appendChild(video);
-  } else if (item.type === "audio") {
-    const wrapper = document.createElement("div");
-    const title = document.createElement("p");
-    title.textContent = item.title || item.src;
-    title.style.marginBottom = "0.5rem";
-    const audio = document.createElement("audio");
-    audio.src = item.src;
-    audio.controls = true;
-    wrapper.appendChild(title);
-    wrapper.appendChild(audio);
-    mediaModalContentEl.appendChild(wrapper);
-  }
-
-  mediaModalEl.hidden = false;
-}
-
-function closeMediaModal() {
-  if (!mediaModalEl || !mediaModalContentEl) return;
-  mediaModalContentEl.innerHTML = "";
-  mediaModalEl.hidden = true;
-}
-
-if (mediaModalEl) {
-  mediaModalEl.addEventListener("click", (e) => {
-    if (e.target === mediaModalEl) {
-      closeMediaModal();
+    if (emptyEl) {
+      emptyEl.hidden = false;
     }
-  });
-}
-if (mediaModalCloseEl) {
-  mediaModalCloseEl.addEventListener("click", closeMediaModal);
-}
-
-function createMediaCard(item) {
-  const card = document.createElement("article");
-  card.className = "media-card";
-
-  const thumbWrap = document.createElement("div");
-  thumbWrap.className = "media-thumb-wrap";
-
-  const badge = document.createElement("span");
-  badge.className = "media-type-badge";
-  badge.textContent =
-    item.type === "image" ? "IMG" :
-    item.type === "video" ? "VID" :
-    item.type === "audio" ? "AUD" :
-    "FILE";
-  thumbWrap.appendChild(badge);
-
-  if (item.type === "image") {
-    const img = document.createElement("img");
-    img.src = item.src;
-    img.alt = item.title || "";
-    thumbWrap.appendChild(img);
-  } else if (item.type === "video") {
-    const video = document.createElement("video");
-    video.src = item.src;
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.autoplay = true;
-    thumbWrap.appendChild(video);
-  } else if (item.type === "audio") {
-    const img = document.createElement("img");
-    img.src = item.thumbnail || "https://via.placeholder.com/300x200?text=AUDIO";
-    img.alt = item.title || "";
-    thumbWrap.appendChild(img);
-  } else {
-    const img = document.createElement("img");
-    img.src = item.thumbnail || "https://via.placeholder.com/300x200?text=FILE";
-    img.alt = item.title || "";
-    thumbWrap.appendChild(img);
-  }
-
-  const body = document.createElement("div");
-  body.className = "media-card-body";
-
-  const title = document.createElement("p");
-  title.className = "media-card-title";
-  title.textContent = item.title || item.src;
-  body.appendChild(title);
-
-  const sub = document.createElement("p");
-  sub.className = "media-card-sub";
-  sub.textContent = item.src;
-  body.appendChild(sub);
-
-  card.appendChild(thumbWrap);
-  card.appendChild(body);
-
-  card.addEventListener("click", () => openMediaModal(item));
-
-  return card;
-}
-
-function renderMedia() {
-  if (!mediaGridEl) return;
-  mediaGridEl.innerHTML = "";
-
-  let filtered = mediaItems;
-  if (mediaFilter !== "all") {
-    filtered = mediaItems.filter(i => i.type === mediaFilter);
-  }
-
-  if (!filtered.length) {
-    if (mediaEmptyEl) mediaEmptyEl.hidden = false;
-    return;
-  }
-  if (mediaEmptyEl) mediaEmptyEl.hidden = true;
-
-  filtered.forEach(item => {
-    const card = createMediaCard(item);
-    mediaGridEl.appendChild(card);
-  });
-}
-
-async function loadMedia() {
-  try {
-    const res = await fetch(MEDIA_INDEX_URL);
-    if (!res.ok) {
-      console.warn("media-index.json not found / HTTP error", res.status);
-      return;
-    }
-    const data = await res.json();
-    mediaItems = Array.isArray(data.items) ? data.items : [];
-    renderMedia();
-  } catch (err) {
-    console.error("Error loading media-index.json:", err);
   }
 }
 
-mediaFilterButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    mediaFilterButtons.forEach(b => b.classList.remove("media-chip-active"));
-    btn.classList.add("media-chip-active");
-    mediaFilter = btn.getAttribute("data-media-filter") || "all";
-    renderMedia();
-  });
-});
-
-/* ---------- Main loader ---------- */
+/* ---------- Load repos ---------- */
 
 async function loadRepos() {
   if (gridEl) {
@@ -1303,6 +1166,7 @@ async function loadRepos() {
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
     repos = cache.projects.filter(p => !isSelfProjectsRepoName(p.rawName));
+    console.log("Loaded projects from cache. Age (ms):", age);
     initLanguageFilter();
     renderProjects();
     usedCache = true;
@@ -1316,6 +1180,7 @@ async function loadRepos() {
   }
 
   if (!canCallApiNow()) {
+    console.warn("Skipping GitHub API call due to recent rate-limit; using cache or fallback.");
     if (!usedCache) {
       await loadFromProjectsJson();
     }
@@ -1332,6 +1197,8 @@ async function loadRepos() {
       } catch {
         body = "";
       }
+
+      console.error("GitHub API error:", res.status, res.statusText, body.slice(0, 200));
 
       if (res.status === 403 && /rate limit/i.test(body)) {
         setRateLimited();
@@ -1353,6 +1220,8 @@ async function loadRepos() {
       .filter(r => !isSelfProjectsRepoName(r.name))
       .map(mapRepoFromGitHub);
 
+    console.log(`Fetched ${repos.length} repos from GitHub API`);
+
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
       if (fallbackRes.ok) {
@@ -1370,10 +1239,7 @@ async function loadRepos() {
               ...p,
               summary: extra.summary || p.summary,
               thumbnailUrl: extra.thumbnailUrl || p.thumbnailUrl,
-              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])],
-              types: extra.types && extra.types.length ? extra.types : p.types,
-              primaryType: extra.primaryType || p.primaryType,
-              type: extra.type || p.type
+              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])]
             };
           });
         }
@@ -1395,10 +1261,240 @@ async function loadRepos() {
   }
 }
 
+/* ---------- Media Wall logic ---------- */
+
+let mediaItems = [];
+const mediaState = {
+  search: "",
+  kind: "all",
+  format: "all"
+};
+
+const mediaGridEl = document.getElementById("mediaGrid");
+const mediaEmptyEl = document.getElementById("mediaEmptyState");
+const mediaKindButtons = document.querySelectorAll(".chip-media-kind");
+const mediaFormatSelectEl = document.getElementById("mediaFormatFilter");
+
+function getExtension(path) {
+  if (!path) return "";
+  const parts = path.split(".");
+  if (parts.length < 2) return "";
+  return parts[parts.length - 1].toLowerCase();
+}
+
+function buildMediaFormatOptions() {
+  if (!mediaFormatSelectEl) return;
+
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
+
+  mediaFormatSelectEl.innerHTML = "";
+  const optAll = document.createElement("option");
+  optAll.value = "all";
+  optAll.setAttribute("data-i18n", "mediaFormatAll");
+  optAll.textContent = dict.mediaFormatAll || "All formats";
+  mediaFormatSelectEl.appendChild(optAll);
+
+  const exts = Array.from(
+    new Set(
+      mediaItems.map(item => getExtension(item.src)).filter(Boolean)
+    )
+  ).sort();
+
+  exts.forEach(ext => {
+    const opt = document.createElement("option");
+    opt.value = ext;
+    opt.textContent = ext.toUpperCase();
+    mediaFormatSelectEl.appendChild(opt);
+  });
+}
+
+function mediaMatches(item) {
+  if (mediaState.kind !== "all" && item.type !== mediaState.kind) {
+    return false;
+  }
+
+  if (mediaState.format !== "all") {
+    const ext = getExtension(item.src);
+    if (ext !== mediaState.format) return false;
+  }
+
+  if (mediaState.search) {
+    const hay = `${item.title || ""} ${item.src || ""} ${item.type || ""}`.toLowerCase();
+    if (!hay.includes(mediaState.search)) return false;
+  }
+
+  return true;
+}
+
+function createMediaCard(item) {
+  const card = document.createElement("article");
+  card.className = "media-card";
+
+  const thumb = document.createElement("div");
+  thumb.className = "media-thumb";
+
+  if (item.type === "image") {
+    const img = document.createElement("img");
+    img.src = item.src;
+    img.alt = item.title || "";
+    thumb.appendChild(img);
+  } else if (item.type === "video") {
+    const video = document.createElement("video");
+    video.src = item.src;
+    video.controls = true;
+    video.playsInline = true;
+    thumb.appendChild(video);
+  } else if (item.type === "audio") {
+    thumb.classList.add("media-thumb-audio");
+    const audio = document.createElement("audio");
+    audio.src = item.src;
+    audio.controls = true;
+    thumb.appendChild(audio);
+  }
+
+  const titleEl = document.createElement("p");
+  titleEl.className = "media-title";
+  titleEl.textContent = item.title || item.src;
+
+  const metaRow = document.createElement("div");
+  metaRow.className = "media-meta-row";
+
+  const kindPill = document.createElement("span");
+  kindPill.className = "media-pill";
+  kindPill.textContent = item.type;
+  metaRow.appendChild(kindPill);
+
+  const ext = getExtension(item.src);
+  if (ext) {
+    const extPill = document.createElement("span");
+    extPill.className = "media-pill";
+    extPill.textContent = ext.toUpperCase();
+    metaRow.appendChild(extPill);
+  }
+
+  card.appendChild(thumb);
+  card.appendChild(titleEl);
+  card.appendChild(metaRow);
+
+  return card;
+}
+
+function renderMedia() {
+  if (!mediaGridEl) return;
+  mediaGridEl.innerHTML = "";
+
+  let filtered = mediaItems.filter(mediaMatches);
+
+  if (!filtered.length) {
+    if (mediaEmptyEl) mediaEmptyEl.hidden = false;
+    return;
+  }
+
+  if (mediaEmptyEl) mediaEmptyEl.hidden = true;
+
+  filtered.forEach(item => {
+    const card = createMediaCard(item);
+    mediaGridEl.appendChild(card);
+  });
+}
+
+async function loadMediaIndex() {
+  try {
+    const res = await fetch("./media/media-index.json", { cache: "no-store" });
+    if (!res.ok) {
+      console.warn("No media-index.json found or HTTP error:", res.status);
+      return;
+    }
+    const data = await res.json();
+    mediaItems = Array.isArray(data.items) ? data.items : [];
+    console.log(`Loaded ${mediaItems.length} media items from media-index.json`);
+    buildMediaFormatOptions();
+    renderMedia();
+  } catch (err) {
+    console.error("Error loading media-index.json:", err);
+  }
+}
+
+function initMediaFilters() {
+  mediaKindButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      mediaKindButtons.forEach(b => b.classList.remove("chip-active"));
+      btn.classList.add("chip-active");
+      mediaState.kind = btn.getAttribute("data-media-kind") || "all";
+      renderMedia();
+    });
+  });
+
+  if (mediaFormatSelectEl) {
+    mediaFormatSelectEl.addEventListener("change", () => {
+      mediaState.format = mediaFormatSelectEl.value;
+      renderMedia();
+    });
+  }
+}
+
+/* ---------- View switching (Projects vs Media) ---------- */
+
+const projectsViewEl = document.getElementById("projectsView");
+const mediaViewEl = document.getElementById("mediaView");
+const projectFiltersEl = document.getElementById("projectFilters");
+const mediaFiltersEl = document.getElementById("mediaFilters");
+const viewTabs = document.querySelectorAll(".view-tab");
+
+function setView(view) {
+  currentView = view === "media" ? "media" : "projects";
+
+  viewTabs.forEach(tab => {
+    const tabView = tab.getAttribute("data-view");
+    if (tabView === currentView) {
+      tab.classList.add("view-tab-active");
+    } else {
+      tab.classList.remove("view-tab-active");
+    }
+  });
+
+  if (projectsViewEl) {
+    projectsViewEl.hidden = currentView !== "projects";
+  }
+  if (mediaViewEl) {
+    mediaViewEl.hidden = currentView !== "media";
+  }
+  if (projectFiltersEl) {
+    projectFiltersEl.hidden = currentView !== "projects";
+  }
+  if (mediaFiltersEl) {
+    mediaFiltersEl.hidden = currentView !== "media";
+  }
+
+  updateSearchPlaceholderForView();
+
+  if (currentView === "projects") {
+    renderProjects();
+  } else {
+    renderMedia();
+  }
+}
+
+function initViewSwitch() {
+  viewTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const view = tab.getAttribute("data-view");
+      setView(view);
+    });
+  });
+
+  // default: projects view
+  setView("projects");
+}
+
 /* ---------- Init ---------- */
 
 (function init() {
+  console.log("Initializing Ferran Projects + Media Wall page…");
+  setupLanguageUI();
   initFiltersAndSearch();
+  initMediaFilters();
+  initViewSwitch();
   loadRepos();
-  loadMedia(); // load media wall index
+  loadMediaIndex();
 })();
