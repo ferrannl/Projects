@@ -1612,6 +1612,9 @@ function setView(view) {
   // "projects" or "media"
   currentView = view === "media" ? "media" : "projects";
 
+  const showingProjects = currentView === "projects";
+  const showingMedia = !showingProjects;
+
   // Active state on tabs
   viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
@@ -1622,27 +1625,30 @@ function setView(view) {
     }
   });
 
-  // ✅ Use the `hidden` property instead of style.display
+  // 🔁 Hoofd-secties tonen/verbergen via `hidden`
   if (projectsViewEl) {
-    projectsViewEl.hidden = currentView !== "projects";
+    projectsViewEl.hidden = !showingProjects;
   }
   if (mediaViewEl) {
-    mediaViewEl.hidden = currentView !== "media";
+    mediaViewEl.hidden = !showingMedia;
   }
 
-  // ✅ Same for filters
+  // 🔁 Filters ook via `hidden`
+  // 👉 Projects: TYPE + TAAL
   if (projectFiltersEl) {
-    projectFiltersEl.hidden = currentView !== "projects";
-  }
-  if (mediaFiltersEl) {
-    mediaFiltersEl.hidden = currentView !== "media";
+    projectFiltersEl.hidden = !showingProjects;
   }
 
-  // Update search placeholder
+  // 👉 Media: MEDIA TYPE + BESTANDSTYPE
+  if (mediaFiltersEl) {
+    mediaFiltersEl.hidden = !showingMedia;
+  }
+
+  // Placeholder van de zoekbalk updaten
   updateSearchPlaceholderForView();
 
-  // Render correct list
-  if (currentView === "projects") {
+  // Correcte lijst opnieuw renderen
+  if (showingProjects) {
     renderProjects();
   } else {
     buildMediaFormatOptions();
