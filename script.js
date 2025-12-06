@@ -376,13 +376,21 @@ function prettifyName(raw) {
     .join(" ");
 }
 
+/**
+ * Choose main type, with explicit priority.
+ * NOTE: "game" is only set from projects.json tags, not from raw heuristics.
+ */
 function choosePrimaryType(types) {
   if (!types || !types.length) return "other";
-  const order = ["website", "mobile", "api", "school", "other"];
+  const order = ["website", "mobile", "game", "api", "school", "other"];
   const found = order.find(t => types.includes(t));
   return found || types[0];
 }
 
+/**
+ * Heuristics for GitHub repos (API response).
+ * IMPORTANT: we do NOT auto-guess "game" here anymore to avoid mislabeling.
+ */
 function inferTypesFromGitHub(repo) {
   const types = [];
   const name = (repo.name || "").toLowerCase();
@@ -425,11 +433,23 @@ function inferTypesFromGitHub(repo) {
   return [...new Set(types)];
 }
 
+/**
+ * Heuristics for entries in projects.json.
+ * Here we allow explicit "game" via tags: ["game"] or ["games"].
+ */
 function inferTypesFromEntry(entry) {
   const types = [];
   const lang = (entry.language || "").toLowerCase();
   const name = (entry.name || "").toLowerCase();
   const desc = (entry.description || "").toLowerCase();
+  const tagsLower = Array.isArray(entry.tags)
+    ? entry.tags.map(t => (t || "").toLowerCase())
+    : [];
+
+  // Explicit "game" via tags – ONLY way to become type game
+  if (tagsLower.includes("game") || tagsLower.includes("games")) {
+    types.push("game");
+  }
 
   const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
   const looksMobileText =
@@ -442,7 +462,11 @@ function inferTypesFromEntry(entry) {
     desc.includes("internship") ||
     desc.includes("final") ||
     desc.includes("cppls") ||
-    desc.includes("devops");
+    desc.includes("devops") ||
+    tagsLower.includes("school") ||
+    tagsLower.includes("study") ||
+    tagsLower.includes("uni") ||
+    tagsLower.includes("university");
 
   if (looksWebLang) {
     types.push("website");
@@ -452,7 +476,7 @@ function inferTypesFromEntry(entry) {
     types.push("mobile");
   }
 
-  if (name.includes("api") || desc.includes("api")) {
+  if (name.includes("api") || desc.includes("api") || tagsLower.includes("api")) {
     types.push("api");
   }
 
@@ -473,6 +497,7 @@ function getTypeLabel(type) {
     case "mobile":  return "Mobile App";
     case "api":     return "API / Backend";
     case "school":  return "School / Study";
+    case "game":    return "Game";
     default:        return "Other";
   }
 }
@@ -489,6 +514,9 @@ function buildTagsBase(type, language) {
     if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
       tags.push("web");
     }
+  }
+  if (type === "game") {
+    tags.push("game");
   }
 
   return tags;
@@ -796,6 +824,7 @@ function createProjectCard(project) {
     mainFooterType === "website" ? "Front-end / website project" :
     mainFooterType === "mobile" ? "Mobile client app" :
     mainFooterType === "api"    ? "Backend / API project" :
+    mainFooterType === "game"   ? "Game / interactive project" :
                                   "Misc project";
 
   card.appendChild(titleRow);
@@ -1182,7 +1211,10 @@ async function loadRepos() {
               ...p,
               summary: extra.summary || p.summary,
               thumbnailUrl: extra.thumbnailUrl || p.thumbnailUrl,
-              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])]
+              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])],
+              types: extra.types && extra.types.length ? extra.types : p.types,
+              primaryType: extra.primaryType || p.primaryType,
+              type: extra.type || p.type
             };
           });
         }
