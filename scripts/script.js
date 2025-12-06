@@ -1,4 +1,6 @@
-/* ---------- Global view + language ---------- */
+// scripts/script.js
+
+/* ---------- Language + global view state ---------- */
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
@@ -10,7 +12,7 @@ const LANGUAGE_NAMES = {
   de: "Deutsch",
   pl: "Polski",
   tr: "Türkçe",
-  es: "Español"
+  es: "Español",
 };
 
 // which tab is active: "projects" or "media"
@@ -22,12 +24,12 @@ let currentLang = DEFAULT_LANG;
 
 // Units per language
 const AGE_UNITS = {
-  nl: { y: "j",  m: "mnd", d: "d",  h: "u",   min: "min", s: "s" },
-  en: { y: "y",  m: "mo",  d: "d",  h: "h",   min: "m",   s: "s" },
-  de: { y: "J",  m: "M",   d: "T",  h: "Std", min: "Min", s: "s" },
-  pl: { y: "l",  m: "m",   d: "d",  h: "g",   min: "min", s: "s" },
-  tr: { y: "y",  m: "ay",  d: "g",  h: "sa",  min: "dk",  s: "sn" },
-  es: { y: "a",  m: "m",   d: "d",  h: "h",   min: "min", s: "s" }
+  nl: { y: "j", m: "mnd", d: "d", h: "u", min: "min", s: "s" },
+  en: { y: "y", m: "mo", d: "d", h: "h", min: "m", s: "s" },
+  de: { y: "J", m: "M", d: "T", h: "Std", min: "Min", s: "s" },
+  pl: { y: "l", m: "m", d: "d", h: "g", min: "min", s: "s" },
+  tr: { y: "y", m: "ay", d: "g", h: "sa", min: "dk", s: "sn" },
+  es: { y: "a", m: "m", d: "d", h: "h", min: "min", s: "s" },
 };
 
 const TRANSLATIONS = {
@@ -61,7 +63,7 @@ const TRANSLATIONS = {
     emptyState: "No projects match your search/filter. Try another search term.",
     mediaEmptyState: "No media match your search/filter. Try another search term.",
     footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages"
+    footerViewOnPages: "View this site on GitHub Pages",
   },
   nl: {
     subtitle:
@@ -90,10 +92,11 @@ const TRANSLATIONS = {
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Bestandstype",
     mediaFormatAll: "Alle formaten",
-    emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+    emptyState:
+      "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages"
+    footerViewOnPages: "Bekijk deze site op GitHub Pages",
   },
   de: {
     subtitle:
@@ -122,10 +125,11 @@ const TRANSLATIONS = {
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Format",
     mediaFormatAll: "Alle Formate",
-    emptyState: "Keine Projekte für diese Suche oder Filter. Bitte etwas anderes versuchen.",
+    emptyState:
+      "Keine Projekte für diese Suche oder Filter. Bitte etwas anderes versuchen.",
     mediaEmptyState: "Keine Medien für diese Suche oder Filter.",
     footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
   },
   pl: {
     subtitle:
@@ -154,10 +158,11 @@ const TRANSLATIONS = {
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Format",
     mediaFormatAll: "Wszystkie formaty",
-    emptyState: "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
+    emptyState:
+      "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
     mediaEmptyState: "Brak mediów dla tych filtrów.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
   },
   tr: {
     subtitle:
@@ -169,7 +174,8 @@ const TRANSLATIONS = {
     tabProjects: "Projeler",
     tabMedia: "Medya",
     searchProjectsPlaceholder: "İsme, açıklamaya, dile veya etikete göre ara…",
-    searchMediaPlaceholder: "Medya için başlık, dosya adı veya türe göre ara…",
+    searchMediaPlaceholder:
+      "Medya için başlık, dosya adı veya türe göre ara…",
     filterTypeLabel: "Tür",
     typeAll: "Tümü",
     typeWebsite: "Web siteleri",
@@ -186,10 +192,11 @@ const TRANSLATIONS = {
     mediaKindAudio: "Ses",
     mediaFormatLabel: "Biçim",
     mediaFormatAll: "Tüm biçimler",
-    emptyState: "Bu arama / filtre ile eşleşen proje yok. Başka bir şey dene.",
+    emptyState:
+      "Bu arama / filtre ile eşleşen proje yok. Başka bir şey dene.",
     mediaEmptyState: "Bu arama / filtre ile eşleşen medya yok.",
     footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
   },
   es: {
     subtitle:
@@ -200,7 +207,8 @@ const TRANSLATIONS = {
     aboutP2: "",
     tabProjects: "Proyectos",
     tabMedia: "Media",
-    searchProjectsPlaceholder: "Busca por nombre, descripción, idioma o etiqueta…",
+    searchProjectsPlaceholder:
+      "Busca por nombre, descripción, idioma o etiqueta…",
     searchMediaPlaceholder: "Busca medios por título, archivo o tipo…",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
@@ -218,11 +226,12 @@ const TRANSLATIONS = {
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Formato",
     mediaFormatAll: "Todos los formatos",
-    emptyState: "No hay proyectos para esta búsqueda o filtros. Prueba con otros términos.",
+    emptyState:
+      "No hay proyectos para esta búsqueda o filtros. Prueba con otros términos.",
     mediaEmptyState: "No hay medios para estos filtros.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages"
-  }
+    footerViewOnPages: "Ver este sitio en GitHub Pages",
+  },
 };
 
 /* ---------- Age calculation ---------- */
@@ -235,15 +244,27 @@ function getAgeParts(now = new Date()) {
   let min = now.getMinutes() - BIRTH_DATE.getMinutes();
   let s = now.getSeconds() - BIRTH_DATE.getSeconds();
 
-  if (s < 0) { s += 60; min -= 1; }
-  if (min < 0) { min += 60; h -= 1; }
-  if (h < 0) { h += 24; d -= 1; }
+  if (s < 0) {
+    s += 60;
+    min -= 1;
+  }
+  if (min < 0) {
+    min += 60;
+    h -= 1;
+  }
+  if (h < 0) {
+    h += 24;
+    d -= 1;
+  }
   if (d < 0) {
     const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     d += prevMonth.getDate();
     m -= 1;
   }
-  if (m < 0) { m += 12; y -= 1; }
+  if (m < 0) {
+    m += 12;
+    y -= 1;
+  }
 
   return { y, m, d, h, min, s };
 }
@@ -295,9 +316,10 @@ function updateSearchPlaceholderForView() {
   const searchEl = document.getElementById("search");
   if (!searchEl) return;
   const dict = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
-  const key = currentView === "projects"
-    ? "searchProjectsPlaceholder"
-    : "searchMediaPlaceholder";
+  const key =
+    currentView === "projects"
+      ? "searchProjectsPlaceholder"
+      : "searchMediaPlaceholder";
   if (dict[key]) {
     searchEl.placeholder = dict[key];
   }
@@ -367,14 +389,14 @@ const PROJECTS_URL = "./projects.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
-const CACHE_TTL_MS = 1000 * 60 * 30;   // 30 minutes cache
+const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes cache
 const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour after rate-limit
 
 let repos = [];
 const state = {
   search: "",
   typeFilter: "all",
-  languageFilter: "all"
+  languageFilter: "all",
 };
 
 const gridEl = document.getElementById("projectsGrid");
@@ -387,10 +409,18 @@ const imageModalEl = document.getElementById("imageModal");
 const imageModalImgEl = document.getElementById("imageModalImg");
 
 const SMALL_WORDS = new Set([
-  "voor", "van", "met",
-  "en", "of",
-  "de", "het", "een",
-  "in", "op", "aan", "bij"
+  "voor",
+  "van",
+  "met",
+  "en",
+  "of",
+  "de",
+  "het",
+  "een",
+  "in",
+  "op",
+  "aan",
+  "bij",
 ]);
 
 const SPECIAL_WORDS = {
@@ -402,7 +432,7 @@ const SPECIAL_WORDS = {
   https: "HTTPS",
   url: "URL",
   ui: "UI",
-  ux: "UX"
+  ux: "UX",
 };
 
 function isSelfProjectsRepoName(name) {
@@ -420,11 +450,9 @@ function prettifyName(raw) {
   s = s.replace(/([a-z0-9])([A-Z])/g, "$1 $2");
   s = s.replace(/\s+/g, " ").trim();
 
-  let words = s.split(" ").map(w => w.trim());
+  let words = s.split(" ").map((w) => w.trim());
 
-  words = words.map(w =>
-    w === IOS_PLACEHOLDER ? "iOS" : w
-  );
+  words = words.map((w) => (w === IOS_PLACEHOLDER ? "iOS" : w));
 
   return words
     .map((w, i) => {
@@ -443,7 +471,7 @@ function prettifyName(raw) {
 function choosePrimaryType(types) {
   if (!types || !types.length) return "other";
   const order = ["website", "mobile", "api", "school", "other"];
-  const found = order.find(t => types.includes(t));
+  const found = order.find((t) => types.includes(t));
   return found || types[0];
 }
 
@@ -453,10 +481,14 @@ function inferTypesFromGitHub(repo) {
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
+  const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(
+    lang
+  );
   const looksMobileText =
-    name.includes("android") || desc.includes("android") ||
-    name.includes("ios") || desc.includes("ios");
+    name.includes("android") ||
+    desc.includes("android") ||
+    name.includes("ios") ||
+    desc.includes("ios");
   const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
   const seemsSchool =
     desc.includes("assignment") ||
@@ -480,10 +512,14 @@ function inferTypesFromEntry(entry) {
   const name = (entry.name || "").toLowerCase();
   const desc = (entry.description || "").toLowerCase();
 
-  const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
+  const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(
+    lang
+  );
   const looksMobileText =
-    name.includes("android") || desc.includes("android") ||
-    name.includes("ios") || desc.includes("ios");
+    name.includes("android") ||
+    desc.includes("android") ||
+    name.includes("ios") ||
+    desc.includes("ios");
   const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
   const seemsSchool =
     desc.includes("assignment") ||
@@ -503,11 +539,16 @@ function inferTypesFromEntry(entry) {
 
 function getTypeLabel(type) {
   switch (type) {
-    case "website": return "Website";
-    case "mobile":  return "Mobile App";
-    case "api":     return "API / Backend";
-    case "school":  return "School / Study";
-    default:        return "Other";
+    case "website":
+      return "Website";
+    case "mobile":
+      return "Mobile App";
+    case "api":
+      return "API / Backend";
+    case "school":
+      return "School / Study";
+    default:
+      return "Other";
   }
 }
 
@@ -516,8 +557,8 @@ function buildTagsBase(type, language) {
   const langLower = (language || "").toLowerCase();
 
   if (type === "website") tags.push("web");
-  if (type === "mobile")  tags.push("mobile");
-  if (type === "api")     tags.push("api");
+  if (type === "mobile") tags.push("mobile");
+  if (type === "api") tags.push("api");
   if (type === "school") {
     tags.push("school");
     if (["html", "css", "javascript", "typescript", "php"].includes(langLower)) {
@@ -585,7 +626,7 @@ function mapRepoFromGitHub(repo) {
     : null;
 
   let tags = [];
-  types.forEach(t => {
+  types.forEach((t) => {
     tags = tags.concat(buildTagsBase(t, primaryLang));
   });
   tags = [...new Set(tags)];
@@ -604,7 +645,7 @@ function mapRepoFromGitHub(repo) {
     hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl: null
+    thumbnailUrl: null,
   };
 }
 
@@ -616,10 +657,15 @@ function mapEntryToProject(entry) {
   const hasPagesFlag = !!entry.hasPages;
   const customPagesUrl = entry.pagesUrl;
   const primaryLang = entry.language || "Various";
-  const languages = computeLanguages(primaryLang, entry.name, entry.description, types);
+  const languages = computeLanguages(
+    primaryLang,
+    entry.name,
+    entry.description,
+    types
+  );
 
   let tagsFromType = [];
-  types.forEach(t => {
+  types.forEach((t) => {
     tagsFromType = tagsFromType.concat(buildTagsBase(t, primaryLang));
   });
   tagsFromType = [...new Set(tagsFromType)];
@@ -633,7 +679,7 @@ function mapEntryToProject(entry) {
   }
 
   const pagesUrl = hasPagesFlag
-    ? (customPagesUrl || `https://${GITHUB_USER}.github.io/${entry.name}/`)
+    ? customPagesUrl || `https://${GITHUB_USER}.github.io/${entry.name}/`
     : null;
 
   return {
@@ -650,7 +696,7 @@ function mapEntryToProject(entry) {
     hasLiveSite: !!pagesUrl,
     baseDescription: baseDesc,
     summary: baseDesc,
-    thumbnailUrl
+    thumbnailUrl,
   };
 }
 
@@ -660,19 +706,27 @@ function matchesProjectFilters(project) {
   const rawName = project.rawName || "";
   if (isSelfProjectsRepoName(rawName)) return false;
 
-  const projectTypes = project.types && project.types.length
-    ? project.types
-    : (project.type ? [project.type] : []);
+  const projectTypes =
+    project.types && project.types.length
+      ? project.types
+      : project.type
+      ? [project.type]
+      : [];
 
   if (state.typeFilter !== "all") {
     if (!projectTypes.includes(state.typeFilter)) return false;
   }
 
   if (state.languageFilter !== "all") {
-    const langs = project.languages && project.languages.length
-      ? project.languages
-      : (project.language ? [project.language] : []);
-    const matchLang = langs.some(l => (l || "").toLowerCase() === state.languageFilter.toLowerCase());
+    const langs =
+      project.languages && project.languages.length
+        ? project.languages
+        : project.language
+        ? [project.language]
+        : [];
+    const matchLang = langs.some(
+      (l) => (l || "").toLowerCase() === state.languageFilter.toLowerCase()
+    );
     if (!matchLang) return false;
   }
 
@@ -685,8 +739,10 @@ function matchesProjectFilters(project) {
       project.type,
       ...(project.languages || []),
       ...(project.tags || []),
-      ...(project.types || [])
-    ].join(" ").toLowerCase();
+      ...(project.types || []),
+    ]
+      .join(" ")
+      .toLowerCase();
 
     if (!haystack.includes(state.search)) return false;
   }
@@ -775,11 +831,14 @@ function createProjectCard(project) {
   const metaRow = document.createElement("div");
   metaRow.className = "project-meta";
 
-  const langList = project.languages && project.languages.length
-    ? project.languages
-    : (project.language ? [project.language] : []);
+  const langList =
+    project.languages && project.languages.length
+      ? project.languages
+      : project.language
+      ? [project.language]
+      : [];
 
-  langList.slice(0, 3).forEach(lang => {
+  langList.slice(0, 3).forEach((lang) => {
     if (!lang) return;
     const langPill = document.createElement("span");
     langPill.className = "meta-pill language";
@@ -787,7 +846,7 @@ function createProjectCard(project) {
     metaRow.appendChild(langPill);
   });
 
-  (project.tags || []).forEach(tag => {
+  (project.tags || []).forEach((tag) => {
     const tagPill = document.createElement("span");
     tagPill.className = "meta-pill tag-pill";
     tagPill.textContent = `#${tag}`;
@@ -820,11 +879,15 @@ function createProjectCard(project) {
 
   const mainFooterType = mainType;
   footerMeta.textContent =
-    mainFooterType === "school" ? "Study / assignment project" :
-    mainFooterType === "website" ? "Front-end / website project" :
-    mainFooterType === "mobile" ? "Mobile client app" :
-    mainFooterType === "api"    ? "Backend / API project" :
-                                  "Misc project";
+    mainFooterType === "school"
+      ? "Study / assignment project"
+      : mainFooterType === "website"
+      ? "Front-end / website project"
+      : mainFooterType === "mobile"
+      ? "Mobile client app"
+      : mainFooterType === "api"
+      ? "Backend / API project"
+      : "Misc project";
 
   card.appendChild(titleRow);
   card.appendChild(descWrapper);
@@ -850,16 +913,18 @@ function renderProjects() {
 
   if (emptyEl) emptyEl.hidden = true;
 
-  filtered = filtered.slice().sort((a, b) => {
-    const aLive = a.hasLiveSite && a.pagesUrl ? 1 : 0;
-    const bLive = b.hasLiveSite && b.pagesUrl ? 1 : 0;
-    if (bLive !== aLive) return bLive - aLive;
-    const nameA = (a.displayName || a.rawName || "").toLowerCase();
-    const nameB = (b.displayName || b.rawName || "").toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
+  filtered = filtered
+    .slice()
+    .sort((a, b) => {
+      const aLive = a.hasLiveSite && a.pagesUrl ? 1 : 0;
+      const bLive = b.hasLiveSite && b.pagesUrl ? 1 : 0;
+      if (bLive !== aLive) return bLive - aLive;
+      const nameA = (a.displayName || a.rawName || "").toLowerCase();
+      const nameB = (b.displayName || b.rawName || "").toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
 
-  filtered.forEach(project => {
+  filtered.forEach((project) => {
     const card = createProjectCard(project);
     gridEl.appendChild(card);
   });
@@ -868,9 +933,9 @@ function renderProjects() {
 /* ---------- Filters + search (UI hooks) ---------- */
 
 function initFiltersAndSearch() {
-  typeChips.forEach(chip => {
+  typeChips.forEach((chip) => {
     chip.addEventListener("click", () => {
-      typeChips.forEach(c => c.classList.remove("chip-active"));
+      typeChips.forEach((c) => c.classList.remove("chip-active"));
       chip.classList.add("chip-active");
       state.typeFilter = chip.getAttribute("data-filter-value") || "all";
       renderProjects();
@@ -905,15 +970,17 @@ function initLanguageFilter() {
 
   const languages = Array.from(
     new Set(
-      repos.flatMap(r => {
-        if (r.languages && r.languages.length) return r.languages;
-        if (r.language) return [r.language];
-        return [];
-      }).filter(Boolean)
+      repos
+        .flatMap((r) => {
+          if (r.languages && r.languages.length) return r.languages;
+          if (r.language) return [r.language];
+          return [];
+        })
+        .filter(Boolean)
     )
   ).sort((a, b) => a.localeCompare(b));
 
-  languages.forEach(lang => {
+  languages.forEach((lang) => {
     const opt = document.createElement("option");
     opt.value = lang;
     opt.textContent = lang;
@@ -936,7 +1003,7 @@ function getCache() {
     if (!parsed || !Array.isArray(parsed.projects)) return null;
 
     parsed.projects = parsed.projects.filter(
-      p => !isSelfProjectsRepoName(p.rawName)
+      (p) => !isSelfProjectsRepoName(p.rawName)
     );
     return parsed;
   } catch {
@@ -947,8 +1014,8 @@ function getCache() {
 function saveCache(projects) {
   try {
     const payload = {
-      projects: projects.filter(p => !isSelfProjectsRepoName(p.rawName)),
-      fetchedAt: Date.now()
+      projects: projects.filter((p) => !isSelfProjectsRepoName(p.rawName)),
+      fetchedAt: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
   } catch {
@@ -984,34 +1051,48 @@ function canCallApiNow() {
 /* ---------- Thumbnail autodetect ---------- */
 
 const thumbnailCandidates = [
-  "logo.png", "logo.jpg", "logo.jpeg", "logo.svg",
-  "banner.png", "banner.jpg",
-  "screenshot.png", "screenshot.jpg",
-  "screenshot-1.png", "screenshot-1.jpg",
-  "hero.png", "hero.jpg",
-  "thumbnail.png", "thumbnail.jpg",
-  "cover.png", "cover.jpg",
-  "favicon.png", "favicon.jpg", "favicon.ico",
-  "icon.png", "icon.jpg",
-  "NewClassDiagram.png", "NewClassDiagram.jpg",
-  "OldClassDiagram.png", "OldClassDiagram.jpg",
-  "SequenceDiagram.png", "SequenceDiagram.jpg",
-  "ClassDiagram.png", "ClassDiagram.jpg",
-  "class-diagram.png", "class-diagram.jpg",
-  "diagram.png", "diagram.jpg",
-  "Diagram.png", "Diagram.jpg",
-  "uml.png", "uml.jpg",
-  "model.png", "model.jpg"
+  "logo.png",
+  "logo.jpg",
+  "logo.jpeg",
+  "logo.svg",
+  "banner.png",
+  "banner.jpg",
+  "screenshot.png",
+  "screenshot.jpg",
+  "screenshot-1.png",
+  "screenshot-1.jpg",
+  "hero.png",
+  "hero.jpg",
+  "thumbnail.png",
+  "thumbnail.jpg",
+  "cover.png",
+  "cover.jpg",
+  "favicon.png",
+  "favicon.jpg",
+  "favicon.ico",
+  "icon.png",
+  "icon.jpg",
+  "NewClassDiagram.png",
+  "NewClassDiagram.jpg",
+  "OldClassDiagram.png",
+  "OldClassDiagram.jpg",
+  "SequenceDiagram.png",
+  "SequenceDiagram.jpg",
+  "ClassDiagram.png",
+  "ClassDiagram.jpg",
+  "class-diagram.png",
+  "class-diagram.jpg",
+  "diagram.png",
+  "diagram.jpg",
+  "Diagram.png",
+  "Diagram.jpg",
+  "uml.png",
+  "uml.jpg",
+  "model.png",
+  "model.jpg",
 ];
 
-const thumbnailFolders = [
-  "",
-  "images",
-  "img",
-  "media",
-  "assets",
-  "public"
-];
+const thumbnailFolders = ["", "images", "img", "media", "assets", "public"];
 
 async function findThumbnailForRepo(project) {
   if (project.thumbnailUrl) return;
@@ -1024,23 +1105,22 @@ async function findThumbnailForRepo(project) {
       try {
         const res = await fetch(url);
         if (res.ok) {
-          console.log(`Found thumbnail for ${project.rawName}: ${url}`);
           project.thumbnailUrl = url;
           return;
         }
       } catch (err) {
-        console.warn(`Error checking thumbnail for ${project.rawName} at ${url}`, err);
+        console.warn(
+          `Error checking thumbnail for ${project.rawName} at ${url}`,
+          err
+        );
       }
     }
   }
-
-  console.log(`No thumbnail found for ${project.rawName}`);
 }
 
 async function enhanceThumbnails() {
   const subset = repos.slice(0, 60);
-  console.log(`Enhancing thumbnails for ${subset.length} projects...`);
-  const tasks = subset.map(project => findThumbnailForRepo(project));
+  const tasks = subset.map((project) => findThumbnailForRepo(project));
   await Promise.all(tasks);
   saveCache(repos);
   renderProjects();
@@ -1063,18 +1143,17 @@ async function checkLiveSite(project) {
       project.pagesUrl = null;
     }
   } catch (err) {
-    console.warn(`Error checking live site for ${project.rawName} at ${project.pagesUrl}`, err);
+    console.warn(
+      `Error checking live site for ${project.rawName} at ${project.pagesUrl}`,
+      err
+    );
     project.hasLiveSite = false;
     project.pagesUrl = null;
   }
 }
 
 async function verifyLiveSites() {
-  console.log("Verifying live sites for projects with pagesUrl...");
-  const tasks = repos
-    .filter(p => p.pagesUrl)
-    .map(p => checkLiveSite(p));
-
+  const tasks = repos.filter((p) => p.pagesUrl).map((p) => checkLiveSite(p));
   await Promise.all(tasks);
   saveCache(repos);
   renderProjects();
@@ -1089,7 +1168,7 @@ async function loadFromProjectsJson() {
     const data = await res.json();
     const projects = Array.isArray(data)
       ? data
-          .filter(entry => !isSelfProjectsRepoName(entry.name))
+          .filter((entry) => !isSelfProjectsRepoName(entry.name))
           .map(mapEntryToProject)
       : [];
     repos = projects;
@@ -1108,7 +1187,8 @@ async function loadFromProjectsJson() {
 
 async function loadRepos() {
   if (gridEl) {
-    gridEl.innerHTML = "<p class='project-footer-meta'>Loading projects…</p>";
+    gridEl.innerHTML =
+      "<p class='project-footer-meta'>Loading projects…</p>";
   }
   if (emptyEl) emptyEl.hidden = true;
 
@@ -1117,8 +1197,7 @@ async function loadRepos() {
 
   if (cache && Array.isArray(cache.projects)) {
     const age = Date.now() - (cache.fetchedAt || 0);
-    repos = cache.projects.filter(p => !isSelfProjectsRepoName(p.rawName));
-    console.log("Loaded projects from cache. Age (ms):", age);
+    repos = cache.projects.filter((p) => !isSelfProjectsRepoName(p.rawName));
     initLanguageFilter();
     renderProjects();
     usedCache = true;
@@ -1132,7 +1211,9 @@ async function loadRepos() {
   }
 
   if (!canCallApiNow()) {
-    console.warn("Skipping GitHub API call due to recent rate-limit; using cache or fallback.");
+    console.warn(
+      "Skipping GitHub API call due to recent rate-limit; using cache or fallback."
+    );
     if (!usedCache) {
       await loadFromProjectsJson();
     }
@@ -1144,7 +1225,11 @@ async function loadRepos() {
 
     if (!res.ok) {
       let body = "";
-      try { body = await res.text(); } catch { body = ""; }
+      try {
+        body = await res.text();
+      } catch {
+        body = "";
+      }
       console.error("GitHub API error:", res.status, res.statusText, body.slice(0, 200));
 
       if (res.status === 403 && /rate limit/i.test(body)) {
@@ -1159,11 +1244,9 @@ async function loadRepos() {
 
     const data = await res.json();
     repos = data
-      .filter(r => !r.private)
-      .filter(r => !isSelfProjectsRepoName(r.name))
+      .filter((r) => !r.private)
+      .filter((r) => !isSelfProjectsRepoName(r.name))
       .map(mapRepoFromGitHub);
-
-    console.log(`Fetched ${repos.length} repos from GitHub API`);
 
     try {
       const fallbackRes = await fetch(PROJECTS_URL);
@@ -1172,17 +1255,17 @@ async function loadRepos() {
         if (Array.isArray(fallbackData)) {
           const byName = new Map(
             fallbackData
-              .filter(entry => !isSelfProjectsRepoName(entry.name))
-              .map(entry => [entry.name, mapEntryToProject(entry)])
+              .filter((entry) => !isSelfProjectsRepoName(entry.name))
+              .map((entry) => [entry.name, mapEntryToProject(entry)])
           );
-          repos = repos.map(p => {
+          repos = repos.map((p) => {
             const extra = byName.get(p.rawName);
             if (!extra) return p;
             return {
               ...p,
               summary: extra.summary || p.summary,
               thumbnailUrl: extra.thumbnailUrl || p.thumbnailUrl,
-              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])]
+              tags: [...new Set([...(p.tags || []), ...(extra.tags || [])])],
             };
           });
         }
@@ -1209,8 +1292,8 @@ async function loadRepos() {
 let mediaItems = [];
 const mediaState = {
   search: "",
-  kind: "all",   // all | image | video | audio
-  format: "all"  // extension or "all"
+  kind: "all", // all | image | video | audio
+  format: "all", // extension or "all"
 };
 
 const mediaGridEl = document.getElementById("mediaGrid");
@@ -1263,7 +1346,7 @@ function ensureMediaType(item) {
   } else if (audioExts.includes(ext)) {
     result.type = "audio";
   } else {
-    result.type = "image"; // shrug default
+    result.type = "image"; // default
   }
 
   return result;
@@ -1271,7 +1354,7 @@ function ensureMediaType(item) {
 
 /**
  * Build format options **based on current mediaState.kind**:
- * - kind = all  -> include all formats
+ * - kind = all   -> include all formats
  * - kind = image -> only extensions found on images
  * - kind = video -> only video extensions
  * - kind = audio -> only audio extensions
@@ -1307,7 +1390,6 @@ function buildMediaFormatOptions() {
     mediaFormatSelectEl.appendChild(opt);
   });
 
-  // ✅ keep select value in sync with state
   mediaFormatSelectEl.value = mediaState.format || "all";
 }
 
@@ -1323,7 +1405,9 @@ function mediaMatches(item) {
   }
 
   if (mediaState.search) {
-    const hay = `${item.title || ""} ${item.src || ""} ${item.type || ""}`.toLowerCase();
+    const hay = `${item.title || ""} ${item.src || ""} ${
+      item.type || ""
+    }`.toLowerCase();
     if (!hay.includes(mediaState.search)) return false;
   }
 
@@ -1387,7 +1471,7 @@ function renderMedia() {
   if (!mediaGridEl) return;
   mediaGridEl.innerHTML = "";
 
-  let filtered = mediaItems.filter(mediaMatches);
+  const filtered = mediaItems.filter(mediaMatches);
 
   if (!filtered.length) {
     if (mediaEmptyEl) mediaEmptyEl.hidden = false;
@@ -1405,7 +1489,7 @@ function renderMedia() {
 async function loadMediaIndex() {
   try {
     // Try both common filenames: media_index.json and media-index.json
-    const candidates = ["./media/media_index.json", "./media/media-index.json"];
+    const candidates = ["media/media_index.json", "media/media-index.json"];
     let res = null;
     let urlUsed = null;
 
@@ -1417,13 +1501,15 @@ async function loadMediaIndex() {
           urlUsed = url;
           break;
         }
-      } catch {
-        // ignore and try next
+      } catch (e) {
+        console.warn("[Media] Fetch error for", url, e);
       }
     }
 
     if (!res) {
-      console.warn("No media index file found (media_index.json or media-index.json).");
+      console.warn(
+        "[Media] No media index file found (media_index.json or media-index.json)."
+      );
       return;
     }
 
@@ -1435,31 +1521,30 @@ async function loadMediaIndex() {
     } else if (Array.isArray(data.items)) {
       rawItems = data.items;
     } else {
-      console.warn("Media index file has unexpected shape:", data);
+      console.warn(
+        "[Media] Media index has unexpected shape, expected [] or { items: [] }"
+      );
       rawItems = [];
     }
 
     mediaItems = rawItems.map((item) => {
-      // accept either `src` or `path`
       if (!item.src && item.path) {
         return ensureMediaType({ ...item, src: item.path });
       }
       return ensureMediaType(item);
     });
 
-    console.log(`Loaded ${mediaItems.length} media items from ${urlUsed}`);
-
     buildMediaFormatOptions();
     renderMedia();
   } catch (err) {
-    console.error("Error loading media index:", err);
+    console.error("[Media] Error loading media index:", err);
   }
 }
 
 function initMediaFilters() {
-  mediaKindButtons.forEach(btn => {
+  mediaKindButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      mediaKindButtons.forEach(b => b.classList.remove("chip-active"));
+      mediaKindButtons.forEach((b) => b.classList.remove("chip-active"));
       btn.classList.add("chip-active");
 
       mediaState.kind = btn.getAttribute("data-media-kind") || "all";
@@ -1495,7 +1580,6 @@ function setView(view) {
   // "projects" or "media"
   currentView = view === "media" ? "media" : "projects";
 
-  // Active state on tabs
   viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
     if (tabView === currentView) {
@@ -1505,7 +1589,6 @@ function setView(view) {
     }
   });
 
-  // Hoofd-secties tonen/verbergen
   if (projectsViewEl) {
     projectsViewEl.style.display = currentView === "projects" ? "" : "none";
   }
@@ -1513,20 +1596,16 @@ function setView(view) {
     mediaViewEl.style.display = currentView === "media" ? "" : "none";
   }
 
-  // 🔹 Alleen project-filters bij Projects
   if (projectFiltersEl) {
     projectFiltersEl.style.display = currentView === "projects" ? "flex" : "none";
   }
 
-  // 🔹 Alleen media-filters bij Media
   if (mediaFiltersEl) {
     mediaFiltersEl.style.display = currentView === "media" ? "flex" : "none";
   }
 
-  // Placeholder van de zoekbalk updaten
   updateSearchPlaceholderForView();
 
-  // Correcte lijst opnieuw renderen
   if (currentView === "projects") {
     renderProjects();
   } else {
