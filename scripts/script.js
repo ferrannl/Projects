@@ -1570,16 +1570,17 @@ function initMediaFilters() {
 
 /* ---------- View switching (Projects vs Media) ---------- */
 
-const projectsViewEl = document.getElementById("projectsView");
-const mediaViewEl = document.getElementById("mediaView");
+const projectsViewEl   = document.getElementById("projectsView");
+const mediaViewEl      = document.getElementById("mediaView");
 const projectFiltersEl = document.getElementById("projectFilters");
-const mediaFiltersEl = document.getElementById("mediaFilters");
-const viewTabs = document.querySelectorAll(".view-tab");
+const mediaFiltersEl   = document.getElementById("mediaFilters");
+const viewTabs         = document.querySelectorAll(".view-tab");
 
 function setView(view) {
   // "projects" or "media"
   currentView = view === "media" ? "media" : "projects";
 
+  // Active state on tabs
   viewTabs.forEach((tab) => {
     const tabView = tab.getAttribute("data-view");
     if (tabView === currentView) {
@@ -1589,23 +1590,26 @@ function setView(view) {
     }
   });
 
+  // ✅ Use the `hidden` property instead of style.display
   if (projectsViewEl) {
-    projectsViewEl.style.display = currentView === "projects" ? "" : "none";
+    projectsViewEl.hidden = currentView !== "projects";
   }
   if (mediaViewEl) {
-    mediaViewEl.style.display = currentView === "media" ? "" : "none";
+    mediaViewEl.hidden = currentView !== "media";
   }
 
+  // ✅ Same for filters
   if (projectFiltersEl) {
-    projectFiltersEl.style.display = currentView === "projects" ? "flex" : "none";
+    projectFiltersEl.hidden = currentView !== "projects";
   }
-
   if (mediaFiltersEl) {
-    mediaFiltersEl.style.display = currentView === "media" ? "flex" : "none";
+    mediaFiltersEl.hidden = currentView !== "media";
   }
 
+  // Update search placeholder
   updateSearchPlaceholderForView();
 
+  // Render correct list
   if (currentView === "projects") {
     renderProjects();
   } else {
