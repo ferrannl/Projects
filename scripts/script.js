@@ -1505,18 +1505,28 @@ function setView(view) {
     }
   });
 
-  // Main content sections
-  if (projectsViewEl) projectsViewEl.hidden = currentView !== "projects";
-  if (mediaViewEl) mediaViewEl.hidden = currentView !== "media";
+  // Hoofd-secties tonen/verbergen
+  if (projectsViewEl) {
+    projectsViewEl.style.display = currentView === "projects" ? "" : "none";
+  }
+  if (mediaViewEl) {
+    mediaViewEl.style.display = currentView === "media" ? "" : "none";
+  }
 
-  // Filters visibility
-  if (projectFiltersEl) projectFiltersEl.hidden = currentView !== "projects";
-  if (mediaFiltersEl) mediaFiltersEl.hidden = currentView !== "media";
+  // 🔹 Alleen project-filters bij Projects
+  if (projectFiltersEl) {
+    projectFiltersEl.style.display = currentView === "projects" ? "flex" : "none";
+  }
 
-  // Update search placeholder for the active view
+  // 🔹 Alleen media-filters bij Media
+  if (mediaFiltersEl) {
+    mediaFiltersEl.style.display = currentView === "media" ? "flex" : "none";
+  }
+
+  // Placeholder van de zoekbalk updaten
   updateSearchPlaceholderForView();
 
-  // Re-render the correct list
+  // Correcte lijst opnieuw renderen
   if (currentView === "projects") {
     renderProjects();
   } else {
