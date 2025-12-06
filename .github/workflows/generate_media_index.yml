@@ -8,6 +8,9 @@ on:
       - '.github/workflows/generate-media-index.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write   # 👈 this is the important line
+
 jobs:
   build:
     runs-on: ubuntu-latest
