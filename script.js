@@ -297,58 +297,103 @@ function prettifyName(raw) {
     .join(" ");
 }
 
-function inferTypeFromGitHub(repo) {
+/**
+ * Decide which type should be the "main" one for the pill & footer text.
+ */
+function choosePrimaryType(types) {
+  if (!types || !types.length) return "other";
+  const order = ["website", "mobile", "api", "school", "other"];
+  const found = order.find(t => types.includes(t));
+  return found || types[0];
+}
+
+/**
+ * Infer multiple types from a GitHub repo.
+ * A repo can be e.g. ["website", "school"] or ["mobile", "school"].
+ */
+function inferTypesFromGitHub(repo) {
+  const types = [];
   const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const lang = (repo.language || "").toLowerCase();
 
-  if (repo.has_pages) return "website";
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
-
-  if (
-    ["swift", "java", "kotlin"].includes(lang) &&
-    (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))
-  ) return "mobile";
-
-  if (name.includes("api") || desc.includes("api")) return "api";
-
-  if (
+  const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
+  const looksMobileText = name.includes("android") || desc.includes("android") ||
+                          name.includes("ios") || desc.includes("ios");
+  const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
+  const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
     desc.includes("internship") ||
     desc.includes("final") ||
     desc.includes("cppls") ||
-    desc.includes("devops")
-  ) return "school";
+    desc.includes("devops");
 
-  return "other";
+  if (repo.has_pages || looksWebLang) {
+    types.push("website");
+  }
+
+  if (looksMobileText || looksMobileLang) {
+    types.push("mobile");
+  }
+
+  if (name.includes("api") || desc.includes("api")) {
+    types.push("api");
+  }
+
+  if (seemsSchool) {
+    types.push("school");
+  }
+
+  if (!types.length) {
+    types.push("other");
+  }
+
+  return [...new Set(types)];
 }
 
-function inferTypeFromEntry(entry) {
-  if (entry.type) return entry.type;
+/**
+ * Same logic but for entries from projects.json
+ */
+function inferTypesFromEntry(entry) {
+  const types = [];
   const lang = (entry.language || "").toLowerCase();
   const name = (entry.name || "").toLowerCase();
   const desc = (entry.description || "").toLowerCase();
 
-  if (["html", "css", "javascript", "typescript", "php"].includes(lang)) return "website";
-
-  if (
-    ["swift", "java", "kotlin"].includes(lang) &&
-    (name.includes("android") || name.includes("ios") || desc.includes("android") || desc.includes("ios"))
-  ) return "mobile";
-
-  if (name.includes("api") || desc.includes("api")) return "api";
-
-  if (
+  const looksWebLang = ["html", "css", "javascript", "typescript", "php"].includes(lang);
+  const looksMobileText = name.includes("android") || desc.includes("android") ||
+                          name.includes("ios") || desc.includes("ios");
+  const looksMobileLang = ["swift", "java", "kotlin"].includes(lang);
+  const seemsSchool =
     desc.includes("assignment") ||
     desc.includes("project") ||
     desc.includes("internship") ||
     desc.includes("final") ||
     desc.includes("cppls") ||
-    desc.includes("devops")
-  ) return "school";
+    desc.includes("devops");
 
-  return "other";
+  if (looksWebLang) {
+    types.push("website");
+  }
+
+  if (looksMobileText || looksMobileLang) {
+    types.push("mobile");
+  }
+
+  if (name.includes("api") || desc.includes("api")) {
+    types.push("api");
+  }
+
+  if (seemsSchool) {
+    types.push("school");
+  }
+
+  if (!types.length) {
+    types.push("other");
+  }
+
+  return [...new Set(types)];
 }
 
 function getTypeLabel(type) {
@@ -382,12 +427,11 @@ function buildTagsBase(type, language) {
  * Compute language array based on primary language, type and name/description.
  * Returns an array with primary language first, up to 3 total.
  */
-function computeLanguages(primaryLang, rawName, desc, type) {
+function computeLanguages(primaryLang, rawName, desc, typeOrTypes) {
   const langs = [];
   const main = primaryLang || "Various";
-  const nameL = (rawName || "").toLowerCase();
   const descL = (desc || "").toLowerCase();
-  const typeL = (type || "").toLowerCase();
+  const nameL = (rawName || "").toLowerCase();
 
   if (!main || main === "Various") {
     langs.push(main);
@@ -401,7 +445,10 @@ function computeLanguages(primaryLang, rawName, desc, type) {
   } else if (l === "css") {
     langs.push("CSS", "HTML", "JavaScript");
   } else if (l === "javascript") {
-    if (typeL === "website") {
+    // if any of types is website, we assume a front-end stack
+    const types = Array.isArray(typeOrTypes) ? typeOrTypes : [typeOrTypes];
+    const hasWebsite = types.includes("website");
+    if (hasWebsite) {
       langs.push("JavaScript", "HTML", "CSS");
     } else {
       langs.push("JavaScript");
@@ -421,7 +468,6 @@ function computeLanguages(primaryLang, rawName, desc, type) {
     langs.push(main);
   }
 
-  // Deduplicate + cap to 3
   const unique = [...new Set(langs)];
   return unique.slice(0, 3);
 }
@@ -429,22 +475,34 @@ function computeLanguages(primaryLang, rawName, desc, type) {
 /* ---------- Map GitHub repo → internal ---------- */
 
 function mapRepoFromGitHub(repo) {
-  const type = inferTypeFromGitHub(repo);
+  const types = inferTypesFromGitHub(repo);
+  const primaryType = choosePrimaryType(types);
+
   const baseDesc = repo.description || "No description yet.";
   const primaryLang = repo.language || "Various";
-  const languages = computeLanguages(primaryLang, repo.name, repo.description, type);
+  const languages = computeLanguages(primaryLang, repo.name, repo.description, types);
 
   const pagesUrl = repo.has_pages
     ? `https://${GITHUB_USER}.github.io/${repo.name}/`
     : null;
+
+  // Build tags based on all types
+  let tags = [];
+  types.forEach(t => {
+    tags = tags.concat(buildTagsBase(t, primaryLang));
+  });
+  tags = [...new Set(tags)];
 
   return {
     rawName: repo.name,
     displayName: prettifyName(repo.name),
     language: languages[0] || "Various",
     languages,
-    type,
-    tags: buildTagsBase(type, primaryLang),
+    types,
+    primaryType,
+    // keep .type for backwards compatibility / simpler usage
+    type: primaryType,
+    tags,
     githubUrl: repo.html_url,
     pagesUrl,
     hasLiveSite: !!pagesUrl, // will be verified later
@@ -457,14 +515,21 @@ function mapRepoFromGitHub(repo) {
 /* ---------- Map projects.json entry → internal ---------- */
 
 function mapEntryToProject(entry) {
-  const type = inferTypeFromEntry(entry);
+  const types = inferTypesFromEntry(entry);
+  const primaryType = choosePrimaryType(types);
+
   const baseDesc = entry.description || "No description yet.";
   const hasPagesFlag = !!entry.hasPages;
   const customPagesUrl = entry.pagesUrl;
   const primaryLang = entry.language || "Various";
-  const languages = computeLanguages(primaryLang, entry.name, entry.description, type);
+  const languages = computeLanguages(primaryLang, entry.name, entry.description, types);
 
-  const tagsFromType = buildTagsBase(type, primaryLang);
+  let tagsFromType = [];
+  types.forEach(t => {
+    tagsFromType = tagsFromType.concat(buildTagsBase(t, primaryLang));
+  });
+  tagsFromType = [...new Set(tagsFromType)];
+
   const extraTags = entry.tags ? entry.tags : [];
   const mergedTags = [...new Set([...tagsFromType, ...extraTags])];
 
@@ -482,7 +547,9 @@ function mapEntryToProject(entry) {
     displayName: prettifyName(entry.name),
     language: languages[0] || "Various",
     languages,
-    type,
+    types,
+    primaryType,
+    type: primaryType,
     tags: mergedTags,
     githubUrl: `https://github.com/${GITHUB_USER}/${entry.name}`,
     pagesUrl,
@@ -499,7 +566,16 @@ function matchesFilters(project) {
   const rawName = project.rawName || "";
   if (isSelfProjectsRepoName(rawName)) return false; // never show self repo
 
-  if (state.typeFilter !== "all" && project.type !== state.typeFilter) return false;
+  // Ensure we have a types array even for old cached data
+  const projectTypes = project.types && project.types.length
+    ? project.types
+    : (project.type ? [project.type] : []);
+
+  if (state.typeFilter !== "all") {
+    if (!projectTypes.includes(state.typeFilter)) {
+      return false;
+    }
+  }
 
   if (state.languageFilter !== "all") {
     const langs = project.languages && project.languages.length
@@ -517,7 +593,8 @@ function matchesFilters(project) {
       project.language,
       project.type,
       ...(project.languages || []),
-      ...(project.tags || [])
+      ...(project.tags || []),
+      ...(project.types || [])
     ].join(" ").toLowerCase();
 
     if (!haystack.includes(state.search)) return false;
@@ -589,7 +666,8 @@ function createProjectCard(project) {
 
   const typePill = document.createElement("span");
   typePill.className = "project-type-pill";
-  typePill.textContent = getTypeLabel(project.type);
+  const mainType = project.primaryType || project.type || "other";
+  typePill.textContent = getTypeLabel(mainType);
 
   titleBlock.appendChild(nameEl);
   titleBlock.appendChild(typePill);
@@ -650,12 +728,14 @@ function createProjectCard(project) {
 
   const footerMeta = document.createElement("div");
   footerMeta.className = "project-footer-meta";
+
+  const mainFooterType = mainType;
   footerMeta.textContent =
-    project.type === "school" ? "Study / assignment project" :
-    project.type === "website" ? "Front-end / website project" :
-    project.type === "mobile" ? "Mobile client app" :
-    project.type === "api"    ? "Backend / API project" :
-                                "Misc project";
+    mainFooterType === "school" ? "Study / assignment project" :
+    mainFooterType === "website" ? "Front-end / website project" :
+    mainFooterType === "mobile" ? "Mobile client app" :
+    mainFooterType === "api"    ? "Backend / API project" :
+                                  "Misc project";
 
   card.appendChild(titleRow);
   card.appendChild(descWrapper);
