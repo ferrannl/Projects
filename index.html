@@ -6,10 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
         content="Overview of all projects by Ferran (ferrannl) – web, mobile, APIs, school assignments and more.">
-
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -75,6 +72,7 @@
           </p>
         </div>
 
+        <!-- Language switch in the top-right next to the title block -->
         <div class="header-main-right">
           <button
             type="button"
@@ -156,13 +154,10 @@
 
     <div class="search-block">
       <label for="search" class="sr-only">Search</label>
-      <input
-        id="search"
-        type="search"
-        placeholder="Search by name, description, language or tag…">
+      <input id="search" type="search" placeholder="Search by name, description, language or tag…">
     </div>
 
-    <!-- PROJECT FILTERS -->
+    <!-- PROJECT FILTERS (Type + Language) -->
     <div class="filters" id="projectFilters">
       <div class="filter-group">
         <span class="filter-label" data-i18n="filterTypeLabel">Type</span>
@@ -184,7 +179,7 @@
       </div>
     </div>
 
-    <!-- MEDIA FILTERS -->
+    <!-- MEDIA FILTERS (shown only in Media Wall view) -->
     <div class="filters filters-media" id="mediaFilters" hidden>
       <div class="filter-group">
         <span class="filter-label" data-i18n="mediaTypeLabel">Media type</span>
@@ -207,7 +202,7 @@
     <!-- PROJECTS VIEW -->
     <section id="projectsView">
       <section id="projectsGrid" class="projects-grid" aria-live="polite">
-        <!-- Cards injected by projects.js -->
+        <!-- Cards injected by script.js -->
       </section>
 
       <div id="emptyState" class="empty-state" hidden data-i18n="emptyState">
@@ -215,10 +210,10 @@
       </div>
     </section>
 
-    <!-- MEDIA VIEW -->
+    <!-- MEDIA WALL VIEW -->
     <section id="mediaView" hidden>
       <section id="mediaGrid" class="media-grid" aria-live="polite">
-        <!-- Media cards injected by media-wall.js -->
+        <!-- Media cards injected by script.js -->
       </section>
 
       <div id="mediaEmptyState" class="empty-state" hidden data-i18n="mediaEmptyState">
@@ -239,7 +234,7 @@
   </footer>
 </div>
 
-<!-- Fullscreen image modal -->
+<!-- Fullscreen image modal (used for project thumbnails) -->
 <div id="imageModal" class="image-modal" hidden>
   <img id="imageModalImg" class="image-modal-img" alt="">
 </div>
@@ -253,7 +248,6 @@
   </p>
 </noscript>
 
-<!-- ES module entrypoint -->
-<script type="module" src="scripts/main.js"></script>
+<script src="scripts/script.js"></script>
 </body>
 </html>
