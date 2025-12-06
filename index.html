@@ -64,7 +64,7 @@
 <div class="app">
   <header class="site-header">
     <div class="site-title-block">
-      <!-- Top row: title + subtitle left, avatar top-right -->
+      <!-- Title + subtitle -->
       <div class="header-main-row">
         <div class="header-main-left">
           <h1>Ferran’s Projects</h1>
@@ -73,20 +73,20 @@
             All my programming &amp; coding projects in one place – websites, apps, school work, guides, APIs and more.
           </p>
         </div>
+      </div>
 
-        <div class="header-main-right">
+      <hr class="about-divider">
+
+      <!-- About Me block: title + avatar on one row, text underneath -->
+      <section class="about-me" data-i18n-block="about">
+        <div class="about-me-header">
+          <h2 data-i18n="aboutTitle">About Me</h2>
           <div class="about-avatar-wrap">
             <!-- Put profile.jpg next to index.html -->
             <img src="./profile.jpg" alt="Ferran" class="about-avatar">
           </div>
         </div>
-      </div>
 
-      <hr class="about-divider">
-
-      <!-- About Me under us -->
-      <section class="about-me" data-i18n-block="about">
-        <h2 data-i18n="aboutTitle">About Me</h2>
         <p data-i18n="aboutP1">
           Hey 👋🏻 Ferran here. I am a Dutch developer from Utrecht / 's-Hertogenbosch.
           I like building websites, apps and small tools and putting everything together on this page.
@@ -156,7 +156,10 @@
       </div>
 
       <div class="filter-group">
-        <span class="filter-label" data-i18n="filterLanguageLabel">Language</span>
+        <span class="filter-label code-label">
+          <span class="code-brackets">&lt;/&gt;</span>
+          <span data-i18n="filterLanguageLabel">Language</span>
+        </span>
         <select id="languageFilter">
           <option value="all">All languages</option>
         </select>
