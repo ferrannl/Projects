@@ -7,15 +7,13 @@ on:
       - "scripts/generate_media_index.py"
       - ".github/workflows/generate-media-index.yml"
   workflow_dispatch:
-  schedule:
-    - cron: "0 3 * * *"
 
 jobs:
-  build-media-index:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -23,11 +21,11 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Generate media index JSON
+      - name: Generate media-index.json
         run: python scripts/generate_media_index.py
 
-      - name: Commit and push media index
+      - name: Commit and push media-index.json
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: update media index"
+          commit_message: "chore: update media/media-index.json"
           file_pattern: "media/media-index.json"
