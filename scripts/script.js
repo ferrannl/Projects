@@ -17,8 +17,8 @@ const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
-// Thumbnail cache key
-const THUMB_CACHE_KEY = "ferranProjectsThumbsV1";
+// Thumbnail cache key (bumped to V2 so old logo.jpg entries are dropped)
+const THUMB_CACHE_KEY = "ferranProjectsThumbsV2";
 
 /* ---------- State ---------- */
 
@@ -544,12 +544,15 @@ async function loadProjects() {
     }
   });
 
-  repos = apiRepos.filter(
-    (repo) =>
-      !repo.archived &&
-      !repo.fork &&
-      repo.name.toLowerCase() !== "projects"
-  );
+  // Hidden repos: Projects (self), Munchkin, PSO WiiU guide
+  repos = apiRepos.filter((repo) => {
+    if (repo.archived || repo.fork) return false;
+    const name = (repo.name || "").toLowerCase();
+    if (name === "projects") return false;
+    if (name.includes("munchkin")) return false;
+    if (name.includes("pso") && name.includes("wiiu")) return false;
+    return true;
+  });
 
   projects = repos.map((repo) => {
     const o = overridesByName[repo.name.toLowerCase()] || {};
@@ -564,7 +567,13 @@ async function loadProjects() {
     const languages = getLanguagesList(repo.language, overrideLangs);
 
     const type = guessProjectType(repo, o);
-    const tags = Array.isArray(o.tags) ? o.tags : [];
+
+    const tags = Array.isArray(o.tags) ? [...o.tags] : [];
+
+    // Auto-tag security-related C#/.NET multi-project as "Security"
+    if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) {
+      tags.push("Security");
+    }
 
     const liveUrl = computeLiveUrl(repo, o);
 
@@ -756,7 +765,6 @@ function getLanguagesList(primary, overrideList) {
   return list;
 }
 
-
 function buildLanguageFilterOptions(projects) {
   const select = document.getElementById("languageFilter");
   if (!select) return;
@@ -783,7 +791,43 @@ function buildLanguageFilterOptions(projects) {
   });
 }
 
-/* ---------- Project helpers: type, liveUrl, thumbnail ---------- */
+/* ---------- Project helpers: type, security tag, liveUrl, thumbnail ---------- */
+
+function isSecurityProject(repo, override, languages) {
+  // If you explicitly tagged it in projects.json, respect that
+  if (override && Array.isArray(override.tags) && override.tags.includes("Security")) {
+    return true;
+  }
+
+  const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
+  const securityWords = [
+    "security",
+    "auth",
+    "authentication",
+    "authorization",
+    "oauth",
+    "jwt",
+    "token",
+    "password",
+    "passwort",
+    "wachtwoord",
+    "hash",
+    "encrypt",
+    "encryption",
+    "crypt",
+    "crypto",
+    "2fa",
+    "mfa"
+  ];
+
+  const hasSecurityWord = securityWords.some((w) => text.includes(w));
+
+  const hasDotNet =
+    (languages || []).some((l) => l.toLowerCase().includes(".net")) ||
+    (repo.language || "").toLowerCase() === "c#";
+
+  return hasDotNet && hasSecurityWord;
+}
 
 function guessProjectType(repo, override) {
   if (override && override.type) {
@@ -796,6 +840,20 @@ function guessProjectType(repo, override) {
   const lang = (repo.language || "").toLowerCase();
 
   const has = (words) => words.some((w) => joined.includes(w));
+
+  // Manual boosts for your specific repos without touching projects.json:
+  // - Java Kolonisten van Katan game
+  // - Dimitri C/C++ game
+  if (
+    name.includes("kolonisten") ||
+    name.includes("katan") ||
+    name.includes("catan")
+  ) {
+    return "game";
+  }
+  if (name.includes("dimitri")) {
+    return "game";
+  }
 
   // GAME: explicit game-ish hints first
   const isGame = has([
@@ -958,30 +1016,54 @@ function saveThumbCache() {
   } catch (_) {}
 }
 
+async function checkImageExists(url) {
+  try {
+    // Try HEAD first
+    let res = await fetch(url, { method: "HEAD" });
+    if (res.ok) return true;
+
+    // Fallback to GET if HEAD not allowed
+    res = await fetch(url, { method: "GET" });
+    return res.ok;
+  } catch (_) {
+    return false;
+  }
+}
+
 async function loadProjectThumbnails() {
   const promises = projects.map(async (project) => {
-    if (project.thumbnail) return;
+    const repoName = project.name;
 
-    const cached = thumbCache[project.name];
+    // 1) If a thumbnail is already defined (e.g. from projects.json), verify once.
+    if (project.thumbnail && !thumbCache[repoName]) {
+      const ok = await checkImageExists(project.thumbnail);
+      if (ok) {
+        thumbCache[repoName] = project.thumbnail;
+        return;
+      } else {
+        // override points to non-existent file (e.g. logo.jpg); fall back to auto detection
+        project.thumbnail = null;
+      }
+    }
+
+    // 2) Use cached thumbnail if present
+    const cached = thumbCache[repoName];
     if (cached) {
       project.thumbnail = cached;
       return;
-    } else if (cached === "") {
-      // known to have no special image, we'll still fall back to OG below
     }
 
-    const repoName = project.name;
-
+    // 3) Try to find a good image in the repo root
     const rootThumb = await findRepoRootThumbnail(repoName);
 
     let finalUrl = rootThumb;
     if (!finalUrl) {
-      // fallback to GitHub social preview if nothing found in root
+      // 4) Fallback to GitHub social preview image
       finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
     }
 
     project.thumbnail = finalUrl;
-    thumbCache[project.name] = finalUrl;
+    thumbCache[repoName] = finalUrl;
   });
 
   await Promise.all(promises);
@@ -1006,17 +1088,18 @@ async function findRepoRootThumbnail(repoName) {
     });
 
     if (!imageFiles.length) {
-      thumbCache[repoName] = "";
       return null;
     }
 
     const score = (name) => {
       const lower = name.toLowerCase();
-      if (lower === "logo.png" || lower === "logo.jpg" || lower === "logo.jpeg") return 0;
-      if (lower.startsWith("logo.")) return 1;
-      if (lower.includes("classdiagram")) return 2;
-      if (lower.includes("diagram")) return 3;
-      return 4;
+      // Prefer logo.png over logo.jpg if both exist
+      if (lower === "logo.png") return 0;
+      if (lower === "logo.jpg" || lower === "logo.jpeg") return 1;
+      if (lower.startsWith("logo.")) return 2;
+      if (lower.includes("classdiagram")) return 3;
+      if (lower.includes("diagram")) return 4;
+      return 5;
     };
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
