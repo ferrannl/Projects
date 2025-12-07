@@ -278,14 +278,13 @@ function computeAgeComponents(now) {
   const h = totalSeconds % 24;
   totalSeconds = (totalSeconds - h) / 24;
 
-  // approximate months/years for a fun live timer
+  // approximate months/years
   const dRaw = totalSeconds % 30;
   totalSeconds = (totalSeconds - dRaw) / 30;
 
   const m = totalSeconds % 12;
   const y = (totalSeconds - m) / 12;
 
-  // split days into weeks + remaining days
   const w = Math.floor(dRaw / 7);
   const d = dRaw % 7;
 
@@ -308,6 +307,15 @@ function formatAge(lang) {
   return parts.join(" ");
 }
 
+/* --- only update the age sentence, not all i18n elements --- */
+
+function updateAboutAge(lang) {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
+  const p = document.querySelector('[data-i18n="aboutP1"]');
+  if (!p || !t.aboutP1) return;
+  p.textContent = t.aboutP1.replace("{age}", formatAge(lang));
+}
+
 /* ---------- i18n application ---------- */
 
 function applyTranslations(lang) {
@@ -317,15 +325,15 @@ function applyTranslations(lang) {
     const key = el.getAttribute("data-i18n");
     if (!key || !(key in t)) return;
 
-    let value = t[key];
-    if (key === "aboutP1") {
-      value = value.replace("{age}", formatAge(lang));
-    }
+    // aboutP1 handled separately so we can tick live age
+    if (key === "aboutP1") return;
 
-    el.textContent = value;
+    el.textContent = t[key];
   });
 
-  // Update search placeholder depending on view
+  // now set the age sentence
+  updateAboutAge(lang);
+
   const searchInput = document.getElementById("search");
   if (searchInput) {
     const placeholderKey =
@@ -335,7 +343,6 @@ function applyTranslations(lang) {
     if (t[placeholderKey]) searchInput.placeholder = t[placeholderKey];
   }
 
-  // Footer text
   const footerBuilt = document.querySelector("[data-i18n-footer-built]");
   const footerPages = document.querySelector("[data-i18n-footer-pages]");
   if (footerBuilt && t.footerBuiltWith) {
@@ -345,13 +352,11 @@ function applyTranslations(lang) {
     footerPages.textContent = t.footerViewOnPages;
   }
 
-  // Tab labels
   const projectsTab = document.getElementById("projectsTab");
   const mediaTab = document.getElementById("mediaTab");
   if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
   if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
 
-  // Header language button label
   const headerLangButton = document.getElementById("headerLangButton");
   if (headerLangButton) {
     const span = headerLangButton.querySelector(".lang-switch-label");
@@ -504,15 +509,11 @@ function getMediaFormat(item) {
 function buildThumbnailCandidates(project) {
   const candidates = [];
 
-  // explicit thumbnail path in JSON (e.g. "images/logo.png")
-  if (project.thumbnail) {
-    const repoName = project.name;
-    if (repoName) {
-      const base = `https://raw.githubusercontent.com/ferrannl/${encodeURIComponent(
-        repoName
-      )}/main/`;
-      candidates.push(base + project.thumbnail.replace(/^\//, ""));
-    }
+  if (project.thumbnail && project.name) {
+    const base = `https://raw.githubusercontent.com/ferrannl/${encodeURIComponent(
+      project.name
+    )}/main/`;
+    candidates.push(base + project.thumbnail.replace(/^\//, ""));
   }
 
   if (!project.name) return candidates;
@@ -589,7 +590,6 @@ function createProjectThumbnail(project) {
 
   const candidates = buildThumbnailCandidates(project);
   if (!candidates.length) {
-    // only placeholder
     return btn;
   }
 
@@ -676,7 +676,6 @@ function renderProjects() {
     const card = document.createElement("article");
     card.className = "project-card";
 
-    // header row with thumbnail + title/lang
     const headerRow = document.createElement("div");
     headerRow.className = "project-title-row";
 
@@ -708,7 +707,6 @@ function renderProjects() {
     const meta = document.createElement("div");
     meta.className = "project-meta";
 
-    // Type badge
     const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
     const typeKey = deriveProjectType(p);
     const typeMap = {
@@ -723,7 +721,6 @@ function renderProjects() {
     typeBadge.textContent = typeMap[typeKey] || t.typeOther;
     meta.appendChild(typeBadge);
 
-    // Live site
     if (p.hasPages && p.pagesUrl) {
       const link = document.createElement("a");
       link.href = p.pagesUrl;
@@ -734,7 +731,6 @@ function renderProjects() {
       meta.appendChild(link);
     }
 
-    // GitHub link
     if (p.name) {
       const repoLink = document.createElement("a");
       repoLink.href = `https://github.com/ferrannl/${encodeURIComponent(
@@ -861,7 +857,6 @@ function updateViewVisibility() {
     mediaTab.classList.toggle("active", currentView === "media");
   }
 
-  // hide filters that don’t make sense in current view
   if (projectFiltersEl) {
     projectFiltersEl.hidden = currentView !== "projects";
   }
@@ -958,21 +953,13 @@ function initEvents() {
     mediaTab.addEventListener("click", () => setView("media"));
   }
 
-  // header language button: re-open gate
+  // header language button: open language gate
   const headerLangButton = document.getElementById("headerLangButton");
   if (headerLangButton) {
     headerLangButton.addEventListener("click", () => {
       openLanguageGate();
     });
   }
-
-  // language buttons inside gate
-  document.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const lang = btn.getAttribute("data-lang");
-      setLanguage(lang);
-    });
-  });
 
   // image modal interactions
   if (imageModal) {
@@ -1002,7 +989,6 @@ function loadProjects() {
       if (!Array.isArray(data)) return;
       allProjects = data;
 
-      // Language select options from data
       if (languageSelect) {
         const existing = new Set(
           Array.from(languageSelect.options).map((o) =>
@@ -1043,7 +1029,6 @@ function loadMedia() {
       if (!data || !Array.isArray(data.items)) return;
       allMedia = data.items;
 
-      // Format select from data
       if (mediaFormatSelect) {
         const existing = new Set(
           Array.from(mediaFormatSelect.options).map((o) =>
@@ -1072,7 +1057,6 @@ function loadMedia() {
 /* ---------- Init ---------- */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Mark page as JS-enabled so CSS can hide fallback UI
   document.body.classList.add("js-enabled");
 
   initDomRefs();
@@ -1083,15 +1067,13 @@ document.addEventListener("DOMContentLoaded", () => {
   initLanguageGate();
   initEvents();
 
-  // default view
   setView("projects");
 
-  // load data
   loadProjects();
   loadMedia();
 
-  // live age update
+  // Live age update ONLY updates the about line, not all texts
   setInterval(() => {
-    applyTranslations(currentLang);
+    updateAboutAge(currentLang);
   }, 1000);
 });
