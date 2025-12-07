@@ -3,9 +3,9 @@
 /* -------------------------------------------------------
    Ferran’s Projects – Main JS
    - Multi-language UI (NL / EN / DE / PL / TR / ES)
-   - Live age text in About section
+   - Live age text in About section (years, months, weeks, days, hours, mins, secs)
    - Projects + Media switcher with filters
-   - Smart thumbnails + fullscreen image modal
+   - Smart thumbnails per repo + fullscreen image modal
    - No-JS fallback (handled via body.js-enabled)
 ------------------------------------------------------- */
 
@@ -499,14 +499,20 @@ function getMediaFormat(item) {
   return src.slice(dot + 1).toLowerCase();
 }
 
-/* ---------- Thumbnail helper ---------- */
+/* ---------- Thumbnail helper (per repo, via raw.githubusercontent) ---------- */
 
 function buildThumbnailCandidates(project) {
   const candidates = [];
 
-  // explicit thumbnail path in JSON
+  // explicit thumbnail path in JSON (e.g. "images/logo.png")
   if (project.thumbnail) {
-    candidates.push(project.thumbnail);
+    const repoName = project.name;
+    if (repoName) {
+      const base = `https://raw.githubusercontent.com/ferrannl/${encodeURIComponent(
+        repoName
+      )}/main/`;
+      candidates.push(base + project.thumbnail.replace(/^\//, ""));
+    }
   }
 
   if (!project.name) return candidates;
@@ -520,6 +526,9 @@ function buildThumbnailCandidates(project) {
     "logo.png",
     "logo.jpg",
     "logo.jpeg",
+    "favicon.png",
+    "favicon.jpg",
+    "favicon.ico",
     "banner.png",
     "banner.jpg",
     "banner.jpeg",
@@ -535,10 +544,20 @@ function buildThumbnailCandidates(project) {
     "class-diagram.jpg"
   ];
 
-  const imageDirFiles = rootFiles.map((f) => `images/${f}`);
+  const dirs = [
+    "",
+    "images/",
+    "media/",
+    "media/images/",
+    "assets/",
+    "assets/images/",
+    "docs/"
+  ];
 
-  rootFiles.concat(imageDirFiles).forEach((file) => {
-    candidates.push(rawBase + file);
+  dirs.forEach((dir) => {
+    rootFiles.forEach((file) => {
+      candidates.push(rawBase + dir + file);
+    });
   });
 
   return candidates;
