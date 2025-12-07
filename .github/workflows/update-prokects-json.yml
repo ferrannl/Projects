@@ -6,8 +6,11 @@ on:
       - "generate_projects_json.py"
       - ".github/workflows/update-projects-json.yml"
   schedule:
-    - cron: "15 3 * * *"  # daily
+    - cron: "15 3 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update-projects-json:
