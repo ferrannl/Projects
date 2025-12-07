@@ -1,1205 +1,1363 @@
-/* css/style.css */
+// scripts/script.js
 
-/* ---------- Theme tokens ---------- */
+/* -------------------------------------------------------
+   Ferran’s Projects – Main JS
 
-:root {
-  --bg: #050712;
-  --bg-alt: #0b0f20;
-  --card-bg: rgba(13, 19, 40, 0.9);
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --accent: #ff4b81;
-  --accent-soft: rgba(255, 75, 129, 0.25);
-  --accent-alt: #4bc3ff;
-  --text: #f7f7ff;
-  --text-muted: #a3a6c0;
-  --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
-  --radius-lg: 18px;
-  --radius-pill: 999px;
-  --transition-fast: 160ms ease-out;
-  --transition-med: 220ms ease-out;
-  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", sans-serif;
+   - Multi-language UI (NL / EN / DE / PL / TR / ES)
+   - Age text in About section (full precision at load)
+   - Projects + Media switcher with filters
+   - Fancy media wall (zoom, download, share)
+   - Auto thumbnails from repo root via GitHub API
+   - Pretty repo titles (no more hyphen hell)
+   - Tags from projects.json (no language duplication)
+   - No-JS fallback (handled via body.js-enabled)
+------------------------------------------------------- */
+
+/* ---------- GitHub + thumbnail cache ---------- */
+
+const GITHUB_USER = "ferrannl";
+const THUMB_CACHE_KEY = "ferranThumbCacheV1";
+const THUMB_CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
+
+function loadThumbCache() {
+  try {
+    const raw = localStorage.getItem(THUMB_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch (_) {}
+  return {};
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+function saveThumbCache() {
+  try {
+    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache));
+  } catch (_) {}
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
+let thumbCache = loadThumbCache();
+
+/* ---------- Language + global view state ---------- */
+
+const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
+const DEFAULT_LANG = "nl";
+const LANG_STORAGE_KEY = "ferranProjectsLang";
+const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
+
+let currentView = "projects";
+let currentLang = DEFAULT_LANG;
+
+// Birthday: 15-08-1999 23:10 Amsterdam time
+const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // months are 0-based
+
+const AGE_UNITS = {
+  nl: { y: "j", m: "mnd", w: "w", d: "d", h: "u", min: "min", s: "s" },
+  en: { y: "y", m: "mo", w: "w", d: "d", h: "h", min: "m", s: "s" },
+  de: { y: "J", m: "M", w: "W", d: "T", h: "Std", min: "Min", s: "s" },
+  pl: { y: "l", m: "m", w: "t", d: "d", h: "g", min: "min", s: "s" },
+  tr: { y: "y", m: "ay", w: "hf", d: "g", h: "sa", min: "dk", s: "sn" },
+  es: { y: "a", m: "m", w: "s", d: "d", h: "h", min: "min", s: "s" }
+};
+
+/* ---------- Translations (with 🇳🇱 flag in About) ---------- */
+
+const TRANSLATIONS = {
+  en: {
+    headerLangButton: "Language",
+    subtitle:
+      "All my projects and media in one place – websites, apps, school work, guides, APIs and more.",
+    aboutTitle: "About Me",
+    aboutP1:
+      "Hey Ferran ({age}) here. I am a Dutch 🇳🇱 developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
+    aboutP2: "",
+    tabProjects: "Projects",
+    tabMedia: "Media",
+    searchProjectsPlaceholder: "Search by name, description, language or tag…",
+    searchMediaPlaceholder: "Search media by title, filename or type…",
+    filterTypeLabel: "Type",
+    typeAll: "All",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "School / Study",
+    typeOther: "Other",
+    filterLanguageLabel: "Language",
+    languageFilterAll: "All languages",
+    mediaTypeLabel: "Media type",
+    mediaKindAll: "All",
+    mediaKindImages: "Images",
+    mediaKindVideos: "Videos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Format",
+    mediaFormatAll: "All formats",
+    emptyState:
+      "Hmm… no projects loaded right now. Maybe I took them offline, or something went wrong. Try a hard refresh (Shift + F5 / Ctrl + F5) and wait a few seconds.",
+    mediaEmptyState:
+      "No media to show right now. Try a hard refresh and wait a few seconds.",
+    footerBuiltWith: "Built with ♥ by Ferran"
+  },
+
+  nl: {
+    headerLangButton: "Taal",
+    subtitle:
+      "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
+    aboutTitle: "Over mij",
+    aboutP1:
+      "Hey 👋🏻 Ferran ({age}) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
+    aboutP2: "",
+    tabProjects: "Projecten",
+    tabMedia: "Media",
+    searchProjectsPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
+    searchMediaPlaceholder:
+      "Zoek media op titel, bestandsnaam of type…",
+    filterTypeLabel: "Type",
+    typeAll: "Alles",
+    typeWebsite: "Websites",
+    typeMobile: "Mobiel",
+    typeApi: "API’s / Backend",
+    typeSchool: "School / Studie",
+    typeOther: "Overig",
+    filterLanguageLabel: "Taal",
+    languageFilterAll: "Alle talen",
+    mediaTypeLabel: "Media type",
+    mediaKindAll: "Alles",
+    mediaKindImages: "Afbeeldingen",
+    mediaKindVideos: "Video’s",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Bestandstype",
+    mediaFormatAll: "Alle formaten",
+    emptyState:
+      "Hmm… geen projecten om te laten zien. Misschien heb ik ze offline gehaald of ging er iets mis. Probeer de pagina hard te verversen (Shift + F5 / Ctrl + F5) en wacht een paar seconden.",
+    mediaEmptyState:
+      "Geen media om te laten zien. Probeer de pagina opnieuw te laden en wacht even.",
+    footerBuiltWith: "Gemaakt met ♥ door Ferran"
+  },
+
+  de: {
+    headerLangButton: "Sprache",
+    subtitle:
+      "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
+    aboutTitle: "Über mich",
+    aboutP1:
+      "Hey hier ist Ferran ({age}). Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die mir und anderen helfen.",
+    aboutP2: "",
+    tabProjects: "Projekte",
+    tabMedia: "Medien",
+    searchProjectsPlaceholder:
+      "Suche nach Name, Beschreibung, Sprache oder Tag…",
+    searchMediaPlaceholder:
+      "Suche Medien nach Titel, Dateiname oder Typ…",
+    filterTypeLabel: "Typ",
+    typeAll: "Alle",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "Schule / Studium",
+    typeOther: "Sonstiges",
+    filterLanguageLabel: "Sprache",
+    languageFilterAll: "Alle Sprachen",
+    mediaTypeLabel: "Medientyp",
+    mediaKindAll: "Alle",
+    mediaKindImages: "Bilder",
+    mediaKindVideos: "Videos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Format",
+    mediaFormatAll: "Alle Formate",
+    emptyState:
+      "Keine Projekte für diese Suche oder Filter. Vielleicht sind sie offline oder etwas ist schief gelaufen. Versuche ein hartes Reload (Shift + F5) und warte ein paar Sekunden.",
+    mediaEmptyState:
+      "Keine Medien für diese Suche oder Filter. Versuche die Seite neu zu laden.",
+    footerBuiltWith: "Mit ♥ erstellt von Ferran"
+  },
+
+  pl: {
+    headerLangButton: "Język",
+    subtitle:
+      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, zadania ze szkoły, poradniki, API i więcej.",
+    aboutTitle: "O mnie",
+    aboutP1:
+      "Cześć tu Ferran ({age}). Jestem holenderskim 🇳🇱 deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia, które pomagają mnie i innym.",
+    aboutP2: "",
+    tabProjects: "Projekty",
+    tabMedia: "Media",
+    searchProjectsPlaceholder:
+      "Szukaj po nazwie, opisie, języku lub tagu…",
+    searchMediaPlaceholder:
+      "Szukaj mediów po tytule, nazwie pliku lub typie…",
+    filterTypeLabel: "Typ",
+    typeAll: "Wszystko",
+    typeWebsite: "Strony WWW",
+    typeMobile: "Mobilne",
+    typeApi: "API / Backend",
+    typeSchool: "Szkoła / Studia",
+    typeOther: "Inne",
+    filterLanguageLabel: "Język",
+    languageFilterAll: "Wszystkie języki",
+    mediaTypeLabel: "Typ mediów",
+    mediaKindAll: "Wszystko",
+    mediaKindImages: "Obrazy",
+    mediaKindVideos: "Wideo",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Format",
+    mediaFormatAll: "Wszystkie formaty",
+    emptyState:
+      "Brak projektów dla tych filtrów. Może są offline albo coś poszło nie tak. Spróbuj odświeżyć stronę (Shift + F5) i chwilę poczekać.",
+    mediaEmptyState:
+      "Brak mediów dla tych filtrów. Spróbuj ponownie odświeżyć stronę.",
+    footerBuiltWith: "Stworzone z ♥ przez Ferrana"
+  },
+
+  tr: {
+    headerLangButton: "Dil",
+    subtitle:
+      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
+    aboutTitle: "Hakkımda",
+    aboutP1:
+      "Selam ben Ferran ({age}). Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir geliştiriciyim. Kendime ve başkalarına yardımcı olan web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
+    aboutP2: "",
+    tabProjects: "Projeler",
+    tabMedia: "Medya",
+    searchProjectsPlaceholder:
+      "İsme, açıklamaya, dile veya etikete göre ara…",
+    searchMediaPlaceholder:
+      "Medya için başlık, dosya adı veya türe göre ara…",
+    filterTypeLabel: "Tür",
+    typeAll: "Tümü",
+    typeWebsite: "Web siteleri",
+    typeMobile: "Mobil",
+    typeApi: "API / Backend",
+    typeSchool: "Okul / Eğitim",
+    typeOther: "Diğer",
+    filterLanguageLabel: "Dil",
+    languageFilterAll: "Tüm diller",
+    mediaTypeLabel: "Medya türü",
+    mediaKindAll: "Tümü",
+    mediaKindImages: "Görseller",
+    mediaKindVideos: "Videolar",
+    mediaKindAudio: "Ses",
+    mediaFormatLabel: "Biçim",
+    mediaFormatAll: "Tüm biçimler",
+    emptyState:
+      "Bu filtrelerle eşleşen proje yok. Belki offline oldular ya da bir şeyler ters gitti. Sayfayı sert yenile (Shift + F5) ve birkaç saniye bekle.",
+    mediaEmptyState:
+      "Bu filtrelere uygun medya yok. Sayfayı yenilemeyi dene.",
+    footerBuiltWith: "♥ ile geliştirildi – Ferran"
+  },
+
+  es: {
+    headerLangButton: "Idioma",
+    subtitle:
+      "Todos mis proyectos y media en un solo lugar: webs, apps, trabajos de estudio, experimentos de código y más.",
+    aboutTitle: "Sobre mí",
+    aboutP1:
+      "Hola soy Ferran ({age}). Soy un desarrollador 🇳🇱 holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas que ayudan a mí y a otras personas.",
+    aboutP2: "",
+    tabProjects: "Proyectos",
+    tabMedia: "Media",
+    searchProjectsPlaceholder:
+      "Busca por nombre, descripción, idioma o etiqueta…",
+    searchMediaPlaceholder:
+      "Busca medios por título, archivo o tipo…",
+    filterTypeLabel: "Tipo",
+    typeAll: "Todo",
+    typeWebsite: "Webs",
+    typeMobile: "Móvil",
+    typeApi: "APIs / Backend",
+    typeSchool: "Escuela / Estudio",
+    typeOther: "Otros",
+    filterLanguageLabel: "Idioma",
+    languageFilterAll: "Todos los idiomas",
+    mediaTypeLabel: "Tipo de media",
+    mediaKindAll: "Todo",
+    mediaKindImages: "Imágenes",
+    mediaKindVideos: "Vídeos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Formato",
+    mediaFormatAll: "Todos los formatos",
+    emptyState:
+      "No hay proyectos con estos filtros. Puede que estén offline o algo ha fallado. Prueba a recargar la página (Shift + F5) y espera unos segundos.",
+    mediaEmptyState:
+      "No hay media con estos filtros. Prueba a recargar la página.",
+    footerBuiltWith: "Hecho con ♥ por Ferran"
+  }
+};
+
+/* ---------- Age calculation ---------- */
+
+function computeAgeComponents(now) {
+  let diffMs = now - BIRTH_DATE;
+  if (diffMs < 0) diffMs = 0;
+
+  let totalSeconds = Math.floor(diffMs / 1000);
+
+  const s = totalSeconds % 60;
+  totalSeconds = (totalSeconds - s) / 60;
+
+  const min = totalSeconds % 60;
+  totalSeconds = (totalSeconds - min) / 60;
+
+  const h = totalSeconds % 24;
+  totalSeconds = (totalSeconds - h) / 24;
+
+  const d = totalSeconds % 7;
+  totalSeconds = (totalSeconds - d) / 7;
+
+  const w = totalSeconds % 4;
+  totalSeconds = (totalSeconds - w) / 4;
+
+  const m = totalSeconds % 12;
+  const y = (totalSeconds - m) / 12;
+
+  return { y, m, w, d, h, min, s };
 }
 
-body {
-  font-family: var(--font-main);
-  background:
-    radial-gradient(circle at top left, rgba(255, 75, 129, 0.18), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(75, 195, 255, 0.18), transparent 55%),
-    linear-gradient(145deg, #02030a, #050712 55%, #050712);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
+function formatAge(lang) {
+  const units = AGE_UNITS[lang] || AGE_UNITS[DEFAULT_LANG];
+  const { y, m, w, d, h, min, s } = computeAgeComponents(new Date());
+
+  // show full chain: years to seconds
+  const parts = [
+    `${y}${units.y}`,
+    `${m}${units.m}`,
+    `${w}${units.w}`,
+    `${d}${units.d}`,
+    `${h}${units.h}`,
+    `${min}${units.min}`,
+    `${s}${units.s}`
+  ];
+
+  return parts.join(" ");
 }
 
-.app {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 1.5rem clamp(1.25rem, 3vw, 2.25rem) 2.5rem;
+/* ---------- Repo display name prettifier ---------- */
+
+const LOWERCASE_WORDS = new Set([
+  "voor",
+  "na",
+  "met",
+  "door",
+  "van",
+  "en",
+  "of",
+  "de",
+  "het",
+  "een",
+  "der",
+  "den",
+  "und",
+  "mit",
+  "für",
+  "im",
+  "am",
+  "an",
+  "vom",
+  "del",
+  "la",
+  "el",
+  "y",
+  "con",
+  "por"
+]);
+
+function prettifyRepoName(name) {
+  if (!name) return "";
+
+  const cleaned = name.replace(/[-_]+/g, " ");
+  const parts = cleaned.split(/\s+/);
+
+  return parts
+    .map((raw, index) => {
+      const lower = raw.toLowerCase();
+      if (lower === "ios") return "iOS";
+      if (lower === "html") return "HTML";
+      if (lower === "css") return "CSS";
+      if (lower === "js") return "JS";
+      if (lower === "api" || lower === "apis") return lower.toUpperCase();
+      if (lower === "c#") return "C#";
+      if (lower === "c++") return "C++";
+      if (lower === "php") return "PHP";
+
+      if (LOWERCASE_WORDS.has(lower) && index !== 0) return lower;
+
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(" ");
 }
 
-/* ---------- Header ---------- */
+/* ---------- Tag enrichment (no language duplication) ---------- */
 
-.site-header {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 2.4rem 1.75rem 1.6rem;
-  margin-bottom: 1.75rem;
-  background: linear-gradient(145deg, rgba(11, 15, 32, 0.9), rgba(18, 24, 54, 0.9));
-  border-radius: 24px;
-  box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-
-.site-header::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(circle at top right, rgba(255, 75, 129, 0.25) 0, transparent 55%),
-    radial-gradient(circle at bottom left, rgba(75, 195, 255, 0.2) 0, transparent 55%);
-  opacity: 0.6;
-  pointer-events: none;
-  filter: blur(2px);
-}
-
-.site-header > * {
-  position: relative;
-  z-index: 1;
-}
-
-.site-title-block {
-  min-width: 0;
-}
-
-.header-main-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.header-main-left {
-  max-width: 32rem;
-}
-
-.site-title {
-  font-size: clamp(1.9rem, 3.5vw, 2.4rem);
-  margin: 0;
-  letter-spacing: 0.03em;
-}
-
-.site-subtitle {
-  margin: 0.45rem 0 0.4rem;
-  max-width: 32rem;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-/* Header actions: socials block */
-
-.header-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.9rem;
-  margin-top: 0.8rem;
-}
-
-/* 🌐 language pill – fixed top-right of viewport */
-
-.lang-switch-main {
-  position: fixed;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.35rem 0.95rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(7, 10, 28, 0.95);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  cursor: pointer;
-  outline: none;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    transform var(--transition-fast),
-    background var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.lang-switch-main:hover {
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(10, 14, 34, 0.98);
-  transform: translateY(-1px);
-  color: var(--text);
-}
-
-.lang-switch-icon {
-  font-size: 0.95rem;
-}
-
-.lang-switch-label {
-  font-size: 0.8rem;
-}
-
-/* Socials – left-aligned, wrap nicely */
-
-.social-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: flex-start;
-  align-items: flex-start;
-  max-width: 100%;
-}
-
-.social-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0.28rem 0.9rem 0.28rem 0.4rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(7, 10, 28, 0.95);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  text-decoration: none;
-  cursor: pointer;
-  gap: 0.4rem;
-  transition:
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast),
-    filter var(--transition-fast);
-  white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-}
-
-.social-chip::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.12), transparent 55%);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  pointer-events: none;
-}
-
-.social-chip:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.75);
-  color: var(--text);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.social-chip:hover::before {
-  opacity: 0.35;
-}
-
-.social-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.social-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.social-label {
-  position: relative;
-  z-index: 1;
-}
-
-/* subtle platform tints */
-
-.social-github {
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 60%),
-    rgba(7, 10, 28, 0.95);
-  border-color: rgba(255, 255, 255, 0.7);
-}
-
-.social-instagram {
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 60%),
-    rgba(7, 10, 28, 0.95);
-  border-color: rgba(255, 75, 129, 0.7);
-}
-
-.social-linkedin {
-  background:
-    radial-gradient(circle at 0 0, rgba(10, 102, 194, 0.25), transparent 60%),
-    rgba(7, 10, 28, 0.95);
-  border-color: rgba(10, 102, 194, 0.8);
-}
-
-.social-outlook {
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 150, 0, 0.3), transparent 60%),
-    rgba(7, 10, 28, 0.95);
-  border-color: rgba(255, 150, 0, 0.85);
-}
-
-/* ---------- About section ---------- */
-
-.page-main {
-  margin-top: 0.5rem;
-}
-
-.about-section {
-  background: rgba(11, 15, 32, 0.55);
-  padding: 1.1rem 1.2rem 1.15rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  margin-bottom: 1.6rem;
-}
-
-.section-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(240, 242, 255, 0.96);
-}
-
-.about-text {
-  margin: 0.25rem 0 0;
-  font-size: 0.92rem;
-  color: rgba(220, 224, 245, 0.92);
-  line-height: 1.5;
-}
-
-/* About: profile avatar at bottom, centered */
-
-.about-avatar {
-  margin-top: 1.1rem;
-  display: flex;
-  justify-content: center;
-}
-
-.about-avatar img {
-  width: 120px;
-  height: 120px;
-  border-radius: 999px;
-  padding: 3px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.35), transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(75, 195, 255, 0.35), transparent 60%),
-    #050712;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
-  object-fit: cover;
-}
-
-/* ---------- Tabs with sliding pill ---------- */
-
-.tabs-section {
-  margin-bottom: 1rem;
-}
-
-.tabs {
-  position: relative;
-  display: inline-flex;
-  padding: 2px;
-  border-radius: 999px;
-  background: rgba(4, 7, 24, 0.9);
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-}
-
-/* sliding pill background */
-.tabs::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 2px;
-  width: calc(50% - 2px);
-  border-radius: 999px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 75, 129, 0.7),
-    rgba(75, 195, 255, 0.8)
+function deriveExtraTags(project) {
+  // Only use tags explicitly defined in projects.json
+  const tags = new Set(
+    Array.isArray(project.tags) ? project.tags.filter(Boolean) : []
   );
-  transform: translateX(0%);
-  transition: transform var(--transition-med);
-  z-index: 0;
+  return Array.from(tags);
 }
 
-.tabs.tabs-media::before {
-  transform: translateX(100%);
-}
+/* ---------- i18n application ---------- */
 
-.tab-button {
-  position: relative;
-  z-index: 1;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  padding: 0.45rem 1.25rem;
-  cursor: pointer;
-  transition:
-    color var(--transition-fast),
-    transform var(--transition-fast);
-}
+function applyTranslations(lang) {
+  const t = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
 
-.tab-button + .tab-button {
-  margin-left: 2px;
-}
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (!key || !(key in t)) return;
 
-.tab-button:hover {
-  transform: translateY(-1px);
-}
+    let value = t[key];
+    if (key === "aboutP1") {
+      value = value.replace("{age}", formatAge(lang));
+    }
 
-.tab-button.active {
-  color: var(--text);
-}
+    el.textContent = value;
+  });
 
-/* ---------- Search ---------- */
+  // Search placeholder depends on current view
+  const searchInput = document.getElementById("search");
+  if (searchInput) {
+    const placeholderKey =
+      currentView === "media"
+        ? "searchMediaPlaceholder"
+        : "searchProjectsPlaceholder";
+    if (t[placeholderKey]) {
+      searchInput.placeholder = t[placeholderKey];
+    }
+  }
 
-.search-section {
-  margin-bottom: 1rem;
-  position: relative;
-}
+  // Footer text
+  const footerBuilt = document.querySelector("[data-i18n-footer-built]");
+  if (footerBuilt && t.footerBuiltWith) {
+    footerBuilt.textContent = t.footerBuiltWith;
+  }
 
-.search-label {
-  display: block;
-  font-size: 0.8rem;
-  margin-bottom: 0.3rem;
-  color: rgba(163, 166, 192, 0.9);
-}
+  // Tabs labels
+  const projectsTab = document.getElementById("projectsTab");
+  const mediaTab = document.getElementById("mediaTab");
+  if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
+  if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
 
-#search {
-  width: 100%;
-  padding: 0.75rem 0.9rem 0.75rem 2.5rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
-  background: rgba(4, 7, 24, 0.9);
-  color: var(--text);
-  font-size: 0.95rem;
-  outline: none;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
-  transition:
-    border-color var(--transition-med),
-    box-shadow var(--transition-med),
-    background var(--transition-med),
-    transform var(--transition-fast);
-}
-
-#search::placeholder {
-  color: rgba(163, 166, 192, 0.7);
-}
-
-#search:focus {
-  border-color: rgba(255, 75, 129, 0.7);
-  background: rgba(7, 11, 32, 0.98);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
-  transform: translateY(-1px);
-}
-
-#search:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* magnifying glass – slightly adjusted to be more visually centered */
-.search-section::before {
-  content: "🔍";
-  position: absolute;
-  left: 0.9rem;
-  top: 2.55rem; /* tweaked to sit more in the middle */
-  transform: translateY(-50%);
-  font-size: 0.95rem;
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-/* ---------- Filters ---------- */
-
-.filters-section {
-  margin-bottom: 0.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.9rem;
-}
-
-.filter-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.filter-group label {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(163, 166, 192, 0.9);
-}
-
-#typeFilter,
-#languageFilter,
-#mediaTypeFilter,
-#mediaFormatFilter {
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid var(--border-subtle);
-  background: rgba(10, 15, 35, 0.9);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-/* hide filters when [hidden] from JS */
-
-#projectFilters[hidden],
-#mediaFilters[hidden] {
-  display: none !important;
-}
-
-/* ---------- Cards grid ---------- */
-
-.view-section {
-  margin-top: 0.75rem;
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.1rem;
-}
-
-/* ---------- Project cards + thumbnails ---------- */
-
-.project-card {
-  position: relative;
-  padding: 1rem 1.05rem 0.95rem;
-  background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-soft);
-  overflow: hidden;
-  transition:
-    transform var(--transition-med),
-    box-shadow var(--transition-med),
-    border-color var(--transition-med),
-    background var(--transition-med);
-}
-
-.project-card::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background:
-    radial-gradient(circle at top right, var(--accent-soft), transparent 60%),
-    radial-gradient(circle at bottom left, rgba(75, 195, 255, 0.2), transparent 60%);
-  opacity: 0;
-  transition: opacity var(--transition-med);
-  pointer-events: none;
-}
-
-.project-card:hover {
-  transform: translateY(-4px) translateZ(0);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
-  border-color: rgba(255, 255, 255, 0.16);
-  background: linear-gradient(
-    145deg,
-    rgba(12, 18, 40, 0.98),
-    rgba(11, 14, 32, 0.96)
+  // Top-right language button label
+  const headerLangLabel = document.querySelector(
+    ".lang-switch-label[data-i18n='headerLangButton']"
   );
-}
-
-.project-card:hover::before {
-  opacity: 0.5;
-}
-
-.project-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.35rem;
-}
-
-.project-thumb {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  overflow: hidden;
-  flex-shrink: 0;
-  background: radial-gradient(
-    circle at 0 0,
-    rgba(255, 75, 129, 0.6),
-    rgba(14, 24, 55, 1)
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-  padding: 0;
-  outline: none;
-}
-
-.project-thumb span {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: #ffffff;
-}
-
-.project-thumb.has-image {
-  cursor: zoom-in;
-  border-color: rgba(255, 255, 255, 0.3);
-  background: transparent;
-}
-
-.project-thumb.has-image img {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  object-fit: cover;
-  display: block;
-  transition: transform 160ms ease-out;
-}
-
-.project-card:hover .project-thumb.has-image img {
-  transform: scale(1.03);
-}
-
-.project-title-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.project-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-  word-break: break-word;
-}
-
-.project-lang {
-  font-size: 0.78rem;
-  color: rgba(193, 232, 255, 0.95);
-  margin: 0;
-}
-
-.project-desc {
-  margin: 0 0 0.55rem;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.project-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  align-items: center;
-  margin-top: 0.1rem;
-}
-
-.badge {
-  font-size: 0.78rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(5, 8, 22, 0.9);
-  color: var(--text-muted);
-}
-
-.badge-type {
-  border-color: rgba(255, 75, 129, 0.7);
-  color: rgba(245, 229, 255, 0.95);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.7rem;
-}
-
-.btn-card {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 0.32rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(4, 7, 24, 0.9);
-  color: var(--text);
-  font-size: 0.78rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-/* Live site – fancy 360° highlight ring, cross-browser */
-.btn-card-live {
-  position: relative;
-  overflow: hidden;
-  border-color: transparent;
-  background: rgba(4, 7, 24, 0.98);
-  color: #ffffff;
-  font-weight: 500;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
-}
-
-/* outer animated highlight ring */
-.btn-card-live::before {
-  content: "";
-  position: absolute;
-  inset: -30%;
-  border-radius: 999px;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255, 75, 129, 0.0),
-    rgba(255, 75, 129, 0.7),
-    rgba(75, 195, 255, 0.7),
-    rgba(255, 75, 129, 0.7),
-    rgba(255, 75, 129, 0.0)
-  );
-  opacity: 0.0;
-  pointer-events: none;
-  animation: liveGlowSpin 3.2s linear infinite;
-  transition: opacity 180ms ease-out;
-}
-
-/* inner pill – dark center, soft accent edge */
-.btn-card-live::after {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 999px;
-  background: radial-gradient(
-    circle at 0 0,
-    rgba(255, 75, 129, 0.16),
-    rgba(4, 7, 24, 1)
-  );
-  z-index: 0;
-}
-
-/* keep label above effects */
-.btn-card-live span,
-.btn-card-live svg,
-.btn-card-live img {
-  position: relative;
-  z-index: 1;
-}
-
-/* hover / focus – let the ring show more + slight glow */
-.btn-card-live:hover,
-.btn-card-live:focus-visible {
-  box-shadow:
-    0 0 12px rgba(255, 75, 129, 0.35),
-    0 0 18px rgba(75, 195, 255, 0.25);
-  transform: translateY(-1px);
-}
-
-.btn-card-live:hover::before,
-.btn-card-live:focus-visible::before {
-  opacity: 0.85;
-}
-
-/* mobile: low idle opacity so it still looks special */
-@media (hover: none) {
-  .btn-card-live::before {
-    opacity: 0.45;
+  if (headerLangLabel && t.headerLangButton) {
+    headerLangLabel.textContent = t.headerLangButton;
   }
 }
 
-/* smooth 360° rotation */
-@keyframes liveGlowSpin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* ---------- Language helpers ---------- */
+
+function detectInitialLang() {
+  try {
+    const stored = localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
+  } catch (_) {}
+
+  const navLang = (navigator.language || "").slice(0, 2).toLowerCase();
+  if (SUPPORTED_LANGS.includes(navLang)) return navLang;
+
+  return DEFAULT_LANG;
 }
 
-.btn-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+function setActiveLangButton(lang) {
+  document
+    .querySelectorAll(".btn-lang[data-lang]")
+    .forEach((btn) => btn.classList.remove("active"));
+
+  const btn = document.querySelector(`.btn-lang[data-lang="${lang}"]`);
+  if (btn) btn.classList.add("active");
 }
 
-/* ---------- Media cards ---------- */
-
-.media-grid {
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  margin-top: 0.4rem;
+function setLanguage(lang) {
+  if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
+  currentLang = lang;
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+  } catch (_) {}
+  setActiveLangButton(lang);
+  applyTranslations(lang);
 }
 
-.media-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-soft);
-  padding: 0.75rem 0.85rem 0.8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+function initLanguageGate() {
+  const gate = document.getElementById("langGate");
+  if (!gate) return;
 
-.media-title {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin: 0;
-  word-break: break-word;
-}
+  let alreadySeen = false;
+  try {
+    alreadySeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
+  } catch (_) {}
 
-.media-preview {
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: radial-gradient(
-    circle at 0 0,
-    rgba(255, 75, 129, 0.12),
-    rgba(5, 8, 22, 0.96)
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-height: 200px;
-}
-
-/* clickable images for zoom */
-.media-preview.clickable {
-  cursor: zoom-in;
-}
-
-.media-preview.clickable img {
-  transition: transform 160ms ease-out;
-}
-
-.media-preview.clickable:hover img {
-  transform: scale(1.02);
-}
-
-.media-preview img,
-.media-preview video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.media-preview video {
-  border-radius: 10px;
-  background: #000;
-}
-
-/* audio – a bit more modern */
-.media-preview audio {
-  width: 100%;
-  border-radius: 999px;
-  background-color: #050712;
-}
-
-/* meta & actions */
-
-.media-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.badge-media-type,
-.badge-media-format {
-  font-size: 0.75rem;
-  padding: 0.18rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(5, 8, 22, 0.9);
-  color: var(--text-muted);
-}
-
-/* actions: view / download */
-
-.media-actions {
-  margin-top: 0.35rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.media-action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 0.26rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(4, 7, 24, 0.9);
-  color: var(--text);
-  font-size: 0.76rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.media-action-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-}
-
-/* ---------- Empty state ---------- */
-
-.empty-state {
-  margin-top: 1.5rem;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-/* ---------- Footer ---------- */
-
-.site-footer {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-.site-footer a {
-  color: var(--accent-alt);
-  text-decoration: none;
-}
-
-.site-footer a:hover {
-  text-decoration: underline;
-}
-
-/* ---------- Language gate ---------- */
-
-.lang-gate-backdrop {
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at top, rgba(255, 75, 129, 0.18), transparent 60%),
-    radial-gradient(circle at bottom, rgba(75, 195, 255, 0.18), transparent 60%),
-    rgba(0, 0, 10, 0.88);
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9998;
-  padding: 1.5rem;
-}
-
-.lang-gate-backdrop[hidden] {
-  display: none;
-}
-
-.lang-gate-card {
-  max-width: 640px;
-  width: 100%;
-  padding: 1.8rem 1.6rem 1.5rem;
-  border-radius: 24px;
-  background: linear-gradient(
-    145deg,
-    rgba(11, 15, 32, 0.96),
-    rgba(15, 21, 49, 0.98)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85);
-  color: var(--text);
-}
-
-.lang-gate-logo {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.35rem;
-}
-
-.lang-gate-title {
-  font-size: 1.35rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-
-.lang-gate-sub {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-}
-
-.lang-gate-sub small {
-  display: block;
-  font-size: 0.75rem;
-  opacity: 0.8;
-  margin-top: 0.35rem;
-}
-
-.lang-gate-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.55rem;
-  margin-bottom: 0.3rem;
-}
-
-.btn-lang {
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 55%),
-    rgba(8, 10, 28, 0.95);
-  color: var(--text);
-  padding: 0.55rem 0.8rem;
-  display: flex;
-  gap: 0.55rem;
-  align-items: center;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast),
-    border-color var(--transition-fast),
-    background var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.btn-lang:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
-  border-color: rgba(255, 255, 255, 0.46);
-}
-
-.btn-lang.active {
-  border-color: rgba(255, 255, 255, 0.55);
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.4), transparent 55%),
-    rgba(12, 15, 35, 0.98);
-}
-
-.flag {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.label-main {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.label-sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
-/* ---------- Fullscreen image modal + controls ---------- */
-
-.image-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 8, 0.86);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.image-modal[hidden] {
-  display: none;
-}
-
-.image-modal-inner {
-  max-width: min(92vw, 1100px);
-  max-height: 92vh;
-  background: rgba(5, 8, 22, 0.97);
-  border-radius: 18px;
-  padding: 0.9rem 1rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.image-modal-figure {
-  margin: 0;
-}
-
-.image-modal-img {
-  max-width: 100%;
-  max-height: 70vh;
-  border-radius: 14px;
-  display: block;
-  cursor: zoom-out; /* click to close */
-}
-
-.image-modal-caption {
-  margin-top: 0.45rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.image-modal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.35rem;
-  margin-top: 0.3rem;
-}
-
-.image-modal-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.26rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(4, 7, 24, 0.95);
-  color: var(--text);
-  font-size: 0.78rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition:
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.image-modal-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-1px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
-}
-
-.image-modal-close {
-  border-color: rgba(255, 75, 129, 0.8);
-}
-
-/* ---------- No-JS fallback ---------- */
-
-.no-js-fallback {
-  margin-top: 1.5rem;
-  padding: 0.9rem 1rem;
-  border-radius: 14px;
-  background: rgba(11, 15, 32, 0.75);
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  color: var(--text-muted);
-  font-size: 0.88rem;
-}
-
-body.js-enabled .no-js-fallback {
-  display: none;
-}
-
-/* ---------- Accessibility ---------- */
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ---------- Responsive tweaks ---------- */
-
-@media (max-width: 800px) {
-  .site-header {
-    padding: 2.6rem 1.3rem 1.4rem;
+  if (alreadySeen) {
+    gate.style.display = "none";
   }
 
-  .header-main-row {
-    flex-direction: column;
-    align-items: flex-start;
+  gate.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      setLanguage(lang);
+      try {
+        localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+      } catch (_) {}
+      gate.style.display = "none";
+    });
+  });
+}
+
+/* ---------- View state & filters ---------- */
+
+const state = {
+  search: "",
+  typeFilter: "all",
+  languageFilter: "all",
+  mediaTypeFilter: "all",
+  mediaFormatFilter: "all"
+};
+
+let allProjects = [];
+let allMedia = [];
+
+// DOM refs
+let projectsGrid,
+  projectsEmpty,
+  mediaGrid,
+  mediaEmpty,
+  searchInput,
+  typeSelect,
+  languageSelect,
+  mediaTypeSelect,
+  mediaFormatSelect,
+  projectFiltersEl,
+  mediaFiltersEl,
+  projectsTab,
+  mediaTab,
+  projectsView,
+  mediaView,
+  tabsEl;
+
+// modal refs
+let imageModal,
+  imageModalImg,
+  imageModalCaption,
+  imageModalDownload,
+  imageModalOpen,
+  imageModalShare,
+  imageModalClose;
+
+/* ---------- Data helpers ---------- */
+
+const PROJECTS_URL = "./projects.json";
+const MEDIA_URL = "./media/media-index.json";
+
+function deriveProjectType(project) {
+  const name = (project.name || "").toLowerCase();
+  const desc = (project.description || "").toLowerCase();
+  const lang = (project.language || "").toLowerCase();
+
+  if (
+    project.hasPages ||
+    ["html", "scss", "less", "php"].includes(lang) ||
+    desc.includes("website")
+  ) {
+    return "website";
   }
 
-  .lang-switch-main {
-    top: 0.65rem;
-    right: 0.65rem;
+  if (
+    ["java", "swift", "kotlin"].includes(lang) ||
+    name.includes("android") ||
+    name.includes("ios")
+  ) {
+    return "mobile";
   }
 
-  .about-avatar img {
-    width: 110px;
-    height: 110px;
+  if (
+    desc.includes("api") ||
+    desc.includes("rest") ||
+    desc.includes("backend")
+  ) {
+    return "api";
+  }
+
+  if (
+    desc.includes("assignment") ||
+    desc.includes("course") ||
+    desc.includes("school") ||
+    desc.includes("exam") ||
+    desc.includes("eindopdracht")
+  ) {
+    return "school";
+  }
+
+  return "other";
+}
+
+function getMediaFormat(item) {
+  const src = item.src || "";
+  const dot = src.lastIndexOf(".");
+  if (dot === -1) return "";
+  return src.slice(dot + 1).toLowerCase();
+}
+
+/* ---------- Thumbnail chooser via GitHub API ---------- */
+
+const THUMB_PRIORITY_NAMES = [
+  "logo.png",
+  "logo.jpg",
+  "logo.jpeg",
+  "favicon.png",
+  "favicon.jpg",
+  "favicon.ico",
+  "icon.png",
+  "icon.jpg",
+  "icon.jpeg",
+  "thumbnail.png",
+  "thumbnail.jpg",
+  "preview.png",
+  "preview.jpg",
+  "sequencediagram.png",
+  "sequencediagram1.png",
+  "sequencediagram.jpg",
+  "sequencediagram1.jpg"
+];
+
+async function ensureThumbnailForProject(project) {
+  if (!project || !project.name) return null;
+
+  const repoName = project.name;
+  const now = Date.now();
+
+  const cached = thumbCache[repoName];
+  if (cached && now - cached.ts < THUMB_CACHE_TTL_MS) {
+    return cached.url || null;
+  }
+
+  try {
+    const contentsRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_USER}/${encodeURIComponent(
+        repoName
+      )}/contents`
+    );
+    if (!contentsRes.ok) {
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
+    }
+
+    const items = await contentsRes.json();
+    if (!Array.isArray(items)) {
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
+    }
+
+    let imageFiles = items.filter(
+      (it) =>
+        it.type === "file" &&
+        /\.(png|jpe?g|webp|gif)$/i.test(it.name || "")
+    );
+
+    // If no images in root, check /images folder
+    if (!imageFiles.length) {
+      const imagesDir = items.find(
+        (it) => it.type === "dir" && (it.name || "").toLowerCase() === "images"
+      );
+      if (imagesDir && imagesDir.url) {
+        const imagesRes = await fetch(imagesDir.url);
+        if (imagesRes.ok) {
+          const imgItems = await imagesRes.json();
+          if (Array.isArray(imgItems)) {
+            imageFiles = imgItems.filter(
+              (it) =>
+                it.type === "file" &&
+                /\.(png|jpe?g|webp|gif)$/i.test(it.name || "")
+            );
+          }
+        }
+      }
+    }
+
+    if (!imageFiles.length) {
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
+    }
+
+    const lowerMap = new Map(
+      imageFiles.map((f) => [(f.name || "").toLowerCase(), f])
+    );
+
+    let chosen = null;
+    for (const candidate of THUMB_PRIORITY_NAMES) {
+      const match = lowerMap.get(candidate);
+      if (match) {
+        chosen = match;
+        break;
+      }
+    }
+
+    if (!chosen) {
+      chosen = imageFiles[0];
+    }
+
+    const url = chosen.download_url || chosen.html_url || null;
+    thumbCache[repoName] = { url, ts: now };
+    saveThumbCache();
+    return url;
+  } catch (err) {
+    console.error("Thumbnail fetch failed for", project.name, err);
+    thumbCache[repoName] = { url: null, ts: now };
+    saveThumbCache();
+    return null;
   }
 }
 
-@media (max-width: 640px) {
-  .about-section {
-    margin-inline: 0;
+function loadAndApplyThumbnail(thumbEl, project) {
+  ensureThumbnailForProject(project).then((url) => {
+    if (!url || !thumbEl.isConnected) return;
+
+    thumbEl.classList.add("has-image");
+    thumbEl.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = project.name || "";
+    img.loading = "lazy";
+    thumbEl.appendChild(img);
+
+    thumbEl.addEventListener("click", () => {
+      openImageModal({ src: url, title: project.name || "" });
+    });
+  });
+}
+
+/* ---------- Media modal ---------- */
+
+function initImageModal() {
+  if (imageModal) return;
+
+  imageModal = document.getElementById("imageModal");
+  if (!imageModal) {
+    imageModal = document.createElement("div");
+    imageModal.id = "imageModal";
+    imageModal.className = "image-modal";
+    imageModal.hidden = true;
+    document.body.appendChild(imageModal);
+  }
+
+  imageModal.innerHTML = `
+    <div class="image-modal-inner">
+      <figure class="image-modal-figure">
+        <img id="imageModalImg" class="image-modal-img" alt="">
+        <figcaption id="imageModalCaption" class="image-modal-caption"></figcaption>
+      </figure>
+      <div class="image-modal-actions">
+        <a id="imageModalDownload" class="image-modal-btn" download>Download</a>
+        <a id="imageModalOpen" class="image-modal-btn" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+        <button id="imageModalShare" class="image-modal-btn" type="button">Share</button>
+        <button id="imageModalClose" class="image-modal-btn image-modal-close" type="button">Close</button>
+      </div>
+    </div>
+  `;
+
+  imageModalImg = document.getElementById("imageModalImg");
+  imageModalCaption = document.getElementById("imageModalCaption");
+  imageModalDownload = document.getElementById("imageModalDownload");
+  imageModalOpen = document.getElementById("imageModalOpen");
+  imageModalShare = document.getElementById("imageModalShare");
+  imageModalClose = document.getElementById("imageModalClose");
+
+  imageModal.addEventListener("click", (e) => {
+    if (e.target === imageModal) {
+      closeImageModal();
+    }
+  });
+
+  if (imageModalClose) {
+    imageModalClose.addEventListener("click", () => closeImageModal());
+  }
+
+  // clicking the big image closes again (minimize)
+  if (imageModalImg) {
+    imageModalImg.addEventListener("click", () => closeImageModal());
+  }
+
+  if (imageModalShare) {
+    imageModalShare.addEventListener("click", async () => {
+      if (!imageModalOpen) return;
+      const url = imageModalOpen.href;
+      const title = imageModalCaption?.textContent || "Media";
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, url });
+        } catch (_) {}
+      } else {
+        try {
+          await navigator.clipboard.writeText(url);
+          imageModalShare.textContent = "Link copied!";
+          setTimeout(() => {
+            imageModalShare.textContent = "Share";
+          }, 1200);
+        } catch (_) {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !imageModal.hidden) {
+      closeImageModal();
+    }
+  });
+}
+
+function openImageModal(item) {
+  if (!item || !item.src) {
+    return;
+  }
+
+  initImageModal();
+
+  if (!imageModal || !imageModalImg) {
+    // hard fallback: just open in new tab
+    window.open(item.src, "_blank", "noopener,noreferrer");
+    return;
+  }
+
+  const src = item.src;
+  const title = item.title || "";
+  imageModalImg.src = src;
+  imageModalImg.alt = title || "Media";
+
+  if (imageModalCaption) {
+    imageModalCaption.textContent = title || src;
+  }
+
+  if (imageModalDownload) {
+    imageModalDownload.href = src;
+    imageModalDownload.download = src.split("/").pop() || "media";
+  }
+
+  if (imageModalOpen) {
+    imageModalOpen.href = src;
+  }
+
+  imageModal.hidden = false;
+}
+
+function closeImageModal() {
+  if (!imageModal) return;
+  imageModal.hidden = true;
+}
+
+/* ---------- Rendering: Projects ---------- */
+
+function renderProjects() {
+  if (!projectsGrid || !projectsEmpty) return;
+
+  const search = state.search.trim().toLowerCase();
+  const type = state.typeFilter;
+  const langFilter = state.languageFilter;
+
+  const filtered = allProjects.filter((p) => {
+    const derivedTags = deriveExtraTags(p);
+    const baseTags =
+      Array.isArray(p.tags) && p.tags.length ? p.tags.join(" ") : "";
+    const tagsText = `${baseTags} ${derivedTags.join(" ")}`.toLowerCase();
+
+    const displayName = prettifyRepoName(p.name || "");
+
+    const inSearch =
+      !search ||
+      displayName.toLowerCase().includes(search) ||
+      (p.name || "").toLowerCase().includes(search) ||
+      (p.description || "").toLowerCase().includes(search) ||
+      (p.language || "").toLowerCase().includes(search) ||
+      tagsText.includes(search);
+
+    if (!inSearch) return false;
+
+    const derivedType = deriveProjectType(p);
+    if (type !== "all" && derivedType !== type) return false;
+
+    if (
+      langFilter !== "all" &&
+      (p.language || "").toLowerCase() !== langFilter.toLowerCase()
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  projectsGrid.innerHTML = "";
+
+  if (filtered.length === 0) {
+    projectsEmpty.style.display = "block";
+    projectsGrid.style.display = "none";
+    return;
+  }
+
+  projectsEmpty.style.display = "none";
+  projectsGrid.style.display = "grid";
+
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
+
+  filtered.forEach((p) => {
+    const card = document.createElement("article");
+    card.className = "project-card";
+
+    const titleRow = document.createElement("div");
+    titleRow.className = "project-title-row";
+
+    const thumb = document.createElement("button");
+    thumb.type = "button";
+    thumb.className = "project-thumb";
+
+    const niceName = prettifyRepoName(p.name || "");
+    const displayForLetter = niceName || p.name || "?";
+
+    const span = document.createElement("span");
+    span.textContent = displayForLetter.charAt(0).toUpperCase();
+    thumb.appendChild(span);
+
+    const titleText = document.createElement("div");
+    titleText.className = "project-title-text";
+
+    const title = document.createElement("h3");
+    title.className = "project-title";
+    title.textContent = niceName;
+
+    const lang = document.createElement("div");
+    lang.className = "project-lang";
+    lang.textContent = p.language || "";
+
+    titleText.appendChild(title);
+    titleText.appendChild(lang);
+
+    titleRow.appendChild(thumb);
+    titleRow.appendChild(titleText);
+    card.appendChild(titleRow);
+
+    const desc = document.createElement("p");
+    desc.className = "project-desc";
+    desc.textContent = p.description || "";
+    card.appendChild(desc);
+
+    const meta = document.createElement("div");
+    meta.className = "project-meta";
+
+    const typeKey = deriveProjectType(p);
+    const typeMap = {
+      website: t.typeWebsite,
+      mobile: t.typeMobile,
+      api: t.typeApi,
+      school: t.typeSchool,
+      other: t.typeOther
+    };
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "badge badge-type";
+    typeBadge.textContent = typeMap[typeKey] || t.typeOther;
+    meta.appendChild(typeBadge);
+
+    // extra tags (no languages auto-added)
+    const extraTags = deriveExtraTags(p);
+    extraTags.forEach((tag) => {
+      if (!tag) return;
+      const tagBadge = document.createElement("span");
+      tagBadge.className = "badge";
+      tagBadge.textContent = tag;
+      meta.appendChild(tagBadge);
+    });
+
+    const hasLive = p.hasPages && p.pagesUrl;
+
+    if (hasLive) {
+      const live = document.createElement("a");
+      live.href = p.pagesUrl;
+      live.target = "_blank";
+      live.rel = "noopener noreferrer";
+      live.className = "btn-card btn-card-live";
+      live.innerHTML = `<span>Live site</span>`;
+      meta.appendChild(live);
+    }
+
+    if (p.name && !hasLive) {
+      const repoLink = document.createElement("a");
+      repoLink.href = `https://github.com/${GITHUB_USER}/${encodeURIComponent(
+        p.name
+      )}`;
+      repoLink.target = "_blank";
+      repoLink.rel = "noopener noreferrer";
+      repoLink.className = "btn-card";
+      repoLink.textContent = "GitHub";
+      meta.appendChild(repoLink);
+    }
+
+    card.appendChild(meta);
+    projectsGrid.appendChild(card);
+
+    // Try to upgrade thumbnail asynchronously using repo root images
+    loadAndApplyThumbnail(thumb, p);
+  });
+}
+
+/* ---------- Rendering: Media ---------- */
+
+function renderMedia() {
+  if (!mediaGrid || !mediaEmpty) return;
+
+  const search = state.search.trim().toLowerCase();
+  const type = state.mediaTypeFilter;
+  const formatFilter = state.mediaFormatFilter;
+
+  const filtered = allMedia.filter((item) => {
+    const inSearch =
+      !search ||
+      (item.title || "").toLowerCase().includes(search) ||
+      (item.src || "").toLowerCase().includes(search) ||
+      (item.type || "").toLowerCase().includes(search);
+
+    if (!inSearch) return false;
+
+    if (type !== "all" && (item.type || "").toLowerCase() !== type) {
+      return false;
+    }
+
+    const fmt = getMediaFormat(item);
+    if (formatFilter !== "all" && fmt !== formatFilter) {
+      return false;
+    }
+
+    return true;
+  });
+
+  mediaGrid.innerHTML = "";
+
+  if (filtered.length === 0) {
+    mediaEmpty.style.display = "block";
+    mediaGrid.style.display = "none";
+    return;
+  }
+
+  mediaEmpty.style.display = "none";
+  mediaGrid.style.display = "grid";
+
+  filtered.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "media-card";
+
+    const title = document.createElement("h3");
+    title.className = "media-title";
+    title.textContent = item.title || "";
+    card.appendChild(title);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "media-preview";
+
+    const src = item.src;
+
+    if (item.type === "image") {
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = item.title || "";
+      img.loading = "lazy";
+      wrapper.appendChild(img);
+      wrapper.classList.add("clickable");
+
+      // click on whole preview (including image) opens modal
+      wrapper.addEventListener("click", () => {
+        openImageModal(item);
+      });
+    } else if (item.type === "video") {
+      const video = document.createElement("video");
+      video.controls = true;
+      video.src = src;
+      video.preload = "metadata";
+      wrapper.appendChild(video);
+    } else if (item.type === "audio") {
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.src = src;
+      audio.preload = "metadata";
+      wrapper.appendChild(audio);
+    }
+
+    card.appendChild(wrapper);
+
+    const meta = document.createElement("div");
+    meta.className = "media-meta";
+
+    const typeSpan = document.createElement("span");
+    typeSpan.className = "badge badge-media-type";
+    typeSpan.textContent = item.type || "";
+
+    const fmtSpan = document.createElement("span");
+    fmtSpan.className = "badge badge-media-format";
+    fmtSpan.textContent = getMediaFormat(item) || "-";
+
+    meta.appendChild(typeSpan);
+    meta.appendChild(fmtSpan);
+    card.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "media-actions";
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "media-action-btn";
+    viewBtn.textContent = item.type === "image" ? "View" : "Open";
+    viewBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (item.type === "image") {
+        openImageModal(item);
+      } else {
+        window.open(src, "_blank", "noopener,noreferrer");
+      }
+    });
+    actions.appendChild(viewBtn);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.className = "media-action-btn";
+    downloadLink.href = src;
+    downloadLink.download = src.split("/").pop() || "media";
+    downloadLink.textContent = "Download";
+    actions.appendChild(downloadLink);
+
+    card.appendChild(actions);
+    mediaGrid.appendChild(card);
+  });
+}
+
+/* ---------- View switching ---------- */
+
+function updateViewVisibility() {
+  if (projectsView) {
+    projectsView.style.display = currentView === "projects" ? "block" : "none";
+  }
+  if (mediaView) {
+    mediaView.style.display = currentView === "media" ? "block" : "none";
+  }
+
+  if (projectsTab) {
+    projectsTab.classList.toggle("active", currentView === "projects");
+  }
+  if (mediaTab) {
+    mediaTab.classList.toggle("active", currentView === "media");
+  }
+
+  if (projectFiltersEl) {
+    projectFiltersEl.hidden = currentView !== "projects";
+  }
+  if (mediaFiltersEl) {
+    mediaFiltersEl.hidden = currentView !== "media";
+  }
+
+  if (tabsEl) {
+    tabsEl.classList.toggle("tabs-media", currentView === "media");
+  }
+
+  applyTranslations(currentLang);
+
+  if (currentView === "projects") {
+    renderProjects();
+  } else {
+    renderMedia();
   }
 }
 
-@media (max-width: 480px) {
-  .lang-gate-card {
-    padding: 1.4rem 1.1rem 1.1rem;
+function setView(view) {
+  if (view !== "projects" && view !== "media") view = "projects";
+  currentView = view;
+  updateViewVisibility();
+}
+
+/* ---------- DOM refs & events ---------- */
+
+function initDomRefs() {
+  projectsGrid = document.getElementById("projectsGrid");
+  projectsEmpty = document.getElementById("emptyState");
+  mediaGrid = document.getElementById("mediaGrid");
+  mediaEmpty = document.getElementById("mediaEmptyState");
+
+  searchInput = document.getElementById("search");
+  typeSelect = document.getElementById("typeFilter");
+  languageSelect = document.getElementById("languageFilter");
+  mediaTypeSelect = document.getElementById("mediaTypeFilter");
+  mediaFormatSelect = document.getElementById("mediaFormatFilter");
+
+  projectFiltersEl = document.getElementById("projectFilters");
+  mediaFiltersEl = document.getElementById("mediaFilters");
+
+  projectsTab = document.getElementById("projectsTab");
+  mediaTab = document.getElementById("mediaTab");
+
+  projectsView = document.getElementById("projectsView");
+  mediaView = document.getElementById("mediaView");
+
+  tabsEl = document.querySelector(".tabs");
+
+  // modal base element if present
+  imageModal = document.getElementById("imageModal");
+}
+
+function initEvents() {
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      state.search = e.target.value || "";
+      if (currentView === "projects") {
+        renderProjects();
+      } else {
+        renderMedia();
+      }
+    });
+  }
+
+  if (typeSelect) {
+    typeSelect.addEventListener("change", (e) => {
+      state.typeFilter = e.target.value || "all";
+      renderProjects();
+    });
+  }
+
+  if (languageSelect) {
+    languageSelect.addEventListener("change", (e) => {
+      state.languageFilter = e.target.value || "all";
+      renderProjects();
+    });
+  }
+
+  if (mediaTypeSelect) {
+    mediaTypeSelect.addEventListener("change", (e) => {
+      state.mediaTypeFilter = e.target.value || "all";
+      renderMedia();
+    });
+  }
+
+  if (mediaFormatSelect) {
+    mediaFormatSelect.addEventListener("change", (e) => {
+      state.mediaFormatFilter = e.target.value || "all";
+      renderMedia();
+    });
+  }
+
+  if (projectsTab) {
+    projectsTab.addEventListener("click", () => setView("projects"));
+  }
+  if (mediaTab) {
+    mediaTab.addEventListener("click", () => setView("media"));
+  }
+
+  // language buttons (gate + any other .btn-lang)
+  document.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      setLanguage(lang);
+    });
+  });
+
+  // top-right language pill opens the gate
+  const langSwitchBtn = document.getElementById("headerLangButton");
+  if (langSwitchBtn) {
+    langSwitchBtn.addEventListener("click", () => {
+      const gate = document.getElementById("langGate");
+      if (gate) {
+        gate.style.display = "flex";
+      }
+    });
   }
 }
+
+/* ---------- Data loading ---------- */
+
+function loadProjects() {
+  return fetch(PROJECTS_URL)
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to load projects.json");
+      return res.json();
+    })
+    .then((data) => {
+      if (!Array.isArray(data)) return;
+      allProjects = data;
+
+      if (languageSelect) {
+        const existing = new Set(
+          Array.from(languageSelect.options).map((o) =>
+            (o.value || "").toLowerCase()
+          )
+        );
+        const langs = Array.from(
+          new Set(
+            allProjects
+              .map((p) => (p.language || "").trim())
+              .filter(Boolean)
+          )
+        ).sort();
+        langs.forEach((l) => {
+          const lower = l.toLowerCase();
+          if (existing.has(lower)) return;
+          const opt = document.createElement("option");
+          opt.value = l;
+          opt.textContent = l;
+          languageSelect.appendChild(opt);
+        });
+      }
+
+      renderProjects();
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+function loadMedia() {
+  return fetch(MEDIA_URL)
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to load media-index.json");
+      return res.json();
+    })
+    .then((data) => {
+      if (!data || !Array.isArray(data.items)) return;
+      allMedia = data.items;
+
+      if (mediaFormatSelect) {
+        const existing = new Set(
+          Array.from(mediaFormatSelect.options).map((o) =>
+            (o.value || "").toLowerCase()
+          )
+        );
+        const formats = Array.from(
+          new Set(allMedia.map(getMediaFormat).filter(Boolean))
+        ).sort();
+        formats.forEach((fmt) => {
+          if (existing.has(fmt.toLowerCase())) return;
+          const opt = document.createElement("option");
+          opt.value = fmt;
+          opt.textContent = fmt;
+          mediaFormatSelect.appendChild(opt);
+        });
+      }
+
+      renderMedia();
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+/* ---------- Init ---------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("js-enabled");
+
+  initDomRefs();
+
+  currentLang = detectInitialLang();
+  setLanguage(currentLang);
+
+  initLanguageGate();
+  initEvents();
+  initImageModal();
+
+  setView("projects");
+
+  loadProjects();
+  loadMedia();
+});
