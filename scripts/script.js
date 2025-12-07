@@ -901,3 +901,4 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTranslations(currentLang);
   }, 1000);
 });
+```0
