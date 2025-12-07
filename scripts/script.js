@@ -786,47 +786,90 @@ function guessProjectType(repo, override) {
 
   const has = (words) => words.some((w) => joined.includes(w));
 
-  // Game-ish
-  if (has(["game", "sudoku", "unity", "platformer", "puzzle"])) {
-    return "game";
-  }
+  // GAME: explicit game-ish hints first
+  const isGame = has([
+    "game",
+    "games",
+    "spel",
+    "sudoku",
+    "unity",
+    "platformer",
+    "puzzle",
+    "rpg",
+    "jigsaw"
+  ]);
 
   // API / Backend
-  if (has(["api", "backend", "server", "service", "rest"])) {
-    return "api";
-  }
+  const isApi = has([
+    "api",
+    "backend",
+    "server",
+    "service",
+    "rest",
+    "endpoint"
+  ]);
 
-  // Mobile
-  if (
-    has(["android", "ios", "xamarin", "phone", "mobile", "app"]) ||
-    ["kotlin", "swift"].includes(lang)
-  ) {
-    return "mobile";
-  }
-
-  // School / Study
-  if (
+  // Mobile: only treat as mobile if it REALLY looks mobile – not just "app"
+  const isMobile =
     has([
-      "school",
-      "study",
-      "studie",
-      "uni",
-      "university",
-      "hogeschool",
-      "opdracht",
-      "assignment"
-    ])
-  ) {
-    return "school";
-  }
+      "android",
+      "ios",
+      "xamarin",
+      "apk",
+      "play store",
+      "playstore",
+      "xcode",
+      "swiftui",
+      "react native",
+      "react-native",
+      "flutter"
+    ]) ||
+    (["kotlin", "swift", "objective-c", "objective c", "dart"].includes(
+      lang
+    ) &&
+      has(["android", "ios", "mobile"]));
 
-  // Website
-  if (
+  // School / study
+  const isSchool = has([
+    "school",
+    "study",
+    "studie",
+    "uni",
+    "university",
+    "hogeschool",
+    "opdracht",
+    "assignment",
+    "project for school",
+    "school project"
+  ]);
+
+  // Website: PHP/Laravel/WordPress/etc are strongly considered "website"
+  const isWebsite =
     lang === "html" ||
-    has(["website", "web", "site", "landing", "portfolio", "page"])
-  ) {
-    return "website";
-  }
+    lang === "php" ||
+    lang === "vue" ||
+    lang === "asp.net" ||
+    has([
+      "website",
+      "web site",
+      "webpage",
+      "web page",
+      "web",
+      "site",
+      "landing",
+      "portfolio",
+      "page",
+      "laravel",
+      "wordpress",
+      "webshop",
+      "shop"
+    ]);
+
+  if (isGame) return "game";
+  if (isApi) return "api";
+  if (isMobile) return "mobile";
+  if (isSchool) return "school";
+  if (isWebsite) return "website";
 
   return "other";
 }
@@ -1034,28 +1077,22 @@ function renderProjects() {
     const titleRow = document.createElement("div");
     titleRow.className = "project-title-row";
 
-    const thumbBtn = document.createElement("button");
-    thumbBtn.type = "button";
-    thumbBtn.className = "project-thumb";
+    // Thumbnail: now a simple div, not clickable
+    const thumb = document.createElement("div");
+    thumb.className = "project-thumb";
 
     if (project.thumbnail) {
-      thumbBtn.classList.add("has-image");
+      thumb.classList.add("has-image");
       const img = document.createElement("img");
       img.src = project.thumbnail;
       img.alt = project.displayName;
-      thumbBtn.dataset.fullImage = project.thumbnail;
-      thumbBtn.dataset.caption = project.displayName;
-      thumbBtn.appendChild(img);
-
-      thumbBtn.addEventListener("click", () => {
-        openImageModal(project.thumbnail, project.displayName);
-      });
+      thumb.appendChild(img);
     } else {
       const span = document.createElement("span");
       span.textContent = (project.displayName || "?")
         .charAt(0)
         .toUpperCase();
-      thumbBtn.appendChild(span);
+      thumb.appendChild(span);
     }
 
     const titleText = document.createElement("div");
@@ -1072,7 +1109,7 @@ function renderProjects() {
     titleText.appendChild(title);
     titleText.appendChild(langP);
 
-    titleRow.appendChild(thumbBtn);
+    titleRow.appendChild(thumb);
     titleRow.appendChild(titleText);
 
     const desc = document.createElement("p");
