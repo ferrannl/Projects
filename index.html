@@ -31,43 +31,55 @@
         <!-- Nederlands -->
         <button class="btn-lang" data-lang="nl">
           <span class="flag">🇳🇱</span>
-          <span class="label-main">Nederlands</span>
-          <span class="label-sub">Moedertaal</span>
+          <span class="btn-lang-text">
+            <span class="label-main">Nederlands</span>
+            <span class="label-sub">Moedertaal</span>
+          </span>
         </button>
 
         <!-- English -->
         <button class="btn-lang" data-lang="en">
           <span class="flag">🇬🇧</span>
-          <span class="label-main">English</span>
-          <span class="label-sub">International</span>
+          <span class="btn-lang-text">
+            <span class="label-main">English</span>
+            <span class="label-sub">International</span>
+          </span>
         </button>
 
         <!-- Deutsch -->
         <button class="btn-lang" data-lang="de">
           <span class="flag">🇩🇪</span>
-          <span class="label-main">Deutsch</span>
-          <span class="label-sub">Für meine Nachbarn</span>
+          <span class="btn-lang-text">
+            <span class="label-main">Deutsch</span>
+            <span class="label-sub">Für meine Nachbarn</span>
+          </span>
         </button>
 
         <!-- Polski -->
         <button class="btn-lang" data-lang="pl">
           <span class="flag">🇵🇱</span>
-          <span class="label-main">Polski</span>
-          <span class="label-sub">właśc. Dominik Włodzimierz Czajka-Groot</span>
+          <span class="btn-lang-text">
+            <span class="label-main">Polski</span>
+            <span class="label-sub">właśc. Dominik Włodzimierz Czajka-Groot</span>
+          </span>
         </button>
 
         <!-- Türkçe -->
         <button class="btn-lang" data-lang="tr">
           <span class="flag">🇹🇷</span>
-          <span class="label-main">Türkçe</span>
-          <span class="label-sub">Merhaba, hoş geldin</span>
+          <span class="btn-lang-text">
+            <span class="label-main">Türkçe</span>
+            <span class="label-sub">Merhaba, hoş geldin</span>
+          </span>
         </button>
 
         <!-- Español -->
         <button class="btn-lang" data-lang="es">
           <span class="flag">🇪🇸</span>
-          <span class="label-main">Español</span>
-          <span class="label-sub">Para amigos de España y Canarias</span>
+          <span class="btn-lang-text">
+            <span class="label-main">Español</span>
+            <span class="label-sub">Para amigos de España y Canarias</span>
+          </span>
         </button>
       </div>
     </div>
@@ -227,6 +239,7 @@
             <option value="mobile" data-i18n="typeMobile">Mobiel</option>
             <option value="api" data-i18n="typeApi">API’s / Backend</option>
             <option value="school" data-i18n="typeSchool">School / Studie</option>
+            <option value="game" data-i18n="typeGame">Game</option>
             <option value="other" data-i18n="typeOther">Overig</option>
           </select>
         </div>
@@ -290,24 +303,25 @@
     <div id="imageModal" class="image-modal" hidden></div>
 
     <footer class="site-footer">
-      <span data-i18n-footer-built>
+      <span class="footer-left" data-i18n-footer-built>
         Gemaakt met ♥ door Ferran
       </span>
-      &nbsp;·&nbsp;
+      <span class="footer-center" id="footerCopyright"></span>
       <a
+        class="footer-right"
         href="https://github.com/ferrannl"
         target="_blank"
         rel="noopener noreferrer"
       >
         @ferrannl
       </a>
-
-      <noscript>
-        <p class="noscript-warning">
-          JavaScript is disabled – enable it to see the interactive project &amp; media listing.
-        </p>
-      </noscript>
     </footer>
+
+    <noscript>
+      <p class="noscript-warning">
+        JavaScript is disabled – enable it to see the interactive project &amp; media listing.
+      </p>
+    </noscript>
   </div>
 </body>
 </html>
