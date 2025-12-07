@@ -71,16 +71,20 @@
     </div>
   </div>
 
-  <header class="site-header">
-    <div class="site-header-inner">
-      <div class="brand-block">
-        <h1 class="site-title">Ferran’s Projects</h1>
-        <p class="site-subtitle" data-i18n="subtitle">
-          Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.
-        </p>
+  <div class="app">
+    <header class="site-header">
+      <div class="site-title-block">
+        <div class="header-main-row">
+          <div class="header-main-left">
+            <h1 class="site-title">Ferran’s Projects</h1>
+            <p class="site-subtitle" data-i18n="subtitle">
+              Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div class="header-right">
+      <div class="header-actions">
         <!-- Top-right language buttons -->
         <div class="header-lang-switcher">
           <button class="btn-lang" data-lang="nl">
@@ -111,207 +115,213 @@
           <button class="btn-lang" data-lang="es">
             <span class="flag">🇪🇸</span>
             <span class="label-main">Español</span>
-            <span class="label-sub">España & Canarias</span>
+            <span class="label-sub">España &amp; Canarias</span>
           </button>
         </div>
 
         <!-- Social / contact -->
-        <nav class="social-links">
+        <nav class="social-links" aria-label="Social links">
           <a
             href="https://github.com/ferrannl"
-            class="social-link"
+            class="social-chip social-github"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <!-- adjust icon paths if needed -->
-            <img src="images/github_icon.png" alt="GitHub" class="social-icon" />
-            <span>GitHub</span>
+            <span class="social-icon">
+              <img src="images/github_icon.png" alt="GitHub" />
+            </span>
+            <span class="social-label">GitHub</span>
           </a>
           <a
             href="https://www.instagram.com/ferrannl"
-            class="social-link"
+            class="social-chip social-instagram"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src="images/instagram_icon.png" alt="Instagram" class="social-icon" />
-            <span>Instagram</span>
+            <span class="social-icon">
+              <img src="images/instagram_icon.png" alt="Instagram" />
+            </span>
+            <span class="social-label">Instagram</span>
           </a>
           <a
             href="https://www.linkedin.com/in/ferrannl"
-            class="social-link"
+            class="social-chip social-linkedin"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src="images/linkedin_icon.png" alt="LinkedIn" class="social-icon" />
-            <span>LinkedIn</span>
+            <span class="social-icon">
+              <img src="images/linkedin_icon.png" alt="LinkedIn" />
+            </span>
+            <span class="social-label">LinkedIn</span>
           </a>
           <a
             href="mailto:ferrannl@outlook.com"
-            class="social-link"
+            class="social-chip social-outlook"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src="images/email_icon.png" alt="Email" class="social-icon" />
-            <span>Outlook / Email</span>
+            <span class="social-icon">
+              <img src="images/email_icon.png" alt="Email" />
+            </span>
+            <span class="social-label">Outlook / Email</span>
           </a>
         </nav>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="page-main">
-    <!-- About -->
-    <section class="about-section">
-      <h2 class="section-title" data-i18n="aboutTitle">Over mij</h2>
-      <p class="about-text" data-i18n="aboutP1">
-        Hey 👋🏻 Ferran (26) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch.
-        Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.
-      </p>
-      <p class="about-text" data-i18n="aboutP2"></p>
-    </section>
+    <main class="page-main">
+      <!-- About -->
+      <section class="about-section">
+        <h2 class="section-title" data-i18n="aboutTitle">Over mij</h2>
+        <p class="about-text" data-i18n="aboutP1">
+          Hey 👋🏻 Ferran (26) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch.
+          Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.
+        </p>
+        <p class="about-text" data-i18n="aboutP2"></p>
+      </section>
 
-    <!-- Tabs -->
-    <section class="tabs-section">
-      <div class="tabs">
-        <button
-          id="projectsTab"
-          class="tab-button active"
-          type="button"
-          data-i18n="tabProjects"
+      <!-- Tabs -->
+      <section class="tabs-section">
+        <div class="tabs">
+          <button
+            id="projectsTab"
+            class="tab-button active"
+            type="button"
+            data-i18n="tabProjects"
+          >
+            Projecten
+          </button>
+          <button
+            id="mediaTab"
+            class="tab-button"
+            type="button"
+            data-i18n="tabMedia"
+          >
+            Media
+          </button>
+        </div>
+      </section>
+
+      <!-- No-JS / broken-JS fallback -->
+      <div class="no-js-fallback">
+        <p>
+          Hmm… no projects here right now. Maybe I took them offline, or something went wrong loading them.
+        </p>
+        <p>
+          Try refreshing the page with a hard reload (Shift + F5 / Ctrl + F5, or the mobile equivalent),
+          then wait a few seconds.
+        </p>
+      </div>
+
+      <!-- Shared search -->
+      <section class="search-section">
+        <label for="search" class="search-label">Search</label>
+        <input
+          id="search"
+          type="search"
+          placeholder="Search by name, description, language or tag…"
+          autocomplete="off"
+        />
+      </section>
+
+      <!-- Project filters -->
+      <section id="projectFilters" class="filters-section">
+        <div class="filter-group">
+          <label for="typeFilter" data-i18n="filterTypeLabel">Type</label>
+          <select id="typeFilter">
+            <option value="all" data-i18n="typeAll">Alles</option>
+            <option value="website" data-i18n="typeWebsite">Websites</option>
+            <option value="mobile" data-i18n="typeMobile">Mobiel</option>
+            <option value="api" data-i18n="typeApi">API’s / Backend</option>
+            <option value="school" data-i18n="typeSchool">School / Studie</option>
+            <option value="other" data-i18n="typeOther">Overig</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="languageFilter" data-i18n="filterLanguageLabel">Taal</label>
+          <select id="languageFilter">
+            <option value="all" data-i18n="languageFilterAll">Alle talen</option>
+            <!-- more options will be appended by JS based on projects.json -->
+          </select>
+        </div>
+      </section>
+
+      <!-- Media filters -->
+      <section id="mediaFilters" class="filters-section">
+        <div class="filter-group">
+          <label for="mediaTypeFilter" data-i18n="mediaTypeLabel">Media type</label>
+          <select id="mediaTypeFilter">
+            <option value="all" data-i18n="mediaKindAll">Alles</option>
+            <option value="image" data-i18n="mediaKindImages">Afbeeldingen</option>
+            <option value="video" data-i18n="mediaKindVideos">Video’s</option>
+            <option value="audio" data-i18n="mediaKindAudio">Audio</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="mediaFormatFilter" data-i18n="mediaFormatLabel">Bestandstype</label>
+          <select id="mediaFormatFilter">
+            <option value="all" data-i18n="mediaFormatAll">Alle formaten</option>
+            <!-- more options (jpg, png, mp4, etc.) will be appended by JS from media-index.json -->
+          </select>
+        </div>
+      </section>
+
+      <!-- Projects view -->
+      <section id="projectsView" class="view-section">
+        <div id="projectsGrid" class="cards-grid"></div>
+        <p
+          id="emptyState"
+          class="empty-state"
+          data-i18n="emptyState"
         >
-          Projecten
-        </button>
-        <button
-          id="mediaTab"
-          class="tab-button"
-          type="button"
-          data-i18n="tabMedia"
+          Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.
+        </p>
+      </section>
+
+      <!-- Media view -->
+      <section id="mediaView" class="view-section">
+        <div id="mediaGrid" class="cards-grid media-grid"></div>
+        <p
+          id="mediaEmptyState"
+          class="empty-state"
+          data-i18n="mediaEmptyState"
         >
-          Media
-        </button>
-      </div>
-    </section>
+          Geen media gevonden met deze zoekopdracht of filters.
+        </p>
+      </section>
+    </main>
 
-    <!-- No-JS / broken-JS fallback -->
-    <div class="no-js-fallback">
-      <p>
-        Hmm… no projects here right now. Maybe I took them offline, or something went wrong loading them.
-      </p>
-      <p>
-        Try refreshing the page with a hard reload (Shift + F5 / Ctrl + F5, or the mobile equivalent),
-        then wait a few seconds.
-      </p>
-    </div>
-
-    <!-- Shared search -->
-    <section class="search-section">
-      <label for="search" class="search-label">Search</label>
-      <input
-        id="search"
-        class="search-input"
-        type="search"
-        placeholder="Search by name, description, language or tag…"
-        autocomplete="off"
-      />
-    </section>
-
-    <!-- Project filters -->
-    <section id="projectFilters" class="filters-section">
-      <div class="filter-group">
-        <label for="typeFilter" data-i18n="filterTypeLabel">Type</label>
-        <select id="typeFilter">
-          <option value="all" data-i18n="typeAll">Alles</option>
-          <option value="website" data-i18n="typeWebsite">Websites</option>
-          <option value="mobile" data-i18n="typeMobile">Mobiel</option>
-          <option value="api" data-i18n="typeApi">API’s / Backend</option>
-          <option value="school" data-i18n="typeSchool">School / Studie</option>
-          <option value="other" data-i18n="typeOther">Overig</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="languageFilter" data-i18n="filterLanguageLabel">Taal</label>
-        <select id="languageFilter">
-          <option value="all" data-i18n="languageFilterAll">Alle talen</option>
-          <!-- more options will be appended by JS based on projects.json -->
-        </select>
-      </div>
-    </section>
-
-    <!-- Media filters -->
-    <section id="mediaFilters" class="filters-section">
-      <div class="filter-group">
-        <label for="mediaTypeFilter" data-i18n="mediaTypeLabel">Media type</label>
-        <select id="mediaTypeFilter">
-          <option value="all" data-i18n="mediaKindAll">Alles</option>
-          <option value="image" data-i18n="mediaKindImages">Afbeeldingen</option>
-          <option value="video" data-i18n="mediaKindVideos">Video’s</option>
-          <option value="audio" data-i18n="mediaKindAudio">Audio</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="mediaFormatFilter" data-i18n="mediaFormatLabel">Bestandstype</label>
-        <select id="mediaFormatFilter">
-          <option value="all" data-i18n="mediaFormatAll">Alle formaten</option>
-          <!-- more options (jpg, png, mp4, etc.) will be appended by JS from media-index.json -->
-        </select>
-      </div>
-    </section>
-
-    <!-- Projects view -->
-    <section id="projectsView" class="view-section">
-      <div id="projectsGrid" class="cards-grid"></div>
-      <p
-        id="emptyState"
-        class="empty-state"
-        data-i18n="emptyState"
+    <footer class="site-footer">
+      <span data-i18n-footer-built>
+        Gemaakt met ♥ door Ferran
+      </span>
+      &nbsp;·&nbsp;
+      <a
+        href="https://github.com/ferrannl/Projects"
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.
-      </p>
-    </section>
-
-    <!-- Media view -->
-    <section id="mediaView" class="view-section">
-      <div id="mediaGrid" class="cards-grid media-grid"></div>
-      <p
-        id="mediaEmptyState"
-        class="empty-state"
-        data-i18n="mediaEmptyState"
+        @ferrannl
+      </a>
+      &nbsp;·&nbsp;
+      <a
+        href="https://ferrannl.github.io/Projects/index.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-i18n-footer-pages
       >
-        Geen media gevonden met deze zoekopdracht of filters.
-      </p>
-    </section>
-  </main>
+        Bekijk deze site op GitHub Pages
+      </a>
 
-  <footer class="site-footer">
-    <span data-i18n-footer-built>
-      Gemaakt met ♥ door Ferran
-    </span>
-    &nbsp;·&nbsp;
-    <a
-      href="https://github.com/ferrannl/Projects"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      @ferrannl
-    </a>
-    &nbsp;·&nbsp;
-    <a
-      href="https://ferrannl.github.io/Projects/index.html"
-      target="_blank"
-      rel="noopener noreferrer"
-      data-i18n-footer-pages
-    >
-      Bekijk deze site op GitHub Pages
-    </a>
-
-    <noscript>
-      <p class="noscript-warning">
-        JavaScript is disabled – enable it to see the interactive project &amp; media listing.
-      </p>
-    </noscript>
-  </footer>
+      <noscript>
+        <p class="noscript-warning">
+          JavaScript is disabled – enable it to see the interactive project &amp; media listing.
+        </p>
+      </noscript>
+    </footer>
+  </div>
 
   <!-- Main script -->
   <script src="scripts/script.js"></script>
