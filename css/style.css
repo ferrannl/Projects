@@ -1,5 +1,3 @@
-/* css/style.css */
-
 /* ---------- Theme tokens ---------- */
 
 :root {
@@ -306,7 +304,7 @@ body {
   line-height: 1.5;
 }
 
-/* Profile avatar in About section */
+/* Profile avatar */
 
 .profile-avatar {
   margin-top: 1.1rem;
@@ -318,14 +316,17 @@ body {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  padding: 3px;
+  padding: 4px; /* a bit thicker */
   background: conic-gradient(
     from 180deg,
-    rgba(255, 75, 129, 0.95),
-    rgba(75, 195, 255, 0.95),
-    rgba(255, 75, 129, 0.95)
+    #0b1a3d,
+    #0b1a3d 10%,
+    #b0172f 30%,
+    #0b1a3d 55%,
+    #b0172f 75%,
+    #050716 100%
   );
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
 }
 
 .profile-avatar-inner img {
@@ -451,12 +452,12 @@ body {
   outline-offset: 2px;
 }
 
-/* magnifying glass – slightly adjusted to be more visually centered */
+/* magnifying glass – centered-ish */
 .search-section::before {
   content: "🔍";
   position: absolute;
   left: 0.9rem;
-  top: 2.55rem; /* tweaked to sit more in the middle */
+  top: 2.55rem;
   transform: translateY(-50%);
   font-size: 0.95rem;
   opacity: 0.7;
@@ -656,6 +657,13 @@ body {
   margin-top: 0.1rem;
 }
 
+.project-actions {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
 .badge {
   font-size: 0.78rem;
   padding: 0.25rem 0.6rem;
@@ -693,7 +701,6 @@ body {
     box-shadow var(--transition-fast);
 }
 
-/* Live site – fancy 360° highlight ring, cross-browser */
 /* Live site – fancy 360° highlight ring, ALWAYS ACTIVE */
 .btn-card-live {
   position: relative;
@@ -719,7 +726,7 @@ body {
     rgba(255, 75, 129, 0.7),
     rgba(255, 75, 129, 0.0)
   );
-  opacity: 0.85; /* <-- ALWAYS ON */
+  opacity: 0.85;
   pointer-events: none;
   animation: liveGlowSpin 3.2s linear infinite;
   transition: opacity 180ms ease-out;
@@ -747,7 +754,7 @@ body {
   z-index: 1;
 }
 
-/* hover just adds a slight lift & glow */
+/* hover lift & glow */
 .btn-card-live:hover,
 .btn-card-live:focus-visible {
   box-shadow:
@@ -756,13 +763,12 @@ body {
   transform: translateY(-1px);
 }
 
-
 .btn-card-live:hover::before,
 .btn-card-live:focus-visible::before {
   opacity: 0.85;
 }
 
-/* mobile: low idle opacity so it still looks special */
+/* mobile: lower idle opacity */
 @media (hover: none) {
   .btn-card-live::before {
     opacity: 0.45;
@@ -1026,10 +1032,10 @@ body {
   padding: 0.55rem 0.8rem;
   display: flex;
   gap: 0.55rem;
-  align-items: flex-start; /* allow multi-line labels without overflow */
+  align-items: flex-start;
   cursor: pointer;
   text-align: left;
-  white-space: normal; /* allow wrapping */
+  white-space: normal;
   transition:
     transform var(--transition-fast),
     box-shadow var(--transition-fast),
@@ -1110,7 +1116,7 @@ body {
   max-height: 70vh;
   border-radius: 14px;
   display: block;
-  cursor: zoom-out; /* click to close */
+  cursor: zoom-out;
 }
 
 .image-modal-caption {
