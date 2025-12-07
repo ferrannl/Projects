@@ -606,7 +606,7 @@ body {
 }
 
 .project-thumb.has-image {
-  cursor: zoom-in;
+  cursor: default; /* no zoom cursor anymore; just eyecandy */
   border-color: rgba(255, 255, 255, 0.3);
   background: transparent;
 }
