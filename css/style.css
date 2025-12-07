@@ -456,7 +456,7 @@ body {
   gap: 1.1rem;
 }
 
-/* ---------- Project cards ---------- */
+/* ---------- Project cards + thumbnails ---------- */
 
 .project-card {
   position: relative;
@@ -493,18 +493,79 @@ body {
   opacity: 0.5;
 }
 
+.project-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
+}
+
+/* Project thumbnail */
+
+.project-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.6), rgba(14, 24, 55, 1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  padding: 0;
+  outline: none;
+}
+
+.project-thumb span {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
+
+.project-thumb.has-image {
+  cursor: zoom-in;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: transparent;
+}
+
+.project-thumb.has-image img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+  transition: transform 160ms ease-out;
+}
+
+.project-card:hover .project-thumb.has-image img {
+  transform: scale(1.03);
+}
+
+.project-title-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 .project-title {
   font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 0.15rem;
+  margin: 0;
   word-break: break-word;
 }
 
 .project-lang {
   font-size: 0.78rem;
   color: rgba(193, 232, 255, 0.95);
-  margin-bottom: 0.25rem;
+  margin: 0;
 }
+
+/* description + meta */
 
 .project-desc {
   margin: 0 0 0.55rem;
@@ -787,6 +848,29 @@ body {
 .label-sub {
   font-size: 0.78rem;
   color: var(--text-muted);
+}
+
+/* ---------- Fullscreen image modal ---------- */
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 8, 0.86);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.image-modal[hidden] {
+  display: none;
+}
+
+.image-modal-img {
+  max-width: min(90vw, 1200px);
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9);
 }
 
 /* ---------- No-JS fallback ---------- */
