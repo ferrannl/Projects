@@ -4,7 +4,7 @@
    Ferran’s Projects – Main JS
 
    - Multi-language UI (NL / EN / DE / PL / TR / ES)
-   - Live age text in About section
+   - Age text in About section (full precision at load)
    - Projects + Media switcher with filters
    - Fancy media wall (zoom, download, share)
    - No-JS fallback (handled via body.js-enabled)
@@ -24,12 +24,12 @@ let currentLang = DEFAULT_LANG;
 const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // months are 0-based
 
 const AGE_UNITS = {
-  nl: { y: "j", m: "mnd", d: "d", h: "u", min: "min", s: "s" },
-  en: { y: "y", m: "mo", d: "d", h: "h", min: "m", s: "s" },
-  de: { y: "J", m: "M", d: "T", h: "Std", min: "Min", s: "s" },
-  pl: { y: "l", m: "m", d: "d", h: "g", min: "min", s: "s" },
-  tr: { y: "y", m: "ay", d: "g", h: "sa", min: "dk", s: "sn" },
-  es: { y: "a", m: "m", d: "d", h: "h", min: "min", s: "s" }
+  nl: { y: "j", m: "mnd", w: "w", d: "d", h: "u", min: "min", s: "s" },
+  en: { y: "y", m: "mo", w: "w", d: "d", h: "h", min: "m", s: "s" },
+  de: { y: "J", m: "M", w: "W", d: "T", h: "Std", min: "Min", s: "s" },
+  pl: { y: "l", m: "m", w: "t", d: "d", h: "g", min: "min", s: "s" },
+  tr: { y: "y", m: "ay", w: "hf", d: "g", h: "sa", min: "dk", s: "sn" },
+  es: { y: "a", m: "m", w: "s", d: "d", h: "h", min: "min", s: "s" }
 };
 
 /* ---------- Translations (with 🇳🇱 flag in About) ---------- */
@@ -283,15 +283,17 @@ function computeAgeComponents(now) {
 function formatAge(lang) {
   const units = AGE_UNITS[lang] || AGE_UNITS[DEFAULT_LANG];
   const { y, m, w, d, h, min, s } = computeAgeComponents(new Date());
-  const parts = [];
 
-  if (y) parts.push(`${y}${units.y}`);
-  if (m) parts.push(`${m}${units.m}`);
-  if (w) parts.push(`${w}w`);
-  if (!y && !m && !w && d) parts.push(`${d}${units.d}`);
-  if (!y && !m && !w && !d && h) parts.push(`${h}${units.h}`);
-  if (!y && !m && !w && !d && !h && min) parts.push(`${min}${units.min}`);
-  if (!y && !m && !w && !d && !h && !min) parts.push(`${s}${units.s}`);
+  // Always show everything from years down to seconds
+  const parts = [
+    `${y}${units.y}`,
+    `${m}${units.m}`,
+    `${w}${units.w}`,
+    `${d}${units.d}`,
+    `${h}${units.h}`,
+    `${min}${units.min}`,
+    `${s}${units.s}`
+  ];
 
   return parts.join(" ");
 }
@@ -544,7 +546,7 @@ function initImageModal() {
     imageModalClose.addEventListener("click", () => closeImageModal());
   }
 
-  // NEW: clicking the big image also closes the modal
+  // click on big image closes modal too
   if (imageModalImg) {
     imageModalImg.addEventListener("click", () => closeImageModal());
   }
@@ -869,7 +871,7 @@ function renderMedia() {
     downloadLink.textContent = "Download";
     actions.appendChild(downloadLink);
 
-    // REMOVED: "Open tab" button – was overkill / clutter
+    // "Open tab" removed on purpose
 
     card.appendChild(actions);
     mediaGrid.appendChild(card);
@@ -1110,9 +1112,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadProjects();
   loadMedia();
-
-  // Update age every second
-  setInterval(() => {
-    applyTranslations(currentLang);
-  }, 1000);
 });
