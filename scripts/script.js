@@ -8,6 +8,8 @@
    - Projects + Media switcher with filters
    - Fancy media wall (zoom, download, share)
    - Auto thumbnails from repo root via GitHub API
+   - Pretty repo titles (no more hyphen hell)
+   - Enriched tags (HTML → HTML/CSS/JS, C# → .NET, etc.)
    - No-JS fallback (handled via body.js-enabled)
 ------------------------------------------------------- */
 
@@ -313,7 +315,7 @@ function formatAge(lang) {
   const units = AGE_UNITS[lang] || AGE_UNITS[DEFAULT_LANG];
   const { y, m, w, d, h, min, s } = computeAgeComponents(new Date());
 
-  // Always show everything from years down to seconds
+  // show full chain: years to seconds
   const parts = [
     `${y}${units.y}`,
     `${m}${units.m}`,
@@ -325,6 +327,110 @@ function formatAge(lang) {
   ];
 
   return parts.join(" ");
+}
+
+/* ---------- Repo display name prettifier ---------- */
+
+const LOWERCASE_WORDS = new Set([
+  "voor",
+  "na",
+  "met",
+  "door",
+  "van",
+  "en",
+  "of",
+  "de",
+  "het",
+  "een",
+  "der",
+  "den",
+  "und",
+  "mit",
+  "für",
+  "im",
+  "am",
+  "an",
+  "vom",
+  "del",
+  "la",
+  "el",
+  "y",
+  "con",
+  "por"
+]);
+
+function prettifyRepoName(name) {
+  if (!name) return "";
+
+  const cleaned = name.replace(/[-_]+/g, " ");
+  const parts = cleaned.split(/\s+/);
+
+  return parts
+    .map((raw, index) => {
+      const lower = raw.toLowerCase();
+      if (lower === "ios") return "iOS";
+      if (lower === "html") return "HTML";
+      if (lower === "css") return "CSS";
+      if (lower === "js") return "JS";
+      if (lower === "api" || lower === "apis") return lower.toUpperCase();
+      if (lower === "c#") return "C#";
+      if (lower === "c++") return "C++";
+      if (lower === "php") return "PHP";
+
+      if (LOWERCASE_WORDS.has(lower) && index !== 0) return lower;
+
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(" ");
+}
+
+/* ---------- Tag enrichment ---------- */
+
+function deriveExtraTags(project) {
+  const tags = new Set(
+    Array.isArray(project.tags) ? project.tags.filter(Boolean) : []
+  );
+
+  const lang = (project.language || "").toLowerCase();
+
+  if (lang.includes("html")) {
+    tags.add("HTML");
+    tags.add("CSS");
+    tags.add("JS");
+  }
+
+  if (lang.includes("javascript") || lang === "js") {
+    tags.add("JavaScript");
+    tags.add("JS");
+  }
+
+  if (lang.includes("typescript")) {
+    tags.add("TypeScript");
+  }
+
+  if (lang.includes("c#")) {
+    tags.add("C#");
+    tags.add(".NET");
+  }
+
+  if (lang.includes(".net")) {
+    tags.add(".NET");
+  }
+
+  if (lang.includes("c++")) {
+    tags.add("C++");
+    tags.add("C");
+  }
+
+  if (lang === "c") {
+    tags.add("C");
+  }
+
+  if (lang.includes("php")) {
+    tags.add("PHP");
+  }
+
+  return Array.from(tags);
 }
 
 /* ---------- i18n application ---------- */
@@ -582,7 +688,6 @@ async function ensureThumbnailForProject(project) {
       return null;
     }
 
-    // Map for quick name lookup (case-insensitive)
     const lowerMap = new Map(
       imageFiles.map((f) => [(f.name || "").toLowerCase(), f])
     );
@@ -613,7 +718,6 @@ async function ensureThumbnailForProject(project) {
 }
 
 function loadAndApplyThumbnail(thumbEl, project) {
-  // fire and forget; no await in render
   ensureThumbnailForProject(project).then((url) => {
     if (!url || !thumbEl.isConnected) return;
 
@@ -677,7 +781,7 @@ function initImageModal() {
     imageModalClose.addEventListener("click", () => closeImageModal());
   }
 
-  // click on big image closes modal too
+  // clicking the big image closes again (minimize)
   if (imageModalImg) {
     imageModalImg.addEventListener("click", () => closeImageModal());
   }
@@ -713,8 +817,17 @@ function initImageModal() {
 }
 
 function openImageModal(item) {
+  if (!item || !item.src) {
+    return;
+  }
+
   initImageModal();
-  if (!imageModal || !imageModalImg) return;
+
+  if (!imageModal || !imageModalImg) {
+    // hard fallback: just open in new tab
+    window.open(item.src, "_blank", "noopener,noreferrer");
+    return;
+  }
 
   const src = item.src;
   const title = item.title || "";
@@ -752,14 +865,20 @@ function renderProjects() {
   const langFilter = state.languageFilter;
 
   const filtered = allProjects.filter((p) => {
+    const derivedTags = deriveExtraTags(p);
+    const baseTags =
+      Array.isArray(p.tags) && p.tags.length ? p.tags.join(" ") : "";
+    const tagsText = `${baseTags} ${derivedTags.join(" ")}`.toLowerCase();
+
+    const displayName = prettifyRepoName(p.name || "");
+
     const inSearch =
       !search ||
+      displayName.toLowerCase().includes(search) ||
       (p.name || "").toLowerCase().includes(search) ||
       (p.description || "").toLowerCase().includes(search) ||
       (p.language || "").toLowerCase().includes(search) ||
-      (Array.isArray(p.tags)
-        ? p.tags.join(" ").toLowerCase().includes(search)
-        : false);
+      tagsText.includes(search);
 
     if (!inSearch) return false;
 
@@ -800,9 +919,11 @@ function renderProjects() {
     thumb.type = "button";
     thumb.className = "project-thumb";
 
-    // Initial letter fallback
+    const niceName = prettifyRepoName(p.name || "");
+    const displayForLetter = niceName || p.name || "?";
+
     const span = document.createElement("span");
-    span.textContent = (p.name || "?").charAt(0).toUpperCase();
+    span.textContent = displayForLetter.charAt(0).toUpperCase();
     thumb.appendChild(span);
 
     const titleText = document.createElement("div");
@@ -810,7 +931,7 @@ function renderProjects() {
 
     const title = document.createElement("h3");
     title.className = "project-title";
-    title.textContent = p.name || "";
+    title.textContent = niceName;
 
     const lang = document.createElement("div");
     lang.className = "project-lang";
@@ -843,6 +964,16 @@ function renderProjects() {
     typeBadge.className = "badge badge-type";
     typeBadge.textContent = typeMap[typeKey] || t.typeOther;
     meta.appendChild(typeBadge);
+
+    // extra language/tech tags
+    const extraTags = deriveExtraTags(p);
+    extraTags.forEach((tag) => {
+      if (!tag) return;
+      const tagBadge = document.createElement("span");
+      tagBadge.className = "badge";
+      tagBadge.textContent = tag;
+      meta.appendChild(tagBadge);
+    });
 
     if (p.hasPages && p.pagesUrl) {
       const live = document.createElement("a");
@@ -936,7 +1067,8 @@ function renderMedia() {
       img.loading = "lazy";
       wrapper.appendChild(img);
       wrapper.classList.add("clickable");
-      // click on whole preview (image area) opens modal
+
+      // click on whole preview (including image) opens modal
       wrapper.addEventListener("click", () => {
         openImageModal(item);
       });
@@ -995,7 +1127,7 @@ function renderMedia() {
     downloadLink.textContent = "Download";
     actions.appendChild(downloadLink);
 
-    // "Open tab" removed on purpose
+    // "Open tab" button intentionally removed
 
     card.appendChild(actions);
     mediaGrid.appendChild(card);
