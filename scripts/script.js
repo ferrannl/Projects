@@ -3,9 +3,9 @@
 /* -------------------------------------------------------
    Ferran’s Projects – Main JS
    - Multi-language UI (NL / EN / DE / PL / TR / ES)
-   - Live age text in About section (years, months, weeks, days, hours, mins, secs)
+   - Live age text in About section
    - Projects + Media switcher with filters
-   - Smart thumbnails per repo + fullscreen image modal
+   - Fancy media wall (zoom, download, share)
    - No-JS fallback (handled via body.js-enabled)
 ------------------------------------------------------- */
 
@@ -23,15 +23,15 @@ let currentLang = DEFAULT_LANG;
 const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // months are 0-based
 
 const AGE_UNITS = {
-  nl: { y: "j", m: "mnd", w: "w", d: "d", h: "u", min: "min", s: "s" },
-  en: { y: "y", m: "mo", w: "w", d: "d", h: "h", min: "m", s: "s" },
-  de: { y: "J", m: "M", w: "W", d: "T", h: "Std", min: "Min", s: "s" },
-  pl: { y: "l", m: "m", w: "tyg", d: "d", h: "g", min: "min", s: "s" },
-  tr: { y: "y", m: "ay", w: "hf", d: "g", h: "sa", min: "dk", s: "sn" },
-  es: { y: "a", m: "m", w: "sem", d: "d", h: "h", min: "min", s: "s" }
+  nl: { y: "j", m: "mnd", d: "d", h: "u", min: "min", s: "s" },
+  en: { y: "y", m: "mo", d: "d", h: "h", min: "m", s: "s" },
+  de: { y: "J", m: "M", d: "T", h: "Std", min: "Min", s: "s" },
+  pl: { y: "l", m: "m", d: "d", h: "g", min: "min", s: "s" },
+  tr: { y: "y", m: "ay", d: "g", h: "sa", min: "dk", s: "sn" },
+  es: { y: "a", m: "m", d: "d", h: "h", min: "min", s: "s" }
 };
 
-/* ---------- Translations ---------- */
+/* ---------- Translations (with 🇳🇱 flag in About) ---------- */
 
 const TRANSLATIONS = {
   en: {
@@ -66,8 +66,7 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "No media to show right now. Try a hard refresh and wait a few seconds.",
     footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages",
-    headerLangButton: "Language"
+    footerViewOnPages: "View this site on GitHub Pages"
   },
 
   nl: {
@@ -104,8 +103,7 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Geen media om te laten zien. Probeer de pagina opnieuw te laden en wacht even.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages",
-    headerLangButton: "Taal"
+    footerViewOnPages: "Bekijk deze site op GitHub Pages"
   },
 
   de: {
@@ -142,8 +140,7 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Keine Medien für diese Suche oder Filter. Versuche die Seite neu zu laden.",
     footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
-    headerLangButton: "Sprache"
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
   },
 
   pl: {
@@ -180,8 +177,7 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Brak mediów dla tych filtrów. Spróbuj ponownie odświeżyć stronę.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
-    headerLangButton: "Język"
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
   },
 
   tr: {
@@ -218,8 +214,7 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Bu filtrelere uygun medya yok. Sayfayı yenilemeyi dene.",
     footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
-    headerLangButton: "Dil"
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
   },
 
   es: {
@@ -256,8 +251,7 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "No hay media con estos filtros. Prueba a recargar la página.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages",
-    headerLangButton: "Idioma"
+    footerViewOnPages: "Ver este sitio en GitHub Pages"
   }
 };
 
@@ -278,15 +272,14 @@ function computeAgeComponents(now) {
   const h = totalSeconds % 24;
   totalSeconds = (totalSeconds - h) / 24;
 
-  // approximate months/years
-  const dRaw = totalSeconds % 30;
-  totalSeconds = (totalSeconds - dRaw) / 30;
+  const d = totalSeconds % 7;
+  totalSeconds = (totalSeconds - d) / 7;
+
+  const w = totalSeconds % 4;
+  totalSeconds = (totalSeconds - w) / 4;
 
   const m = totalSeconds % 12;
   const y = (totalSeconds - m) / 12;
-
-  const w = Math.floor(dRaw / 7);
-  const d = dRaw % 7;
 
   return { y, m, w, d, h, min, s };
 }
@@ -298,22 +291,13 @@ function formatAge(lang) {
 
   if (y) parts.push(`${y}${units.y}`);
   if (m) parts.push(`${m}${units.m}`);
-  if (w) parts.push(`${w}${units.w}`);
-  if (d) parts.push(`${d}${units.d}`);
-  if (h) parts.push(`${h}${units.h}`);
-  if (min) parts.push(`${min}${units.min}`);
-  if (s || parts.length === 0) parts.push(`${s}${units.s}`);
+  if (w) parts.push(`${w}w`);
+  if (!y && !m && !w && d) parts.push(`${d}${units.d}`);
+  if (!y && !m && !w && !d && h) parts.push(`${h}${units.h}`);
+  if (!y && !m && !w && !d && !h && min) parts.push(`${min}${units.min}`);
+  if (!y && !m && !w && !d && !h && !min) parts.push(`${s}${units.s}`);
 
   return parts.join(" ");
-}
-
-/* --- only update the age sentence, not all i18n elements --- */
-
-function updateAboutAge(lang) {
-  const t = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
-  const p = document.querySelector('[data-i18n="aboutP1"]');
-  if (!p || !t.aboutP1) return;
-  p.textContent = t.aboutP1.replace("{age}", formatAge(lang));
 }
 
 /* ---------- i18n application ---------- */
@@ -325,14 +309,13 @@ function applyTranslations(lang) {
     const key = el.getAttribute("data-i18n");
     if (!key || !(key in t)) return;
 
-    // aboutP1 handled separately so we can tick live age
-    if (key === "aboutP1") return;
+    let value = t[key];
+    if (key === "aboutP1") {
+      value = value.replace("{age}", formatAge(lang));
+    }
 
-    el.textContent = t[key];
+    el.textContent = value;
   });
-
-  // now set the age sentence
-  updateAboutAge(lang);
 
   const searchInput = document.getElementById("search");
   if (searchInput) {
@@ -356,19 +339,15 @@ function applyTranslations(lang) {
   const mediaTab = document.getElementById("mediaTab");
   if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
   if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
-
-  const headerLangButton = document.getElementById("headerLangButton");
-  if (headerLangButton) {
-    const span = headerLangButton.querySelector(".lang-switch-label");
-    if (span && t.headerLangButton) span.textContent = t.headerLangButton;
-  }
 }
 
 /* ---------- Language helpers ---------- */
 
 function detectInitialLang() {
-  const stored = localStorage.getItem(LANG_STORAGE_KEY);
-  if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
+  try {
+    const stored = localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
+  } catch (_) {}
 
   const navLang = (navigator.language || "").slice(0, 2).toLowerCase();
   if (SUPPORTED_LANGS.includes(navLang)) return navLang;
@@ -383,12 +362,27 @@ function setActiveLangButton(lang) {
 
   const btn = document.querySelector(`.btn-lang[data-lang="${lang}"]`);
   if (btn) btn.classList.add("active");
+
+  const uiLangLabel = document.getElementById("uiLangLabel");
+  if (uiLangLabel) {
+    const map = {
+      nl: "Nederlands",
+      en: "English",
+      de: "Deutsch",
+      pl: "Polski",
+      tr: "Türkçe",
+      es: "Español"
+    };
+    uiLangLabel.textContent = map[lang] || "Language";
+  }
 }
 
 function setLanguage(lang) {
   if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
   currentLang = lang;
-  localStorage.setItem(LANG_STORAGE_KEY, lang);
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+  } catch (_) {}
   setActiveLangButton(lang);
   applyTranslations(lang);
 }
@@ -397,7 +391,11 @@ function initLanguageGate() {
   const gate = document.getElementById("langGate");
   if (!gate) return;
 
-  const alreadySeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
+  let alreadySeen = false;
+  try {
+    alreadySeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
+  } catch (_) {}
+
   if (alreadySeen) {
     gate.style.display = "none";
   }
@@ -406,16 +404,12 @@ function initLanguageGate() {
     btn.addEventListener("click", () => {
       const lang = btn.getAttribute("data-lang");
       setLanguage(lang);
-      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+      try {
+        localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+      } catch (_) {}
       gate.style.display = "none";
     });
   });
-}
-
-function openLanguageGate() {
-  const gate = document.getElementById("langGate");
-  if (!gate) return;
-  gate.style.display = "flex";
 }
 
 /* ---------- View state & filters ---------- */
@@ -447,8 +441,16 @@ let projectsGrid,
   mediaTab,
   projectsView,
   mediaView,
-  imageModal,
-  imageModalImg;
+  tabsEl;
+
+// modal refs
+let imageModal,
+  imageModalImg,
+  imageModalCaption,
+  imageModalDownload,
+  imageModalOpen,
+  imageModalShare,
+  imageModalClose;
 
 /* ---------- Data helpers ---------- */
 
@@ -504,127 +506,110 @@ function getMediaFormat(item) {
   return src.slice(dot + 1).toLowerCase();
 }
 
-/* ---------- Thumbnail helper (per repo, via raw.githubusercontent) ---------- */
+/* ---------- Media modal ---------- */
 
-function buildThumbnailCandidates(project) {
-  const candidates = [];
+function initImageModal() {
+  if (imageModal) return;
 
-  if (project.thumbnail && project.name) {
-    const base = `https://raw.githubusercontent.com/ferrannl/${encodeURIComponent(
-      project.name
-    )}/main/`;
-    candidates.push(base + project.thumbnail.replace(/^\//, ""));
+  imageModal = document.getElementById("imageModal");
+  if (!imageModal) {
+    imageModal = document.createElement("div");
+    imageModal.id = "imageModal";
+    imageModal.className = "image-modal";
+    imageModal.hidden = true;
+    document.body.appendChild(imageModal);
   }
 
-  if (!project.name) return candidates;
+  imageModal.innerHTML = `
+    <div class="image-modal-inner">
+      <figure class="image-modal-figure">
+        <img id="imageModalImg" class="image-modal-img" alt="">
+        <figcaption id="imageModalCaption" class="image-modal-caption"></figcaption>
+      </figure>
+      <div class="image-modal-actions">
+        <a id="imageModalDownload" class="image-modal-btn" download>Download</a>
+        <a id="imageModalOpen" class="image-modal-btn" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+        <button id="imageModalShare" class="image-modal-btn" type="button">Share</button>
+        <button id="imageModalClose" class="image-modal-btn image-modal-close" type="button">Close</button>
+      </div>
+    </div>
+  `;
 
-  const repo = project.name;
-  const rawBase = `https://raw.githubusercontent.com/ferrannl/${encodeURIComponent(
-    repo
-  )}/main/`;
+  imageModalImg = document.getElementById("imageModalImg");
+  imageModalCaption = document.getElementById("imageModalCaption");
+  imageModalDownload = document.getElementById("imageModalDownload");
+  imageModalOpen = document.getElementById("imageModalOpen");
+  imageModalShare = document.getElementById("imageModalShare");
+  imageModalClose = document.getElementById("imageModalClose");
 
-  const rootFiles = [
-    "logo.png",
-    "logo.jpg",
-    "logo.jpeg",
-    "favicon.png",
-    "favicon.jpg",
-    "favicon.ico",
-    "banner.png",
-    "banner.jpg",
-    "banner.jpeg",
-    "thumb.png",
-    "thumb.jpg",
-    "thumbnail.png",
-    "thumbnail.jpg",
-    "screenshot.png",
-    "screenshot.jpg",
-    "diagram.png",
-    "diagram.jpg",
-    "class-diagram.png",
-    "class-diagram.jpg"
-  ];
-
-  const dirs = [
-    "",
-    "images/",
-    "media/",
-    "media/images/",
-    "assets/",
-    "assets/images/",
-    "docs/"
-  ];
-
-  dirs.forEach((dir) => {
-    rootFiles.forEach((file) => {
-      candidates.push(rawBase + dir + file);
-    });
+  imageModal.addEventListener("click", (e) => {
+    if (e.target === imageModal) {
+      closeImageModal();
+    }
   });
 
-  return candidates;
+  if (imageModalClose) {
+    imageModalClose.addEventListener("click", () => closeImageModal());
+  }
+
+  if (imageModalShare) {
+    imageModalShare.addEventListener("click", async () => {
+      if (!imageModalOpen) return;
+      const url = imageModalOpen.href;
+      const title = imageModalCaption?.textContent || "Media";
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, url });
+        } catch (_) {}
+      } else {
+        try {
+          await navigator.clipboard.writeText(url);
+          imageModalShare.textContent = "Link copied!";
+          setTimeout(() => {
+            imageModalShare.textContent = "Share";
+          }, 1200);
+        } catch (_) {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !imageModal.hidden) {
+      closeImageModal();
+    }
+  });
 }
 
-function openImageModal(src, alt) {
+function openImageModal(item) {
+  initImageModal();
   if (!imageModal || !imageModalImg) return;
+
+  const src = item.src;
+  const title = item.title || "";
   imageModalImg.src = src;
-  imageModalImg.alt = alt || "";
+  imageModalImg.alt = title || "Media";
+
+  if (imageModalCaption) {
+    imageModalCaption.textContent = title || src;
+  }
+
+  if (imageModalDownload) {
+    imageModalDownload.href = src;
+    imageModalDownload.download = src.split("/").pop() || "media";
+  }
+
+  if (imageModalOpen) {
+    imageModalOpen.href = src;
+  }
+
   imageModal.hidden = false;
 }
 
 function closeImageModal() {
-  if (!imageModal || !imageModalImg) return;
+  if (!imageModal) return;
   imageModal.hidden = true;
-  imageModalImg.src = "";
-  imageModalImg.alt = "";
-}
-
-function createProjectThumbnail(project) {
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "project-thumb";
-
-  const firstLetter = (project.name || "?")[0].toUpperCase();
-  const placeholderSpan = document.createElement("span");
-  placeholderSpan.textContent = firstLetter;
-  btn.appendChild(placeholderSpan);
-
-  const candidates = buildThumbnailCandidates(project);
-  if (!candidates.length) {
-    return btn;
-  }
-
-  const img = document.createElement("img");
-  img.loading = "lazy";
-
-  let index = 0;
-
-  function tryNext() {
-    if (index >= candidates.length) {
-      return;
-    }
-    img.src = candidates[index++];
-  }
-
-  img.addEventListener("error", () => {
-    if (index < candidates.length) {
-      tryNext();
-    }
-  });
-
-  img.addEventListener("load", () => {
-    btn.classList.add("has-image");
-    btn.innerHTML = "";
-    btn.appendChild(img);
-  });
-
-  btn.addEventListener("click", () => {
-    if (!img.src) return;
-    openImageModal(img.src, project.name || "");
-  });
-
-  tryNext();
-
-  return btn;
 }
 
 /* ---------- Rendering: Projects ---------- */
@@ -672,15 +657,34 @@ function renderProjects() {
   projectsEmpty.style.display = "none";
   projectsGrid.style.display = "grid";
 
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
+
   filtered.forEach((p) => {
     const card = document.createElement("article");
     card.className = "project-card";
 
-    const headerRow = document.createElement("div");
-    headerRow.className = "project-title-row";
+    const titleRow = document.createElement("div");
+    titleRow.className = "project-title-row";
 
-    const thumb = createProjectThumbnail(p);
-    headerRow.appendChild(thumb);
+    const thumb = document.createElement("button");
+    thumb.type = "button";
+    thumb.className = "project-thumb";
+    if (p.thumbnail && p.thumbnailType === "image") {
+      thumb.classList.add("has-image");
+      const img = document.createElement("img");
+      img.src = p.thumbnail;
+      img.alt = p.name || "";
+      img.loading = "lazy";
+      thumb.appendChild(img);
+      // optional zoom using same modal
+      thumb.addEventListener("click", () => {
+        openImageModal({ src: p.thumbnail, title: p.name || "" });
+      });
+    } else {
+      const span = document.createElement("span");
+      span.textContent = (p.name || "?").charAt(0).toUpperCase();
+      thumb.appendChild(span);
+    }
 
     const titleText = document.createElement("div");
     titleText.className = "project-title-text";
@@ -696,8 +700,9 @@ function renderProjects() {
     titleText.appendChild(title);
     titleText.appendChild(lang);
 
-    headerRow.appendChild(titleText);
-    card.appendChild(headerRow);
+    titleRow.appendChild(thumb);
+    titleRow.appendChild(titleText);
+    card.appendChild(titleRow);
 
     const desc = document.createElement("p");
     desc.className = "project-desc";
@@ -707,7 +712,6 @@ function renderProjects() {
     const meta = document.createElement("div");
     meta.className = "project-meta";
 
-    const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
     const typeKey = deriveProjectType(p);
     const typeMap = {
       website: t.typeWebsite,
@@ -717,18 +721,18 @@ function renderProjects() {
       other: t.typeOther
     };
     const typeBadge = document.createElement("span");
-    typeBadge.className = `badge badge-type badge-type-${typeKey}`;
+    typeBadge.className = "badge badge-type";
     typeBadge.textContent = typeMap[typeKey] || t.typeOther;
     meta.appendChild(typeBadge);
 
     if (p.hasPages && p.pagesUrl) {
-      const link = document.createElement("a");
-      link.href = p.pagesUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.className = "btn-card btn-card-live";
-      link.textContent = "Live site";
-      meta.appendChild(link);
+      const live = document.createElement("a");
+      live.href = p.pagesUrl;
+      live.target = "_blank";
+      live.rel = "noopener noreferrer";
+      live.className = "btn-card btn-card-live";
+      live.innerHTML = `<span>Live site</span>`;
+      meta.appendChild(live);
     }
 
     if (p.name) {
@@ -738,7 +742,7 @@ function renderProjects() {
       )}`;
       repoLink.target = "_blank";
       repoLink.rel = "noopener noreferrer";
-      repoLink.className = "btn-card btn-card-github";
+      repoLink.className = "btn-card";
       repoLink.textContent = "GitHub";
       meta.appendChild(repoLink);
     }
@@ -796,27 +800,38 @@ function renderMedia() {
     const title = document.createElement("h3");
     title.className = "media-title";
     title.textContent = item.title || "";
+    card.appendChild(title);
 
     const wrapper = document.createElement("div");
     wrapper.className = "media-preview";
 
+    const src = item.src;
+
     if (item.type === "image") {
       const img = document.createElement("img");
-      img.src = item.src;
+      img.src = src;
       img.alt = item.title || "";
       img.loading = "lazy";
       wrapper.appendChild(img);
+      wrapper.classList.add("clickable");
+      wrapper.addEventListener("click", () => {
+        openImageModal(item);
+      });
     } else if (item.type === "video") {
       const video = document.createElement("video");
       video.controls = true;
-      video.src = item.src;
+      video.src = src;
+      video.preload = "metadata";
       wrapper.appendChild(video);
     } else if (item.type === "audio") {
       const audio = document.createElement("audio");
       audio.controls = true;
-      audio.src = item.src;
+      audio.src = src;
+      audio.preload = "metadata";
       wrapper.appendChild(audio);
     }
+
+    card.appendChild(wrapper);
 
     const meta = document.createElement("div");
     meta.className = "media-meta";
@@ -827,15 +842,45 @@ function renderMedia() {
 
     const fmtSpan = document.createElement("span");
     fmtSpan.className = "badge badge-media-format";
-    fmtSpan.textContent = getMediaFormat(item);
+    fmtSpan.textContent = getMediaFormat(item) || "-";
 
     meta.appendChild(typeSpan);
     meta.appendChild(fmtSpan);
-
-    card.appendChild(title);
-    card.appendChild(wrapper);
     card.appendChild(meta);
 
+    const actions = document.createElement("div");
+    actions.className = "media-actions";
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "media-action-btn";
+    viewBtn.textContent = item.type === "image" ? "View" : "Open";
+    viewBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (item.type === "image") {
+        openImageModal(item);
+      } else {
+        window.open(src, "_blank", "noopener,noreferrer");
+      }
+    });
+    actions.appendChild(viewBtn);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.className = "media-action-btn";
+    downloadLink.href = src;
+    downloadLink.download = src.split("/").pop() || "media";
+    downloadLink.textContent = "Download";
+    actions.appendChild(downloadLink);
+
+    const openLink = document.createElement("a");
+    openLink.className = "media-action-btn";
+    openLink.href = src;
+    openLink.target = "_blank";
+    openLink.rel = "noopener noreferrer";
+    openLink.textContent = "Open tab";
+    actions.appendChild(openLink);
+
+    card.appendChild(actions);
     mediaGrid.appendChild(card);
   });
 }
@@ -862,6 +907,10 @@ function updateViewVisibility() {
   }
   if (mediaFiltersEl) {
     mediaFiltersEl.hidden = currentView !== "media";
+  }
+
+  if (tabsEl) {
+    tabsEl.classList.toggle("tabs-media", currentView === "media");
   }
 
   applyTranslations(currentLang);
@@ -902,8 +951,10 @@ function initDomRefs() {
   projectsView = document.getElementById("projectsView");
   mediaView = document.getElementById("mediaView");
 
+  tabsEl = document.querySelector(".tabs");
+
+  // modal base element if present
   imageModal = document.getElementById("imageModal");
-  imageModalImg = document.getElementById("imageModalImg");
 }
 
 function initEvents() {
@@ -953,25 +1004,20 @@ function initEvents() {
     mediaTab.addEventListener("click", () => setView("media"));
   }
 
-  // header language button: open language gate
-  const headerLangButton = document.getElementById("headerLangButton");
-  if (headerLangButton) {
-    headerLangButton.addEventListener("click", () => {
-      openLanguageGate();
+  // language buttons (gate + any other .btn-lang)
+  document.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      setLanguage(lang);
     });
-  }
+  });
 
-  // image modal interactions
-  if (imageModal) {
-    imageModal.addEventListener("click", (e) => {
-      if (e.target === imageModal || e.target === imageModalImg) {
-        closeImageModal();
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !imageModal.hidden) {
-        closeImageModal();
+  const langSwitchBtn = document.getElementById("uiLangButton");
+  if (langSwitchBtn) {
+    langSwitchBtn.addEventListener("click", () => {
+      const gate = document.getElementById("langGate");
+      if (gate) {
+        gate.style.display = "flex";
       }
     });
   }
@@ -1066,14 +1112,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initLanguageGate();
   initEvents();
+  initImageModal();
 
   setView("projects");
 
   loadProjects();
   loadMedia();
 
-  // Live age update ONLY updates the about line, not all texts
   setInterval(() => {
-    updateAboutAge(currentLang);
+    applyTranslations(currentLang);
   }, 1000);
 });
