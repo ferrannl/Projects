@@ -114,7 +114,7 @@ body {
   font-size: 0.95rem;
 }
 
-/* Header right: languages + socials */
+/* Header right: language button + socials */
 
 .header-actions {
   display: flex;
@@ -124,11 +124,41 @@ body {
   flex: 0 0 auto;
 }
 
-.header-lang-switcher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  justify-content: flex-end;
+/* main top-right language button */
+
+.lang-switch-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(7, 10, 28, 0.95);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast),
+              background var(--transition-fast),
+              color var(--transition-fast);
+}
+
+.lang-switch-main:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(10, 14, 34, 0.98);
+  transform: translateY(-1px);
+  color: var(--text);
+}
+
+.lang-switch-icon {
+  font-size: 0.95rem;
+}
+
+.lang-switch-label {
+  font-size: 0.8rem;
 }
 
 /* Socials */
@@ -550,7 +580,6 @@ body {
 /* ---------- Media cards ---------- */
 
 .media-grid {
-  /* cards-grid already sets grid; this just tweaks column min width for media */
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   margin-top: 0.4rem;
 }
