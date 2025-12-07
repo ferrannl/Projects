@@ -694,6 +694,7 @@ body {
 }
 
 /* Live site – fancy 360° highlight ring, cross-browser */
+/* Live site – fancy 360° highlight ring, ALWAYS ACTIVE */
 .btn-card-live {
   position: relative;
   overflow: hidden;
@@ -704,7 +705,7 @@ body {
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
 }
 
-/* outer animated highlight ring */
+/* outer animated highlight ring – always visible */
 .btn-card-live::before {
   content: "";
   position: absolute;
@@ -718,13 +719,13 @@ body {
     rgba(255, 75, 129, 0.7),
     rgba(255, 75, 129, 0.0)
   );
-  opacity: 0.0;
+  opacity: 0.85; /* <-- ALWAYS ON */
   pointer-events: none;
   animation: liveGlowSpin 3.2s linear infinite;
   transition: opacity 180ms ease-out;
 }
 
-/* inner pill – dark center, soft accent edge */
+/* inner pill */
 .btn-card-live::after {
   content: "";
   position: absolute;
@@ -738,7 +739,7 @@ body {
   z-index: 0;
 }
 
-/* keep label above effects */
+/* label stays above animation */
 .btn-card-live span,
 .btn-card-live svg,
 .btn-card-live img {
@@ -746,7 +747,7 @@ body {
   z-index: 1;
 }
 
-/* hover / focus – let the ring show more + slight glow */
+/* hover just adds a slight lift & glow */
 .btn-card-live:hover,
 .btn-card-live:focus-visible {
   box-shadow:
@@ -754,6 +755,7 @@ body {
     0 0 18px rgba(75, 195, 255, 0.25);
   transform: translateY(-1px);
 }
+
 
 .btn-card-live:hover::before,
 .btn-card-live:focus-visible::before {
