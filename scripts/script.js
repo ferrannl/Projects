@@ -9,14 +9,14 @@
    - Fancy media wall (zoom, download, share)
    - Auto thumbnails from repo root via GitHub API
    - Pretty repo titles (no more hyphen hell)
-   - Enriched tags (HTML → HTML/CSS/JS, C# → .NET, etc.)
+   - Enriched tags (but no duplicate language tags)
    - No-JS fallback (handled via body.js-enabled)
 ------------------------------------------------------- */
 
 /* ---------- GitHub + thumbnail cache ---------- */
 
 const GITHUB_USER = "ferrannl";
-const THUMB_CACHE_KEY = "ferranThumbCacheV1";
+const THUMB_CACHE_KEY = "ferranThumbCacheV2"; // bumped to force refresh
 const THUMB_CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
 
 function loadThumbCache() {
@@ -315,7 +315,6 @@ function formatAge(lang) {
   const units = AGE_UNITS[lang] || AGE_UNITS[DEFAULT_LANG];
   const { y, m, w, d, h, min, s } = computeAgeComponents(new Date());
 
-  // show full chain: years to seconds
   const parts = [
     `${y}${units.y}`,
     `${m}${units.m}`,
@@ -393,6 +392,8 @@ function deriveExtraTags(project) {
 
   const lang = (project.language || "").toLowerCase();
 
+  // Extra tech/meta tags derived from language,
+  // NOTE: language itself will later be *filtered out* from badges.
   if (lang.includes("html")) {
     tags.add("HTML");
     tags.add("CSS");
@@ -641,11 +642,51 @@ const THUMB_PRIORITY_NAMES = [
   "logo.png",
   "logo.jpg",
   "logo.jpeg",
+  "favicon.png",
+  "favicon.jpg",
+  "favicon.jpeg",
+  "favicon.ico",
+  "banner.png",
+  "banner.jpg",
+  "profile.png",
+  "profile.jpg",
+  "profile.jpeg",
   "sequencediagram.png",
   "sequencediagram1.png",
   "sequencediagram.jpg",
   "sequencediagram1.jpg"
 ];
+
+// Search helper in a given list of items (files only)
+function pickImageFileFromItems(items) {
+  if (!Array.isArray(items)) return null;
+
+  const imageFiles = items.filter(
+    (it) =>
+      it.type === "file" &&
+      /\.(png|jpe?g|webp|gif|svg|ico)$/i.test(it.name || "")
+  );
+  if (!imageFiles.length) return null;
+
+  const lowerMap = new Map(
+    imageFiles.map((f) => [(f.name || "").toLowerCase(), f])
+  );
+
+  let chosen = null;
+  for (const candidate of THUMB_PRIORITY_NAMES) {
+    const match = lowerMap.get(candidate);
+    if (match) {
+      chosen = match;
+      break;
+    }
+  }
+
+  if (!chosen) {
+    chosen = imageFiles[0];
+  }
+
+  return chosen;
+}
 
 async function ensureThumbnailForProject(project) {
   if (!project || !project.name) return null;
@@ -677,32 +718,33 @@ async function ensureThumbnailForProject(project) {
       return null;
     }
 
-    const imageFiles = items.filter(
-      (it) =>
-        it.type === "file" &&
-        /\.(png|jpe?g|webp|gif)$/i.test(it.name || "")
-    );
-    if (!imageFiles.length) {
-      thumbCache[repoName] = { url: null, ts: now };
-      saveThumbCache();
-      return null;
-    }
+    // 1) Try images directly in repo root
+    let chosen = pickImageFileFromItems(items);
 
-    const lowerMap = new Map(
-      imageFiles.map((f) => [(f.name || "").toLowerCase(), f])
-    );
-
-    let chosen = null;
-    for (const candidate of THUMB_PRIORITY_NAMES) {
-      const match = lowerMap.get(candidate);
-      if (match) {
-        chosen = match;
-        break;
+    // 2) If none, try /images, /image, /media, /assets directory
+    if (!chosen) {
+      const dir = items.find(
+        (it) =>
+          it.type === "dir" &&
+          /^(images?|media|assets?)$/i.test(it.name || "")
+      );
+      if (dir && dir.url) {
+        try {
+          const dirRes = await fetch(dir.url);
+          if (dirRes.ok) {
+            const dirItems = await dirRes.json();
+            chosen = pickImageFileFromItems(dirItems);
+          }
+        } catch (_) {
+          // ignore nested errors
+        }
       }
     }
 
     if (!chosen) {
-      chosen = imageFiles[0];
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
     }
 
     const url = chosen.download_url || chosen.html_url || null;
@@ -965,17 +1007,36 @@ function renderProjects() {
     typeBadge.textContent = typeMap[typeKey] || t.typeOther;
     meta.appendChild(typeBadge);
 
-    // extra language/tech tags
+    // Combine base tags + extra tags, but do NOT show language again as a badge
+    const baseTags = Array.isArray(p.tags) ? p.tags.filter(Boolean) : [];
     const extraTags = deriveExtraTags(p);
-    extraTags.forEach((tag) => {
+    const allTags = [...baseTags, ...extraTags];
+
+    const langTokens = new Set(
+      (p.language || "")
+        .split(/[,\s/|+]+/)
+        .map((part) => part.trim().toLowerCase())
+        .filter(Boolean)
+    );
+
+    const seenTags = new Set();
+
+    allTags.forEach((tag) => {
       if (!tag) return;
+      const lower = tag.toLowerCase();
+      if (langTokens.has(lower)) return; // don't show language as tag
+      if (seenTags.has(lower)) return;
+      seenTags.add(lower);
+
       const tagBadge = document.createElement("span");
       tagBadge.className = "badge";
       tagBadge.textContent = tag;
       meta.appendChild(tagBadge);
     });
 
-    if (p.hasPages && p.pagesUrl) {
+    const hasLiveSite = p.hasPages && p.pagesUrl;
+
+    if (hasLiveSite) {
       const live = document.createElement("a");
       live.href = p.pagesUrl;
       live.target = "_blank";
@@ -985,7 +1046,8 @@ function renderProjects() {
       meta.appendChild(live);
     }
 
-    if (p.name) {
+    // Only show GitHub button if there is NO live site for this repo
+    if (p.name && !hasLiveSite) {
       const repoLink = document.createElement("a");
       repoLink.href = `https://github.com/${GITHUB_USER}/${encodeURIComponent(
         p.name
@@ -1000,7 +1062,7 @@ function renderProjects() {
     card.appendChild(meta);
     projectsGrid.appendChild(card);
 
-    // Try to upgrade thumbnail asynchronously using repo root images
+    // Try to upgrade thumbnail asynchronously using repo root / images folder
     loadAndApplyThumbnail(thumb, p);
   });
 }
@@ -1126,8 +1188,6 @@ function renderMedia() {
     downloadLink.download = src.split("/").pop() || "media";
     downloadLink.textContent = "Download";
     actions.appendChild(downloadLink);
-
-    // "Open tab" button intentionally removed
 
     card.appendChild(actions);
     mediaGrid.appendChild(card);
