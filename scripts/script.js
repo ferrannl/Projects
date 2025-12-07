@@ -38,7 +38,7 @@ const SMALL_WORDS = [
   "the", "and", "of"
 ];
 
-/* ---------- i18n dictionary (minimal but working) ---------- */
+/* ---------- i18n dictionary ---------- */
 
 const I18N = {
   nl: {
@@ -57,6 +57,7 @@ const I18N = {
     typeMobile: "Mobiel",
     typeApi: "API’s / Backend",
     typeSchool: "School / Studie",
+    typeGame: "Game",
     typeOther: "Overig",
     filterLanguageLabel: "Taal",
     languageFilterAll: "Alle talen",
@@ -90,6 +91,7 @@ const I18N = {
     typeMobile: "Mobile",
     typeApi: "APIs / Backend",
     typeSchool: "School / Study",
+    typeGame: "Game",
     typeOther: "Other",
     filterLanguageLabel: "Language",
     languageFilterAll: "All languages",
@@ -106,8 +108,198 @@ const I18N = {
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
     btnLiveSite: "Live site"
+  },
+  de: {
+    subtitle:
+      "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Schulprojekte, Guides, APIs und mehr.",
+    aboutTitle: "Über mich",
+    aboutP1:
+      "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
+    aboutP2: "",
+    tabProjects: "Projekte",
+    tabMedia: "Medien",
+    searchLabel: "Suchen",
+    filterTypeLabel: "Typ",
+    typeAll: "Alle",
+    typeWebsite: "Websites",
+    typeMobile: "Mobile",
+    typeApi: "APIs / Backend",
+    typeSchool: "Schule / Studium",
+    typeGame: "Game",
+    typeOther: "Sonstiges",
+    filterLanguageLabel: "Sprache",
+    languageFilterAll: "Alle Sprachen",
+    mediaTypeLabel: "Medientyp",
+    mediaKindAll: "Alle",
+    mediaKindImages: "Bilder",
+    mediaKindVideos: "Videos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Dateityp",
+    mediaFormatAll: "Alle Formate",
+    emptyState:
+      "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
+    mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
+    headerLangButton: "Sprache",
+    footerBuilt: "Erstellt mit ♥ von Ferran",
+    btnLiveSite: "Live-Seite"
+  },
+  pl: {
+    subtitle:
+      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
+    aboutTitle: "O mnie",
+    aboutP1:
+      "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
+    aboutP2: "",
+    tabProjects: "Projekty",
+    tabMedia: "Media",
+    searchLabel: "Szukaj",
+    filterTypeLabel: "Typ",
+    typeAll: "Wszystko",
+    typeWebsite: "Strony WWW",
+    typeMobile: "Mobilne",
+    typeApi: "API / Backend",
+    typeSchool: "Szkoła / Studia",
+    typeGame: "Gra",
+    typeOther: "Inne",
+    filterLanguageLabel: "Język",
+    languageFilterAll: "Wszystkie języki",
+    mediaTypeLabel: "Typ medium",
+    mediaKindAll: "Wszystko",
+    mediaKindImages: "Obrazy",
+    mediaKindVideos: "Wideo",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Typ pliku",
+    mediaFormatAll: "Wszystkie formaty",
+    emptyState:
+      "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
+    mediaEmptyState:
+      "Nie znaleziono mediów dla tych filtrów.",
+    headerLangButton: "Język",
+    footerBuilt: "Stworzone z ♥ przez Ferrana",
+    btnLiveSite: "Strona live"
+  },
+  tr: {
+    subtitle:
+      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
+    aboutTitle: "Hakkımda",
+    aboutP1:
+      "Selam 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir developer’ım. Kendime ve başkalarına yardımcı olmak için web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
+    aboutP2: "",
+    tabProjects: "Projeler",
+    tabMedia: "Medya",
+    searchLabel: "Ara",
+    filterTypeLabel: "Tür",
+    typeAll: "Hepsi",
+    typeWebsite: "Web siteleri",
+    typeMobile: "Mobil",
+    typeApi: "API’ler / Backend",
+    typeSchool: "Okul / Çalışma",
+    typeGame: "Oyun",
+    typeOther: "Diğer",
+    filterLanguageLabel: "Dil",
+    languageFilterAll: "Tüm diller",
+    mediaTypeLabel: "Medya türü",
+    mediaKindAll: "Hepsi",
+    mediaKindImages: "Görseller",
+    mediaKindVideos: "Videolar",
+    mediaKindAudio: "Ses",
+    mediaFormatLabel: "Dosya türü",
+    mediaFormatAll: "Tüm türler",
+    emptyState:
+      "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
+    mediaEmptyState:
+      "Bu arama veya filtrelerle medya bulunamadı.",
+    headerLangButton: "Dil",
+    footerBuilt: "♥ ile geliştirildi – Ferran",
+    btnLiveSite: "Canlı site"
+  },
+  es: {
+    subtitle:
+      "Todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
+    aboutTitle: "Sobre mí",
+    aboutP1:
+      "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
+    aboutP2: "",
+    tabProjects: "Proyectos",
+    tabMedia: "Media",
+    searchLabel: "Buscar",
+    filterTypeLabel: "Tipo",
+    typeAll: "Todo",
+    typeWebsite: "Webs",
+    typeMobile: "Móvil",
+    typeApi: "APIs / Backend",
+    typeSchool: "Escuela / Estudio",
+    typeGame: "Juego",
+    typeOther: "Otros",
+    filterLanguageLabel: "Idioma",
+    languageFilterAll: "Todos los idiomas",
+    mediaTypeLabel: "Tipo de media",
+    mediaKindAll: "Todo",
+    mediaKindImages: "Imágenes",
+    mediaKindVideos: "Vídeos",
+    mediaKindAudio: "Audio",
+    mediaFormatLabel: "Tipo de archivo",
+    mediaFormatAll: "Todos los tipos",
+    emptyState:
+      "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
+    mediaEmptyState:
+      "No se encontró media con estos filtros.",
+    headerLangButton: "Idioma",
+    footerBuilt: "Hecho con ♥ por Ferran",
+    btnLiveSite: "Sitio live"
   }
-  // de / pl / tr / es could be added later; missing keys just fall back
+};
+
+/* Type labels for the type-badge, by language */
+const TYPE_LABELS = {
+  website: {
+    nl: "Website",
+    en: "Website",
+    de: "Website",
+    pl: "Strona WWW",
+    tr: "Web sitesi",
+    es: "Sitio web"
+  },
+  mobile: {
+    nl: "Mobiel",
+    en: "Mobile",
+    de: "Mobile",
+    pl: "Mobilne",
+    tr: "Mobil",
+    es: "Móvil"
+  },
+  api: {
+    nl: "API / Backend",
+    en: "API / Backend",
+    de: "API / Backend",
+    pl: "API / Backend",
+    tr: "API / Backend",
+    es: "API / Backend"
+  },
+  school: {
+    nl: "School / Studie",
+    en: "School / Study",
+    de: "Schule / Studium",
+    pl: "Szkoła / Studia",
+    tr: "Okul / Çalışma",
+    es: "Escuela / Estudio"
+  },
+  game: {
+    nl: "Game",
+    en: "Game",
+    de: "Game",
+    pl: "Gra",
+    tr: "Oyun",
+    es: "Juego"
+  },
+  other: {
+    nl: "Overig",
+    en: "Other",
+    de: "Sonstiges",
+    pl: "Inne",
+    tr: "Diğer",
+    es: "Otros"
+  }
 };
 
 /* ---------- Init ---------- */
@@ -119,6 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTabsAndFilters();
   setupSearch();
   setupImageModal();
+  setupFooterCopyright();
 
   loadProjects();
   loadMedia();
@@ -157,10 +350,12 @@ function setupLanguage() {
     headerLangButton.addEventListener("click", () => {
       if (!gate) return;
       gate.hidden = false;
+      updateLanguageGateActive();
     });
   }
 
   setLanguage(initialLang);
+  updateLanguageGateActive();
 }
 
 function setLanguage(lang) {
@@ -191,6 +386,45 @@ function setLanguage(lang) {
   if (searchLabelEl && dict.searchLabel) {
     searchLabelEl.textContent = dict.searchLabel;
   }
+
+  // (Optional) translate search placeholder a bit
+  const searchInput = document.getElementById("search");
+  if (searchInput) {
+    if (lang === "nl") {
+      searchInput.placeholder =
+        "Zoek op naam, beschrijving, programmeertaal of tag…";
+    } else if (lang === "de") {
+      searchInput.placeholder =
+        "Suche nach Name, Beschreibung, Sprache oder Tag…";
+    } else if (lang === "pl") {
+      searchInput.placeholder =
+        "Szukaj po nazwie, opisie, języku lub tagu…";
+    } else if (lang === "tr") {
+      searchInput.placeholder =
+        "Ada, açıklamaya, dile veya etikete göre ara…";
+    } else if (lang === "es") {
+      searchInput.placeholder =
+        "Busca por nombre, descripción, lenguaje o etiqueta…";
+    } else {
+      searchInput.placeholder =
+        "Search by name, description, language or tag…";
+    }
+  }
+
+  updateLanguageGateActive();
+  renderProjects(); // refresh type badge labels etc.
+}
+
+function updateLanguageGateActive() {
+  const buttons = document.querySelectorAll(".btn-lang");
+  buttons.forEach((btn) => {
+    const code = btn.dataset.lang;
+    if (code === state.lang) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
 }
 
 /* ---------- Tabs & filters visibility ---------- */
@@ -324,14 +558,13 @@ async function loadProjects() {
       : o.langs;
     const languages = getLanguagesList(repo.language, overrideLangs);
 
-    const type = o.type || "other";
+    const type = guessProjectType(repo, o);
+
     const tags = Array.isArray(o.tags) ? o.tags : [];
 
-    const liveUrlRaw = (o.liveUrl || repo.homepage || "").trim();
-    const liveUrl = liveUrlRaw || null;
+    const liveUrl = computeLiveUrl(repo, o);
 
-    const thumbnail =
-      o.thumbnail || o.thumb || null;
+    const thumbnail = computeThumbnail(repo, o);
 
     return {
       id: repo.id,
@@ -535,6 +768,88 @@ function buildLanguageFilterOptions(projects) {
   });
 }
 
+/* ---------- Project helpers: type, liveUrl, thumbnail ---------- */
+
+function guessProjectType(repo, override) {
+  if (override && override.type) {
+    return override.type;
+  }
+
+  const name = (repo.name || "").toLowerCase();
+  const desc = (repo.description || "").toLowerCase();
+  const joined = `${name} ${desc}`;
+  const lang = (repo.language || "").toLowerCase();
+
+  const has = (words) => words.some((w) => joined.includes(w));
+
+  // Game-ish
+  if (has(["game", "sudoku", "unity", "platformer", "puzzle"])) {
+    return "game";
+  }
+
+  // API / Backend
+  if (has(["api", "backend", "server", "service", "rest"])) {
+    return "api";
+  }
+
+  // Mobile
+  if (
+    has(["android", "ios", "xamarin", "phone", "mobile", "app"]) ||
+    ["kotlin", "swift"].includes(lang)
+  ) {
+    return "mobile";
+  }
+
+  // School / Study
+  if (
+    has([
+      "school",
+      "study",
+      "studie",
+      "uni",
+      "university",
+      "hogeschool",
+      "opdracht",
+      "assignment"
+    ])
+  ) {
+    return "school";
+  }
+
+  // Website
+  if (
+    lang === "html" ||
+    has(["website", "web", "site", "landing", "portfolio", "page"])
+  ) {
+    return "website";
+  }
+
+  return "other";
+}
+
+function computeLiveUrl(repo, override) {
+  const raw = (override.liveUrl || repo.homepage || "").trim();
+  if (raw) return raw;
+
+  const hasLive =
+    override.hasLive !== undefined ? !!override.hasLive : !!repo.has_pages;
+
+  if (hasLive) {
+    return `https://${GITHUB_USER}.github.io/${repo.name}/`;
+  }
+
+  return null;
+}
+
+function computeThumbnail(repo, override) {
+  if (override.thumbnail || override.thumb) {
+    return override.thumbnail || override.thumb;
+  }
+
+  // Fallback: GitHub social preview image — works for every repo
+  return `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repo.name}`;
+}
+
 /* ---------- Project rendering ---------- */
 
 function getFilteredProjects() {
@@ -643,7 +958,14 @@ function renderProjects() {
 
     const typeBadge = document.createElement("span");
     typeBadge.className = "badge badge-type";
-    typeBadge.textContent = project.type;
+
+    const typeMap = TYPE_LABELS[project.type] || TYPE_LABELS.other;
+    const typeLabel =
+      typeMap[state.lang] ||
+      typeMap[DEFAULT_LANG] ||
+      project.type;
+    typeBadge.textContent = typeLabel;
+
     meta.appendChild(typeBadge);
 
     (project.tags || []).forEach((tag) => {
@@ -985,4 +1307,13 @@ function closeImageModal() {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
   modal.hidden = true;
+}
+
+/* ---------- Footer ---------- */
+
+function setupFooterCopyright() {
+  const el = document.getElementById("footerCopyright");
+  if (!el) return;
+  const year = new Date().getFullYear();
+  el.textContent = `© ${year}`;
 }
