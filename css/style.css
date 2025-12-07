@@ -615,9 +615,84 @@ body {
               transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+/* Live site – animated glow pill */
 .btn-card-live {
-  border-color: rgba(255, 75, 129, 0.9);
-  background: radial-gradient(circle at top left, rgba(255, 75, 129, 0.3), rgba(5, 7, 24, 0.98));
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255, 75, 129, 0.0); /* border comes from glow layer */
+  background: rgba(4, 7, 24, 0.96);
+  color: var(--text);
+}
+
+/* spinning 360° glow ring */
+.btn-card-live::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 75, 129, 0.0),
+    rgba(255, 75, 129, 0.9),
+    rgba(75, 195, 255, 0.9),
+    rgba(255, 75, 129, 0.9),
+    rgba(255, 75, 129, 0.0)
+  );
+  opacity: 0.0;
+  transition: opacity 200ms ease-out;
+  animation: liveGlowSpin 2.4s linear infinite;
+  pointer-events: none;
+}
+
+/* inner pill so the glow becomes a border instead of filling the whole pill */
+.btn-card-live::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 0 0,
+    rgba(255, 75, 129, 0.26),
+    rgba(5, 7, 24, 0.98)
+  );
+  z-index: 0;
+}
+
+/* keep label above glow layers */
+.btn-card-live span,
+.btn-card-live svg,
+.btn-card-live img {
+  position: relative;
+  z-index: 1;
+}
+
+/* hover / focus: stronger glow + shadow */
+.btn-card-live:hover,
+.btn-card-live:focus-visible {
+  box-shadow: 0 0 22px rgba(255, 75, 129, 0.65),
+              0 0 30px rgba(75, 195, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-card-live:hover::before,
+.btn-card-live:focus-visible::before {
+  opacity: 1;
+}
+
+/* subtle idle glow so it still stands out even without hover (mobile) */
+@media (hover: none) {
+  .btn-card-live::before {
+    opacity: 0.7;
+  }
+}
+
+/* 360° rotating glow */
+@keyframes liveGlowSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .btn-card:hover {
