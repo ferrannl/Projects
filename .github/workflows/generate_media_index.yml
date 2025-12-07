@@ -3,40 +3,37 @@ name: Generate media index
 on:
   push:
     paths:
-      - 'media/**'
-      - 'generate_media_index.py'
-      - '.github/workflows/generate-media-index.yml'
+      - "media/**"
+      - "generate_media_index.py"
+      - ".github/workflows/generate-media-index.yml"
   workflow_dispatch:
-
-permissions:
-  contents: write   # 👈 this is the important line
+  schedule:
+    - cron: "0 3 * * *"  # daily at ~03:00 UTC
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repo
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
-      - name: Generate media index JSON
+      - name: Generate media index
         run: python generate_media_index.py
 
-      - name: Commit and push updated media index
+      - name: Commit and push media-index.json if changed
         run: |
-          if git diff --quiet media/media-index.json media/media_index.json; then
-            echo "No changes in media index."
-            exit 0
+          if git status --porcelain | grep -q "media/media-index.json"; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add media/media-index.json
+            git commit -m "chore: update media index"
+            git push
+          else
+            echo "No changes to media-index.json"
           fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add media/media-index.json media/media_index.json
-          git commit -m "Update media index"
-          git push
