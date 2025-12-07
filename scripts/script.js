@@ -1,5 +1,13 @@
 // scripts/script.js
 
+/* -------------------------------------------------------
+   Ferran’s Projects – Main JS
+   - Multi-language UI (NL / EN / DE / PL / TR / ES)
+   - Live age text in About section
+   - Projects + Media switcher with filters
+   - No-JS fallback (handled via body.js-enabled)
+------------------------------------------------------- */
+
 /* ---------- Language + global view state ---------- */
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
@@ -7,50 +15,35 @@ const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
-const LANGUAGE_NAMES = {
-  nl: "Nederlands",
-  en: "English",
-  de: "Deutsch",
-  pl: "Polski",
-  tr: "Türkçe",
-  es: "Español",
-};
-
-// which tab is active: "projects" or "media"
 let currentView = "projects";
-// current language
 let currentLang = DEFAULT_LANG;
 
-// Birthday: 15-08-1999 23:10 local (Amsterdam time)
-const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // month 7 = August
+// Birthday: 15-08-1999 23:10 Amsterdam time
+const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // months are 0-based
 
-// Units per language
 const AGE_UNITS = {
   nl: { y: "j", m: "mnd", d: "d", h: "u", min: "min", s: "s" },
   en: { y: "y", m: "mo", d: "d", h: "h", min: "m", s: "s" },
   de: { y: "J", m: "M", d: "T", h: "Std", min: "Min", s: "s" },
   pl: { y: "l", m: "m", d: "d", h: "g", min: "min", s: "s" },
   tr: { y: "y", m: "ay", d: "g", h: "sa", min: "dk", s: "sn" },
-  es: { y: "a", m: "m", d: "d", h: "h", min: "min", s: "s" },
+  es: { y: "a", m: "m", d: "d", h: "h", min: "min", s: "s" }
 };
 
-/* ---------- Translations (with 🇳🇱 flag) ---------- */
+/* ---------- Translations (with 🇳🇱 flag in About) ---------- */
 
 const TRANSLATIONS = {
   en: {
     subtitle:
       "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
     aboutTitle: "About Me",
-    // 🇳🇱 flag here
     aboutP1:
       "Hey Ferran ({age}) here. I am a Dutch 🇳🇱 developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
     tabProjects: "Projects",
     tabMedia: "Media",
-    searchProjectsPlaceholder:
-      "Search by name, description, language or tag…",
-    searchMediaPlaceholder:
-      "Search media by title, filename or type…",
+    searchProjectsPlaceholder: "Search by name, description, language or tag…",
+    searchMediaPlaceholder: "Search media by title, filename or type…",
     filterTypeLabel: "Type",
     typeAll: "All",
     typeWebsite: "Websites",
@@ -68,20 +61,19 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Format",
     mediaFormatAll: "All formats",
     emptyState:
-      "No projects match your search/filter. Try another search term.",
+      "Hmm… no projects loaded right now. Maybe I took them offline, or something went wrong. Try a hard refresh (Shift + F5 / Ctrl + F5) and wait a few seconds.",
     mediaEmptyState:
-      "No media match your search/filter. Try another search term.",
+      "No media to show right now. Try a hard refresh and wait a few seconds.",
     footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages",
+    footerViewOnPages: "View this site on GitHub Pages"
   },
 
   nl: {
     subtitle:
       "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
     aboutTitle: "Over mij",
-    // 🇳🇱 flag here
     aboutP1:
-      "Hey Ferran ({age}) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
+      "Hey 👋🏻 Ferran ({age}) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
@@ -106,18 +98,17 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Bestandstype",
     mediaFormatAll: "Alle formaten",
     emptyState:
-      "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+      "Hmm… geen projecten om te laten zien. Misschien heb ik ze offline gehaald of ging er iets mis. Probeer de pagina hard te verversen (Shift + F5 / Ctrl + F5) en wacht een paar seconden.",
     mediaEmptyState:
-      "Geen media gevonden met deze zoekopdracht of filters.",
+      "Geen media om te laten zien. Probeer de pagina opnieuw te laden en wacht even.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages",
+    footerViewOnPages: "Bekijk deze site op GitHub Pages"
   },
 
   de: {
     subtitle:
       "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
     aboutTitle: "Über mich",
-    // 🇳🇱 flag here
     aboutP1:
       "Hey hier ist Ferran ({age}). Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die mir und anderen helfen.",
     aboutP2: "",
@@ -144,18 +135,17 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Format",
     mediaFormatAll: "Alle Formate",
     emptyState:
-      "Keine Projekte für diese Suche oder Filter. Bitte etwas anderes versuchen.",
+      "Keine Projekte für diese Suche oder Filter. Vielleicht sind sie offline oder etwas ist schief gelaufen. Versuche ein hartes Reload (Shift + F5) und warte ein paar Sekunden.",
     mediaEmptyState:
-      "Keine Medien für diese Suche oder Filter.",
+      "Keine Medien für diese Suche oder Filter. Versuche die Seite neu zu laden.",
     footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
   },
 
   pl: {
     subtitle:
       "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, zadania ze szkoły, poradniki, API i więcej.",
     aboutTitle: "O mnie",
-    // 🇳🇱 flag here
     aboutP1:
       "Cześć tu Ferran ({age}). Jestem holenderskim 🇳🇱 deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia, które pomagają mnie i innym.",
     aboutP2: "",
@@ -182,18 +172,17 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Format",
     mediaFormatAll: "Wszystkie formaty",
     emptyState:
-      "Brak projektów dla tych filtrów. Spróbuj innego wyszukiwania.",
+      "Brak projektów dla tych filtrów. Może są offline albo coś poszło nie tak. Spróbuj odświeżyć stronę (Shift + F5) i chwilę poczekać.",
     mediaEmptyState:
-      "Brak mediów dla tych filtrów.",
+      "Brak mediów dla tych filtrów. Spróbuj ponownie odświeżyć stronę.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
   },
 
   tr: {
     subtitle:
       "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
     aboutTitle: "Hakkımda",
-    // 🇳🇱 flag here
     aboutP1:
       "Selam ben Ferran ({age}). Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir geliştiriciyim. Kendime ve başkalarına yardımcı olan web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
     aboutP2: "",
@@ -220,19 +209,17 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Biçim",
     mediaFormatAll: "Tüm biçimler",
     emptyState:
-      "Bu arama / filtre ile eşleşen proje yok. Başka bir şey dene.",
+      "Bu filtrelerle eşleşen proje yok. Belki offline oldular ya da bir şeyler ters gitti. Sayfayı sert yenile (Shift + F5) ve birkaç saniye bekle.",
     mediaEmptyState:
-      "Bu arama / filtre ile eşleşen medya yok.",
+      "Bu filtrelere uygun medya yok. Sayfayı yenilemeyi dene.",
     footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages:
-      "Bu siteyi GitHub Pages üzerinde görüntüle",
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
   },
 
   es: {
     subtitle:
-      "Todos mis proyectos y media en un solo lugar: repos de GitHub, webs, apps, trabajos de estudio, experimentos de código y más.",
+      "Todos mis proyectos y media en un solo lugar: webs, apps, trabajos de estudio, experimentos de código y más.",
     aboutTitle: "Sobre mí",
-    // 🇳🇱 flag here
     aboutP1:
       "Hola soy Ferran ({age}). Soy un desarrollador 🇳🇱 holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas que ayudan a mí y a otras personas.",
     aboutP2: "",
@@ -259,13 +246,12 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Formato",
     mediaFormatAll: "Todos los formatos",
     emptyState:
-      "No hay proyectos para esta búsqueda o filtros.",
+      "No hay proyectos con estos filtros. Puede que estén offline o algo ha fallado. Prueba a recargar la página (Shift + F5) y espera unos segundos.",
     mediaEmptyState:
-      "No hay media para esta búsqueda o filtros.",
+      "No hay media con estos filtros. Prueba a recargar la página.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages:
-      "Ver este sitio en GitHub Pages",
-  },
+    footerViewOnPages: "Ver este sitio en GitHub Pages"
+  }
 };
 
 /* ---------- Age calculation ---------- */
@@ -285,7 +271,7 @@ function computeAgeComponents(now) {
   const h = totalSeconds % 24;
   totalSeconds = (totalSeconds - h) / 24;
 
-  // approximate months/years (good enough for a fun live timer)
+  // approximate months/years for a fun live timer
   const d = totalSeconds % 30;
   totalSeconds = (totalSeconds - d) / 30;
 
@@ -320,28 +306,25 @@ function applyTranslations(lang) {
     if (!key || !(key in t)) return;
 
     let value = t[key];
-
     if (key === "aboutP1") {
       value = value.replace("{age}", formatAge(lang));
     }
 
-    // Use textContent; if you need inner HTML for links, don’t mark those elements with data-i18n
+    // plain text only; if you need rich HTML, don't mark that element with data-i18n
     el.textContent = value;
   });
 
-  // Update search placeholder based on active view
+  // Update search placeholder depending on view
   const searchInput = document.getElementById("search");
   if (searchInput) {
     const placeholderKey =
       currentView === "media"
         ? "searchMediaPlaceholder"
         : "searchProjectsPlaceholder";
-    if (t[placeholderKey]) {
-      searchInput.placeholder = t[placeholderKey];
-    }
+    if (t[placeholderKey]) searchInput.placeholder = t[placeholderKey];
   }
 
-  // Footer lines (if present)
+  // Footer text
   const footerBuilt = document.querySelector("[data-i18n-footer-built]");
   const footerPages = document.querySelector("[data-i18n-footer-pages]");
   if (footerBuilt && t.footerBuiltWith) {
@@ -350,31 +333,33 @@ function applyTranslations(lang) {
   if (footerPages && t.footerViewOnPages) {
     footerPages.textContent = t.footerViewOnPages;
   }
+
+  // Tab labels if needed
+  const projectsTab = document.getElementById("projectsTab");
+  const mediaTab = document.getElementById("mediaTab");
+  if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
+  if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
 }
 
-/* ---------- Language init & switch ---------- */
+/* ---------- Language helpers ---------- */
 
 function detectInitialLang() {
   const stored = localStorage.getItem(LANG_STORAGE_KEY);
-  if (stored && SUPPORTED_LANGS.includes(stored)) {
-    return stored;
-  }
+  if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
+
   const navLang = (navigator.language || "").slice(0, 2).toLowerCase();
-  if (SUPPORTED_LANGS.includes(navLang)) {
-    return navLang;
-  }
+  if (SUPPORTED_LANGS.includes(navLang)) return navLang;
+
   return DEFAULT_LANG;
 }
 
 function setActiveLangButton(lang) {
   document
-    .querySelectorAll("[data-lang]")
+    .querySelectorAll(".btn-lang[data-lang]")
     .forEach((btn) => btn.classList.remove("active"));
 
-  const btn = document.querySelector(`[data-lang="${lang}"]`);
-  if (btn) {
-    btn.classList.add("active");
-  }
+  const btn = document.querySelector(`.btn-lang[data-lang="${lang}"]`);
+  if (btn) btn.classList.add("active");
 }
 
 function setLanguage(lang) {
@@ -394,16 +379,14 @@ function initLanguageGate() {
     gate.style.display = "none";
   }
 
-  gate
-    .querySelectorAll("[data-lang]")
-    .forEach((btn) =>
-      btn.addEventListener("click", () => {
-        const lang = btn.getAttribute("data-lang");
-        setLanguage(lang);
-        localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
-        gate.style.display = "none";
-      })
-    );
+  gate.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lang = btn.getAttribute("data-lang");
+      setLanguage(lang);
+      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+      gate.style.display = "none";
+    });
+  });
 }
 
 /* ---------- View state & filters ---------- */
@@ -413,13 +396,13 @@ const state = {
   typeFilter: "all",
   languageFilter: "all",
   mediaTypeFilter: "all",
-  mediaFormatFilter: "all",
+  mediaFormatFilter: "all"
 };
 
 let allProjects = [];
 let allMedia = [];
 
-// DOM refs (will be null if elements don’t exist – guarded in code)
+// DOM refs
 let projectsGrid,
   projectsEmpty,
   mediaGrid,
@@ -446,7 +429,6 @@ function deriveProjectType(project) {
   const desc = (project.description || "").toLowerCase();
   const lang = (project.language || "").toLowerCase();
 
-  // website
   if (
     project.hasPages ||
     ["html", "scss", "less", "php"].includes(lang) ||
@@ -455,7 +437,6 @@ function deriveProjectType(project) {
     return "website";
   }
 
-  // mobile
   if (
     ["java", "swift", "kotlin"].includes(lang) ||
     name.includes("android") ||
@@ -464,7 +445,6 @@ function deriveProjectType(project) {
     return "mobile";
   }
 
-  // api / backend
   if (
     desc.includes("api") ||
     desc.includes("rest") ||
@@ -473,7 +453,6 @@ function deriveProjectType(project) {
     return "api";
   }
 
-  // school / study
   if (
     desc.includes("assignment") ||
     desc.includes("course") ||
@@ -494,7 +473,7 @@ function getMediaFormat(item) {
   return src.slice(dot + 1).toLowerCase();
 }
 
-/* ---------- Rendering ---------- */
+/* ---------- Rendering: Projects ---------- */
 
 function renderProjects() {
   if (!projectsGrid || !projectsEmpty) return;
@@ -559,25 +538,21 @@ function renderProjects() {
     meta.className = "project-meta";
 
     // Type badge
+    const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
+    const typeKey = deriveProjectType(p);
+    const typeMap = {
+      website: t.typeWebsite,
+      mobile: t.typeMobile,
+      api: t.typeApi,
+      school: t.typeSchool,
+      other: t.typeOther
+    };
     const typeBadge = document.createElement("span");
-    typeBadge.className = `badge badge-type badge-type-${deriveProjectType(
-      p
-    )}`;
-    typeBadge.textContent = (function () {
-      const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
-      const map = {
-        website: t.typeWebsite,
-        mobile: t.typeMobile,
-        api: t.typeApi,
-        school: t.typeSchool,
-        other: t.typeOther,
-      };
-      return map[deriveProjectType(p)] || t.typeOther;
-    })();
-
+    typeBadge.className = `badge badge-type badge-type-${typeKey}`;
+    typeBadge.textContent = typeMap[typeKey] || t.typeOther;
     meta.appendChild(typeBadge);
 
-    // Live site link if hasPages
+    // Live site
     if (p.hasPages && p.pagesUrl) {
       const link = document.createElement("a");
       link.href = p.pagesUrl;
@@ -588,7 +563,7 @@ function renderProjects() {
       meta.appendChild(link);
     }
 
-    // GitHub repo link
+    // GitHub link
     if (p.name) {
       const repoLink = document.createElement("a");
       repoLink.href = `https://github.com/ferrannl/${encodeURIComponent(
@@ -605,10 +580,11 @@ function renderProjects() {
     card.appendChild(lang);
     card.appendChild(desc);
     card.appendChild(meta);
-
     projectsGrid.appendChild(card);
   });
 }
+
+/* ---------- Rendering: Media ---------- */
 
 function renderMedia() {
   if (!mediaGrid || !mediaEmpty) return;
@@ -623,6 +599,7 @@ function renderMedia() {
       (item.title || "").toLowerCase().includes(search) ||
       (item.src || "").toLowerCase().includes(search) ||
       (item.type || "").toLowerCase().includes(search);
+
     if (!inSearch) return false;
 
     if (type !== "all" && (item.type || "").toLowerCase() !== type) {
@@ -659,31 +636,30 @@ function renderMedia() {
     const wrapper = document.createElement("div");
     wrapper.className = "media-preview";
 
-    const src = item.src;
-
     if (item.type === "image") {
       const img = document.createElement("img");
-      img.src = src;
+      img.src = item.src;
       img.alt = item.title || "";
       img.loading = "lazy";
       wrapper.appendChild(img);
     } else if (item.type === "video") {
       const video = document.createElement("video");
       video.controls = true;
-      video.src = src;
+      video.src = item.src;
       wrapper.appendChild(video);
     } else if (item.type === "audio") {
       const audio = document.createElement("audio");
       audio.controls = true;
-      audio.src = src;
+      audio.src = item.src;
       wrapper.appendChild(audio);
     }
 
     const meta = document.createElement("div");
     meta.className = "media-meta";
+
     const typeSpan = document.createElement("span");
     typeSpan.className = "badge badge-media-type";
-    typeSpan.textContent = item.type;
+    typeSpan.textContent = item.type || "";
 
     const fmtSpan = document.createElement("span");
     fmtSpan.className = "badge badge-media-format";
@@ -717,6 +693,7 @@ function updateViewVisibility() {
     mediaTab.classList.toggle("active", currentView === "media");
   }
 
+  // hide filters that don’t make sense in current view
   if (projectFiltersEl) {
     projectFiltersEl.hidden = currentView !== "projects";
   }
@@ -724,7 +701,6 @@ function updateViewVisibility() {
     mediaFiltersEl.hidden = currentView !== "media";
   }
 
-  // Re-apply translations so the search placeholder switches
   applyTranslations(currentLang);
 
   if (currentView === "projects") {
@@ -740,22 +716,26 @@ function setView(view) {
   updateViewVisibility();
 }
 
-/* ---------- Event wiring ---------- */
+/* ---------- DOM refs & events ---------- */
 
 function initDomRefs() {
   projectsGrid = document.getElementById("projectsGrid");
   projectsEmpty = document.getElementById("emptyState");
   mediaGrid = document.getElementById("mediaGrid");
   mediaEmpty = document.getElementById("mediaEmptyState");
+
   searchInput = document.getElementById("search");
   typeSelect = document.getElementById("typeFilter");
   languageSelect = document.getElementById("languageFilter");
   mediaTypeSelect = document.getElementById("mediaTypeFilter");
   mediaFormatSelect = document.getElementById("mediaFormatFilter");
+
   projectFiltersEl = document.getElementById("projectFilters");
   mediaFiltersEl = document.getElementById("mediaFilters");
+
   projectsTab = document.getElementById("projectsTab");
   mediaTab = document.getElementById("mediaTab");
+
   projectsView = document.getElementById("projectsView");
   mediaView = document.getElementById("mediaView");
 }
@@ -807,7 +787,7 @@ function initEvents() {
     mediaTab.addEventListener("click", () => setView("media"));
   }
 
-  // Header language buttons
+  // language buttons (header + gate)
   document.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const lang = btn.getAttribute("data-lang");
@@ -828,9 +808,9 @@ function loadProjects() {
       if (!Array.isArray(data)) return;
       allProjects = data;
 
-      // Populate language filter (if empty / only "all")
+      // Language select options from data
       if (languageSelect) {
-        const existingValues = new Set(
+        const existing = new Set(
           Array.from(languageSelect.options).map((o) =>
             (o.value || "").toLowerCase()
           )
@@ -842,10 +822,9 @@ function loadProjects() {
               .filter(Boolean)
           )
         ).sort();
-
         langs.forEach((l) => {
           const lower = l.toLowerCase();
-          if (existingValues.has(lower)) return;
+          if (existing.has(lower)) return;
           const opt = document.createElement("option");
           opt.value = l;
           opt.textContent = l;
@@ -870,18 +849,18 @@ function loadMedia() {
       if (!data || !Array.isArray(data.items)) return;
       allMedia = data.items;
 
-      // Populate format filter (if present)
+      // Format select from data
       if (mediaFormatSelect) {
-        const formats = Array.from(
-          new Set(allMedia.map(getMediaFormat).filter(Boolean))
-        ).sort();
-        const existingValues = new Set(
+        const existing = new Set(
           Array.from(mediaFormatSelect.options).map((o) =>
             (o.value || "").toLowerCase()
           )
         );
+        const formats = Array.from(
+          new Set(allMedia.map(getMediaFormat).filter(Boolean))
+        ).sort();
         formats.forEach((fmt) => {
-          if (existingValues.has(fmt.toLowerCase())) return;
+          if (existing.has(fmt.toLowerCase())) return;
           const opt = document.createElement("option");
           opt.value = fmt;
           opt.textContent = fmt;
@@ -899,6 +878,9 @@ function loadMedia() {
 /* ---------- Init ---------- */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Mark page as JS-enabled so CSS can hide fallback UI
+  document.body.classList.add("js-enabled");
+
   initDomRefs();
 
   currentLang = detectInitialLang();
@@ -907,7 +889,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLanguageGate();
   initEvents();
 
-  // default view is projects
+  // default view
   setView("projects");
 
   // load data
