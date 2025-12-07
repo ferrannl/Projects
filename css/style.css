@@ -57,7 +57,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 1.5rem 1.75rem 1.6rem;
+  padding: 2.4rem 1.75rem 1.6rem; /* extra top padding so pill has space */
   margin-bottom: 1.75rem;
   background: linear-gradient(145deg, rgba(11, 15, 32, 0.9), rgba(18, 24, 54, 0.9));
   border-radius: 24px;
@@ -111,20 +111,21 @@ body {
   font-size: 0.95rem;
 }
 
-/* Header actions: lang pill + socials */
+/* Header actions: socials block */
 
 .header-actions {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.9rem;
+  margin-top: 0.8rem;
 }
 
-/* 🌐 language pill – pinned top-right */
+/* 🌐 language pill – top-right inside header */
 
 .lang-switch-main {
   position: absolute;
-  top: 1.1rem;
+  top: 0.9rem;
   right: 1.2rem;
 
   display: inline-flex;
@@ -161,7 +162,7 @@ body {
   font-size: 0.8rem;
 }
 
-/* Socials – bottom-left area inside header */
+/* Socials – left-aligned, wrap nicely */
 
 .social-links {
   display: flex;
@@ -239,7 +240,7 @@ body {
   z-index: 1;
 }
 
-/* Per-platform flavors (subtle tint, still on theme) */
+/* subtle platform tints */
 
 .social-github {
   background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 60%),
@@ -388,8 +389,6 @@ body {
   outline-offset: 2px;
 }
 
-/* magnifying glass */
-
 .search-section::before {
   content: "🔍";
   position: absolute;
@@ -437,7 +436,8 @@ body {
   font-size: 0.8rem;
 }
 
-/* Ensure hidden filters don't render (JS toggles [hidden]) */
+/* hide filters when [hidden] from JS */
+
 #projectFilters[hidden],
 #mediaFilters[hidden] {
   display: none !important;
@@ -498,8 +498,6 @@ body {
   gap: 0.6rem;
   margin-bottom: 0.35rem;
 }
-
-/* Project thumbnail */
 
 .project-thumb {
   width: 52px;
@@ -564,8 +562,6 @@ body {
   margin: 0;
 }
 
-/* description + meta */
-
 .project-desc {
   margin: 0 0 0.55rem;
   font-size: 0.9rem;
@@ -576,8 +572,6 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
-/* badges + links row */
 
 .project-meta {
   display: flex;
@@ -740,7 +734,7 @@ body {
   align-items: center;
 }
 
-/* ---------- Language gate (overlay) ---------- */
+/* ---------- Language gate ---------- */
 
 .lang-gate-backdrop {
   position: fixed;
@@ -906,7 +900,7 @@ body.js-enabled .no-js-fallback {
 
 @media (max-width: 800px) {
   .site-header {
-    padding: 1.3rem 1.3rem 1.4rem;
+    padding: 2.6rem 1.3rem 1.4rem;
   }
 
   .header-main-row {
@@ -915,8 +909,8 @@ body.js-enabled .no-js-fallback {
   }
 
   .lang-switch-main {
-    top: 1rem;
-    right: 1rem;
+    top: 0.6rem;
+    right: 0.9rem;
   }
 }
 
