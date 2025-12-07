@@ -22,12 +22,12 @@ let currentLang = DEFAULT_LANG;
 const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // months are 0-based
 
 const AGE_UNITS = {
-  nl: { y: "j", m: "mnd", d: "d", h: "u", min: "min", s: "s" },
-  en: { y: "y", m: "mo", d: "d", h: "h", min: "m", s: "s" },
-  de: { y: "J", m: "M", d: "T", h: "Std", min: "Min", s: "s" },
-  pl: { y: "l", m: "m", d: "d", h: "g", min: "min", s: "s" },
-  tr: { y: "y", m: "ay", d: "g", h: "sa", min: "dk", s: "sn" },
-  es: { y: "a", m: "m", d: "d", h: "h", min: "min", s: "s" }
+  nl: { y: "j", m: "mnd", w: "w", d: "d", h: "u", min: "min", s: "s" },
+  en: { y: "y", m: "mo", w: "w", d: "d", h: "h", min: "m", s: "s" },
+  de: { y: "J", m: "M", w: "W", d: "T", h: "Std", min: "Min", s: "s" },
+  pl: { y: "l", m: "m", w: "tyg", d: "d", h: "g", min: "min", s: "s" },
+  tr: { y: "y", m: "ay", w: "hf", d: "g", h: "sa", min: "dk", s: "sn" },
+  es: { y: "a", m: "m", w: "sem", d: "d", h: "h", min: "min", s: "s" }
 };
 
 /* ---------- Translations (with 🇳🇱 flag in About) ---------- */
@@ -65,7 +65,8 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "No media to show right now. Try a hard refresh and wait a few seconds.",
     footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages"
+    footerViewOnPages: "View this site on GitHub Pages",
+    headerLangButton: "Language"
   },
 
   nl: {
@@ -102,7 +103,8 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Geen media om te laten zien. Probeer de pagina opnieuw te laden en wacht even.",
     footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages"
+    footerViewOnPages: "Bekijk deze site op GitHub Pages",
+    headerLangButton: "Taal"
   },
 
   de: {
@@ -139,7 +141,8 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Keine Medien für diese Suche oder Filter. Versuche die Seite neu zu laden.",
     footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
+    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen",
+    headerLangButton: "Sprache"
   },
 
   pl: {
@@ -176,7 +179,8 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Brak mediów dla tych filtrów. Spróbuj ponownie odświeżyć stronę.",
     footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
+    footerViewOnPages: "Zobacz tę stronę na GitHub Pages",
+    headerLangButton: "Język"
   },
 
   tr: {
@@ -213,7 +217,8 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "Bu filtrelere uygun medya yok. Sayfayı yenilemeyi dene.",
     footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
+    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle",
+    headerLangButton: "Dil"
   },
 
   es: {
@@ -250,7 +255,8 @@ const TRANSLATIONS = {
     mediaEmptyState:
       "No hay media con estos filtros. Prueba a recargar la página.",
     footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages"
+    footerViewOnPages: "Ver este sitio en GitHub Pages",
+    headerLangButton: "Idioma"
   }
 };
 
@@ -272,26 +278,31 @@ function computeAgeComponents(now) {
   totalSeconds = (totalSeconds - h) / 24;
 
   // approximate months/years for a fun live timer
-  const d = totalSeconds % 30;
-  totalSeconds = (totalSeconds - d) / 30;
+  const dRaw = totalSeconds % 30;
+  totalSeconds = (totalSeconds - dRaw) / 30;
 
   const m = totalSeconds % 12;
   const y = (totalSeconds - m) / 12;
 
-  return { y, m, d, h, min, s };
+  // split days into weeks + remaining days
+  const w = Math.floor(dRaw / 7);
+  const d = dRaw % 7;
+
+  return { y, m, w, d, h, min, s };
 }
 
 function formatAge(lang) {
   const units = AGE_UNITS[lang] || AGE_UNITS[DEFAULT_LANG];
-  const { y, m, d, h, min, s } = computeAgeComponents(new Date());
+  const { y, m, w, d, h, min, s } = computeAgeComponents(new Date());
   const parts = [];
 
   if (y) parts.push(`${y}${units.y}`);
   if (m) parts.push(`${m}${units.m}`);
-  if (!y && !m && d) parts.push(`${d}${units.d}`);
-  if (!y && !m && !d && h) parts.push(`${h}${units.h}`);
-  if (!y && !m && !d && !h && min) parts.push(`${min}${units.min}`);
-  if (!y && !m && !d && !h && !min) parts.push(`${s}${units.s}`);
+  if (w) parts.push(`${w}${units.w}`);
+  if (d) parts.push(`${d}${units.d}`);
+  if (h) parts.push(`${h}${units.h}`);
+  if (min) parts.push(`${min}${units.min}`);
+  if (s || parts.length === 0) parts.push(`${s}${units.s}`);
 
   return parts.join(" ");
 }
@@ -387,6 +398,12 @@ function initLanguageGate() {
       gate.style.display = "none";
     });
   });
+}
+
+function openLanguageGate() {
+  const gate = document.getElementById("langGate");
+  if (!gate) return;
+  gate.style.display = "flex";
 }
 
 /* ---------- View state & filters ---------- */
@@ -787,7 +804,15 @@ function initEvents() {
     mediaTab.addEventListener("click", () => setView("media"));
   }
 
-  // language buttons (header + gate)
+  // header language button: re-open gate
+  const headerLangButton = document.getElementById("headerLangButton");
+  if (headerLangButton) {
+    headerLangButton.addEventListener("click", () => {
+      openLanguageGate();
+    });
+  }
+
+  // language buttons inside gate
   document.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const lang = btn.getAttribute("data-lang");
