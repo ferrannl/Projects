@@ -1,3 +1,5 @@
+// scripts/script.js
+
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -390,6 +392,7 @@ function setLanguage(lang) {
     searchLabelEl.textContent = dict.searchLabel;
   }
 
+  // (Optional) translate search placeholder a bit
   const searchInput = document.getElementById("search");
   if (searchInput) {
     if (lang === "nl") {
@@ -565,7 +568,6 @@ async function loadProjects() {
 
     const liveUrl = computeLiveUrl(repo, o);
 
-    // initial thumbnail: only overrides, actual detection happens later
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -587,7 +589,7 @@ async function loadProjects() {
   buildLanguageFilterOptions(projects);
   renderProjects();
 
-  // verify that live URLs really work (no 404 / broken Laravel pages)
+  // verify that live URLs really work (no 404 / Laravel-only repos)
   verifyLiveSites();
 
   // load proper thumbnails from repo root images
@@ -609,6 +611,7 @@ async function loadProjectOverrides() {
 async function loadGitHubReposWithCache() {
   const now = Date.now();
 
+  // respect rate limit backoff
   try {
     const rateRaw = localStorage.getItem(RATE_LIMIT_KEY);
     if (rateRaw) {
@@ -621,12 +624,15 @@ async function loadGitHubReposWithCache() {
     }
   } catch (_) {}
 
+  // try cache first
   const cached = readReposFromCache();
   if (cached) {
+    // also try to refresh, but even if it fails we still have cached
     refreshReposInBackground();
     return cached;
   }
 
+  // no cache? fetch now
   return fetchReposFromGitHub();
 }
 
@@ -744,6 +750,7 @@ function buildLanguageFilterOptions(projects) {
   const select = document.getElementById("languageFilter");
   if (!select) return;
 
+  // keep first option, remove the rest
   while (select.options.length > 1) {
     select.remove(1);
   }
@@ -779,14 +786,17 @@ function guessProjectType(repo, override) {
 
   const has = (words) => words.some((w) => joined.includes(w));
 
+  // Game-ish
   if (has(["game", "sudoku", "unity", "platformer", "puzzle"])) {
     return "game";
   }
 
+  // API / Backend
   if (has(["api", "backend", "server", "service", "rest"])) {
     return "api";
   }
 
+  // Mobile
   if (
     has(["android", "ios", "xamarin", "phone", "mobile", "app"]) ||
     ["kotlin", "swift"].includes(lang)
@@ -794,6 +804,7 @@ function guessProjectType(repo, override) {
     return "mobile";
   }
 
+  // School / Study
   if (
     has([
       "school",
@@ -809,6 +820,7 @@ function guessProjectType(repo, override) {
     return "school";
   }
 
+  // Website
   if (
     lang === "html" ||
     has(["website", "web", "site", "landing", "portfolio", "page"])
@@ -901,7 +913,7 @@ async function loadProjectThumbnails() {
       project.thumbnail = cached;
       return;
     } else if (cached === "") {
-      // known to have no special image, we’ll use OG fallback below
+      // known to have no special image, we'll still fall back to OG below
     }
 
     const repoName = project.name;
@@ -915,7 +927,7 @@ async function loadProjectThumbnails() {
     }
 
     project.thumbnail = finalUrl;
-    thumbCache[project.name] = rootThumb ? finalUrl : finalUrl; // store final so we don't recompute
+    thumbCache[project.name] = finalUrl;
   });
 
   await Promise.all(promises);
@@ -1092,6 +1104,7 @@ function renderProjects() {
     const actions = document.createElement("div");
     actions.className = "project-actions";
 
+    // GitHub button – always
     const githubBtn = document.createElement("a");
     githubBtn.href = project.githubUrl;
     githubBtn.target = "_blank";
@@ -1100,6 +1113,7 @@ function renderProjects() {
     githubBtn.innerHTML = `<span>GitHub</span>`;
     actions.appendChild(githubBtn);
 
+    // Live site – only if url present AND verified
     if (project.liveUrl) {
       const liveBtn = document.createElement("a");
       liveBtn.href = project.liveUrl;
@@ -1189,6 +1203,7 @@ function buildMediaFilterOptions(items) {
   const formatSelect = document.getElementById("mediaFormatFilter");
   if (!typeSelect || !formatSelect) return;
 
+  // type
   while (typeSelect.options.length > 1) typeSelect.remove(1);
   const typeSet = new Set();
   items.forEach((i) => typeSet.add(i.type));
@@ -1201,6 +1216,7 @@ function buildMediaFilterOptions(items) {
       typeSelect.appendChild(opt);
     });
 
+  // format
   while (formatSelect.options.length > 1) formatSelect.remove(1);
   const formatSet = new Set();
   items.forEach((i) => {
@@ -1345,6 +1361,7 @@ function setupImageModal() {
   if (!modal) return;
 
   modal.addEventListener("click", (event) => {
+    // click outside inner box closes
     if (event.target === modal) {
       closeImageModal();
     }
@@ -1424,5 +1441,6 @@ function setupFooterCopyright() {
   const el = document.getElementById("footerCopyright");
   if (!el) return;
   const year = new Date().getFullYear();
-  el.textContent = `© ${year}`;
+  // only year, © is in HTML
+  el.textContent = `${year}`;
 }
