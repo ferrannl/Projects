@@ -334,7 +334,7 @@ function applyTranslations(lang) {
     footerPages.textContent = t.footerViewOnPages;
   }
 
-  // Tab labels if needed
+  // Tab labels
   const projectsTab = document.getElementById("projectsTab");
   const mediaTab = document.getElementById("mediaTab");
   if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
