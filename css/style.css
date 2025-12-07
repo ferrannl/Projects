@@ -1,3 +1,5 @@
+/* css/style.css */
+
 /* ---------- Theme tokens ---------- */
 
 :root {
@@ -616,6 +618,8 @@ body {
   object-fit: cover;
   display: block;
   transition: transform 160ms ease-out;
+  /* white background behind transparent PNGs */
+  background-color: #ffffff;
 }
 
 .project-card:hover .project-thumb.has-image img {
@@ -705,7 +709,7 @@ body {
     box-shadow var(--transition-fast);
 }
 
-/* Live site – fancy 360° highlight ring, ALWAYS ACTIVE */
+/* Live site – fancy 360° highlight ring */
 .btn-card-live {
   position: relative;
   overflow: hidden;
@@ -716,7 +720,7 @@ body {
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
 }
 
-/* outer animated highlight ring – always visible */
+/* outer animated highlight ring */
 .btn-card-live::before {
   content: "";
   position: absolute;
@@ -937,10 +941,9 @@ body {
 
 .site-footer {
   margin-top: 2rem;
-  padding: 1rem 0 1.5rem;
+  padding: 1.2rem 0 1.4rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -962,13 +965,33 @@ body {
 }
 
 .footer-center {
-  margin: 0 auto;
+  flex: 1;
   text-align: center;
   opacity: 0.9;
 }
 
-.footer-right {
-  white-space: nowrap;
+/* icon-only socials bottom-right */
+.footer-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.footer-social-icons a {
+  text-decoration: none;
+}
+
+.footer-social-icons img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
+  transition: transform 160ms ease-out, opacity 160ms ease-out;
+}
+
+.footer-social-icons img:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
 }
 
 /* ---------- Language gate ---------- */
@@ -1248,6 +1271,7 @@ body.js-enabled .no-js-fallback {
 
   .footer-center {
     margin: 0;
+    text-align: left;
   }
 }
 
