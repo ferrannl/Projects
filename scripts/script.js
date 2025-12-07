@@ -7,8 +7,33 @@
    - Age text in About section (full precision at load)
    - Projects + Media switcher with filters
    - Fancy media wall (zoom, download, share)
+   - Auto thumbnails from repo root via GitHub API
    - No-JS fallback (handled via body.js-enabled)
 ------------------------------------------------------- */
+
+/* ---------- GitHub + thumbnail cache ---------- */
+
+const GITHUB_USER = "ferrannl";
+const THUMB_CACHE_KEY = "ferranThumbCacheV1";
+const THUMB_CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
+
+function loadThumbCache() {
+  try {
+    const raw = localStorage.getItem(THUMB_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch (_) {}
+  return {};
+}
+
+function saveThumbCache() {
+  try {
+    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache));
+  } catch (_) {}
+}
+
+let thumbCache = loadThumbCache();
 
 /* ---------- Language + global view state ---------- */
 
@@ -81,7 +106,8 @@ const TRANSLATIONS = {
     tabProjects: "Projecten",
     tabMedia: "Media",
     searchProjectsPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
-    searchMediaPlaceholder: "Zoek media op titel, bestandsnaam of type…",
+    searchMediaPlaceholder:
+      "Zoek media op titel, bestandsnaam of type…",
     filterTypeLabel: "Type",
     typeAll: "Alles",
     typeWebsite: "Websites",
@@ -115,8 +141,10 @@ const TRANSLATIONS = {
     aboutP2: "",
     tabProjects: "Projekte",
     tabMedia: "Medien",
-    searchProjectsPlaceholder: "Suche nach Name, Beschreibung, Sprache oder Tag…",
-    searchMediaPlaceholder: "Suche Medien nach Titel, Dateiname oder Typ…",
+    searchProjectsPlaceholder:
+      "Suche nach Name, Beschreibung, Sprache oder Tag…",
+    searchMediaPlaceholder:
+      "Suche Medien nach Titel, Dateiname oder Typ…",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
     typeWebsite: "Websites",
@@ -150,7 +178,8 @@ const TRANSLATIONS = {
     aboutP2: "",
     tabProjects: "Projekty",
     tabMedia: "Media",
-    searchProjectsPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
+    searchProjectsPlaceholder:
+      "Szukaj po nazwie, opisie, języku lub tagu…",
     searchMediaPlaceholder:
       "Szukaj mediów po tytule, nazwie pliku lub typie…",
     filterTypeLabel: "Typ",
@@ -500,6 +529,108 @@ function getMediaFormat(item) {
   return src.slice(dot + 1).toLowerCase();
 }
 
+/* ---------- Thumbnail chooser via GitHub API ---------- */
+
+const THUMB_PRIORITY_NAMES = [
+  "logo.png",
+  "logo.jpg",
+  "logo.jpeg",
+  "sequencediagram.png",
+  "sequencediagram1.png",
+  "sequencediagram.jpg",
+  "sequencediagram1.jpg"
+];
+
+async function ensureThumbnailForProject(project) {
+  if (!project || !project.name) return null;
+
+  const repoName = project.name;
+  const now = Date.now();
+
+  const cached = thumbCache[repoName];
+  if (cached && now - cached.ts < THUMB_CACHE_TTL_MS) {
+    return cached.url || null;
+  }
+
+  try {
+    const contentsRes = await fetch(
+      `https://api.github.com/repos/${GITHUB_USER}/${encodeURIComponent(
+        repoName
+      )}/contents`
+    );
+    if (!contentsRes.ok) {
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
+    }
+
+    const items = await contentsRes.json();
+    if (!Array.isArray(items)) {
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
+    }
+
+    const imageFiles = items.filter(
+      (it) =>
+        it.type === "file" &&
+        /\.(png|jpe?g|webp|gif)$/i.test(it.name || "")
+    );
+    if (!imageFiles.length) {
+      thumbCache[repoName] = { url: null, ts: now };
+      saveThumbCache();
+      return null;
+    }
+
+    // Map for quick name lookup (case-insensitive)
+    const lowerMap = new Map(
+      imageFiles.map((f) => [(f.name || "").toLowerCase(), f])
+    );
+
+    let chosen = null;
+    for (const candidate of THUMB_PRIORITY_NAMES) {
+      const match = lowerMap.get(candidate);
+      if (match) {
+        chosen = match;
+        break;
+      }
+    }
+
+    if (!chosen) {
+      chosen = imageFiles[0];
+    }
+
+    const url = chosen.download_url || chosen.html_url || null;
+    thumbCache[repoName] = { url, ts: now };
+    saveThumbCache();
+    return url;
+  } catch (err) {
+    console.error("Thumbnail fetch failed for", project.name, err);
+    thumbCache[repoName] = { url: null, ts: now };
+    saveThumbCache();
+    return null;
+  }
+}
+
+function loadAndApplyThumbnail(thumbEl, project) {
+  // fire and forget; no await in render
+  ensureThumbnailForProject(project).then((url) => {
+    if (!url || !thumbEl.isConnected) return;
+
+    thumbEl.classList.add("has-image");
+    thumbEl.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = project.name || "";
+    img.loading = "lazy";
+    thumbEl.appendChild(img);
+
+    thumbEl.addEventListener("click", () => {
+      openImageModal({ src: url, title: project.name || "" });
+    });
+  });
+}
+
 /* ---------- Media modal ---------- */
 
 function initImageModal() {
@@ -668,21 +799,11 @@ function renderProjects() {
     const thumb = document.createElement("button");
     thumb.type = "button";
     thumb.className = "project-thumb";
-    if (p.thumbnail && p.thumbnailType === "image") {
-      thumb.classList.add("has-image");
-      const img = document.createElement("img");
-      img.src = p.thumbnail;
-      img.alt = p.name || "";
-      img.loading = "lazy";
-      thumb.appendChild(img);
-      thumb.addEventListener("click", () => {
-        openImageModal({ src: p.thumbnail, title: p.name || "" });
-      });
-    } else {
-      const span = document.createElement("span");
-      span.textContent = (p.name || "?").charAt(0).toUpperCase();
-      thumb.appendChild(span);
-    }
+
+    // Initial letter fallback
+    const span = document.createElement("span");
+    span.textContent = (p.name || "?").charAt(0).toUpperCase();
+    thumb.appendChild(span);
 
     const titleText = document.createElement("div");
     titleText.className = "project-title-text";
@@ -735,7 +856,7 @@ function renderProjects() {
 
     if (p.name) {
       const repoLink = document.createElement("a");
-      repoLink.href = `https://github.com/ferrannl/${encodeURIComponent(
+      repoLink.href = `https://github.com/${GITHUB_USER}/${encodeURIComponent(
         p.name
       )}`;
       repoLink.target = "_blank";
@@ -747,6 +868,9 @@ function renderProjects() {
 
     card.appendChild(meta);
     projectsGrid.appendChild(card);
+
+    // Try to upgrade thumbnail asynchronously using repo root images
+    loadAndApplyThumbnail(thumb, p);
   });
 }
 
