@@ -26,6 +26,9 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Install Python dependencies
+        run: pip install requests   # <--- FIX
+
       - name: Generate media index
         run: python generate_media_index.py
 
