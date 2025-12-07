@@ -5,6 +5,7 @@
    - Multi-language UI (NL / EN / DE / PL / TR / ES)
    - Live age text in About section
    - Projects + Media switcher with filters
+   - Smart thumbnails + fullscreen image modal
    - No-JS fallback (handled via body.js-enabled)
 ------------------------------------------------------- */
 
@@ -30,7 +31,7 @@ const AGE_UNITS = {
   es: { y: "a", m: "m", w: "sem", d: "d", h: "h", min: "min", s: "s" }
 };
 
-/* ---------- Translations (with 🇳🇱 flag in About) ---------- */
+/* ---------- Translations ---------- */
 
 const TRANSLATIONS = {
   en: {
@@ -321,7 +322,6 @@ function applyTranslations(lang) {
       value = value.replace("{age}", formatAge(lang));
     }
 
-    // plain text only; if you need rich HTML, don't mark that element with data-i18n
     el.textContent = value;
   });
 
@@ -350,6 +350,13 @@ function applyTranslations(lang) {
   const mediaTab = document.getElementById("mediaTab");
   if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
   if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
+
+  // Header language button label
+  const headerLangButton = document.getElementById("headerLangButton");
+  if (headerLangButton) {
+    const span = headerLangButton.querySelector(".lang-switch-label");
+    if (span && t.headerLangButton) span.textContent = t.headerLangButton;
+  }
 }
 
 /* ---------- Language helpers ---------- */
@@ -434,7 +441,9 @@ let projectsGrid,
   projectsTab,
   mediaTab,
   projectsView,
-  mediaView;
+  mediaView,
+  imageModal,
+  imageModalImg;
 
 /* ---------- Data helpers ---------- */
 
@@ -490,6 +499,115 @@ function getMediaFormat(item) {
   return src.slice(dot + 1).toLowerCase();
 }
 
+/* ---------- Thumbnail helper ---------- */
+
+function buildThumbnailCandidates(project) {
+  const candidates = [];
+
+  // explicit thumbnail path in JSON
+  if (project.thumbnail) {
+    candidates.push(project.thumbnail);
+  }
+
+  if (!project.name) return candidates;
+
+  const repo = project.name;
+  const rawBase = `https://raw.githubusercontent.com/ferrannl/${encodeURIComponent(
+    repo
+  )}/main/`;
+
+  const rootFiles = [
+    "logo.png",
+    "logo.jpg",
+    "logo.jpeg",
+    "banner.png",
+    "banner.jpg",
+    "banner.jpeg",
+    "thumb.png",
+    "thumb.jpg",
+    "thumbnail.png",
+    "thumbnail.jpg",
+    "screenshot.png",
+    "screenshot.jpg",
+    "diagram.png",
+    "diagram.jpg",
+    "class-diagram.png",
+    "class-diagram.jpg"
+  ];
+
+  const imageDirFiles = rootFiles.map((f) => `images/${f}`);
+
+  rootFiles.concat(imageDirFiles).forEach((file) => {
+    candidates.push(rawBase + file);
+  });
+
+  return candidates;
+}
+
+function openImageModal(src, alt) {
+  if (!imageModal || !imageModalImg) return;
+  imageModalImg.src = src;
+  imageModalImg.alt = alt || "";
+  imageModal.hidden = false;
+}
+
+function closeImageModal() {
+  if (!imageModal || !imageModalImg) return;
+  imageModal.hidden = true;
+  imageModalImg.src = "";
+  imageModalImg.alt = "";
+}
+
+function createProjectThumbnail(project) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "project-thumb";
+
+  const firstLetter = (project.name || "?")[0].toUpperCase();
+  const placeholderSpan = document.createElement("span");
+  placeholderSpan.textContent = firstLetter;
+  btn.appendChild(placeholderSpan);
+
+  const candidates = buildThumbnailCandidates(project);
+  if (!candidates.length) {
+    // only placeholder
+    return btn;
+  }
+
+  const img = document.createElement("img");
+  img.loading = "lazy";
+
+  let index = 0;
+
+  function tryNext() {
+    if (index >= candidates.length) {
+      return;
+    }
+    img.src = candidates[index++];
+  }
+
+  img.addEventListener("error", () => {
+    if (index < candidates.length) {
+      tryNext();
+    }
+  });
+
+  img.addEventListener("load", () => {
+    btn.classList.add("has-image");
+    btn.innerHTML = "";
+    btn.appendChild(img);
+  });
+
+  btn.addEventListener("click", () => {
+    if (!img.src) return;
+    openImageModal(img.src, project.name || "");
+  });
+
+  tryNext();
+
+  return btn;
+}
+
 /* ---------- Rendering: Projects ---------- */
 
 function renderProjects() {
@@ -539,6 +657,16 @@ function renderProjects() {
     const card = document.createElement("article");
     card.className = "project-card";
 
+    // header row with thumbnail + title/lang
+    const headerRow = document.createElement("div");
+    headerRow.className = "project-title-row";
+
+    const thumb = createProjectThumbnail(p);
+    headerRow.appendChild(thumb);
+
+    const titleText = document.createElement("div");
+    titleText.className = "project-title-text";
+
     const title = document.createElement("h3");
     title.className = "project-title";
     title.textContent = p.name || "";
@@ -547,9 +675,16 @@ function renderProjects() {
     lang.className = "project-lang";
     lang.textContent = p.language || "";
 
+    titleText.appendChild(title);
+    titleText.appendChild(lang);
+
+    headerRow.appendChild(titleText);
+    card.appendChild(headerRow);
+
     const desc = document.createElement("p");
     desc.className = "project-desc";
     desc.textContent = p.description || "";
+    card.appendChild(desc);
 
     const meta = document.createElement("div");
     meta.className = "project-meta";
@@ -593,9 +728,6 @@ function renderProjects() {
       meta.appendChild(repoLink);
     }
 
-    card.appendChild(title);
-    card.appendChild(lang);
-    card.appendChild(desc);
     card.appendChild(meta);
     projectsGrid.appendChild(card);
   });
@@ -755,6 +887,9 @@ function initDomRefs() {
 
   projectsView = document.getElementById("projectsView");
   mediaView = document.getElementById("mediaView");
+
+  imageModal = document.getElementById("imageModal");
+  imageModalImg = document.getElementById("imageModalImg");
 }
 
 function initEvents() {
@@ -819,6 +954,21 @@ function initEvents() {
       setLanguage(lang);
     });
   });
+
+  // image modal interactions
+  if (imageModal) {
+    imageModal.addEventListener("click", (e) => {
+      if (e.target === imageModal || e.target === imageModalImg) {
+        closeImageModal();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !imageModal.hidden) {
+        closeImageModal();
+      }
+    });
+  }
 }
 
 /* ---------- Data loading ---------- */
