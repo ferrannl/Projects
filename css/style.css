@@ -1,5 +1,3 @@
-/* css/style.css */
-
 /* ---------- Theme tokens ---------- */
 
 :root {
@@ -17,18 +15,14 @@
   --radius-pill: 999px;
   --transition-fast: 160ms ease-out;
   --transition-med: 220ms ease-out;
-  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-               "Segoe UI", sans-serif;
+  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
 }
 
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   min-height: 100%;
@@ -111,7 +105,7 @@ body {
   font-size: 0.95rem;
 }
 
-/* Header actions: socials block */
+/* Header actions */
 
 .header-actions {
   display: flex;
@@ -141,11 +135,12 @@ body {
   cursor: pointer;
   outline: none;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-  transition: border-color var(--transition-fast),
-              box-shadow var(--transition-fast),
-              transform var(--transition-fast),
-              background var(--transition-fast),
-              color var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .lang-switch-main:hover {
@@ -163,7 +158,7 @@ body {
   font-size: 0.8rem;
 }
 
-/* Socials – left-aligned, wrap nicely */
+/* Socials */
 
 .social-links {
   display: flex;
@@ -187,9 +182,13 @@ body {
   text-decoration: none;
   cursor: pointer;
   gap: 0.4rem;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              color var(--transition-fast), transform var(--transition-fast),
-              box-shadow var(--transition-fast), filter var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    filter var(--transition-fast);
   white-space: nowrap;
   position: relative;
   overflow: hidden;
@@ -244,26 +243,30 @@ body {
 /* subtle platform tints */
 
 .social-github {
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 60%),
-              rgba(7, 10, 28, 0.95);
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 60%),
+    rgba(7, 10, 28, 0.95);
   border-color: rgba(255, 255, 255, 0.7);
 }
 
 .social-instagram {
-  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 60%),
-              rgba(7, 10, 28, 0.95);
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 60%),
+    rgba(7, 10, 28, 0.95);
   border-color: rgba(255, 75, 129, 0.7);
 }
 
 .social-linkedin {
-  background: radial-gradient(circle at 0 0, rgba(10, 102, 194, 0.25), transparent 60%),
-              rgba(7, 10, 28, 0.95);
+  background:
+    radial-gradient(circle at 0 0, rgba(10, 102, 194, 0.25), transparent 60%),
+    rgba(7, 10, 28, 0.95);
   border-color: rgba(10, 102, 194, 0.8);
 }
 
 .social-outlook {
-  background: radial-gradient(circle at 0 0, rgba(255, 150, 0, 0.3), transparent 60%),
-              rgba(7, 10, 28, 0.95);
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 150, 0, 0.3), transparent 60%),
+    rgba(7, 10, 28, 0.95);
   border-color: rgba(255, 150, 0, 0.85);
 }
 
@@ -306,7 +309,7 @@ body {
 
 .tabs {
   position: relative;
-  display: inline-flex;
+  display: flex;
   padding: 2px;
   border-radius: 999px;
   background: rgba(4, 7, 24, 0.9);
@@ -322,7 +325,7 @@ body {
   top: 2px;
   bottom: 2px;
   left: 2px;
-  width: calc(50% - 2px);
+  width: calc(50% - 4px);
   border-radius: 999px;
   background: linear-gradient(
     135deg,
@@ -351,10 +354,12 @@ body {
   transition:
     color var(--transition-fast),
     transform var(--transition-fast);
+  flex: 1 0 0;
+  text-align: center;
 }
 
 .tab-button + .tab-button {
-  margin-left: 2px;
+  margin-left: 0;
 }
 
 .tab-button:hover {
@@ -389,10 +394,11 @@ body {
   font-size: 0.95rem;
   outline: none;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
-  transition: border-color var(--transition-med),
-              box-shadow var(--transition-med),
-              background var(--transition-med),
-              transform var(--transition-fast);
+  transition:
+    border-color var(--transition-med),
+    box-shadow var(--transition-med),
+    background var(--transition-med),
+    transform var(--transition-fast);
 }
 
 #search::placeholder {
@@ -411,7 +417,7 @@ body {
   outline-offset: 2px;
 }
 
-/* manually aligned so it's visually centered in the input on normal font sizes */
+/* search icon */
 .search-section::before {
   content: "🔍";
   position: absolute;
@@ -461,7 +467,6 @@ body {
 }
 
 /* hide filters when [hidden] from JS */
-
 #projectFilters[hidden],
 #mediaFilters[hidden] {
   display: none !important;
@@ -489,8 +494,11 @@ body {
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
-  transition: transform var(--transition-med), box-shadow var(--transition-med),
-              border-color var(--transition-med), background var(--transition-med);
+  transition:
+    transform var(--transition-med),
+    box-shadow var(--transition-med),
+    border-color var(--transition-med),
+    background var(--transition-med);
 }
 
 .project-card::before {
@@ -509,7 +517,11 @@ body {
   transform: translateY(-4px) translateZ(0);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
   border-color: rgba(255, 255, 255, 0.16);
-  background: linear-gradient(145deg, rgba(12, 18, 40, 0.98), rgba(11, 14, 32, 0.96));
+  background: linear-gradient(
+    145deg,
+    rgba(12, 18, 40, 0.98),
+    rgba(11, 14, 32, 0.96)
+  );
 }
 
 .project-card:hover::before {
@@ -635,8 +647,11 @@ body {
   font-size: 0.78rem;
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 /* Live site – fancy 360° highlight ring, but text stays readable */
@@ -717,12 +732,8 @@ body {
 
 /* smooth 360° rotation */
 @keyframes liveGlowSpin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .btn-card:hover {
@@ -842,8 +853,11 @@ body {
   font-size: 0.76rem;
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast),
-              transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .media-action-btn:hover {
@@ -870,7 +884,7 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.5rem;
   font-size: 0.82rem;
   color: var(--text-muted);
@@ -885,20 +899,15 @@ body {
   text-decoration: underline;
 }
 
-.footer-links {
-  display: inline-flex;
-  gap: 0.4rem;
-  align-items: center;
-}
-
 /* ---------- Language gate ---------- */
 
 .lang-gate-backdrop {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at top, rgba(255, 75, 129, 0.18), transparent 60%),
-              radial-gradient(circle at bottom, rgba(75, 195, 255, 0.18), transparent 60%),
-              rgba(0, 0, 10, 0.88);
+  background:
+    radial-gradient(circle at top, rgba(255, 75, 129, 0.18), transparent 60%),
+    radial-gradient(circle at bottom, rgba(75, 195, 255, 0.18), transparent 60%),
+    rgba(0, 0, 10, 0.88);
   backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
@@ -959,8 +968,9 @@ body {
 .btn-lang {
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 55%),
-              rgba(8, 10, 28, 0.95);
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.25), transparent 55%),
+    rgba(8, 10, 28, 0.95);
   color: var(--text);
   padding: 0.55rem 0.8rem;
   display: flex;
@@ -968,9 +978,12 @@ body {
   align-items: center;
   cursor: pointer;
   text-align: left;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-              border-color var(--transition-fast), background var(--transition-fast),
-              color var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .btn-lang:hover {
@@ -981,8 +994,9 @@ body {
 
 .btn-lang.active {
   border-color: rgba(255, 255, 255, 0.55);
-  background: radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.4), transparent 55%),
-              rgba(12, 15, 35, 0.98);
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 75, 129, 0.4), transparent 55%),
+    rgba(12, 15, 35, 0.98);
 }
 
 .flag {
@@ -1066,10 +1080,11 @@ body {
   font-size: 0.78rem;
   cursor: pointer;
   text-decoration: none;
-  transition: background var(--transition-fast),
-              border-color var(--transition-fast),
-              transform var(--transition-fast),
-              box-shadow var(--transition-fast);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .image-modal-btn:hover {
