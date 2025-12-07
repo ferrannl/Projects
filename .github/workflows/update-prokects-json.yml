@@ -1,0 +1,40 @@
+name: Update projects.json
+
+on:
+  push:
+    paths:
+      - "generate_projects_json.py"
+      - ".github/workflows/update-projects-json.yml"
+  schedule:
+    - cron: "15 3 * * *"  # daily
+  workflow_dispatch:
+
+jobs:
+  update-projects-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Generate projects.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python generate_projects_json.py
+
+      - name: Commit and push projects.json if changed
+        run: |
+          if git status --porcelain | grep -q "projects.json"; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add projects.json
+            git commit -m "chore: update projects.json"
+            git push
+          else
+            echo "No changes to projects.json"
+          fi
