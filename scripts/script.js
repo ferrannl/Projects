@@ -1,115 +1,56 @@
-// scripts/script.js
-
-/* -------------------------------------------------------
-   Ferran’s Projects – Main JS
-
-   - Multi-language UI (NL / EN / DE / PL / TR / ES)
-   - Age text in About section (full precision at load)
-   - Projects + Media switcher with filters
-   - Fancy media wall (zoom, download, share)
-   - Auto thumbnails from repo root via GitHub API
-   - Pretty repo titles (no more hyphen hell)
-   - Tags from projects.json (no language duplication)
-   - No-JS fallback (handled via body.js-enabled)
-------------------------------------------------------- */
-
-/* ---------- GitHub + thumbnail cache ---------- */
+/* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
-const THUMB_CACHE_KEY = "ferranThumbCacheV1";
-const THUMB_CACHE_TTL_MS = 1000 * 60 * 60 * 6; // 6 hours
+const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`;
+const PROJECTS_URL = "./projects.json";
+const MEDIA_INDEX_URL = "./media-index.json";
 
-function loadThumbCache() {
-  try {
-    const raw = localStorage.getItem(THUMB_CACHE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === "object") return parsed;
-  } catch (_) {}
-  return {};
-}
-
-function saveThumbCache() {
-  try {
-    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache));
-  } catch (_) {}
-}
-
-let thumbCache = loadThumbCache();
-
-/* ---------- Language + global view state ---------- */
+const CACHE_KEY = "ferranProjectsCacheV2";
+const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
+const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
+const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
-let currentView = "projects";
-let currentLang = DEFAULT_LANG;
+/* ---------- State ---------- */
 
-// Birthday: 15-08-1999 23:10 Amsterdam time
-const BIRTH_DATE = new Date(1999, 7, 15, 23, 10); // months are 0-based
+let repos = [];
+let projects = [];
+let mediaItems = [];
 
-const AGE_UNITS = {
-  nl: { y: "j", m: "mnd", w: "w", d: "d", h: "u", min: "min", s: "s" },
-  en: { y: "y", m: "mo", w: "w", d: "d", h: "h", min: "m", s: "s" },
-  de: { y: "J", m: "M", w: "W", d: "T", h: "Std", min: "Min", s: "s" },
-  pl: { y: "l", m: "m", w: "t", d: "d", h: "g", min: "min", s: "s" },
-  tr: { y: "y", m: "ay", w: "hf", d: "g", h: "sa", min: "dk", s: "sn" },
-  es: { y: "a", m: "m", w: "s", d: "d", h: "h", min: "min", s: "s" }
+const state = {
+  activeTab: "projects",
+  search: "",
+  typeFilter: "all",
+  languageFilter: "all",
+  mediaTypeFilter: "all",
+  mediaFormatFilter: "all",
+  lang: DEFAULT_LANG
 };
 
-/* ---------- Translations (with 🇳🇱 flag in About) ---------- */
+/* Small words not capitalized in titles (except first word) */
+const SMALL_WORDS = [
+  "voor", "na", "met", "door", "en", "of",
+  "und", "mit", "von",
+  "the", "and", "of"
+];
 
-const TRANSLATIONS = {
-  en: {
-    headerLangButton: "Language",
-    subtitle:
-      "All my projects and media in one place – websites, apps, school work, guides, APIs and more.",
-    aboutTitle: "About Me",
-    aboutP1:
-      "Hey Ferran ({age}) here. I am a Dutch 🇳🇱 developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
-    aboutP2: "",
-    tabProjects: "Projects",
-    tabMedia: "Media",
-    searchProjectsPlaceholder: "Search by name, description, language or tag…",
-    searchMediaPlaceholder: "Search media by title, filename or type…",
-    filterTypeLabel: "Type",
-    typeAll: "All",
-    typeWebsite: "Websites",
-    typeMobile: "Mobile",
-    typeApi: "APIs / Backend",
-    typeSchool: "School / Study",
-    typeOther: "Other",
-    filterLanguageLabel: "Language",
-    languageFilterAll: "All languages",
-    mediaTypeLabel: "Media type",
-    mediaKindAll: "All",
-    mediaKindImages: "Images",
-    mediaKindVideos: "Videos",
-    mediaKindAudio: "Audio",
-    mediaFormatLabel: "Format",
-    mediaFormatAll: "All formats",
-    emptyState:
-      "Hmm… no projects loaded right now. Maybe I took them offline, or something went wrong. Try a hard refresh (Shift + F5 / Ctrl + F5) and wait a few seconds.",
-    mediaEmptyState:
-      "No media to show right now. Try a hard refresh and wait a few seconds.",
-    footerBuiltWith: "Built with ♥ by Ferran"
-  },
+/* ---------- i18n dictionary (minimal but working) ---------- */
 
+const I18N = {
   nl: {
-    headerLangButton: "Taal",
     subtitle:
       "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
     aboutTitle: "Over mij",
     aboutP1:
-      "Hey 👋🏻 Ferran ({age}) hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
+      "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
-    searchProjectsPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
-    searchMediaPlaceholder:
-      "Zoek media op titel, bestandsnaam of type…",
+    searchLabel: "Zoeken",
     filterTypeLabel: "Type",
     typeAll: "Alles",
     typeWebsite: "Websites",
@@ -127,918 +68,758 @@ const TRANSLATIONS = {
     mediaFormatLabel: "Bestandstype",
     mediaFormatAll: "Alle formaten",
     emptyState:
-      "Hmm… geen projecten om te laten zien. Misschien heb ik ze offline gehaald of ging er iets mis. Probeer de pagina hard te verversen (Shift + F5 / Ctrl + F5) en wacht een paar seconden.",
-    mediaEmptyState:
-      "Geen media om te laten zien. Probeer de pagina opnieuw te laden en wacht even.",
-    footerBuiltWith: "Gemaakt met ♥ door Ferran"
+      "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+    mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
+    headerLangButton: "Taal",
+    footerBuilt: "Gemaakt met ♥ door Ferran",
+    btnLiveSite: "Live site"
   },
-
-  de: {
-    headerLangButton: "Sprache",
+  en: {
     subtitle:
-      "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
-    aboutTitle: "Über mich",
+      "All my programming and coding projects in one place – websites, apps, school projects, guides, APIs and more.",
+    aboutTitle: "About me",
     aboutP1:
-      "Hey hier ist Ferran ({age}). Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gerne Websites, Apps und kleine Tools, die mir und anderen helfen.",
+      "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
-    tabProjects: "Projekte",
-    tabMedia: "Medien",
-    searchProjectsPlaceholder:
-      "Suche nach Name, Beschreibung, Sprache oder Tag…",
-    searchMediaPlaceholder:
-      "Suche Medien nach Titel, Dateiname oder Typ…",
-    filterTypeLabel: "Typ",
-    typeAll: "Alle",
+    tabProjects: "Projects",
+    tabMedia: "Media",
+    searchLabel: "Search",
+    filterTypeLabel: "Type",
+    typeAll: "All",
     typeWebsite: "Websites",
     typeMobile: "Mobile",
     typeApi: "APIs / Backend",
-    typeSchool: "Schule / Studium",
-    typeOther: "Sonstiges",
-    filterLanguageLabel: "Sprache",
-    languageFilterAll: "Alle Sprachen",
-    mediaTypeLabel: "Medientyp",
-    mediaKindAll: "Alle",
-    mediaKindImages: "Bilder",
+    typeSchool: "School / Study",
+    typeOther: "Other",
+    filterLanguageLabel: "Language",
+    languageFilterAll: "All languages",
+    mediaTypeLabel: "Media type",
+    mediaKindAll: "All",
+    mediaKindImages: "Images",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
-    mediaFormatLabel: "Format",
-    mediaFormatAll: "Alle Formate",
+    mediaFormatLabel: "File type",
+    mediaFormatAll: "All types",
     emptyState:
-      "Keine Projekte für diese Suche oder Filter. Vielleicht sind sie offline oder etwas ist schief gelaufen. Versuche ein hartes Reload (Shift + F5) und warte ein paar Sekunden.",
-    mediaEmptyState:
-      "Keine Medien für diese Suche oder Filter. Versuche die Seite neu zu laden.",
-    footerBuiltWith: "Mit ♥ erstellt von Ferran"
-  },
-
-  pl: {
-    headerLangButton: "Język",
-    subtitle:
-      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, zadania ze szkoły, poradniki, API i więcej.",
-    aboutTitle: "O mnie",
-    aboutP1:
-      "Cześć tu Ferran ({age}). Jestem holenderskim 🇳🇱 deweloperem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony, aplikacje i małe narzędzia, które pomagają mnie i innym.",
-    aboutP2: "",
-    tabProjects: "Projekty",
-    tabMedia: "Media",
-    searchProjectsPlaceholder:
-      "Szukaj po nazwie, opisie, języku lub tagu…",
-    searchMediaPlaceholder:
-      "Szukaj mediów po tytule, nazwie pliku lub typie…",
-    filterTypeLabel: "Typ",
-    typeAll: "Wszystko",
-    typeWebsite: "Strony WWW",
-    typeMobile: "Mobilne",
-    typeApi: "API / Backend",
-    typeSchool: "Szkoła / Studia",
-    typeOther: "Inne",
-    filterLanguageLabel: "Język",
-    languageFilterAll: "Wszystkie języki",
-    mediaTypeLabel: "Typ mediów",
-    mediaKindAll: "Wszystko",
-    mediaKindImages: "Obrazy",
-    mediaKindVideos: "Wideo",
-    mediaKindAudio: "Audio",
-    mediaFormatLabel: "Format",
-    mediaFormatAll: "Wszystkie formaty",
-    emptyState:
-      "Brak projektów dla tych filtrów. Może są offline albo coś poszło nie tak. Spróbuj odświeżyć stronę (Shift + F5) i chwilę poczekać.",
-    mediaEmptyState:
-      "Brak mediów dla tych filtrów. Spróbuj ponownie odświeżyć stronę.",
-    footerBuiltWith: "Stworzone z ♥ przez Ferrana"
-  },
-
-  tr: {
-    headerLangButton: "Dil",
-    subtitle:
-      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
-    aboutTitle: "Hakkımda",
-    aboutP1:
-      "Selam ben Ferran ({age}). Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir geliştiriciyim. Kendime ve başkalarına yardımcı olan web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
-    aboutP2: "",
-    tabProjects: "Projeler",
-    tabMedia: "Medya",
-    searchProjectsPlaceholder:
-      "İsme, açıklamaya, dile veya etikete göre ara…",
-    searchMediaPlaceholder:
-      "Medya için başlık, dosya adı veya türe göre ara…",
-    filterTypeLabel: "Tür",
-    typeAll: "Tümü",
-    typeWebsite: "Web siteleri",
-    typeMobile: "Mobil",
-    typeApi: "API / Backend",
-    typeSchool: "Okul / Eğitim",
-    typeOther: "Diğer",
-    filterLanguageLabel: "Dil",
-    languageFilterAll: "Tüm diller",
-    mediaTypeLabel: "Medya türü",
-    mediaKindAll: "Tümü",
-    mediaKindImages: "Görseller",
-    mediaKindVideos: "Videolar",
-    mediaKindAudio: "Ses",
-    mediaFormatLabel: "Biçim",
-    mediaFormatAll: "Tüm biçimler",
-    emptyState:
-      "Bu filtrelerle eşleşen proje yok. Belki offline oldular ya da bir şeyler ters gitti. Sayfayı sert yenile (Shift + F5) ve birkaç saniye bekle.",
-    mediaEmptyState:
-      "Bu filtrelere uygun medya yok. Sayfayı yenilemeyi dene.",
-    footerBuiltWith: "♥ ile geliştirildi – Ferran"
-  },
-
-  es: {
-    headerLangButton: "Idioma",
-    subtitle:
-      "Todos mis proyectos y media en un solo lugar: webs, apps, trabajos de estudio, experimentos de código y más.",
-    aboutTitle: "Sobre mí",
-    aboutP1:
-      "Hola soy Ferran ({age}). Soy un desarrollador 🇳🇱 holandés de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas que ayudan a mí y a otras personas.",
-    aboutP2: "",
-    tabProjects: "Proyectos",
-    tabMedia: "Media",
-    searchProjectsPlaceholder:
-      "Busca por nombre, descripción, idioma o etiqueta…",
-    searchMediaPlaceholder:
-      "Busca medios por título, archivo o tipo…",
-    filterTypeLabel: "Tipo",
-    typeAll: "Todo",
-    typeWebsite: "Webs",
-    typeMobile: "Móvil",
-    typeApi: "APIs / Backend",
-    typeSchool: "Escuela / Estudio",
-    typeOther: "Otros",
-    filterLanguageLabel: "Idioma",
-    languageFilterAll: "Todos los idiomas",
-    mediaTypeLabel: "Tipo de media",
-    mediaKindAll: "Todo",
-    mediaKindImages: "Imágenes",
-    mediaKindVideos: "Vídeos",
-    mediaKindAudio: "Audio",
-    mediaFormatLabel: "Formato",
-    mediaFormatAll: "Todos los formatos",
-    emptyState:
-      "No hay proyectos con estos filtros. Puede que estén offline o algo ha fallado. Prueba a recargar la página (Shift + F5) y espera unos segundos.",
-    mediaEmptyState:
-      "No hay media con estos filtros. Prueba a recargar la página.",
-    footerBuiltWith: "Hecho con ♥ por Ferran"
+      "No projects found with these filters. Try something else.",
+    mediaEmptyState: "No media found with these filters.",
+    headerLangButton: "Language",
+    footerBuilt: "Built with ♥ by Ferran",
+    btnLiveSite: "Live site"
   }
+  // de / pl / tr / es could be added later; missing keys just fall back
 };
 
-/* ---------- Age calculation ---------- */
+/* ---------- Init ---------- */
 
-function computeAgeComponents(now) {
-  let diffMs = now - BIRTH_DATE;
-  if (diffMs < 0) diffMs = 0;
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("js-enabled");
 
-  let totalSeconds = Math.floor(diffMs / 1000);
+  setupLanguage();
+  setupTabsAndFilters();
+  setupSearch();
+  setupImageModal();
 
-  const s = totalSeconds % 60;
-  totalSeconds = (totalSeconds - s) / 60;
+  loadProjects();
+  loadMedia();
+});
 
-  const min = totalSeconds % 60;
-  totalSeconds = (totalSeconds - min) / 60;
+/* ---------- Language / gate ---------- */
 
-  const h = totalSeconds % 24;
-  totalSeconds = (totalSeconds - h) / 24;
+function setupLanguage() {
+  const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+  const gateSeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
 
-  const d = totalSeconds % 7;
-  totalSeconds = (totalSeconds - d) / 7;
+  const initialLang = SUPPORTED_LANGS.includes(savedLang)
+    ? savedLang
+    : DEFAULT_LANG;
+  state.lang = initialLang;
 
-  const w = totalSeconds % 4;
-  totalSeconds = (totalSeconds - w) / 4;
-
-  const m = totalSeconds % 12;
-  const y = (totalSeconds - m) / 12;
-
-  return { y, m, w, d, h, min, s };
-}
-
-function formatAge(lang) {
-  const units = AGE_UNITS[lang] || AGE_UNITS[DEFAULT_LANG];
-  const { y, m, w, d, h, min, s } = computeAgeComponents(new Date());
-
-  // show full chain: years to seconds
-  const parts = [
-    `${y}${units.y}`,
-    `${m}${units.m}`,
-    `${w}${units.w}`,
-    `${d}${units.d}`,
-    `${h}${units.h}`,
-    `${min}${units.min}`,
-    `${s}${units.s}`
-  ];
-
-  return parts.join(" ");
-}
-
-/* ---------- Repo display name prettifier ---------- */
-
-const LOWERCASE_WORDS = new Set([
-  "voor",
-  "na",
-  "met",
-  "door",
-  "van",
-  "en",
-  "of",
-  "de",
-  "het",
-  "een",
-  "der",
-  "den",
-  "und",
-  "mit",
-  "für",
-  "im",
-  "am",
-  "an",
-  "vom",
-  "del",
-  "la",
-  "el",
-  "y",
-  "con",
-  "por"
-]);
-
-function prettifyRepoName(name) {
-  if (!name) return "";
-
-  const cleaned = name.replace(/[-_]+/g, " ");
-  const parts = cleaned.split(/\s+/);
-
-  return parts
-    .map((raw, index) => {
-      const lower = raw.toLowerCase();
-      if (lower === "ios") return "iOS";
-      if (lower === "html") return "HTML";
-      if (lower === "css") return "CSS";
-      if (lower === "js") return "JS";
-      if (lower === "api" || lower === "apis") return lower.toUpperCase();
-      if (lower === "c#") return "C#";
-      if (lower === "c++") return "C++";
-      if (lower === "php") return "PHP";
-
-      if (LOWERCASE_WORDS.has(lower) && index !== 0) return lower;
-
-      return lower.charAt(0).toUpperCase() + lower.slice(1);
-    })
-    .join(" ");
-}
-
-/* ---------- Tag enrichment (no language duplication) ---------- */
-
-function deriveExtraTags(project) {
-  // Only use tags explicitly defined in projects.json
-  const tags = new Set(
-    Array.isArray(project.tags) ? project.tags.filter(Boolean) : []
-  );
-  return Array.from(tags);
-}
-
-/* ---------- i18n application ---------- */
-
-function applyTranslations(lang) {
-  const t = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANG];
-
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.getAttribute("data-i18n");
-    if (!key || !(key in t)) return;
-
-    let value = t[key];
-    if (key === "aboutP1") {
-      value = value.replace("{age}", formatAge(lang));
+  const gate = document.getElementById("langGate");
+  if (gate) {
+    if (gateSeen) {
+      gate.hidden = true;
     }
 
-    el.textContent = value;
-  });
-
-  // Search placeholder depends on current view
-  const searchInput = document.getElementById("search");
-  if (searchInput) {
-    const placeholderKey =
-      currentView === "media"
-        ? "searchMediaPlaceholder"
-        : "searchProjectsPlaceholder";
-    if (t[placeholderKey]) {
-      searchInput.placeholder = t[placeholderKey];
-    }
+    gate.addEventListener("click", (event) => {
+      const btn = event.target.closest(".btn-lang");
+      if (!btn) return;
+      const langCode = btn.dataset.lang;
+      if (!SUPPORTED_LANGS.includes(langCode)) return;
+      setLanguage(langCode);
+      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+      gate.hidden = true;
+    });
   }
 
-  // Footer text
-  const footerBuilt = document.querySelector("[data-i18n-footer-built]");
-  if (footerBuilt && t.footerBuiltWith) {
-    footerBuilt.textContent = t.footerBuiltWith;
+  const headerLangButton = document.getElementById("headerLangButton");
+  if (headerLangButton) {
+    headerLangButton.addEventListener("click", () => {
+      if (!gate) return;
+      gate.hidden = false;
+    });
   }
 
-  // Tabs labels
-  const projectsTab = document.getElementById("projectsTab");
-  const mediaTab = document.getElementById("mediaTab");
-  if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
-  if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
-
-  // Top-right language button label
-  const headerLangLabel = document.querySelector(
-    ".lang-switch-label[data-i18n='headerLangButton']"
-  );
-  if (headerLangLabel && t.headerLangButton) {
-    headerLangLabel.textContent = t.headerLangButton;
-  }
-}
-
-/* ---------- Language helpers ---------- */
-
-function detectInitialLang() {
-  try {
-    const stored = localStorage.getItem(LANG_STORAGE_KEY);
-    if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
-  } catch (_) {}
-
-  const navLang = (navigator.language || "").slice(0, 2).toLowerCase();
-  if (SUPPORTED_LANGS.includes(navLang)) return navLang;
-
-  return DEFAULT_LANG;
-}
-
-function setActiveLangButton(lang) {
-  document
-    .querySelectorAll(".btn-lang[data-lang]")
-    .forEach((btn) => btn.classList.remove("active"));
-
-  const btn = document.querySelector(`.btn-lang[data-lang="${lang}"]`);
-  if (btn) btn.classList.add("active");
+  setLanguage(initialLang);
 }
 
 function setLanguage(lang) {
-  if (!SUPPORTED_LANGS.includes(lang)) lang = DEFAULT_LANG;
-  currentLang = lang;
+  state.lang = lang;
   try {
     localStorage.setItem(LANG_STORAGE_KEY, lang);
   } catch (_) {}
-  setActiveLangButton(lang);
-  applyTranslations(lang);
+
+  const dict = I18N[lang] || I18N[DEFAULT_LANG] || {};
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    const value = dict[key];
+    if (typeof value === "string") {
+      el.textContent = value;
+    }
+  });
+
+  document.querySelectorAll("[data-i18n-footer-built]").forEach((el) => {
+    const key = "footerBuilt";
+    const value = dict[key];
+    if (typeof value === "string") {
+      el.textContent = value;
+    }
+  });
+
+  const searchLabelEl = document.querySelector("[data-i18n='searchLabel']");
+  if (searchLabelEl && dict.searchLabel) {
+    searchLabelEl.textContent = dict.searchLabel;
+  }
 }
 
-function initLanguageGate() {
-  const gate = document.getElementById("langGate");
-  if (!gate) return;
+/* ---------- Tabs & filters visibility ---------- */
 
-  let alreadySeen = false;
-  try {
-    alreadySeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
-  } catch (_) {}
+function setupTabsAndFilters() {
+  const projectsTab = document.getElementById("projectsTab");
+  const mediaTab = document.getElementById("mediaTab");
+  const projectsView = document.getElementById("projectsView");
+  const mediaView = document.getElementById("mediaView");
+  const projectFilters = document.getElementById("projectFilters");
+  const mediaFilters = document.getElementById("mediaFilters");
 
-  if (alreadySeen) {
-    gate.style.display = "none";
+  if (!projectsTab || !mediaTab || !projectsView || !mediaView) return;
+
+  function showProjects() {
+    state.activeTab = "projects";
+    projectsTab.classList.add("active");
+    mediaTab.classList.remove("active");
+    projectsView.style.display = "";
+    mediaView.style.display = "none";
+    if (projectFilters) projectFilters.hidden = false;
+    if (mediaFilters) mediaFilters.hidden = true;
+
+    const tabs = document.querySelector(".tabs");
+    if (tabs) tabs.classList.remove("tabs-media");
+
+    renderProjects();
   }
 
-  gate.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const lang = btn.getAttribute("data-lang");
-      setLanguage(lang);
-      try {
-        localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
-      } catch (_) {}
-      gate.style.display = "none";
+  function showMedia() {
+    state.activeTab = "media";
+    mediaTab.classList.add("active");
+    projectsTab.classList.remove("active");
+    mediaView.style.display = "";
+    projectsView.style.display = "none";
+    if (projectFilters) projectFilters.hidden = true;
+    if (mediaFilters) mediaFilters.hidden = false;
+
+    const tabs = document.querySelector(".tabs");
+    if (tabs) tabs.classList.add("tabs-media");
+
+    renderMedia();
+  }
+
+  projectsTab.addEventListener("click", showProjects);
+  mediaTab.addEventListener("click", showMedia);
+
+  // Default: projects
+  showProjects();
+
+  // Filter listeners
+  const typeFilter = document.getElementById("typeFilter");
+  const languageFilter = document.getElementById("languageFilter");
+  const mediaTypeFilter = document.getElementById("mediaTypeFilter");
+  const mediaFormatFilter = document.getElementById("mediaFormatFilter");
+
+  if (typeFilter) {
+    typeFilter.addEventListener("change", () => {
+      state.typeFilter = typeFilter.value;
+      renderProjects();
     });
+  }
+
+  if (languageFilter) {
+    languageFilter.addEventListener("change", () => {
+      state.languageFilter = languageFilter.value;
+      renderProjects();
+    });
+  }
+
+  if (mediaTypeFilter) {
+    mediaTypeFilter.addEventListener("change", () => {
+      state.mediaTypeFilter = mediaTypeFilter.value;
+      renderMedia();
+    });
+  }
+
+  if (mediaFormatFilter) {
+    mediaFormatFilter.addEventListener("change", () => {
+      state.mediaFormatFilter = mediaFormatFilter.value;
+      renderMedia();
+    });
+  }
+}
+
+/* ---------- Search ---------- */
+
+function setupSearch() {
+  const searchEl = document.getElementById("search");
+  if (!searchEl) return;
+
+  searchEl.addEventListener("input", () => {
+    state.search = searchEl.value.trim();
+    if (state.activeTab === "projects") {
+      renderProjects();
+    } else {
+      renderMedia();
+    }
   });
 }
 
-/* ---------- View state & filters ---------- */
+/* ---------- GitHub + projects.json loading ---------- */
 
-const state = {
-  search: "",
-  typeFilter: "all",
-  languageFilter: "all",
-  mediaTypeFilter: "all",
-  mediaFormatFilter: "all"
-};
+async function loadProjects() {
+  const overrides = await loadProjectOverrides();
+  const apiRepos = await loadGitHubReposWithCache();
 
-let allProjects = [];
-let allMedia = [];
+  const overridesByName = {};
+  overrides.forEach((o) => {
+    if (o && o.name) {
+      overridesByName[o.name.toLowerCase()] = o;
+    }
+  });
 
-// DOM refs
-let projectsGrid,
-  projectsEmpty,
-  mediaGrid,
-  mediaEmpty,
-  searchInput,
-  typeSelect,
-  languageSelect,
-  mediaTypeSelect,
-  mediaFormatSelect,
-  projectFiltersEl,
-  mediaFiltersEl,
-  projectsTab,
-  mediaTab,
-  projectsView,
-  mediaView,
-  tabsEl;
+  repos = apiRepos.filter(
+    (repo) =>
+      !repo.archived &&
+      !repo.fork &&
+      repo.name.toLowerCase() !== "projects"
+  );
 
-// modal refs
-let imageModal,
-  imageModalImg,
-  imageModalCaption,
-  imageModalDownload,
-  imageModalOpen,
-  imageModalShare,
-  imageModalClose;
+  projects = repos.map((repo) => {
+    const o = overridesByName[repo.name.toLowerCase()] || {};
 
-/* ---------- Data helpers ---------- */
+    const displayName = formatRepoName(o.displayName || repo.name || "");
+    const description =
+      o.description || repo.description || "No description yet.";
 
-const PROJECTS_URL = "./projects.json";
-const MEDIA_URL = "./media/media-index.json";
+    const overrideLangs = Array.isArray(o.languages)
+      ? o.languages
+      : o.langs;
+    const languages = getLanguagesList(repo.language, overrideLangs);
 
-function deriveProjectType(project) {
-  const name = (project.name || "").toLowerCase();
-  const desc = (project.description || "").toLowerCase();
-  const lang = (project.language || "").toLowerCase();
+    const type = o.type || "other";
+    const tags = Array.isArray(o.tags) ? o.tags : [];
 
-  if (
-    project.hasPages ||
-    ["html", "scss", "less", "php"].includes(lang) ||
-    desc.includes("website")
-  ) {
-    return "website";
-  }
+    const liveUrlRaw = (o.liveUrl || repo.homepage || "").trim();
+    const liveUrl = liveUrlRaw || null;
 
-  if (
-    ["java", "swift", "kotlin"].includes(lang) ||
-    name.includes("android") ||
-    name.includes("ios")
-  ) {
-    return "mobile";
-  }
+    const thumbnail =
+      o.thumbnail || o.thumb || null;
 
-  if (
-    desc.includes("api") ||
-    desc.includes("rest") ||
-    desc.includes("backend")
-  ) {
-    return "api";
-  }
+    return {
+      id: repo.id,
+      name: repo.name,
+      displayName,
+      description,
+      languages,
+      primaryLanguage: repo.language,
+      type,
+      tags,
+      liveUrl,
+      githubUrl: repo.html_url,
+      thumbnail
+    };
+  });
 
-  if (
-    desc.includes("assignment") ||
-    desc.includes("course") ||
-    desc.includes("school") ||
-    desc.includes("exam") ||
-    desc.includes("eindopdracht")
-  ) {
-    return "school";
-  }
+  // Sort: live sites first, then by name
+  projects.sort((a, b) => {
+    if (a.liveUrl && !b.liveUrl) return -1;
+    if (!a.liveUrl && b.liveUrl) return 1;
+    return a.displayName.localeCompare(b.displayName, "en");
+  });
 
-  return "other";
+  buildLanguageFilterOptions(projects);
+  renderProjects();
 }
 
-function getMediaFormat(item) {
-  const src = item.src || "";
-  const dot = src.lastIndexOf(".");
-  if (dot === -1) return "";
-  return src.slice(dot + 1).toLowerCase();
+async function loadProjectOverrides() {
+  try {
+    const res = await fetch(PROJECTS_URL);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Failed to load projects.json", err);
+    return [];
+  }
 }
 
-/* ---------- Thumbnail chooser via GitHub API ---------- */
-
-const THUMB_PRIORITY_NAMES = [
-  "logo.png",
-  "logo.jpg",
-  "logo.jpeg",
-  "favicon.png",
-  "favicon.jpg",
-  "favicon.ico",
-  "icon.png",
-  "icon.jpg",
-  "icon.jpeg",
-  "thumbnail.png",
-  "thumbnail.jpg",
-  "preview.png",
-  "preview.jpg",
-  "sequencediagram.png",
-  "sequencediagram1.png",
-  "sequencediagram.jpg",
-  "sequencediagram1.jpg"
-];
-
-async function ensureThumbnailForProject(project) {
-  if (!project || !project.name) return null;
-
-  const repoName = project.name;
+async function loadGitHubReposWithCache() {
   const now = Date.now();
 
-  const cached = thumbCache[repoName];
-  if (cached && now - cached.ts < THUMB_CACHE_TTL_MS) {
-    return cached.url || null;
+  // respect rate limit backoff
+  try {
+    const rateRaw = localStorage.getItem(RATE_LIMIT_KEY);
+    if (rateRaw) {
+      const rate = JSON.parse(rateRaw);
+      if (rate && now - rate.timestamp < RATE_LIMIT_BACKOFF_MS) {
+        const cached = readReposFromCache();
+        if (cached) return cached;
+        return [];
+      }
+    }
+  } catch (_) {}
+
+  // try cache first
+  const cached = readReposFromCache();
+  if (cached) {
+    // also try to refresh, but even if it fails we still have cached
+    refreshReposInBackground();
+    return cached;
   }
 
+  // no cache? fetch now
+  return fetchReposFromGitHub();
+}
+
+function readReposFromCache() {
   try {
-    const contentsRes = await fetch(
-      `https://api.github.com/repos/${GITHUB_USER}/${encodeURIComponent(
-        repoName
-      )}/contents`
-    );
-    if (!contentsRes.ok) {
-      thumbCache[repoName] = { url: null, ts: now };
-      saveThumbCache();
-      return null;
-    }
-
-    const items = await contentsRes.json();
-    if (!Array.isArray(items)) {
-      thumbCache[repoName] = { url: null, ts: now };
-      saveThumbCache();
-      return null;
-    }
-
-    let imageFiles = items.filter(
-      (it) =>
-        it.type === "file" &&
-        /\.(png|jpe?g|webp|gif)$/i.test(it.name || "")
-    );
-
-    // If no images in root, check /images folder
-    if (!imageFiles.length) {
-      const imagesDir = items.find(
-        (it) => it.type === "dir" && (it.name || "").toLowerCase() === "images"
-      );
-      if (imagesDir && imagesDir.url) {
-        const imagesRes = await fetch(imagesDir.url);
-        if (imagesRes.ok) {
-          const imgItems = await imagesRes.json();
-          if (Array.isArray(imgItems)) {
-            imageFiles = imgItems.filter(
-              (it) =>
-                it.type === "file" &&
-                /\.(png|jpe?g|webp|gif)$/i.test(it.name || "")
-            );
-          }
-        }
-      }
-    }
-
-    if (!imageFiles.length) {
-      thumbCache[repoName] = { url: null, ts: now };
-      saveThumbCache();
-      return null;
-    }
-
-    const lowerMap = new Map(
-      imageFiles.map((f) => [(f.name || "").toLowerCase(), f])
-    );
-
-    let chosen = null;
-    for (const candidate of THUMB_PRIORITY_NAMES) {
-      const match = lowerMap.get(candidate);
-      if (match) {
-        chosen = match;
-        break;
-      }
-    }
-
-    if (!chosen) {
-      chosen = imageFiles[0];
-    }
-
-    const url = chosen.download_url || chosen.html_url || null;
-    thumbCache[repoName] = { url, ts: now };
-    saveThumbCache();
-    return url;
-  } catch (err) {
-    console.error("Thumbnail fetch failed for", project.name, err);
-    thumbCache[repoName] = { url: null, ts: now };
-    saveThumbCache();
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.repos)) return null;
+    if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
+    return parsed.repos;
+  } catch (_) {
     return null;
   }
 }
 
-function loadAndApplyThumbnail(thumbEl, project) {
-  ensureThumbnailForProject(project).then((url) => {
-    if (!url || !thumbEl.isConnected) return;
-
-    thumbEl.classList.add("has-image");
-    thumbEl.innerHTML = "";
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = project.name || "";
-    img.loading = "lazy";
-    thumbEl.appendChild(img);
-
-    thumbEl.addEventListener("click", () => {
-      openImageModal({ src: url, title: project.name || "" });
-    });
-  });
+function saveReposToCache(repos) {
+  try {
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        timestamp: Date.now(),
+        repos
+      })
+    );
+  } catch (_) {}
 }
 
-/* ---------- Media modal ---------- */
+function setRateLimited() {
+  try {
+    localStorage.setItem(
+      RATE_LIMIT_KEY,
+      JSON.stringify({ timestamp: Date.now() })
+    );
+  } catch (_) {}
+}
 
-function initImageModal() {
-  if (imageModal) return;
+function refreshReposInBackground() {
+  fetchReposFromGitHub().catch(() => {});
+}
 
-  imageModal = document.getElementById("imageModal");
-  if (!imageModal) {
-    imageModal = document.createElement("div");
-    imageModal.id = "imageModal";
-    imageModal.className = "image-modal";
-    imageModal.hidden = true;
-    document.body.appendChild(imageModal);
-  }
-
-  imageModal.innerHTML = `
-    <div class="image-modal-inner">
-      <figure class="image-modal-figure">
-        <img id="imageModalImg" class="image-modal-img" alt="">
-        <figcaption id="imageModalCaption" class="image-modal-caption"></figcaption>
-      </figure>
-      <div class="image-modal-actions">
-        <a id="imageModalDownload" class="image-modal-btn" download>Download</a>
-        <a id="imageModalOpen" class="image-modal-btn" target="_blank" rel="noopener noreferrer">Open in new tab</a>
-        <button id="imageModalShare" class="image-modal-btn" type="button">Share</button>
-        <button id="imageModalClose" class="image-modal-btn image-modal-close" type="button">Close</button>
-      </div>
-    </div>
-  `;
-
-  imageModalImg = document.getElementById("imageModalImg");
-  imageModalCaption = document.getElementById("imageModalCaption");
-  imageModalDownload = document.getElementById("imageModalDownload");
-  imageModalOpen = document.getElementById("imageModalOpen");
-  imageModalShare = document.getElementById("imageModalShare");
-  imageModalClose = document.getElementById("imageModalClose");
-
-  imageModal.addEventListener("click", (e) => {
-    if (e.target === imageModal) {
-      closeImageModal();
+async function fetchReposFromGitHub() {
+  try {
+    const res = await fetch(API_URL);
+    if (res.status === 403) {
+      setRateLimited();
+      const cached = readReposFromCache();
+      return cached || [];
     }
-  });
-
-  if (imageModalClose) {
-    imageModalClose.addEventListener("click", () => closeImageModal());
+    if (!res.ok) throw new Error("GitHub error");
+    const data = await res.json();
+    saveReposToCache(data);
+    return data;
+  } catch (err) {
+    console.error("GitHub fetch failed", err);
+    const cached = readReposFromCache();
+    return cached || [];
   }
+}
 
-  // clicking the big image closes again (minimize)
-  if (imageModalImg) {
-    imageModalImg.addEventListener("click", () => closeImageModal());
-  }
+/* ---------- Name / language helpers ---------- */
 
-  if (imageModalShare) {
-    imageModalShare.addEventListener("click", async () => {
-      if (!imageModalOpen) return;
-      const url = imageModalOpen.href;
-      const title = imageModalCaption?.textContent || "Media";
-      if (navigator.share) {
-        try {
-          await navigator.share({ title, url });
-        } catch (_) {}
-      } else {
-        try {
-          await navigator.clipboard.writeText(url);
-          imageModalShare.textContent = "Link copied!";
-          setTimeout(() => {
-            imageModalShare.textContent = "Share";
-          }, 1200);
-        } catch (_) {
-          window.open(url, "_blank", "noopener,noreferrer");
-        }
+function formatRepoName(raw) {
+  if (!raw) return "";
+  let name = raw.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+
+  const words = name.split(" ");
+  return words
+    .map((w, index) => {
+      const lw = w.toLowerCase();
+
+      if (lw === "ios") return "iOS";
+      if (lw === "api") return "API";
+      if (lw === "asp.net") return "ASP.NET";
+
+      if (SMALL_WORDS.includes(lw) && index !== 0) {
+        return lw;
       }
-    });
+
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
+    .join(" ");
+}
+
+function getLanguagesList(primary, overrideList) {
+  if (Array.isArray(overrideList) && overrideList.length) {
+    return overrideList;
   }
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !imageModal.hidden) {
-      closeImageModal();
-    }
+  const list = [];
+  if (!primary) return list;
+
+  const p = String(primary).toLowerCase();
+
+  if (p === "html") {
+    list.push("HTML", "CSS", "JS");
+  } else if (p === "javascript") {
+    list.push("JS", "HTML", "CSS");
+  } else if (p === "typescript") {
+    list.push("TypeScript", "JS", "HTML", "CSS");
+  } else if (p === "c#") {
+    list.push("C#", ".NET");
+  } else if (p === "c++") {
+    list.push("C++", "C");
+  } else if (p === "php") {
+    list.push("PHP", "HTML", "CSS", "JS");
+  } else {
+    list.push(primary);
+  }
+
+  return list;
+}
+
+function buildLanguageFilterOptions(projects) {
+  const select = document.getElementById("languageFilter");
+  if (!select) return;
+
+  // keep first option, remove the rest
+  while (select.options.length > 1) {
+    select.remove(1);
+  }
+
+  const set = new Set();
+  projects.forEach((p) => {
+    (p.languages || []).forEach((lang) => set.add(lang));
+  });
+
+  const sorted = Array.from(set).sort((a, b) =>
+    a.localeCompare(b, "en")
+  );
+
+  sorted.forEach((lang) => {
+    const opt = document.createElement("option");
+    opt.value = lang;
+    opt.textContent = lang;
+    select.appendChild(opt);
   });
 }
 
-function openImageModal(item) {
-  if (!item || !item.src) {
-    return;
-  }
+/* ---------- Project rendering ---------- */
 
-  initImageModal();
-
-  if (!imageModal || !imageModalImg) {
-    // hard fallback: just open in new tab
-    window.open(item.src, "_blank", "noopener,noreferrer");
-    return;
-  }
-
-  const src = item.src;
-  const title = item.title || "";
-  imageModalImg.src = src;
-  imageModalImg.alt = title || "Media";
-
-  if (imageModalCaption) {
-    imageModalCaption.textContent = title || src;
-  }
-
-  if (imageModalDownload) {
-    imageModalDownload.href = src;
-    imageModalDownload.download = src.split("/").pop() || "media";
-  }
-
-  if (imageModalOpen) {
-    imageModalOpen.href = src;
-  }
-
-  imageModal.hidden = false;
-}
-
-function closeImageModal() {
-  if (!imageModal) return;
-  imageModal.hidden = true;
-}
-
-/* ---------- Rendering: Projects ---------- */
-
-function renderProjects() {
-  if (!projectsGrid || !projectsEmpty) return;
-
-  const search = state.search.trim().toLowerCase();
-  const type = state.typeFilter;
+function getFilteredProjects() {
+  const search = state.search.toLowerCase();
+  const typeFilter = state.typeFilter;
   const langFilter = state.languageFilter;
 
-  const filtered = allProjects.filter((p) => {
-    const derivedTags = deriveExtraTags(p);
-    const baseTags =
-      Array.isArray(p.tags) && p.tags.length ? p.tags.join(" ") : "";
-    const tagsText = `${baseTags} ${derivedTags.join(" ")}`.toLowerCase();
-
-    const displayName = prettifyRepoName(p.name || "");
-
-    const inSearch =
-      !search ||
-      displayName.toLowerCase().includes(search) ||
-      (p.name || "").toLowerCase().includes(search) ||
-      (p.description || "").toLowerCase().includes(search) ||
-      (p.language || "").toLowerCase().includes(search) ||
-      tagsText.includes(search);
-
-    if (!inSearch) return false;
-
-    const derivedType = deriveProjectType(p);
-    if (type !== "all" && derivedType !== type) return false;
+  return projects.filter((p) => {
+    if (typeFilter !== "all" && p.type !== typeFilter) return false;
 
     if (
       langFilter !== "all" &&
-      (p.language || "").toLowerCase() !== langFilter.toLowerCase()
+      !p.languages.some(
+        (l) => l.toLowerCase() === langFilter.toLowerCase()
+      )
     ) {
       return false;
     }
 
-    return true;
+    if (!search) return true;
+
+    const haystack = [
+      p.displayName,
+      p.description,
+      p.type,
+      (p.tags || []).join(" "),
+      (p.languages || []).join(" ")
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(search);
   });
+}
 
-  projectsGrid.innerHTML = "";
+function renderProjects() {
+  const grid = document.getElementById("projectsGrid");
+  const emptyState = document.getElementById("emptyState");
+  if (!grid || !emptyState) return;
 
-  if (filtered.length === 0) {
-    projectsEmpty.style.display = "block";
-    projectsGrid.style.display = "none";
+  const filtered = getFilteredProjects();
+
+  grid.innerHTML = "";
+  if (!filtered.length) {
+    emptyState.style.display = "block";
     return;
   }
+  emptyState.style.display = "none";
 
-  projectsEmpty.style.display = "none";
-  projectsGrid.style.display = "grid";
+  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
 
-  const t = TRANSLATIONS[currentLang] || TRANSLATIONS[DEFAULT_LANG];
-
-  filtered.forEach((p) => {
+  filtered.forEach((project) => {
     const card = document.createElement("article");
     card.className = "project-card";
 
     const titleRow = document.createElement("div");
     titleRow.className = "project-title-row";
 
-    const thumb = document.createElement("button");
-    thumb.type = "button";
-    thumb.className = "project-thumb";
+    const thumbBtn = document.createElement("button");
+    thumbBtn.type = "button";
+    thumbBtn.className = "project-thumb";
 
-    const niceName = prettifyRepoName(p.name || "");
-    const displayForLetter = niceName || p.name || "?";
+    if (project.thumbnail) {
+      thumbBtn.classList.add("has-image");
+      const img = document.createElement("img");
+      img.src = project.thumbnail;
+      img.alt = project.displayName;
+      thumbBtn.dataset.fullImage = project.thumbnail;
+      thumbBtn.dataset.caption = project.displayName;
+      thumbBtn.appendChild(img);
 
-    const span = document.createElement("span");
-    span.textContent = displayForLetter.charAt(0).toUpperCase();
-    thumb.appendChild(span);
+      thumbBtn.addEventListener("click", () => {
+        openImageModal(project.thumbnail, project.displayName);
+      });
+    } else {
+      const span = document.createElement("span");
+      span.textContent = (project.displayName || "?")
+        .charAt(0)
+        .toUpperCase();
+      thumbBtn.appendChild(span);
+    }
 
     const titleText = document.createElement("div");
     titleText.className = "project-title-text";
 
     const title = document.createElement("h3");
     title.className = "project-title";
-    title.textContent = niceName;
+    title.textContent = project.displayName;
 
-    const lang = document.createElement("div");
-    lang.className = "project-lang";
-    lang.textContent = p.language || "";
+    const langP = document.createElement("p");
+    langP.className = "project-lang";
+    langP.textContent = (project.languages || []).join(" · ");
 
     titleText.appendChild(title);
-    titleText.appendChild(lang);
+    titleText.appendChild(langP);
 
-    titleRow.appendChild(thumb);
+    titleRow.appendChild(thumbBtn);
     titleRow.appendChild(titleText);
-    card.appendChild(titleRow);
 
     const desc = document.createElement("p");
     desc.className = "project-desc";
-    desc.textContent = p.description || "";
-    card.appendChild(desc);
+    desc.textContent = project.description;
 
     const meta = document.createElement("div");
     meta.className = "project-meta";
 
-    const typeKey = deriveProjectType(p);
-    const typeMap = {
-      website: t.typeWebsite,
-      mobile: t.typeMobile,
-      api: t.typeApi,
-      school: t.typeSchool,
-      other: t.typeOther
-    };
     const typeBadge = document.createElement("span");
     typeBadge.className = "badge badge-type";
-    typeBadge.textContent = typeMap[typeKey] || t.typeOther;
+    typeBadge.textContent = project.type;
     meta.appendChild(typeBadge);
 
-    // extra tags (no languages auto-added)
-    const extraTags = deriveExtraTags(p);
-    extraTags.forEach((tag) => {
-      if (!tag) return;
+    (project.tags || []).forEach((tag) => {
       const tagBadge = document.createElement("span");
       tagBadge.className = "badge";
       tagBadge.textContent = tag;
       meta.appendChild(tagBadge);
     });
 
-    const hasLive = p.hasPages && p.pagesUrl;
+    const actions = document.createElement("div");
+    actions.className = "project-actions";
 
-    if (hasLive) {
-      const live = document.createElement("a");
-      live.href = p.pagesUrl;
-      live.target = "_blank";
-      live.rel = "noopener noreferrer";
-      live.className = "btn-card btn-card-live";
-      live.innerHTML = `<span>Live site</span>`;
-      meta.appendChild(live);
+    // GitHub button – always
+    const githubBtn = document.createElement("a");
+    githubBtn.href = project.githubUrl;
+    githubBtn.target = "_blank";
+    githubBtn.rel = "noopener noreferrer";
+    githubBtn.className = "btn-card";
+    githubBtn.innerHTML = `<span>GitHub</span>`;
+    actions.appendChild(githubBtn);
+
+    // Live site – only if url present
+    if (project.liveUrl) {
+      const liveBtn = document.createElement("a");
+      liveBtn.href = project.liveUrl;
+      liveBtn.target = "_blank";
+      liveBtn.rel = "noopener noreferrer";
+      liveBtn.className = "btn-card btn-card-live";
+      const label =
+        dict.btnLiveSite || I18N[DEFAULT_LANG].btnLiveSite || "Live site";
+      liveBtn.innerHTML = `<span>${label}</span>`;
+      actions.appendChild(liveBtn);
     }
 
-    if (p.name && !hasLive) {
-      const repoLink = document.createElement("a");
-      repoLink.href = `https://github.com/${GITHUB_USER}/${encodeURIComponent(
-        p.name
-      )}`;
-      repoLink.target = "_blank";
-      repoLink.rel = "noopener noreferrer";
-      repoLink.className = "btn-card";
-      repoLink.textContent = "GitHub";
-      meta.appendChild(repoLink);
-    }
-
+    card.appendChild(titleRow);
+    card.appendChild(desc);
     card.appendChild(meta);
-    projectsGrid.appendChild(card);
+    card.appendChild(actions);
 
-    // Try to upgrade thumbnail asynchronously using repo root images
-    loadAndApplyThumbnail(thumb, p);
+    grid.appendChild(card);
   });
 }
 
-/* ---------- Rendering: Media ---------- */
+/* ---------- Media loading & rendering ---------- */
 
-function renderMedia() {
-  if (!mediaGrid || !mediaEmpty) return;
+async function loadMedia() {
+  try {
+    const res = await fetch(MEDIA_INDEX_URL);
+    if (!res.ok) {
+      mediaItems = [];
+      renderMedia();
+      return;
+    }
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : data.items || [];
 
-  const search = state.search.trim().toLowerCase();
-  const type = state.mediaTypeFilter;
+    mediaItems = items.map((item, index) => {
+      const path = item.path || item.url || "";
+      const title =
+        item.title ||
+        item.name ||
+        item.fileName ||
+        path.split("/").pop() ||
+        `Media ${index + 1}`;
+
+      const format =
+        (item.format ||
+          (path.split(".").pop() || "").toLowerCase()) || "";
+
+      let type = item.type;
+      if (!type) {
+        type = guessMediaType(path);
+      }
+
+      return {
+        id: index,
+        title,
+        path,
+        type,
+        format
+      };
+    });
+
+    buildMediaFilterOptions(mediaItems);
+    renderMedia();
+  } catch (err) {
+    console.error("Failed to load media index", err);
+    mediaItems = [];
+    renderMedia();
+  }
+}
+
+function guessMediaType(path) {
+  const ext = (path.split(".").pop() || "").toLowerCase();
+  if (["jpg", "jpeg", "png", "gif", "webp", "bmp"].includes(ext)) {
+    return "image";
+  }
+  if (["mp4", "webm", "mov", "m4v"].includes(ext)) {
+    return "video";
+  }
+  if (["mp3", "wav", "ogg", "flac"].includes(ext)) {
+    return "audio";
+  }
+  return "image";
+}
+
+function buildMediaFilterOptions(items) {
+  const typeSelect = document.getElementById("mediaTypeFilter");
+  const formatSelect = document.getElementById("mediaFormatFilter");
+  if (!typeSelect || !formatSelect) return;
+
+  // type
+  while (typeSelect.options.length > 1) typeSelect.remove(1);
+  const typeSet = new Set();
+  items.forEach((i) => typeSet.add(i.type));
+  Array.from(typeSet)
+    .sort()
+    .forEach((t) => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+      typeSelect.appendChild(opt);
+    });
+
+  // format
+  while (formatSelect.options.length > 1) formatSelect.remove(1);
+  const formatSet = new Set();
+  items.forEach((i) => {
+    if (i.format) formatSet.add(i.format.toLowerCase());
+  });
+  Array.from(formatSet)
+    .sort()
+    .forEach((f) => {
+      const opt = document.createElement("option");
+      opt.value = f;
+      opt.textContent = f.toUpperCase();
+      formatSelect.appendChild(opt);
+    });
+}
+
+function getFilteredMedia() {
+  const search = state.search.toLowerCase();
+  const typeFilter = state.mediaTypeFilter;
   const formatFilter = state.mediaFormatFilter;
 
-  const filtered = allMedia.filter((item) => {
-    const inSearch =
-      !search ||
-      (item.title || "").toLowerCase().includes(search) ||
-      (item.src || "").toLowerCase().includes(search) ||
-      (item.type || "").toLowerCase().includes(search);
-
-    if (!inSearch) return false;
-
-    if (type !== "all" && (item.type || "").toLowerCase() !== type) {
+  return mediaItems.filter((item) => {
+    if (typeFilter !== "all" && item.type !== typeFilter) return false;
+    if (
+      formatFilter !== "all" &&
+      item.format.toLowerCase() !== formatFilter.toLowerCase()
+    ) {
       return false;
     }
 
-    const fmt = getMediaFormat(item);
-    if (formatFilter !== "all" && fmt !== formatFilter) {
-      return false;
-    }
+    if (!search) return true;
 
-    return true;
+    const haystack = (item.title + " " + item.path + " " + item.type + " " + item.format)
+      .toLowerCase();
+
+    return haystack.includes(search);
   });
+}
 
-  mediaGrid.innerHTML = "";
+function renderMedia() {
+  const grid = document.getElementById("mediaGrid");
+  const emptyState = document.getElementById("mediaEmptyState");
+  if (!grid || !emptyState) return;
 
-  if (filtered.length === 0) {
-    mediaEmpty.style.display = "block";
-    mediaGrid.style.display = "none";
+  const filtered = getFilteredMedia();
+
+  grid.innerHTML = "";
+  if (!filtered.length) {
+    emptyState.style.display = "block";
     return;
   }
-
-  mediaEmpty.style.display = "none";
-  mediaGrid.style.display = "grid";
+  emptyState.style.display = "none";
 
   filtered.forEach((item) => {
     const card = document.createElement("article");
@@ -1046,318 +827,162 @@ function renderMedia() {
 
     const title = document.createElement("h3");
     title.className = "media-title";
-    title.textContent = item.title || "";
-    card.appendChild(title);
+    title.textContent = item.title;
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "media-preview";
-
-    const src = item.src;
+    const preview = document.createElement("div");
+    preview.className = "media-preview";
 
     if (item.type === "image") {
+      preview.classList.add("clickable");
       const img = document.createElement("img");
-      img.src = src;
-      img.alt = item.title || "";
-      img.loading = "lazy";
-      wrapper.appendChild(img);
-      wrapper.classList.add("clickable");
+      img.src = item.path;
+      img.alt = item.title;
+      preview.appendChild(img);
 
-      // click on whole preview (including image) opens modal
-      wrapper.addEventListener("click", () => {
-        openImageModal(item);
+      preview.addEventListener("click", () => {
+        openImageModal(item.path, item.title);
       });
     } else if (item.type === "video") {
       const video = document.createElement("video");
+      video.src = item.path;
       video.controls = true;
-      video.src = src;
-      video.preload = "metadata";
-      wrapper.appendChild(video);
+      preview.appendChild(video);
     } else if (item.type === "audio") {
       const audio = document.createElement("audio");
+      audio.src = item.path;
       audio.controls = true;
-      audio.src = src;
-      audio.preload = "metadata";
-      wrapper.appendChild(audio);
+      preview.appendChild(audio);
     }
-
-    card.appendChild(wrapper);
 
     const meta = document.createElement("div");
     meta.className = "media-meta";
 
-    const typeSpan = document.createElement("span");
-    typeSpan.className = "badge badge-media-type";
-    typeSpan.textContent = item.type || "";
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "badge-media-type";
+    typeBadge.textContent = item.type;
 
-    const fmtSpan = document.createElement("span");
-    fmtSpan.className = "badge badge-media-format";
-    fmtSpan.textContent = getMediaFormat(item) || "-";
+    const formatBadge = document.createElement("span");
+    formatBadge.className = "badge-media-format";
+    formatBadge.textContent = item.format.toUpperCase();
 
-    meta.appendChild(typeSpan);
-    meta.appendChild(fmtSpan);
-    card.appendChild(meta);
+    meta.appendChild(typeBadge);
+    meta.appendChild(formatBadge);
 
     const actions = document.createElement("div");
     actions.className = "media-actions";
 
-    const viewBtn = document.createElement("button");
-    viewBtn.type = "button";
-    viewBtn.className = "media-action-btn";
-    viewBtn.textContent = item.type === "image" ? "View" : "Open";
-    viewBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (item.type === "image") {
-        openImageModal(item);
-      } else {
-        window.open(src, "_blank", "noopener,noreferrer");
-      }
-    });
-    actions.appendChild(viewBtn);
+    if (item.type === "image") {
+      const viewBtn = document.createElement("button");
+      viewBtn.type = "button";
+      viewBtn.className = "media-action-btn";
+      viewBtn.textContent = "View";
+      viewBtn.addEventListener("click", () => {
+        openImageModal(item.path, item.title);
+      });
+      actions.appendChild(viewBtn);
+    } else {
+      const openBtn = document.createElement("a");
+      openBtn.href = item.path;
+      openBtn.target = "_blank";
+      openBtn.rel = "noopener noreferrer";
+      openBtn.className = "media-action-btn";
+      openBtn.textContent = "Open";
+      actions.appendChild(openBtn);
+    }
 
-    const downloadLink = document.createElement("a");
-    downloadLink.className = "media-action-btn";
-    downloadLink.href = src;
-    downloadLink.download = src.split("/").pop() || "media";
-    downloadLink.textContent = "Download";
-    actions.appendChild(downloadLink);
+    const downloadBtn = document.createElement("a");
+    downloadBtn.href = item.path;
+    downloadBtn.download = "";
+    downloadBtn.className = "media-action-btn";
+    downloadBtn.textContent = "Download";
+    actions.appendChild(downloadBtn);
 
+    card.appendChild(title);
+    card.appendChild(preview);
+    card.appendChild(meta);
     card.appendChild(actions);
-    mediaGrid.appendChild(card);
+
+    grid.appendChild(card);
   });
 }
 
-/* ---------- View switching ---------- */
+/* ---------- Image modal (projects + media) ---------- */
 
-function updateViewVisibility() {
-  if (projectsView) {
-    projectsView.style.display = currentView === "projects" ? "block" : "none";
-  }
-  if (mediaView) {
-    mediaView.style.display = currentView === "media" ? "block" : "none";
-  }
+function setupImageModal() {
+  const modal = document.getElementById("imageModal");
+  if (!modal) return;
 
-  if (projectsTab) {
-    projectsTab.classList.toggle("active", currentView === "projects");
-  }
-  if (mediaTab) {
-    mediaTab.classList.toggle("active", currentView === "media");
-  }
-
-  if (projectFiltersEl) {
-    projectFiltersEl.hidden = currentView !== "projects";
-  }
-  if (mediaFiltersEl) {
-    mediaFiltersEl.hidden = currentView !== "media";
-  }
-
-  if (tabsEl) {
-    tabsEl.classList.toggle("tabs-media", currentView === "media");
-  }
-
-  applyTranslations(currentLang);
-
-  if (currentView === "projects") {
-    renderProjects();
-  } else {
-    renderMedia();
-  }
-}
-
-function setView(view) {
-  if (view !== "projects" && view !== "media") view = "projects";
-  currentView = view;
-  updateViewVisibility();
-}
-
-/* ---------- DOM refs & events ---------- */
-
-function initDomRefs() {
-  projectsGrid = document.getElementById("projectsGrid");
-  projectsEmpty = document.getElementById("emptyState");
-  mediaGrid = document.getElementById("mediaGrid");
-  mediaEmpty = document.getElementById("mediaEmptyState");
-
-  searchInput = document.getElementById("search");
-  typeSelect = document.getElementById("typeFilter");
-  languageSelect = document.getElementById("languageFilter");
-  mediaTypeSelect = document.getElementById("mediaTypeFilter");
-  mediaFormatSelect = document.getElementById("mediaFormatFilter");
-
-  projectFiltersEl = document.getElementById("projectFilters");
-  mediaFiltersEl = document.getElementById("mediaFilters");
-
-  projectsTab = document.getElementById("projectsTab");
-  mediaTab = document.getElementById("mediaTab");
-
-  projectsView = document.getElementById("projectsView");
-  mediaView = document.getElementById("mediaView");
-
-  tabsEl = document.querySelector(".tabs");
-
-  // modal base element if present
-  imageModal = document.getElementById("imageModal");
-}
-
-function initEvents() {
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      state.search = e.target.value || "";
-      if (currentView === "projects") {
-        renderProjects();
-      } else {
-        renderMedia();
-      }
-    });
-  }
-
-  if (typeSelect) {
-    typeSelect.addEventListener("change", (e) => {
-      state.typeFilter = e.target.value || "all";
-      renderProjects();
-    });
-  }
-
-  if (languageSelect) {
-    languageSelect.addEventListener("change", (e) => {
-      state.languageFilter = e.target.value || "all";
-      renderProjects();
-    });
-  }
-
-  if (mediaTypeSelect) {
-    mediaTypeSelect.addEventListener("change", (e) => {
-      state.mediaTypeFilter = e.target.value || "all";
-      renderMedia();
-    });
-  }
-
-  if (mediaFormatSelect) {
-    mediaFormatSelect.addEventListener("change", (e) => {
-      state.mediaFormatFilter = e.target.value || "all";
-      renderMedia();
-    });
-  }
-
-  if (projectsTab) {
-    projectsTab.addEventListener("click", () => setView("projects"));
-  }
-  if (mediaTab) {
-    mediaTab.addEventListener("click", () => setView("media"));
-  }
-
-  // language buttons (gate + any other .btn-lang)
-  document.querySelectorAll(".btn-lang[data-lang]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const lang = btn.getAttribute("data-lang");
-      setLanguage(lang);
-    });
+  modal.addEventListener("click", (event) => {
+    // click outside inner box closes
+    if (event.target === modal) {
+      closeImageModal();
+    }
   });
 
-  // top-right language pill opens the gate
-  const langSwitchBtn = document.getElementById("headerLangButton");
-  if (langSwitchBtn) {
-    langSwitchBtn.addEventListener("click", () => {
-      const gate = document.getElementById("langGate");
-      if (gate) {
-        gate.style.display = "flex";
-      }
-    });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeImageModal();
+    }
+  });
+}
+
+function openImageModal(src, captionText) {
+  const modal = document.getElementById("imageModal");
+  if (!modal) return;
+
+  modal.innerHTML = "";
+
+  const inner = document.createElement("div");
+  inner.className = "image-modal-inner";
+
+  const figure = document.createElement("figure");
+  figure.className = "image-modal-figure";
+
+  const img = document.createElement("img");
+  img.className = "image-modal-img";
+  img.src = src;
+  img.alt = captionText || "";
+  img.addEventListener("click", () => {
+    closeImageModal();
+  });
+
+  figure.appendChild(img);
+
+  if (captionText) {
+    const caption = document.createElement("figcaption");
+    caption.className = "image-modal-caption";
+    caption.textContent = captionText;
+    figure.appendChild(caption);
   }
+
+  inner.appendChild(figure);
+
+  const actions = document.createElement("div");
+  actions.className = "image-modal-actions";
+
+  const openTabBtn = document.createElement("a");
+  openTabBtn.href = src;
+  openTabBtn.target = "_blank";
+  openTabBtn.rel = "noopener noreferrer";
+  openTabBtn.className = "image-modal-btn";
+  openTabBtn.textContent = "Open in new tab";
+  actions.appendChild(openTabBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "image-modal-btn image-modal-close";
+  closeBtn.textContent = "Close";
+  closeBtn.addEventListener("click", closeImageModal);
+  actions.appendChild(closeBtn);
+
+  inner.appendChild(actions);
+
+  modal.appendChild(inner);
+  modal.hidden = false;
 }
 
-/* ---------- Data loading ---------- */
-
-function loadProjects() {
-  return fetch(PROJECTS_URL)
-    .then((res) => {
-      if (!res.ok) throw new Error("Failed to load projects.json");
-      return res.json();
-    })
-    .then((data) => {
-      if (!Array.isArray(data)) return;
-      allProjects = data;
-
-      if (languageSelect) {
-        const existing = new Set(
-          Array.from(languageSelect.options).map((o) =>
-            (o.value || "").toLowerCase()
-          )
-        );
-        const langs = Array.from(
-          new Set(
-            allProjects
-              .map((p) => (p.language || "").trim())
-              .filter(Boolean)
-          )
-        ).sort();
-        langs.forEach((l) => {
-          const lower = l.toLowerCase();
-          if (existing.has(lower)) return;
-          const opt = document.createElement("option");
-          opt.value = l;
-          opt.textContent = l;
-          languageSelect.appendChild(opt);
-        });
-      }
-
-      renderProjects();
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+function closeImageModal() {
+  const modal = document.getElementById("imageModal");
+  if (!modal) return;
+  modal.hidden = true;
 }
-
-function loadMedia() {
-  return fetch(MEDIA_URL)
-    .then((res) => {
-      if (!res.ok) throw new Error("Failed to load media-index.json");
-      return res.json();
-    })
-    .then((data) => {
-      if (!data || !Array.isArray(data.items)) return;
-      allMedia = data.items;
-
-      if (mediaFormatSelect) {
-        const existing = new Set(
-          Array.from(mediaFormatSelect.options).map((o) =>
-            (o.value || "").toLowerCase()
-          )
-        );
-        const formats = Array.from(
-          new Set(allMedia.map(getMediaFormat).filter(Boolean))
-        ).sort();
-        formats.forEach((fmt) => {
-          if (existing.has(fmt.toLowerCase())) return;
-          const opt = document.createElement("option");
-          opt.value = fmt;
-          opt.textContent = fmt;
-          mediaFormatSelect.appendChild(opt);
-        });
-      }
-
-      renderMedia();
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-}
-
-/* ---------- Init ---------- */
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.classList.add("js-enabled");
-
-  initDomRefs();
-
-  currentLang = detectInitialLang();
-  setLanguage(currentLang);
-
-  initLanguageGate();
-  initEvents();
-  initImageModal();
-
-  setView("projects");
-
-  loadProjects();
-  loadMedia();
-});
