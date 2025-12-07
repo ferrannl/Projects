@@ -85,39 +85,17 @@
       </div>
 
       <div class="header-actions">
-        <!-- Top-right language buttons -->
-        <div class="header-lang-switcher">
-          <button class="btn-lang" data-lang="nl">
-            <span class="flag">🇳🇱</span>
-            <span class="label-main">Nederlands</span>
-            <span class="label-sub">Moedertaal</span>
-          </button>
-          <button class="btn-lang" data-lang="en">
-            <span class="flag">🇬🇧</span>
-            <span class="label-main">English</span>
-            <span class="label-sub">International</span>
-          </button>
-          <button class="btn-lang" data-lang="de">
-            <span class="flag">🇩🇪</span>
-            <span class="label-main">Deutsch</span>
-            <span class="label-sub">Nachbarn</span>
-          </button>
-          <button class="btn-lang" data-lang="pl">
-            <span class="flag">🇵🇱</span>
-            <span class="label-main">Polski</span>
-            <span class="label-sub">Rodzina</span>
-          </button>
-          <button class="btn-lang" data-lang="tr">
-            <span class="flag">🇹🇷</span>
-            <span class="label-main">Türkçe</span>
-            <span class="label-sub">Hoş geldin</span>
-          </button>
-          <button class="btn-lang" data-lang="es">
-            <span class="flag">🇪🇸</span>
-            <span class="label-main">Español</span>
-            <span class="label-sub">España &amp; Canarias</span>
-          </button>
-        </div>
+        <!-- Single top-right language button -->
+        <button
+          class="lang-switch-main"
+          type="button"
+          id="headerLangButton"
+        >
+          <span class="lang-switch-icon">🌐</span>
+          <span class="lang-switch-label" data-i18n="headerLangButton">
+            Language
+          </span>
+        </button>
 
         <!-- Social / contact -->
         <nav class="social-links" aria-label="Social links">
