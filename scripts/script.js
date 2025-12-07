@@ -2,6 +2,7 @@
 
 /* -------------------------------------------------------
    Ferran’s Projects – Main JS
+
    - Multi-language UI (NL / EN / DE / PL / TR / ES)
    - Live age text in About section
    - Projects + Media switcher with filters
@@ -35,8 +36,8 @@ const AGE_UNITS = {
 
 const TRANSLATIONS = {
   en: {
-    subtitle:
-      "All my programming & coding projects in one place – websites, apps, school work, guides, APIs and more.",
+    headerLangButton: "Language",
+    subtitle: "All my projects and media in one place – websites, apps, school work, guides, APIs and more.",
     aboutTitle: "About Me",
     aboutP1:
       "Hey Ferran ({age}) here. I am a Dutch 🇳🇱 developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
@@ -65,11 +66,11 @@ const TRANSLATIONS = {
       "Hmm… no projects loaded right now. Maybe I took them offline, or something went wrong. Try a hard refresh (Shift + F5 / Ctrl + F5) and wait a few seconds.",
     mediaEmptyState:
       "No media to show right now. Try a hard refresh and wait a few seconds.",
-    footerBuiltWith: "Built with ♥ by Ferran",
-    footerViewOnPages: "View this site on GitHub Pages"
+    footerBuiltWith: "Built with ♥ by Ferran"
   },
 
   nl: {
+    headerLangButton: "Taal",
     subtitle:
       "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
     aboutTitle: "Over mij",
@@ -78,10 +79,8 @@ const TRANSLATIONS = {
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
-    searchProjectsPlaceholder:
-      "Zoek op naam, beschrijving, taal of tag…",
-    searchMediaPlaceholder:
-      "Zoek media op titel, bestandsnaam of type…",
+    searchProjectsPlaceholder: "Zoek op naam, beschrijving, taal of tag…",
+    searchMediaPlaceholder: "Zoek media op titel, bestandsnaam of type…",
     filterTypeLabel: "Type",
     typeAll: "Alles",
     typeWebsite: "Websites",
@@ -102,11 +101,11 @@ const TRANSLATIONS = {
       "Hmm… geen projecten om te laten zien. Misschien heb ik ze offline gehaald of ging er iets mis. Probeer de pagina hard te verversen (Shift + F5 / Ctrl + F5) en wacht een paar seconden.",
     mediaEmptyState:
       "Geen media om te laten zien. Probeer de pagina opnieuw te laden en wacht even.",
-    footerBuiltWith: "Gemaakt met ♥ door Ferran",
-    footerViewOnPages: "Bekijk deze site op GitHub Pages"
+    footerBuiltWith: "Gemaakt met ♥ door Ferran"
   },
 
   de: {
+    headerLangButton: "Sprache",
     subtitle:
       "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Studienprojekte, Guides, APIs und mehr.",
     aboutTitle: "Über mich",
@@ -115,10 +114,8 @@ const TRANSLATIONS = {
     aboutP2: "",
     tabProjects: "Projekte",
     tabMedia: "Medien",
-    searchProjectsPlaceholder:
-      "Suche nach Name, Beschreibung, Sprache oder Tag…",
-    searchMediaPlaceholder:
-      "Suche Medien nach Titel, Dateiname oder Typ…",
+    searchProjectsPlaceholder: "Suche nach Name, Beschreibung, Sprache oder Tag…",
+    searchMediaPlaceholder: "Suche Medien nach Titel, Dateiname oder Typ…",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
     typeWebsite: "Websites",
@@ -139,11 +136,11 @@ const TRANSLATIONS = {
       "Keine Projekte für diese Suche oder Filter. Vielleicht sind sie offline oder etwas ist schief gelaufen. Versuche ein hartes Reload (Shift + F5) und warte ein paar Sekunden.",
     mediaEmptyState:
       "Keine Medien für diese Suche oder Filter. Versuche die Seite neu zu laden.",
-    footerBuiltWith: "Mit ♥ erstellt von Ferran",
-    footerViewOnPages: "Diese Seite auf GitHub Pages ansehen"
+    footerBuiltWith: "Mit ♥ erstellt von Ferran"
   },
 
   pl: {
+    headerLangButton: "Język",
     subtitle:
       "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, zadania ze szkoły, poradniki, API i więcej.",
     aboutTitle: "O mnie",
@@ -152,8 +149,7 @@ const TRANSLATIONS = {
     aboutP2: "",
     tabProjects: "Projekty",
     tabMedia: "Media",
-    searchProjectsPlaceholder:
-      "Szukaj po nazwie, opisie, języku lub tagu…",
+    searchProjectsPlaceholder: "Szukaj po nazwie, opisie, języku lub tagu…",
     searchMediaPlaceholder:
       "Szukaj mediów po tytule, nazwie pliku lub typie…",
     filterTypeLabel: "Typ",
@@ -176,11 +172,11 @@ const TRANSLATIONS = {
       "Brak projektów dla tych filtrów. Może są offline albo coś poszło nie tak. Spróbuj odświeżyć stronę (Shift + F5) i chwilę poczekać.",
     mediaEmptyState:
       "Brak mediów dla tych filtrów. Spróbuj ponownie odświeżyć stronę.",
-    footerBuiltWith: "Stworzone z ♥ przez Ferrana",
-    footerViewOnPages: "Zobacz tę stronę na GitHub Pages"
+    footerBuiltWith: "Stworzone z ♥ przez Ferrana"
   },
 
   tr: {
+    headerLangButton: "Dil",
     subtitle:
       "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
     aboutTitle: "Hakkımda",
@@ -213,11 +209,11 @@ const TRANSLATIONS = {
       "Bu filtrelerle eşleşen proje yok. Belki offline oldular ya da bir şeyler ters gitti. Sayfayı sert yenile (Shift + F5) ve birkaç saniye bekle.",
     mediaEmptyState:
       "Bu filtrelere uygun medya yok. Sayfayı yenilemeyi dene.",
-    footerBuiltWith: "♥ ile geliştirildi – Ferran",
-    footerViewOnPages: "Bu siteyi GitHub Pages üzerinde görüntüle"
+    footerBuiltWith: "♥ ile geliştirildi – Ferran"
   },
 
   es: {
+    headerLangButton: "Idioma",
     subtitle:
       "Todos mis proyectos y media en un solo lugar: webs, apps, trabajos de estudio, experimentos de código y más.",
     aboutTitle: "Sobre mí",
@@ -250,8 +246,7 @@ const TRANSLATIONS = {
       "No hay proyectos con estos filtros. Puede que estén offline o algo ha fallado. Prueba a recargar la página (Shift + F5) y espera unos segundos.",
     mediaEmptyState:
       "No hay media con estos filtros. Prueba a recargar la página.",
-    footerBuiltWith: "Hecho con ♥ por Ferran",
-    footerViewOnPages: "Ver este sitio en GitHub Pages"
+    footerBuiltWith: "Hecho con ♥ por Ferran"
   }
 };
 
@@ -317,28 +312,37 @@ function applyTranslations(lang) {
     el.textContent = value;
   });
 
+  // Search placeholder depends on current view
   const searchInput = document.getElementById("search");
   if (searchInput) {
     const placeholderKey =
       currentView === "media"
         ? "searchMediaPlaceholder"
         : "searchProjectsPlaceholder";
-    if (t[placeholderKey]) searchInput.placeholder = t[placeholderKey];
+    if (t[placeholderKey]) {
+      searchInput.placeholder = t[placeholderKey];
+    }
   }
 
+  // Footer text
   const footerBuilt = document.querySelector("[data-i18n-footer-built]");
-  const footerPages = document.querySelector("[data-i18n-footer-pages]");
   if (footerBuilt && t.footerBuiltWith) {
     footerBuilt.textContent = t.footerBuiltWith;
   }
-  if (footerPages && t.footerViewOnPages) {
-    footerPages.textContent = t.footerViewOnPages;
-  }
 
+  // Tabs labels
   const projectsTab = document.getElementById("projectsTab");
   const mediaTab = document.getElementById("mediaTab");
   if (projectsTab && t.tabProjects) projectsTab.textContent = t.tabProjects;
   if (mediaTab && t.tabMedia) mediaTab.textContent = t.tabMedia;
+
+  // Top-right language button label
+  const headerLangLabel = document.querySelector(
+    ".lang-switch-label[data-i18n='headerLangButton']"
+  );
+  if (headerLangLabel && t.headerLangButton) {
+    headerLangLabel.textContent = t.headerLangButton;
+  }
 }
 
 /* ---------- Language helpers ---------- */
@@ -362,19 +366,6 @@ function setActiveLangButton(lang) {
 
   const btn = document.querySelector(`.btn-lang[data-lang="${lang}"]`);
   if (btn) btn.classList.add("active");
-
-  const uiLangLabel = document.getElementById("uiLangLabel");
-  if (uiLangLabel) {
-    const map = {
-      nl: "Nederlands",
-      en: "English",
-      de: "Deutsch",
-      pl: "Polski",
-      tr: "Türkçe",
-      es: "Español"
-    };
-    uiLangLabel.textContent = map[lang] || "Language";
-  }
 }
 
 function setLanguage(lang) {
@@ -676,7 +667,6 @@ function renderProjects() {
       img.alt = p.name || "";
       img.loading = "lazy";
       thumb.appendChild(img);
-      // optional zoom using same modal
       thumb.addEventListener("click", () => {
         openImageModal({ src: p.thumbnail, title: p.name || "" });
       });
@@ -1012,7 +1002,8 @@ function initEvents() {
     });
   });
 
-  const langSwitchBtn = document.getElementById("uiLangButton");
+  // top-right language pill opens the gate
+  const langSwitchBtn = document.getElementById("headerLangButton");
   if (langSwitchBtn) {
     langSwitchBtn.addEventListener("click", () => {
       const gate = document.getElementById("langGate");
@@ -1119,6 +1110,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadProjects();
   loadMedia();
 
+  // Update age every second
   setInterval(() => {
     applyTranslations(currentLang);
   }, 1000);
