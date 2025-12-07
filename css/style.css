@@ -59,11 +59,7 @@ body {
   gap: 1.25rem;
   padding: 2.4rem 1.75rem 1.6rem;
   margin-bottom: 1.75rem;
-  background: linear-gradient(
-    145deg,
-    rgba(11, 15, 32, 0.9),
-    rgba(18, 24, 54, 0.9)
-  );
+  background: linear-gradient(145deg, rgba(11, 15, 32, 0.9), rgba(18, 24, 54, 0.9));
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -132,7 +128,6 @@ body {
   top: 0.75rem;
   right: 0.75rem;
   z-index: 500;
-
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -208,11 +203,7 @@ body {
   content: "";
   position: absolute;
   inset: -40%;
-  background: radial-gradient(
-    circle at 0 0,
-    rgba(255, 255, 255, 0.12),
-    transparent 55%
-  );
+  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.12), transparent 55%);
   opacity: 0;
   transition: opacity var(--transition-fast);
   pointer-events: none;
@@ -429,13 +420,12 @@ body {
   outline-offset: 2px;
 }
 
-/* 🔍 icon visually centered inside the input */
+/* magnifying glass – slightly adjusted to be more visually centered */
 .search-section::before {
   content: "🔍";
   position: absolute;
   left: 0.9rem;
-  /* center relative to the input – use bottom of section minus half input height */
-  top: calc(100% - 1.25rem);
+  top: 2.55rem; /* tweaked to sit more in the middle */
   transform: translateY(-50%);
   font-size: 0.95rem;
   opacity: 0.7;
@@ -672,7 +662,7 @@ body {
     box-shadow var(--transition-fast);
 }
 
-/* Live site – fancy 360° highlight ring, but text stays readable */
+/* Live site – fancy 360° highlight ring, cross-browser */
 .btn-card-live {
   position: relative;
   overflow: hidden;
@@ -689,16 +679,14 @@ body {
   position: absolute;
   inset: -30%;
   border-radius: 999px;
-  background:
-    radial-gradient(circle at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.0) 60%),
-    conic-gradient(
-      from 0deg,
-      rgba(255, 75, 129, 0.0),
-      rgba(255, 75, 129, 0.7),
-      rgba(75, 195, 255, 0.7),
-      rgba(255, 75, 129, 0.7),
-      rgba(255, 75, 129, 0.0)
-    );
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 75, 129, 0.0),
+    rgba(255, 75, 129, 0.7),
+    rgba(75, 195, 255, 0.7),
+    rgba(255, 75, 129, 0.7),
+    rgba(255, 75, 129, 0.0)
+  );
   opacity: 0.0;
   pointer-events: none;
   animation: liveGlowSpin 3.2s linear infinite;
@@ -925,12 +913,6 @@ body {
   text-decoration: underline;
 }
 
-.footer-links {
-  display: inline-flex;
-  gap: 0.4rem;
-  align-items: center;
-}
-
 /* ---------- Language gate ---------- */
 
 .lang-gate-backdrop {
@@ -1088,7 +1070,7 @@ body {
   max-height: 70vh;
   border-radius: 14px;
   display: block;
-  cursor: zoom-out;
+  cursor: zoom-out; /* click to close */
 }
 
 .image-modal-caption {
