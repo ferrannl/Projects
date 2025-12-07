@@ -160,7 +160,7 @@
         </p>
         <p class="about-text" data-i18n="aboutP2"></p>
 
-        <!-- Profile avatar moved here, using images/profile.jpg -->
+        <!-- Profile avatar -->
         <div class="profile-avatar">
           <div class="profile-avatar-inner">
             <img
@@ -208,7 +208,7 @@
 
       <!-- Shared search -->
       <section class="search-section">
-        <label for="search" class="search-label">Search</label>
+        <label for="search" class="search-label" data-i18n="searchLabel">Search</label>
         <input
           id="search"
           type="search"
@@ -235,7 +235,7 @@
           <label for="languageFilter" data-i18n="filterLanguageLabel">Taal</label>
           <select id="languageFilter">
             <option value="all" data-i18n="languageFilterAll">Alle talen</option>
-            <!-- more options will be appended by JS based on projects.json -->
+            <!-- more options appended by JS -->
           </select>
         </div>
       </section>
@@ -256,7 +256,7 @@
           <label for="mediaFormatFilter" data-i18n="mediaFormatLabel">Bestandstype</label>
           <select id="mediaFormatFilter">
             <option value="all" data-i18n="mediaFormatAll">Alle formaten</option>
-            <!-- more options (jpg, png, mp4, etc.) will be appended by JS from media-index.json -->
+            <!-- more options appended by JS -->
           </select>
         </div>
       </section>
@@ -286,7 +286,7 @@
       </section>
     </main>
 
-    <!-- Fullscreen image modal (base element; JS fills content) -->
+    <!-- Fullscreen image modal (JS fills content) -->
     <div id="imageModal" class="image-modal" hidden></div>
 
     <footer class="site-footer">
