@@ -37,7 +37,8 @@ const AGE_UNITS = {
 const TRANSLATIONS = {
   en: {
     headerLangButton: "Language",
-    subtitle: "All my projects and media in one place – websites, apps, school work, guides, APIs and more.",
+    subtitle:
+      "All my projects and media in one place – websites, apps, school work, guides, APIs and more.",
     aboutTitle: "About Me",
     aboutP1:
       "Hey Ferran ({age}) here. I am a Dutch 🇳🇱 developer from Utrecht / 's-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
@@ -543,6 +544,11 @@ function initImageModal() {
     imageModalClose.addEventListener("click", () => closeImageModal());
   }
 
+  // NEW: clicking the big image also closes the modal
+  if (imageModalImg) {
+    imageModalImg.addEventListener("click", () => closeImageModal());
+  }
+
   if (imageModalShare) {
     imageModalShare.addEventListener("click", async () => {
       if (!imageModalOpen) return;
@@ -804,6 +810,7 @@ function renderMedia() {
       img.loading = "lazy";
       wrapper.appendChild(img);
       wrapper.classList.add("clickable");
+      // click on whole preview (image area) opens modal
       wrapper.addEventListener("click", () => {
         openImageModal(item);
       });
@@ -862,13 +869,7 @@ function renderMedia() {
     downloadLink.textContent = "Download";
     actions.appendChild(downloadLink);
 
-    const openLink = document.createElement("a");
-    openLink.className = "media-action-btn";
-    openLink.href = src;
-    openLink.target = "_blank";
-    openLink.rel = "noopener noreferrer";
-    openLink.textContent = "Open tab";
-    actions.appendChild(openLink);
+    // REMOVED: "Open tab" button – was overkill / clutter
 
     card.appendChild(actions);
     mediaGrid.appendChild(card);
