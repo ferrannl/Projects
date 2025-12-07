@@ -718,6 +718,7 @@ function formatRepoName(raw) {
 }
 
 function getLanguagesList(primary, overrideList) {
+  // If you explicitly set languages in projects.json, always trust that
   if (Array.isArray(overrideList) && overrideList.length) {
     return overrideList;
   }
@@ -739,12 +740,22 @@ function getLanguagesList(primary, overrideList) {
     list.push("C++", "C");
   } else if (p === "php") {
     list.push("PHP", "HTML", "CSS", "JS");
+  } else if (p === "css") {
+    // Pure CSS project – usually still has HTML + JS around it
+    list.push("CSS", "HTML", "JS");
+  } else if (p === "less") {
+    // Your case: site written in Less plus other front-end bits
+    list.push("Less", "HTML", "CSS", "JS", "SCSS");
+  } else if (p === "scss" || p === "sass") {
+    list.push("SCSS", "CSS", "HTML", "JS");
   } else {
+    // Fallback: just show whatever GitHub says
     list.push(primary);
   }
 
   return list;
 }
+
 
 function buildLanguageFilterOptions(projects) {
   const select = document.getElementById("languageFilter");
