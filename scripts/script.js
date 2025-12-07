@@ -15,11 +15,15 @@ const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
+// Thumbnail cache key
+const THUMB_CACHE_KEY = "ferranProjectsThumbsV1";
+
 /* ---------- State ---------- */
 
 let repos = [];
 let projects = [];
 let mediaItems = [];
+let thumbCache = loadThumbCache();
 
 const state = {
   activeTab: "projects",
@@ -102,8 +106,7 @@ const I18N = {
     mediaKindAudio: "Audio",
     mediaFormatLabel: "File type",
     mediaFormatAll: "All types",
-    emptyState:
-      "No projects found with these filters. Try something else.",
+    emptyState: "No projects found with these filters. Try something else.",
     mediaEmptyState: "No media found with these filters.",
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
@@ -132,13 +135,14 @@ const I18N = {
     mediaTypeLabel: "Medientyp",
     mediaKindAll: "Alle",
     mediaKindImages: "Bilder",
-    mediaKindVideos: "Videos",
+    mediaKindVideos: "Video’s",
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Dateityp",
     mediaFormatAll: "Alle Formate",
     emptyState:
       "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
-    mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
+    mediaEmptyState:
+      "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
     btnLiveSite: "Live-Seite"
@@ -172,8 +176,7 @@ const I18N = {
     mediaFormatAll: "Wszystkie formaty",
     emptyState:
       "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
-    mediaEmptyState:
-      "Nie znaleziono mediów dla tych filtrów.",
+    mediaEmptyState: "Nie znaleziono mediów dla tych filtrów.",
     headerLangButton: "Język",
     footerBuilt: "Stworzone z ♥ przez Ferrana",
     btnLiveSite: "Strona live"
@@ -387,7 +390,6 @@ function setLanguage(lang) {
     searchLabelEl.textContent = dict.searchLabel;
   }
 
-  // (Optional) translate search placeholder a bit
   const searchInput = document.getElementById("search");
   if (searchInput) {
     if (lang === "nl") {
@@ -559,11 +561,11 @@ async function loadProjects() {
     const languages = getLanguagesList(repo.language, overrideLangs);
 
     const type = guessProjectType(repo, o);
-
     const tags = Array.isArray(o.tags) ? o.tags : [];
 
     const liveUrl = computeLiveUrl(repo, o);
 
+    // initial thumbnail: only overrides, actual detection happens later
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -581,15 +583,15 @@ async function loadProjects() {
     };
   });
 
-  // Sort: live sites first, then by name
-  projects.sort((a, b) => {
-    if (a.liveUrl && !b.liveUrl) return -1;
-    if (!a.liveUrl && b.liveUrl) return 1;
-    return a.displayName.localeCompare(b.displayName, "en");
-  });
-
+  sortProjectsByLive();
   buildLanguageFilterOptions(projects);
   renderProjects();
+
+  // verify that live URLs really work (no 404 / broken Laravel pages)
+  verifyLiveSites();
+
+  // load proper thumbnails from repo root images
+  loadProjectThumbnails();
 }
 
 async function loadProjectOverrides() {
@@ -607,7 +609,6 @@ async function loadProjectOverrides() {
 async function loadGitHubReposWithCache() {
   const now = Date.now();
 
-  // respect rate limit backoff
   try {
     const rateRaw = localStorage.getItem(RATE_LIMIT_KEY);
     if (rateRaw) {
@@ -620,15 +621,12 @@ async function loadGitHubReposWithCache() {
     }
   } catch (_) {}
 
-  // try cache first
   const cached = readReposFromCache();
   if (cached) {
-    // also try to refresh, but even if it fails we still have cached
     refreshReposInBackground();
     return cached;
   }
 
-  // no cache? fetch now
   return fetchReposFromGitHub();
 }
 
@@ -746,7 +744,6 @@ function buildLanguageFilterOptions(projects) {
   const select = document.getElementById("languageFilter");
   if (!select) return;
 
-  // keep first option, remove the rest
   while (select.options.length > 1) {
     select.remove(1);
   }
@@ -782,17 +779,14 @@ function guessProjectType(repo, override) {
 
   const has = (words) => words.some((w) => joined.includes(w));
 
-  // Game-ish
   if (has(["game", "sudoku", "unity", "platformer", "puzzle"])) {
     return "game";
   }
 
-  // API / Backend
   if (has(["api", "backend", "server", "service", "rest"])) {
     return "api";
   }
 
-  // Mobile
   if (
     has(["android", "ios", "xamarin", "phone", "mobile", "app"]) ||
     ["kotlin", "swift"].includes(lang)
@@ -800,7 +794,6 @@ function guessProjectType(repo, override) {
     return "mobile";
   }
 
-  // School / Study
   if (
     has([
       "school",
@@ -816,7 +809,6 @@ function guessProjectType(repo, override) {
     return "school";
   }
 
-  // Website
   if (
     lang === "html" ||
     has(["website", "web", "site", "landing", "portfolio", "page"])
@@ -841,13 +833,135 @@ function computeLiveUrl(repo, override) {
   return null;
 }
 
+// Only immediate overrides; “smart” detection happens in loadProjectThumbnails
 function computeThumbnail(repo, override) {
   if (override.thumbnail || override.thumb) {
     return override.thumbnail || override.thumb;
   }
+  return null;
+}
 
-  // Fallback: GitHub social preview image — works for every repo
-  return `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repo.name}`;
+/* sort with live sites (after verification) first, then by name */
+function sortProjectsByLive() {
+  projects.sort((a, b) => {
+    if (a.liveUrl && !b.liveUrl) return -1;
+    if (!a.liveUrl && b.liveUrl) return 1;
+    return a.displayName.localeCompare(b.displayName, "en");
+  });
+}
+
+/* verify that liveUrl really works – drop it if 404 / network error */
+async function verifyLiveSites() {
+  const checks = projects.map(async (project) => {
+    if (!project.liveUrl) return;
+
+    try {
+      const res = await fetch(project.liveUrl, {
+        method: "GET",
+        redirect: "follow"
+      });
+      if (!res.ok) {
+        project.liveUrl = null;
+      }
+    } catch (_) {
+      project.liveUrl = null;
+    }
+  });
+
+  await Promise.all(checks);
+  sortProjectsByLive();
+  renderProjects();
+}
+
+/* ---------- Thumbnail helpers (root images) ---------- */
+
+function loadThumbCache() {
+  try {
+    const raw = localStorage.getItem(THUMB_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveThumbCache() {
+  try {
+    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache));
+  } catch (_) {}
+}
+
+async function loadProjectThumbnails() {
+  const promises = projects.map(async (project) => {
+    if (project.thumbnail) return;
+
+    const cached = thumbCache[project.name];
+    if (cached) {
+      project.thumbnail = cached;
+      return;
+    } else if (cached === "") {
+      // known to have no special image, we’ll use OG fallback below
+    }
+
+    const repoName = project.name;
+
+    const rootThumb = await findRepoRootThumbnail(repoName);
+
+    let finalUrl = rootThumb;
+    if (!finalUrl) {
+      // fallback to GitHub social preview if nothing found in root
+      finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
+    }
+
+    project.thumbnail = finalUrl;
+    thumbCache[project.name] = rootThumb ? finalUrl : finalUrl; // store final so we don't recompute
+  });
+
+  await Promise.all(promises);
+  saveThumbCache();
+  renderProjects();
+}
+
+async function findRepoRootThumbnail(repoName) {
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+
+    const files = data.filter((item) => item.type === "file");
+
+    const imageFiles = files.filter((item) => {
+      const ext = (item.name.split(".").pop() || "").toLowerCase();
+      return ["jpg", "jpeg", "png", "svg", "gif", "webp"].includes(ext);
+    });
+
+    if (!imageFiles.length) {
+      thumbCache[repoName] = "";
+      return null;
+    }
+
+    const score = (name) => {
+      const lower = name.toLowerCase();
+      if (lower === "logo.png" || lower === "logo.jpg" || lower === "logo.jpeg") return 0;
+      if (lower.startsWith("logo.")) return 1;
+      if (lower.includes("classdiagram")) return 2;
+      if (lower.includes("diagram")) return 3;
+      return 4;
+    };
+
+    imageFiles.sort((a, b) => score(a.name) - score(b.name));
+    const chosen = imageFiles[0];
+
+    const encodedName = encodeURIComponent(chosen.name);
+    return `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodedName}`;
+  } catch (err) {
+    console.error("Failed to load root thumbnail for", repoName, err);
+    return null;
+  }
 }
 
 /* ---------- Project rendering ---------- */
@@ -978,7 +1092,6 @@ function renderProjects() {
     const actions = document.createElement("div");
     actions.className = "project-actions";
 
-    // GitHub button – always
     const githubBtn = document.createElement("a");
     githubBtn.href = project.githubUrl;
     githubBtn.target = "_blank";
@@ -987,7 +1100,6 @@ function renderProjects() {
     githubBtn.innerHTML = `<span>GitHub</span>`;
     actions.appendChild(githubBtn);
 
-    // Live site – only if url present
     if (project.liveUrl) {
       const liveBtn = document.createElement("a");
       liveBtn.href = project.liveUrl;
@@ -1077,7 +1189,6 @@ function buildMediaFilterOptions(items) {
   const formatSelect = document.getElementById("mediaFormatFilter");
   if (!typeSelect || !formatSelect) return;
 
-  // type
   while (typeSelect.options.length > 1) typeSelect.remove(1);
   const typeSet = new Set();
   items.forEach((i) => typeSet.add(i.type));
@@ -1090,7 +1201,6 @@ function buildMediaFilterOptions(items) {
       typeSelect.appendChild(opt);
     });
 
-  // format
   while (formatSelect.options.length > 1) formatSelect.remove(1);
   const formatSet = new Set();
   items.forEach((i) => {
@@ -1235,7 +1345,6 @@ function setupImageModal() {
   if (!modal) return;
 
   modal.addEventListener("click", (event) => {
-    // click outside inner box closes
     if (event.target === modal) {
       closeImageModal();
     }
