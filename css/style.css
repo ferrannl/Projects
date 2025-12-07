@@ -57,7 +57,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 2.4rem 1.75rem 1.6rem; /* extra top padding so language pill has room */
+  /* extra top padding so language pill has its own row */
+  padding: 3.4rem 1.75rem 1.6rem;
   margin-bottom: 1.75rem;
   background: linear-gradient(145deg, rgba(11, 15, 32, 0.9), rgba(18, 24, 54, 0.9));
   border-radius: 24px;
@@ -125,8 +126,9 @@ body {
 
 .lang-switch-main {
   position: absolute;
-  top: 0.9rem;
+  top: 1.2rem;
   right: 1.2rem;
+  z-index: 5;
 
   display: inline-flex;
   align-items: center;
@@ -971,7 +973,8 @@ body.js-enabled .no-js-fallback {
 
 @media (max-width: 800px) {
   .site-header {
-    padding: 2.6rem 1.3rem 1.4rem;
+    /* extra top padding on mobile so the pill never overlaps socials */
+    padding: 3.8rem 1.3rem 1.4rem;
   }
 
   .header-main-row {
@@ -980,7 +983,7 @@ body.js-enabled .no-js-fallback {
   }
 
   .lang-switch-main {
-    top: 0.6rem;
+    top: 0.8rem;
     right: 0.9rem;
   }
 }
