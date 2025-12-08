@@ -6,9 +6,6 @@ const PROJECTS_URL = "./projects/projects.json";
 const MEDIA_INDEX_URL = "./media/media.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
-const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
-const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
-const RATE_LIMIT_BACKOFF_MS = 1000 * 60 * 60; // 1 hour
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
@@ -37,9 +34,18 @@ const state = {
 
 /* Small words not capitalized in titles (except first word) */
 const SMALL_WORDS = [
-  "voor", "na", "met", "door", "en", "of",
-  "und", "mit", "von",
-  "the", "and", "of"
+  "voor",
+  "na",
+  "met",
+  "door",
+  "en",
+  "of",
+  "und",
+  "mit",
+  "von",
+  "the",
+  "and",
+  "of"
 ];
 
 /* ---------- i18n dictionary ---------- */
@@ -210,8 +216,7 @@ const I18N = {
     mediaFormatAll: "Tüm türler",
     emptyState:
       "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
-    mediaEmptyState:
-      "Bu arama veya filtrelerle medya bulunamadı.",
+    mediaEmptyState: "Bu arama veya filtrelerle medya bulunamadı.",
     headerLangButton: "Dil",
     footerBuilt: "♥ ile geliştirildi – Ferran",
     btnLiveSite: "Canlı site"
@@ -245,8 +250,7 @@ const I18N = {
     mediaFormatAll: "Todos los tipos",
     emptyState:
       "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
-    mediaEmptyState:
-      "No se encontró media con estos filtros.",
+    mediaEmptyState: "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
     btnLiveSite: "Sitio live"
@@ -474,6 +478,7 @@ function setupTabsAndFilters() {
   projectsTab.addEventListener("click", showProjects);
   mediaTab.addEventListener("click", showMedia);
 
+  // default
   showProjects();
 
   const typeFilter = document.getElementById("typeFilter");
@@ -526,7 +531,7 @@ function setupSearch() {
   });
 }
 
-/* ---------- GitHub + projects.json loading ---------- */
+/* ---------- Projects loading (GitHub + overrides) ---------- */
 
 async function loadProjects() {
   const overrides = await loadProjectOverrides();
@@ -539,6 +544,7 @@ async function loadProjects() {
     }
   });
 
+  // Hidden repos: Projects (self), Munchkin, PSO WiiU guide
   repos = apiRepos.filter((repo) => {
     if (repo.archived || repo.fork) return false;
     const name = (repo.name || "").toLowerCase();
@@ -589,6 +595,7 @@ async function loadProjects() {
   sortProjectsByLive();
   buildLanguageFilterOptions(projects);
   renderProjects();
+
   verifyLiveSites();
   loadProjectThumbnails();
 }
@@ -605,28 +612,31 @@ async function loadProjectOverrides() {
   }
 }
 
+/* ---------- GitHub repo loading (simplified cache) ---------- */
+
 async function loadGitHubReposWithCache() {
-  const now = Date.now();
-
   try {
-    const rateRaw = localStorage.getItem(RATE_LIMIT_KEY);
-    if (rateRaw) {
-      const rate = JSON.parse(rateRaw);
-      if (rate && now - rate.timestamp < RATE_LIMIT_BACKOFF_MS) {
-        const cached = readReposFromCache();
-        if (cached) return cached;
-        return [];
-      }
+    // Always try live GitHub first
+    const res = await fetch(API_URL);
+    if (!res.ok) {
+      throw new Error("GitHub HTTP " + res.status);
     }
-  } catch (_) {}
 
-  const cached = readReposFromCache();
-  if (cached) {
-    refreshReposInBackground();
-    return cached;
+    const data = await res.json();
+    saveReposToCache(data);
+    return data;
+  } catch (err) {
+    console.error("GitHub fetch failed, trying cache instead:", err);
+
+    const cached = readReposFromCache();
+    if (cached) {
+      console.warn("Using cached GitHub repos");
+      return cached;
+    }
+
+    console.warn("No cached repos available, returning empty list");
+    return [];
   }
-
-  return fetchReposFromGitHub();
 }
 
 function readReposFromCache() {
@@ -634,55 +644,30 @@ function readReposFromCache() {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.repos)) return null;
-    if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
-    return parsed.repos;
-  } catch (_) {
+
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    if (parsed && Array.isArray(parsed.repos)) {
+      return parsed.repos;
+    }
+
+    return null;
+  } catch (err) {
+    console.error("Error reading repos from cache:", err);
     return null;
   }
 }
 
 function saveReposToCache(repos) {
   try {
-    localStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify({
-        timestamp: Date.now(),
-        repos
-      })
-    );
-  } catch (_) {}
-}
-
-function setRateLimited() {
-  try {
-    localStorage.setItem(
-      RATE_LIMIT_KEY,
-      JSON.stringify({ timestamp: Date.now() })
-    );
-  } catch (_) {}
-}
-
-function refreshReposInBackground() {
-  fetchReposFromGitHub().catch(() => {});
-}
-
-async function fetchReposFromGitHub() {
-  try {
-    const res = await fetch(API_URL);
-    if (res.status === 403) {
-      setRateLimited();
-      const cached = readReposFromCache();
-      return cached || [];
-    }
-    if (!res.ok) throw new Error("GitHub error");
-    const data = await res.json();
-    saveReposToCache(data);
-    return data;
+    const payload = {
+      timestamp: Date.now(),
+      repos
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
   } catch (err) {
-    console.error("GitHub fetch failed", err);
-    const cached = readReposFromCache();
-    return cached || [];
+    console.error("Error saving repos to cache:", err);
   }
 }
 
@@ -1236,13 +1221,14 @@ async function loadMedia() {
     const items = Array.isArray(data) ? data : data.items || [];
 
     mediaItems = items.map((item, index) => {
-      // 👇 FIX: also accept `src` from the generator
+      // Accept path, url or src
       let path =
         item.path ||
         item.url ||
         item.src ||
         "";
 
+      // If no path is present, try to reconstruct from fileName + type
       if (!path) {
         const fileName =
           item.fileName ||
