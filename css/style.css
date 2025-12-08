@@ -408,6 +408,8 @@ body {
 
 .tabs-section {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: center; /* center the pill bar itself */
 }
 
 .tabs {
@@ -464,7 +466,7 @@ body {
     color var(--transition-fast),
     transform var(--transition-fast);
   /* make all 3 tabs equal width so the labels sit in the middle of their pill */
-  flex: 1;
+  flex: 1 1 0;
   text-align: center;
 }
 
