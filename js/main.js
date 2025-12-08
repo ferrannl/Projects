@@ -1772,6 +1772,9 @@ function setupPlaygroundRandomButton() {
   const btn = document.getElementById("randomSiteButton");
   if (!btn) return;
 
+  // Make it visually match the Live site pill
+  btn.classList.add("btn-card", "btn-card-live");
+
   btn.addEventListener("click", () => {
     if (!USELESS_WEB_URLS.length) return;
     const idx = Math.floor(Math.random() * USELESS_WEB_URLS.length);
@@ -1779,3 +1782,4 @@ function setupPlaygroundRandomButton() {
     window.open(url, "_blank", "noopener,noreferrer");
   });
 }
+
