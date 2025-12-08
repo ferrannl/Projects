@@ -1,5 +1,3 @@
-/* css/style.css */
-
 /* ---------- Theme tokens ---------- */
 
 :root {
@@ -841,7 +839,6 @@ body {
   word-break: break-word;
 }
 
-/* Base preview style (for images; videos/audio override below) */
 .media-preview {
   border-radius: 12px;
   overflow: hidden;
@@ -854,24 +851,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 260px;
+  max-height: 260px; /* more vertical space for media */
 }
 
-/* More space for video & audio player */
-.media-preview--video,
-.media-preview--audio {
-  align-items: stretch;
-  justify-content: flex-start;
-  max-height: none;
-  padding: 0.55rem;
+/* give videos a bit more headroom */
+.media-preview-video {
+  max-height: 320px;
 }
 
-/* wrapper for video/audio + slider */
-.media-player {
+/* wrapper so player + slider can layout nicely */
+.media-player-wrapper {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
 }
 
 /* clickable images for zoom */
@@ -888,46 +878,43 @@ body {
 }
 
 .media-preview img,
-.media-player video {
+.media-preview video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.media-player video {
-  max-height: 320px;
+.media-preview video {
   border-radius: 10px;
   background: #000;
 }
 
 /* audio – a bit more modern */
-.media-player audio {
+.media-preview audio {
   width: 100%;
   border-radius: 999px;
   background-color: #050716;
 }
 
-/* custom volume row */
+/* custom volume row under audio/video */
 .media-volume-row {
+  margin-top: 0.5rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.1rem 0.05rem;
+  gap: 0.6rem;
 }
 
 .media-volume-label {
-  font-size: 0.9rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  white-space: nowrap;
 }
 
-/* big, smooth slider */
 .media-volume-slider {
   flex: 1;
-  -webkit-appearance: none;
   appearance: none;
   height: 6px;
   border-radius: 999px;
@@ -935,38 +922,55 @@ body {
   outline: none;
 }
 
-/* WebKit thumb */
+/* WebKit */
 .media-volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid #ffffff;
-  box-shadow: 0 0 0 4px rgba(176, 23, 47, 0.35);
+  box-shadow: 0 0 0 3px rgba(176, 23, 47, 0.35);
+  cursor: pointer;
 }
 
-/* Firefox thumb */
+/* Firefox */
 .media-volume-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid #ffffff;
-  box-shadow: 0 0 0 4px rgba(176, 23, 47, 0.35);
+  box-shadow: 0 0 0 3px rgba(176, 23, 47, 0.35);
+  cursor: pointer;
 }
 
-/* Firefox track */
+/* IE/Edge legacy */
+.media-volume-slider::-ms-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 3px rgba(176, 23, 47, 0.35);
+  cursor: pointer;
+}
+
 .media-volume-slider::-moz-range-track {
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
+  background: transparent;
 }
 
-.media-volume-slider:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.media-volume-slider::-ms-track {
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.media-volume-value {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 3ch;
+  text-align: right;
 }
 
 /* meta & actions */
