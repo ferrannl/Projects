@@ -267,6 +267,14 @@ body {
   border-color: rgba(255, 255, 255, 0.7);
 }
 
+/* Discord – Discord purple/blue vibes */
+.social-discord {
+  background:
+    radial-gradient(circle at 0 0, rgba(88, 101, 242, 0.5), transparent 60%),
+    rgba(7, 10, 28, 0.97);
+  border-color: rgba(88, 101, 242, 0.95);
+}
+
 /* Instagram – pill with gradient BORDER only (no filled gradient) */
 .social-instagram {
   border-radius: var(--radius-pill);
@@ -412,14 +420,14 @@ body {
   overflow: hidden;
 }
 
-/* sliding pill background – 3 segments */
+/* sliding pill background – 3 segments; slightly wider to avoid gap on right */
 .tabs::before {
   content: "";
   position: absolute;
   top: 2px;
   bottom: 2px;
   left: 2px;
-  width: calc(33.333% - 4px);
+  width: calc(33.6% - 4px);
   border-radius: 999px;
   background: linear-gradient(
     135deg,
@@ -1070,11 +1078,12 @@ body {
   margin-top: 0.75rem;
 }
 
+/* full-width stacked layout: paint on top, random below */
 .playground-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+  display: flex;
+  flex-direction: column;
   gap: 1.4rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .playground-card {
@@ -1083,6 +1092,7 @@ body {
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   padding: 1rem 1.1rem 1.1rem;
+  width: 100%;
 }
 
 .playground-card h2 {
@@ -1096,13 +1106,13 @@ body {
   color: var(--text-muted);
 }
 
-/* big iframe area for paint.js.org */
+/* big iframe area for paint.js.org – takes most of the page height */
 .playground-embed {
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: #000;
-  min-height: min(70vh, 680px);
+  min-height: min(80vh, 720px);
 }
 
 .playground-embed iframe {
@@ -1484,12 +1494,6 @@ body.js-enabled .no-js-fallback {
 /* ---------- Responsive tweaks ---------- */
 
 @media (max-width: 900px) {
-  .playground-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
   .site-header {
     padding: 2.6rem 1.3rem 1.4rem;
   }
