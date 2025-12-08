@@ -1,3 +1,5 @@
+// js/main.js
+
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -1772,7 +1774,7 @@ function setupPlaygroundRandomButton() {
   const btn = document.getElementById("randomSiteButton");
   if (!btn) return;
 
-  // Make it visually match the Live site pill
+  // Make it visually identical to "Live site" buttons
   btn.classList.add("btn-card", "btn-card-live");
 
   btn.addEventListener("click", () => {
@@ -1782,4 +1784,3 @@ function setupPlaygroundRandomButton() {
     window.open(url, "_blank", "noopener,noreferrer");
   });
 }
-
