@@ -60,6 +60,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
+    tabPlayground: "Playground",
     searchLabel: "Zoeken",
     filterTypeLabel: "Type",
     typeAll: "Alles",
@@ -94,6 +95,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projects",
     tabMedia: "Media",
+    tabPlayground: "Playground",
     searchLabel: "Search",
     filterTypeLabel: "Type",
     typeAll: "All",
@@ -127,6 +129,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projekte",
     tabMedia: "Medien",
+    tabPlayground: "Playground",
     searchLabel: "Suchen",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
@@ -162,6 +165,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projekty",
     tabMedia: "Media",
+    tabPlayground: "Playground",
     searchLabel: "Szukaj",
     filterTypeLabel: "Typ",
     typeAll: "Wszystko",
@@ -196,6 +200,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projeler",
     tabMedia: "Medya",
+    tabPlayground: "Playground",
     searchLabel: "Ara",
     filterTypeLabel: "Tür",
     typeAll: "Hepsi",
@@ -230,6 +235,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Proyectos",
     tabMedia: "Media",
+    tabPlayground: "Playground",
     searchLabel: "Buscar",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
@@ -319,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearch();
   setupImageModal();
   setupFooterCopyright();
+  setupPlaygroundRandomButton();
 
   loadProjects();
   loadMedia();
@@ -347,7 +354,9 @@ function setupLanguage() {
       const langCode = btn.dataset.lang;
       if (!SUPPORTED_LANGS.includes(langCode)) return;
       setLanguage(langCode);
-      localStorage.setItem(LANG_GATE_SEEN_GATE, "1");
+
+      // FIXED: use correct key so no ReferenceError & gate can hide
+      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
       gate.hidden = true;
     });
   }
@@ -438,45 +447,85 @@ function updateLanguageGateActive() {
 function setupTabsAndFilters() {
   const projectsTab = document.getElementById("projectsTab");
   const mediaTab = document.getElementById("mediaTab");
+  const playgroundTab = document.getElementById("playgroundTab");
+
   const projectsView = document.getElementById("projectsView");
   const mediaView = document.getElementById("mediaView");
+  const playgroundView = document.getElementById("playgroundView");
+
   const projectFilters = document.getElementById("projectFilters");
   const mediaFilters = document.getElementById("mediaFilters");
 
-  if (!projectsTab || !mediaTab || !projectsView || !mediaView) return;
+  if (!projectsTab || !mediaTab || !playgroundTab ||
+      !projectsView || !mediaView || !playgroundView) return;
+
+  function updateTabsVisual(mode) {
+    const tabs = document.querySelector(".tabs");
+    if (!tabs) return;
+    tabs.classList.remove("tabs-media", "tabs-playground");
+    if (mode === "media") {
+      tabs.classList.add("tabs-media");
+    } else if (mode === "playground") {
+      tabs.classList.add("tabs-playground");
+    }
+  }
 
   function showProjects() {
     state.activeTab = "projects";
+
     projectsTab.classList.add("active");
     mediaTab.classList.remove("active");
+    playgroundTab.classList.remove("active");
+
     projectsView.style.display = "";
     mediaView.style.display = "none";
+    playgroundView.style.display = "none";
+
     if (projectFilters) projectFilters.hidden = false;
     if (mediaFilters) mediaFilters.hidden = true;
 
-    const tabs = document.querySelector(".tabs");
-    if (tabs) tabs.classList.remove("tabs-media");
-
+    updateTabsVisual("projects");
     renderProjects();
   }
 
   function showMedia() {
     state.activeTab = "media";
+
     mediaTab.classList.add("active");
     projectsTab.classList.remove("active");
+    playgroundTab.classList.remove("active");
+
     mediaView.style.display = "";
     projectsView.style.display = "none";
+    playgroundView.style.display = "none";
+
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = false;
 
-    const tabs = document.querySelector(".tabs");
-    if (tabs) tabs.classList.add("tabs-media");
-
+    updateTabsVisual("media");
     renderMedia();
+  }
+
+  function showPlayground() {
+    state.activeTab = "playground";
+
+    playgroundTab.classList.add("active");
+    projectsTab.classList.remove("active");
+    mediaTab.classList.remove("active");
+
+    playgroundView.style.display = "";
+    projectsView.style.display = "none";
+    mediaView.style.display = "none";
+
+    if (projectFilters) projectFilters.hidden = true;
+    if (mediaFilters) mediaFilters.hidden = true;
+
+    updateTabsVisual("playground");
   }
 
   projectsTab.addEventListener("click", showProjects);
   mediaTab.addEventListener("click", showMedia);
+  playgroundTab.addEventListener("click", showPlayground);
 
   // default
   showProjects();
@@ -525,9 +574,10 @@ function setupSearch() {
     state.search = searchEl.value.trim();
     if (state.activeTab === "projects") {
       renderProjects();
-    } else {
+    } else if (state.activeTab === "media") {
       renderMedia();
     }
+    // when activeTab === "playground", search does nothing visible (which is fine)
   });
 }
 
@@ -1413,7 +1463,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- UPDATED: volume slider is appended inside .media-preview ---- */
+/* ---- volume slider is appended inside .media-preview ---- */
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1621,4 +1671,16 @@ function setupFooterCopyright() {
   if (!el) return;
   const year = new Date().getFullYear();
   el.textContent = `${year}`;
+}
+
+/* ---------- Playground random button ---------- */
+
+function setupPlaygroundRandomButton() {
+  const btn = document.getElementById("randomSiteButton");
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    // Just launch the site in a new tab – no “powered by” text anywhere
+    window.open("https://theuselessweb.com/", "_blank", "noopener,noreferrer");
+  });
 }
