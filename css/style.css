@@ -267,14 +267,6 @@ body {
   border-color: rgba(255, 255, 255, 0.7);
 }
 
-/* Discord – Discord purple/blue vibes */
-.social-discord {
-  background:
-    radial-gradient(circle at 0 0, rgba(88, 101, 242, 0.5), transparent 60%),
-    rgba(7, 10, 28, 0.97);
-  border-color: rgba(88, 101, 242, 0.95);
-}
-
 /* Instagram – pill with gradient BORDER only (no filled gradient) */
 .social-instagram {
   border-radius: var(--radius-pill);
@@ -306,6 +298,15 @@ body {
     radial-gradient(circle at 0 0, rgba(255, 150, 0, 0.35), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: rgba(255, 150, 0, 0.9);
+}
+
+/* Discord – bluish pill */
+
+.social-discord {
+  background:
+    radial-gradient(circle at 0 0, rgba(88, 101, 242, 0.5), transparent 60%),
+    rgba(7, 10, 28, 0.97);
+  border-color: rgba(88, 101, 242, 0.9);
 }
 
 /* Tumblr styles */
@@ -381,7 +382,7 @@ body {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  padding: 4px; /* thicker ring */
+  padding: 4px;
   background: conic-gradient(
     from 180deg,
     #0b1a3d,
@@ -420,14 +421,14 @@ body {
   overflow: hidden;
 }
 
-/* sliding pill background – 3 segments; slightly wider to avoid gap on right */
+/* sliding pill background – 3 segments, full coverage for Playground */
 .tabs::before {
   content: "";
   position: absolute;
   top: 2px;
   bottom: 2px;
   left: 2px;
-  width: calc(33.6% - 4px);
+  width: calc((100% - 4px) / 3);
   border-radius: 999px;
   background: linear-gradient(
     135deg,
@@ -573,7 +574,6 @@ body {
 }
 
 /* hide filters when [hidden] from JS */
-
 #projectFilters[hidden],
 #mediaFilters[hidden] {
   display: none !important;
@@ -589,7 +589,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.1rem;
-  align-items: start; /* so tallest card no longer forces the others */
+  align-items: start;
 }
 
 /* ---------- Project cards + thumbnails ---------- */
@@ -868,7 +868,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.6rem;
   margin-top: 0.4rem;
-  align-items: start; /* don't stretch shorter media cards */
+  align-items: start;
 }
 
 .media-card {
@@ -903,7 +903,6 @@ body {
   align-items: stretch;
 }
 
-/* wrapper so player + slider can layout nicely */
 .media-player-wrapper {
   width: 100%;
 }
@@ -931,7 +930,7 @@ body {
 .media-preview video {
   border-radius: 10px;
   background: #000;
-  aspect-ratio: 16 / 9; /* nicer wide video player */
+  aspect-ratio: 16 / 9;
 }
 
 .media-preview audio {
@@ -940,7 +939,7 @@ body {
   background-color: #050716;
 }
 
-/* custom volume row under audio/video – but INSIDE the preview now */
+/* custom volume row */
 .media-volume-row {
   margin-top: 0.5rem;
   padding: 0.4rem 0.7rem 0.6rem;
@@ -1036,8 +1035,6 @@ body {
   color: var(--text-muted);
 }
 
-/* actions: view / download */
-
 .media-actions {
   margin-top: 0.35rem;
   display: flex;
@@ -1072,18 +1069,17 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
-/* ---------- Playground (for your paint.js.org + random button) ---------- */
+/* ---------- Playground ---------- */
 
 #playgroundView {
   margin-top: 0.75rem;
 }
 
-/* full-width stacked layout: paint on top, random below */
 .playground-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr); /* always stacked: Paint then Random */
   gap: 1.4rem;
-  align-items: stretch;
+  align-items: start;
 }
 
 .playground-card {
@@ -1092,7 +1088,6 @@ body {
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   padding: 1rem 1.1rem 1.1rem;
-  width: 100%;
 }
 
 .playground-card h2 {
@@ -1106,81 +1101,23 @@ body {
   color: var(--text-muted);
 }
 
-/* big iframe area for paint.js.org */
+/* Paint card: full big embed */
 .playground-embed {
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: #000;
+  height: min(70vh, 680px); /* explicit height so iframe can fill it */
 }
 
-/* Make the iframe fill the entire black area */
 .playground-embed iframe {
   width: 100%;
-  height: min(70vh, 680px);  /* same size as before, but now on the iframe */
+  height: 100%;
   border: none;
   display: block;
 }
 
-
-/* huge fancy random button */
-.playground-random-btn {
-  margin-top: 0.4rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.85rem 2.6rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #fff;
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(#050716, #050716) padding-box,
-    conic-gradient(
-      from 0deg,
-      #b0172f,
-      #3f7bff,
-      #b0172f,
-      #3f7bff,
-      #b0172f
-    ) border-box;
-  transition:
-    transform var(--transition-med),
-    box-shadow var(--transition-med),
-    filter var(--transition-med);
-}
-
-.playground-random-btn::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle at 0 0,
-    rgba(176, 23, 47, 0.35),
-    rgba(4, 7, 24, 1)
-  );
-  z-index: 0;
-}
-
-.playground-random-btn span,
-.playground-random-btn svg {
-  position: relative;
-  z-index: 1;
-}
-
-.playground-random-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
-}
-
-/* Center the random website card content */
+/* Random card centered content */
 .playground-card.playground-random {
   display: flex;
   flex-direction: column;
@@ -1188,14 +1125,46 @@ body {
   text-align: center;
 }
 
-/* Center the button itself */
-.playground-random-btn {
-  display: inline-flex;          /* you already had this */
-  margin-top: 0.8rem;
-  margin-left: auto;
-  margin-right: auto;            /* centers it in the card */
+.playground-card.playground-random .playground-title,
+.playground-card.playground-random .playground-text {
+  text-align: center;
 }
 
+/* Base layout for random button – visuals come from .btn-card-live */
+.playground-random-btn {
+  margin-top: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 2.8rem;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  position: relative;
+  text-align: center;
+}
+
+/* Make the random button readable while keeping the glow */
+.playground-random-btn.btn-card-live {
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow:
+    0 0 6px rgba(0, 0, 0, 0.75),
+    0 0 14px rgba(0, 0, 0, 0.8);
+}
+
+/* Soften the glow a bit just for this button */
+.playground-random-btn.btn-card-live::before {
+  opacity: 0.6;
+}
+
+.playground-random-btn.btn-card-live::after {
+  opacity: 0.55;
+}
 
 /* ---------- Empty state ---------- */
 
@@ -1512,6 +1481,12 @@ body.js-enabled .no-js-fallback {
 /* ---------- Responsive tweaks ---------- */
 
 @media (max-width: 900px) {
+  .playground-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
   .site-header {
     padding: 2.6rem 1.3rem 1.4rem;
   }
