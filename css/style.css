@@ -1098,31 +1098,31 @@ body {
   color: var(--text-muted);
 }
 
-/* ----- Remove rounded edges ONLY for the Paint playground ----- */
-.playground-card.playground-paint {
-  border-radius: 0 !important;
-}
-
-/* Also make the iframe itself match the rectangular shape */
-.playground-card.playground-paint iframe {
-  border-radius: 0 !important;
-}
-
 /* Paint card: full big embed */
+/* Playground wrapper: square, nice card, black bg */
 .playground-embed {
-  border-radius: 16px;
+  position: relative;
+  width: 100%;
+  max-width: 960px;            /* or whatever fits your layout */
+  margin: 1.5rem auto 0;
+  aspect-ratio: 1 / 1;         /* 🔲 this makes it square */
+  background: #02040f;         /* dark background */
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #000;
-  height: min(70vh, 680px); /* explicit height so iframe can fill it */
+  border: 1px solid var(--border-subtle);
 }
+
 
 .playground-embed iframe {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: none;
   display: block;
 }
+
 
 /* Random card centered content */
 .playground-card.playground-random {
