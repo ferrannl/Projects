@@ -463,10 +463,14 @@ body {
   transition:
     color var(--transition-fast),
     transform var(--transition-fast);
+  /* make all 3 tabs equal width so the labels sit in the middle of their pill */
+  flex: 1;
+  text-align: center;
 }
 
+/* remove the tiny gap that pushed Media/Playground off-centre */
 .tab-button + .tab-button {
-  margin-left: 2px;
+  margin-left: 0;
 }
 
 .tab-button:hover {
