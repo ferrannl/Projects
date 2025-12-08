@@ -318,26 +318,12 @@ body {
   border-color: rgba(53, 70, 92, 0.9);
 }
 
-/* Old Tumblr: Kadaver with deeper red tint, but softer text */
+/* Old Tumblr: Kadaver – same text style as others, only tint differs */
 .social-tumblr-old {
   background:
     radial-gradient(circle at 0 0, rgba(123, 0, 16, 0.45), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: #7b0010;
-}
-
-/* keep the Kadaver label override, but use a softer, warmer text color */
-.social-tumblr-old .social-label {
-  position: relative;
-  color: transparent;
-}
-
-.social-tumblr-old .social-label::after {
-  content: "Kadaver";
-  position: absolute;
-  inset: 0;
-  display: inline-block;
-  color: rgba(255, 220, 230, 0.96);
 }
 
 /* Reddit – orange glow pill */
@@ -347,21 +333,6 @@ body {
     rgba(7, 10, 28, 0.97);
   border-color: rgba(255, 69, 0, 0.9);
 }
-
-/* --- Fix Tumblr OLD chip ("Kadaver") so it matches all others --- */
-.social-chip.social-tumblr-old {
-  border-color: #b0172f;        /* your accent red */
-  background: rgba(176, 23, 47, 0.15); /* soft red tint like others */
-  color: var(--text);           /* normal text color */
-}
-
-/* Make the label itself red (edgy, matches border) */
-.social-chip.social-tumblr-old .social-label {
-  color: #b0172f;
-  font-weight: 600;
-}
-
-
 
 /* ---------- About section ---------- */
 
