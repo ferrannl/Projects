@@ -423,33 +423,24 @@ body {
   overflow: hidden;
 }
 
-/* sliding pill background – 3 segments, full coverage for Playground */
+/* sliding pill background – bound to active tab via CSS vars */
 .tabs::before {
   content: "";
   position: absolute;
   top: 2px;
   bottom: 2px;
-  left: 2px;
-  width: calc((100% - 4px) / 3);
+  left: var(--pill-left, 2px);
+  width: var(--pill-width, calc((100% - 4px) / 3));
   border-radius: 999px;
   background: linear-gradient(
     135deg,
     rgba(176, 23, 47, 0.9),
     rgba(11, 26, 61, 0.9)
   );
-  transform: translateX(0%);
-  transition: transform var(--transition-med);
   z-index: 0;
-}
-
-/* middle position (Media) */
-.tabs.tabs-media::before {
-  transform: translateX(100%);
-}
-
-/* right position (Playground) */
-.tabs.tabs-playground::before {
-  transform: translateX(200%);
+  transition:
+    left var(--transition-med),
+    width var(--transition-med);
 }
 
 .tab-button {
