@@ -4,8 +4,8 @@
 
 All my GitHub work in one place — client websites, school projects, APIs, mobile apps, and creative experiments.
 
-[![GitHub followers](https://img.shields.io/github/followers/ferrannl?style=flat-square&label=Follow%20me)](https://github.com/ferrannl)
-[![Public repos](https://img.shields.io/badge/Public%20repos-blue?style=flat-square)](https://github.com/ferrannl?tab=repositories)
+[![GitHub followers](https://img.shields.io/badge/Followers-0-blue?style=flat-square)](https://github.com/ferrannl)
+[![Public repos](https://img.shields.io/badge/Public%20repos-27-brightgreen?style=flat-square)](https://github.com/ferrannl?tab=repositories)
 [![Profile views](https://komarev.com/ghpvc/?username=ferrannl&style=flat-square)](https://github.com/ferrannl)
 
 ---
@@ -118,3 +118,7 @@ I like building small, focused things:
 
 **GitHub:** [@ferrannl](https://github.com/ferrannl)  
 **Portfolio:** https://ferrannl.github.io/Projects/
+
+
+---
+_Last updated: 2025-12-08 09:50:48 UTC_
