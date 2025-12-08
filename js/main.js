@@ -1,5 +1,3 @@
-// js/main.js
-
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -11,6 +9,7 @@ const CACHE_KEY = "ferranProjectsCacheV2";
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
+const FALLBACK_LANG = "en";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
@@ -180,7 +179,18 @@ const I18N = {
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
-    btnLiveSite: "Live site"
+    btnLiveSite: "Live site",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText:
+      "Een ingesloten versie van de open-source MS Paint remake van paint.js.org. Je kunt hier direct tekenen (als hun site insluiten toestaat).",
+    playgroundRandomTitle: "Random website-knop",
+    playgroundRandomText:
+      "Nieuwsgierig of verveeld? Druk op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
+    randomButtonLabel: "STUUR ME NAAR EEN RANDOM WEBSITE",
+    mediaBtnView: "Bekijken",
+    mediaBtnOpen: "Openen",
+    mediaBtnDownload: "Downloaden",
+    mediaVolumeLabel: "Volume"
   },
   en: {
     subtitle:
@@ -214,7 +224,18 @@ const I18N = {
     mediaEmptyState: "No media found with these filters.",
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
-    btnLiveSite: "Live site"
+    btnLiveSite: "Live site",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText:
+      "An embedded version of the open-source MS Paint remake from paint.js.org. You can draw right inside this page (if their site allows embedding).",
+    playgroundRandomTitle: "Random Website Button",
+    playgroundRandomText:
+      "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
+    randomButtonLabel: "TAKE ME TO A RANDOM WEBSITE",
+    mediaBtnView: "View",
+    mediaBtnOpen: "Open",
+    mediaBtnDownload: "Download",
+    mediaVolumeLabel: "Volume"
   },
   de: {
     subtitle:
@@ -240,7 +261,7 @@ const I18N = {
     mediaTypeLabel: "Medientyp",
     mediaKindAll: "Alle",
     mediaKindImages: "Bilder",
-    mediaKindVideos: "Video’s",
+    mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Dateityp",
     mediaFormatAll: "Alle Formate",
@@ -250,7 +271,18 @@ const I18N = {
       "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
-    btnLiveSite: "Live-Seite"
+    btnLiveSite: "Live-Seite",
+    playgroundPaintTitle: "MS-Paint-Playground",
+    playgroundPaintText:
+      "Eine eingebettete Version des Open-Source-MS-Paint-Remakes von paint.js.org. Du kannst direkt auf dieser Seite zeichnen (wenn deren Seite Einbettung erlaubt).",
+    playgroundRandomTitle: "Zufällige-Website-Button",
+    playgroundRandomText:
+      "Neugierig oder gelangweilt? Klick auf den Button und eine zufällige, verrückte Website öffnet sich in einem neuen Tab.",
+    randomButtonLabel: "BRING MICH AUF EINE ZUFÄLLIGE WEBSITE",
+    mediaBtnView: "Ansehen",
+    mediaBtnOpen: "Öffnen",
+    mediaBtnDownload: "Download",
+    mediaVolumeLabel: "Lautstärke"
   },
   pl: {
     subtitle:
@@ -285,7 +317,18 @@ const I18N = {
     mediaEmptyState: "Nie znaleziono mediów dla tych filtrów.",
     headerLangButton: "Język",
     footerBuilt: "Stworzone z ♥ przez Ferrana",
-    btnLiveSite: "Strona live"
+    btnLiveSite: "Strona live",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText:
+      "Osadzona wersja otwartego klonu MS Paint z paint.js.org. Możesz rysować bezpośrednio na tej stronie (jeśli ich serwis pozwala na osadzanie).",
+    playgroundRandomTitle: "Przycisk losowej strony",
+    playgroundRandomText:
+      "Nudzisz się albo jesteś ciekawy? Kliknij przycisk, a otworzy się losowa, dziwna strona w nowej karcie.",
+    randomButtonLabel: "PRZENIEŚ MNIE NA LOSOWĄ STRONĘ",
+    mediaBtnView: "Podgląd",
+    mediaBtnOpen: "Otwórz",
+    mediaBtnDownload: "Pobierz",
+    mediaVolumeLabel: "Głośność"
   },
   tr: {
     subtitle:
@@ -320,7 +363,18 @@ const I18N = {
     mediaEmptyState: "Bu arama veya filtrelerle medya bulunamadı.",
     headerLangButton: "Dil",
     footerBuilt: "♥ ile geliştirildi – Ferran",
-    btnLiveSite: "Canlı site"
+    btnLiveSite: "Canlı site",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText:
+      "paint.js.org üzerindeki açık kaynak MS Paint klonunun gömülü bir sürümü. (Eğer siteleri izin veriyorsa) doğrudan bu sayfada çizebilirsin.",
+    playgroundRandomTitle: "Rastgele site butonu",
+    playgroundRandomText:
+      "Meraklı ya da sıkılmış hissediyor musun? Butona bas, yeni sekmede rastgele garip bir site açılsın.",
+    randomButtonLabel: "BENİ RASTGELE BİR SİTEYE GÖTÜR",
+    mediaBtnView: "Görüntüle",
+    mediaBtnOpen: "Aç",
+    mediaBtnDownload: "İndir",
+    mediaVolumeLabel: "Ses"
   },
   es: {
     subtitle:
@@ -355,7 +409,18 @@ const I18N = {
     mediaEmptyState: "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
-    btnLiveSite: "Sitio live"
+    btnLiveSite: "Sitio live",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText:
+      "Versión incrustada del remake open source de MS Paint de paint.js.org. Puedes dibujar directamente en esta página (si su sitio permite la inserción).",
+    playgroundRandomTitle: "Botón de web aleatoria",
+    playgroundRandomText:
+      "¿Con curiosidad o aburrido? Pulsa el botón y se abrirá una web rara y aleatoria en una nueva pestaña.",
+    randomButtonLabel: "LLEVAME A UNA WEB ALEATORIA",
+    mediaBtnView: "Ver",
+    mediaBtnOpen: "Abrir",
+    mediaBtnDownload: "Descargar",
+    mediaVolumeLabel: "Volumen"
   }
 };
 
@@ -410,6 +475,21 @@ const TYPE_LABELS = {
     es: "Otros"
   }
 };
+
+/* ---------- small i18n helper ---------- */
+
+function t(key, fallback = "") {
+  const langDict = I18N[state.lang] || {};
+  const fallbackDict = I18N[FALLBACK_LANG] || {};
+  let value = langDict[key];
+  if (typeof value !== "string" || !value) {
+    value = fallbackDict[key];
+  }
+  if (typeof value !== "string" || !value) {
+    value = fallback;
+  }
+  return value;
+}
 
 /* ---------- Init ---------- */
 
@@ -476,27 +556,30 @@ function setLanguage(lang) {
   } catch (_) {}
 
   const dict = I18N[lang] || I18N[DEFAULT_LANG] || {};
+  const fallbackDict = I18N[FALLBACK_LANG] || {};
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    const value = dict[key];
-    if (typeof value === "string") {
+    if (!key) return;
+    let value = dict[key];
+    if (typeof value !== "string" || !value) {
+      value = fallbackDict[key];
+    }
+    if (typeof value === "string" && value) {
       el.textContent = value;
     }
   });
 
   document.querySelectorAll("[data-i18n-footer-built]").forEach((el) => {
     const key = "footerBuilt";
-    const value = dict[key];
-    if (typeof value === "string") {
+    let value = dict[key];
+    if (typeof value !== "string" || !value) {
+      value = fallbackDict[key];
+    }
+    if (typeof value === "string" && value) {
       el.textContent = value;
     }
   });
-
-  const searchLabelEl = document.querySelector("[data-i18n='searchLabel']");
-  if (searchLabelEl && dict.searchLabel) {
-    searchLabelEl.textContent = dict.searchLabel;
-  }
 
   const searchInput = document.getElementById("search");
   if (searchInput) {
@@ -523,6 +606,9 @@ function setLanguage(lang) {
 
   updateLanguageGateActive();
   renderProjects();
+  if (state.activeTab === "media") {
+    renderMedia();
+  }
 }
 
 function updateLanguageGateActive() {
@@ -1525,7 +1611,7 @@ function createVolumeRow(mediaEl) {
 
   const label = document.createElement("span");
   label.className = "media-volume-label";
-  label.textContent = "Volume";
+  label.textContent = t("mediaVolumeLabel", "Volume");
 
   const slider = document.createElement("input");
   slider.type = "range";
@@ -1648,7 +1734,7 @@ function renderMedia() {
       const viewBtn = document.createElement("button");
       viewBtn.type = "button";
       viewBtn.className = "media-action-btn";
-      viewBtn.textContent = "View";
+      viewBtn.textContent = t("mediaBtnView", "View");
       viewBtn.addEventListener("click", () => {
         openImageModal(item.path, item.title);
       });
@@ -1659,7 +1745,7 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = "Open";
+      openBtn.textContent = t("mediaBtnOpen", "Open");
       actions.appendChild(openBtn);
     }
 
@@ -1667,7 +1753,7 @@ function renderMedia() {
     downloadBtn.href = item.path;
     downloadBtn.download = "";
     downloadBtn.className = "media-action-btn";
-    downloadBtn.textContent = "Download";
+    downloadBtn.textContent = t("mediaBtnDownload", "Download");
     actions.appendChild(downloadBtn);
 
     card.appendChild(title);
