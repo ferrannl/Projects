@@ -412,14 +412,14 @@ body {
   overflow: hidden;
 }
 
-/* sliding pill background */
+/* sliding pill background – 3 segments */
 .tabs::before {
   content: "";
   position: absolute;
   top: 2px;
   bottom: 2px;
   left: 2px;
-  width: calc(50% - 2px);
+  width: calc(33.333% - 4px);
   border-radius: 999px;
   background: linear-gradient(
     135deg,
@@ -431,8 +431,14 @@ body {
   z-index: 0;
 }
 
+/* middle position (Media) */
 .tabs.tabs-media::before {
   transform: translateX(100%);
+}
+
+/* right position (Playground) */
+.tabs.tabs-playground::before {
+  transform: translateX(200%);
 }
 
 .tab-button {
@@ -509,7 +515,7 @@ body {
   outline-offset: 2px;
 }
 
-/* magnifying glass – centered-ish */
+/* magnifying glass – centred-ish */
 .search-section::before {
   content: "🔍";
   position: absolute;
