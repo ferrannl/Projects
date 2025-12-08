@@ -1106,21 +1106,22 @@ body {
   color: var(--text-muted);
 }
 
-/* big iframe area for paint.js.org – takes most of the page height */
+/* big iframe area for paint.js.org */
 .playground-embed {
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: #000;
-  min-height: min(80vh, 720px);
 }
 
+/* Make the iframe fill the entire black area */
 .playground-embed iframe {
   width: 100%;
-  height: 100%;
+  height: min(70vh, 680px);  /* same size as before, but now on the iframe */
   border: none;
   display: block;
 }
+
 
 /* huge fancy random button */
 .playground-random-btn {
@@ -1178,6 +1179,23 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
 }
+
+/* Center the random website card content */
+.playground-card.playground-random {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Center the button itself */
+.playground-random-btn {
+  display: inline-flex;          /* you already had this */
+  margin-top: 0.8rem;
+  margin-left: auto;
+  margin-right: auto;            /* centers it in the card */
+}
+
 
 /* ---------- Empty state ---------- */
 
