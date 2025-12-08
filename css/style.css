@@ -1098,6 +1098,16 @@ body {
   color: var(--text-muted);
 }
 
+/* ----- Remove rounded edges ONLY for the Paint playground ----- */
+.playground-card.playground-paint {
+  border-radius: 0 !important;
+}
+
+/* Also make the iframe itself match the rectangular shape */
+.playground-card.playground-paint iframe {
+  border-radius: 0 !important;
+}
+
 /* Paint card: full big embed */
 .playground-embed {
   border-radius: 16px;
