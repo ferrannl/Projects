@@ -1280,32 +1280,52 @@ async function loadMedia() {
     const data = await res.json();
     const items = Array.isArray(data) ? data : data.items || [];
 
-    mediaItems = items.map((item, index) => {
-      const path = item.path || item.url || "";
-      const title =
-        item.title ||
-        item.name ||
-        item.fileName ||
-        path.split("/").pop() ||
-        `Media ${index + 1}`;
+mediaItems = items.map((item, index) => {
+  // 1) Try direct path/url
+  let path = item.path || item.url || "";
 
-      const format =
-        (item.format ||
-          (path.split(".").pop() || "").toLowerCase()) || "";
-
-      let type = item.type;
-      if (!type) {
-        type = guessMediaType(path);
+  // 2) If there is no path, try to reconstruct from name/fileName + type
+  if (!path) {
+    const fileName = item.fileName || item.name || "";
+    if (fileName) {
+      if (item.type === "image") {
+        path = `media/images/${fileName}`;
+      } else if (item.type === "video") {
+        path = `media/videos/${fileName}`;
+      } else if (item.type === "audio") {
+        path = `media/audio/${fileName}`;
+      } else {
+        // default bucket if type is unknown
+        path = `media/${fileName}`;
       }
+    }
+  }
 
-      return {
-        id: index,
-        title,
-        path,
-        type,
-        format
-      };
-    });
+  const title =
+    item.title ||
+    item.name ||
+    item.fileName ||
+    (path ? path.split("/").pop() : "") ||
+    `Media ${index + 1}`;
+
+  const format =
+    (item.format ||
+      (path.split(".").pop() || "").toLowerCase()) || "";
+
+  let type = item.type;
+  if (!type) {
+    type = guessMediaType(path);
+  }
+
+  return {
+    id: index,
+    title,
+    path,
+    type,
+    format
+  };
+});
+
 
     buildMediaFilterOptions(mediaItems);
     renderMedia();
