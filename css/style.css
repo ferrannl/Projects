@@ -267,18 +267,23 @@ body {
   border-color: rgba(255, 255, 255, 0.7);
 }
 
-/* Instagram – only gradient BORDER, no filled IG gradient */
+/* Instagram – pill with gradient BORDER only (no filled gradient) */
 .social-instagram {
-  background: rgba(7, 10, 28, 0.97);
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
-  border-image: linear-gradient(
-    135deg,
-    #feda75,
-    #fa7e1e,
-    #d62976,
-    #962fbf,
-    #4f5bd5
-  ) 1;
+  background:
+    linear-gradient(rgba(7, 10, 28, 0.97), rgba(7, 10, 28, 0.97)) padding-box,
+    conic-gradient(
+      from 220deg,
+      #feda75,
+      #fa7e1e,
+      #d62976,
+      #962fbf,
+      #4f5bd5,
+      #feda75
+    ) border-box;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
 }
 
 .social-linkedin {
@@ -304,12 +309,25 @@ body {
   border-color: rgba(53, 70, 92, 0.9);
 }
 
-/* Tumblr "Kadaver" – dark red border */
+/* Old Tumblr: Kadaver with red/dark red border */
 .social-tumblr-old {
   background:
-    radial-gradient(circle at 0 0, rgba(176, 23, 47, 0.4), transparent 60%),
+    radial-gradient(circle at 0 0, rgba(123, 0, 16, 0.45), transparent 60%),
     rgba(7, 10, 28, 0.97);
-  border-color: rgba(176, 23, 47, 0.95);
+  border-color: #7b0010;
+}
+
+.social-tumblr-old .social-label {
+  position: relative;
+  color: transparent;
+}
+
+.social-tumblr-old .social-label::after {
+  content: "Kadaver";
+  position: absolute;
+  inset: 0;
+  display: inline-block;
+  color: var(--text);
 }
 
 /* ---------- About section ---------- */
@@ -557,7 +575,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.1rem;
-  align-items: flex-start; /* cards no longer forced to tallest height */
+  align-items: start; /* so tallest card no longer forces the others */
 }
 
 /* ---------- Project cards + thumbnails ---------- */
@@ -756,7 +774,6 @@ body {
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
 }
 
-/* outer animated highlight ring */
 .btn-card-live::before {
   content: "";
   position: absolute;
@@ -776,7 +793,6 @@ body {
   transition: opacity 180ms ease-out;
 }
 
-/* inner pill */
 .btn-card-live::after {
   content: "";
   position: absolute;
@@ -790,7 +806,6 @@ body {
   z-index: 0;
 }
 
-/* label stays above animation */
 .btn-card-live span,
 .btn-card-live svg,
 .btn-card-live img {
@@ -798,7 +813,6 @@ body {
   z-index: 1;
 }
 
-/* hover lift & glow */
 .btn-card-live:hover,
 .btn-card-live:focus-visible {
   box-shadow:
@@ -812,14 +826,12 @@ body {
   opacity: 0.9;
 }
 
-/* mobile: lower idle opacity */
 @media (hover: none) {
   .btn-card-live::before {
     opacity: 0.45;
   }
 }
 
-/* smooth 360° rotation */
 @keyframes liveGlowSpin {
   from {
     transform: rotate(0deg);
@@ -839,9 +851,10 @@ body {
 /* ---------- Media cards ---------- */
 
 .media-grid {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* wider cards so videos breathe */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.6rem;
   margin-top: 0.4rem;
+  align-items: start; /* don't stretch shorter media cards */
 }
 
 .media-card {
@@ -862,7 +875,6 @@ body {
   word-break: break-word;
 }
 
-/* preview now stacks player + slider INSIDE the box */
 .media-preview {
   border-radius: 12px;
   overflow: hidden;
@@ -882,7 +894,6 @@ body {
   width: 100%;
 }
 
-/* clickable images for zoom */
 .media-preview.clickable {
   cursor: zoom-in;
 }
@@ -895,34 +906,27 @@ body {
   transform: scale(1.02);
 }
 
-/* Images/videos: keep them compact, don't blow up cards */
 .media-preview img,
 .media-preview video {
   width: 100%;
-  height: auto;
-  max-height: 260px;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 
 .media-preview video {
   border-radius: 10px;
   background: #000;
+  aspect-ratio: 16 / 9; /* nicer wide video player */
 }
 
-/* audio – a bit more modern */
 .media-preview audio {
   width: 100%;
   border-radius: 999px;
   background-color: #050716;
 }
 
-/* make audio cards a bit more compact visually */
-.media-card-audio .media-preview {
-  padding: 0.35rem 0.6rem;
-}
-
-/* custom volume row under audio/video – INSIDE the preview */
+/* custom volume row under audio/video – but INSIDE the preview now */
 .media-volume-row {
   margin-top: 0.5rem;
   padding: 0.4rem 0.7rem 0.6rem;
@@ -1054,6 +1058,111 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
+/* ---------- Playground (for your paint.js.org + random button) ---------- */
+
+#playgroundView {
+  margin-top: 0.75rem;
+}
+
+.playground-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+  gap: 1.4rem;
+  align-items: start;
+}
+
+.playground-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.playground-card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.playground-card p {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* big iframe area for paint.js.org */
+.playground-embed {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #000;
+  min-height: min(70vh, 680px);
+}
+
+.playground-embed iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* huge fancy random button */
+.playground-random-btn {
+  margin-top: 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 2.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(#050716, #050716) padding-box,
+    conic-gradient(
+      from 0deg,
+      #b0172f,
+      #3f7bff,
+      #b0172f,
+      #3f7bff,
+      #b0172f
+    ) border-box;
+  transition:
+    transform var(--transition-med),
+    box-shadow var(--transition-med),
+    filter var(--transition-med);
+}
+
+.playground-random-btn::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 0 0,
+    rgba(176, 23, 47, 0.35),
+    rgba(4, 7, 24, 1)
+  );
+  z-index: 0;
+}
+
+.playground-random-btn span,
+.playground-random-btn svg {
+  position: relative;
+  z-index: 1;
+}
+
+.playground-random-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
+}
+
 /* ---------- Empty state ---------- */
 
 .empty-state {
@@ -1096,7 +1205,6 @@ body {
   opacity: 0.9;
 }
 
-/* icon-only socials bottom-right */
 .footer-social-icons {
   display: flex;
   align-items: center;
@@ -1368,6 +1476,12 @@ body.js-enabled .no-js-fallback {
 }
 
 /* ---------- Responsive tweaks ---------- */
+
+@media (max-width: 900px) {
+  .playground-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 
 @media (max-width: 800px) {
   .site-header {
