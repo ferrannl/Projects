@@ -60,7 +60,6 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
-    tabPlayground: "Speeltuin",
     searchLabel: "Zoeken",
     filterTypeLabel: "Type",
     typeAll: "Alles",
@@ -95,7 +94,6 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projects",
     tabMedia: "Media",
-    tabPlayground: "Playground",
     searchLabel: "Search",
     filterTypeLabel: "Type",
     typeAll: "All",
@@ -129,7 +127,6 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projekte",
     tabMedia: "Medien",
-    tabPlayground: "Spielplatz",
     searchLabel: "Suchen",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
@@ -165,7 +162,6 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projekty",
     tabMedia: "Media",
-    tabPlayground: "Plac zabaw",
     searchLabel: "Szukaj",
     filterTypeLabel: "Typ",
     typeAll: "Wszystko",
@@ -200,7 +196,6 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projeler",
     tabMedia: "Medya",
-    tabPlayground: "Oyun Alanı",
     searchLabel: "Ara",
     filterTypeLabel: "Tür",
     typeAll: "Hepsi",
@@ -235,7 +230,6 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Proyectos",
     tabMedia: "Media",
-    tabPlayground: "Playground",
     searchLabel: "Buscar",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
@@ -325,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearch();
   setupImageModal();
   setupFooterCopyright();
-  setupPlayground();
 
   loadProjects();
   loadMedia();
@@ -354,7 +347,7 @@ function setupLanguage() {
       const langCode = btn.dataset.lang;
       if (!SUPPORTED_LANGS.includes(langCode)) return;
       setLanguage(langCode);
-      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
+      localStorage.setItem(LANG_GATE_SEEN_GATE, "1");
       gate.hidden = true;
     });
   }
@@ -440,26 +433,13 @@ function updateLanguageGateActive() {
   });
 }
 
-/* ---------- Tabs helper ---------- */
-
-function setTabsMode(mode) {
-  const tabs = document.querySelector(".tabs");
-  if (!tabs) return;
-  tabs.classList.remove("tabs-projects", "tabs-media", "tabs-playground");
-  tabs.classList.add(`tabs-${mode}`);
-}
-
 /* ---------- Tabs & filters visibility ---------- */
 
 function setupTabsAndFilters() {
   const projectsTab = document.getElementById("projectsTab");
   const mediaTab = document.getElementById("mediaTab");
-  const playgroundTab = document.getElementById("playgroundTab");
-
   const projectsView = document.getElementById("projectsView");
   const mediaView = document.getElementById("mediaView");
-  const playgroundView = document.getElementById("playgroundView");
-
   const projectFilters = document.getElementById("projectFilters");
   const mediaFilters = document.getElementById("mediaFilters");
 
@@ -469,16 +449,14 @@ function setupTabsAndFilters() {
     state.activeTab = "projects";
     projectsTab.classList.add("active");
     mediaTab.classList.remove("active");
-    if (playgroundTab) playgroundTab.classList.remove("active");
-
     projectsView.style.display = "";
     mediaView.style.display = "none";
-    if (playgroundView) playgroundView.style.display = "none";
-
     if (projectFilters) projectFilters.hidden = false;
     if (mediaFilters) mediaFilters.hidden = true;
 
-    setTabsMode("projects");
+    const tabs = document.querySelector(".tabs");
+    if (tabs) tabs.classList.remove("tabs-media");
+
     renderProjects();
   }
 
@@ -486,40 +464,19 @@ function setupTabsAndFilters() {
     state.activeTab = "media";
     mediaTab.classList.add("active");
     projectsTab.classList.remove("active");
-    if (playgroundTab) playgroundTab.classList.remove("active");
-
     mediaView.style.display = "";
     projectsView.style.display = "none";
-    if (playgroundView) playgroundView.style.display = "none";
-
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = false;
 
-    setTabsMode("media");
+    const tabs = document.querySelector(".tabs");
+    if (tabs) tabs.classList.add("tabs-media");
+
     renderMedia();
-  }
-
-  function showPlayground() {
-    state.activeTab = "playground";
-    if (playgroundTab) playgroundTab.classList.add("active");
-    projectsTab.classList.remove("active");
-    mediaTab.classList.remove("active");
-
-    if (playgroundView) playgroundView.style.display = "";
-    projectsView.style.display = "none";
-    mediaView.style.display = "none";
-
-    if (projectFilters) projectFilters.hidden = true;
-    if (mediaFilters) mediaFilters.hidden = true;
-
-    setTabsMode("playground");
   }
 
   projectsTab.addEventListener("click", showProjects);
   mediaTab.addEventListener("click", showMedia);
-  if (playgroundTab) {
-    playgroundTab.addEventListener("click", showPlayground);
-  }
 
   // default
   showProjects();
@@ -568,10 +525,8 @@ function setupSearch() {
     state.search = searchEl.value.trim();
     if (state.activeTab === "projects") {
       renderProjects();
-    } else if (state.activeTab === "media") {
-      renderMedia();
     } else {
-      // playground: search not used (yet)
+      renderMedia();
     }
   });
 }
@@ -810,6 +765,7 @@ function isSecurityProject(repo, override, languages) {
   const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
   const securityWords = [
     "security",
+    "secure",
     "auth",
     "authentication",
     "authorization",
@@ -826,10 +782,16 @@ function isSecurityProject(repo, override, languages) {
     "crypto",
     "2fa",
     "mfa",
-    "pentest",
-    "penetration",
+    "devops",
+    "owasp",
+    "vuln",
     "vulnerability",
-    "devops"
+    "pentest",
+    "penetration test",
+    "internship",
+    "intern",
+    "stage",
+    "praktijk"
   ];
 
   const hasSecurityWord = securityWords.some((w) => text.includes(w));
@@ -846,19 +808,19 @@ function guessProjectType(repo, override) {
     return override.type;
   }
 
-  const nameRaw = repo.name || "";
-  const name = nameRaw.toLowerCase();
+  const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const joined = `${name} ${desc}`;
   const lang = (repo.language || "").toLowerCase();
 
   const has = (words) => words.some((w) => joined.includes(w));
 
-  // Explicit special cases
-  if (name.includes("videoshare")) {
-    return "api"; // Force VideoShare to API / Backend
+  // explicit overrides by name
+  if (name.includes("videoshare") || name.includes("video-share")) {
+    return "api"; // VideoShare is backend / API
   }
 
+  // Game hints
   if (
     name.includes("kolonisten") ||
     name.includes("katan") ||
@@ -922,8 +884,9 @@ function guessProjectType(repo, override) {
     "assignment",
     "project for school",
     "school project",
+    "stage",
     "internship",
-    "stage"
+    "praktijk"
   ]);
 
   const isWebsite =
@@ -947,9 +910,9 @@ function guessProjectType(repo, override) {
       "shop"
     ]);
 
+  // Priority: Game > Mobile > API > School > Website > Other
   if (isGame) return "game";
-  // mobile first so mobile apps that mention API don't get stuck as API
-  if (isMobile) return "mobile";
+  if (isMobile) return "mobile"; // Mobile wins over API now
   if (isApi) return "api";
   if (isSchool) return "school";
   if (isWebsite) return "website";
@@ -1450,7 +1413,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- volume slider is appended inside .media-preview ---- */
+/* ---- UPDATED: volume slider is appended inside .media-preview ---- */
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1569,18 +1532,6 @@ function renderMedia() {
 
     grid.appendChild(card);
   });
-}
-
-/* ---------- Playground ---------- */
-
-function setupPlayground() {
-  const randomBtn = document.getElementById("randomSiteButton");
-  if (randomBtn) {
-    randomBtn.addEventListener("click", () => {
-      // use theuselessweb.com’s randomizer
-      window.open("https://theuselessweb.com/", "_blank", "noopener,noreferrer");
-    });
-  }
 }
 
 /* ---------- Image modal ---------- */
