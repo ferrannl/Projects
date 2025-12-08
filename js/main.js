@@ -15,6 +15,100 @@ const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 // Thumbnail cache key (bumped to V2 so old logo.jpg entries are dropped)
 const THUMB_CACHE_KEY = "ferranProjectsThumbsV2";
 
+/* ---------- Random useless websites list ---------- */
+
+const USELESS_WEB_URLS = [
+  "http://heeeeeeeey.com/",
+  "http://thatsthefinger.com/",
+  "http://cant-not-tweet-this.com/",
+  "http://eelslap.com/",
+  "http://www.staggeringbeauty.com/",
+  "http://burymewithmymoney.com/",
+  "http://www.fallingfalling.com/",
+  "http://ducksarethebest.com/",
+  "http://www.trypap.com/",
+  "http://www.republiquedesmangues.fr/",
+  "http://www.movenowthinklater.com/",
+  "http://www.partridgegetslucky.com/",
+  "http://www.rrrgggbbb.com/",
+  "http://beesbeesbees.com/",
+  "http://www.sanger.dk/",
+  "http://www.koalastothemax.com/",
+  "http://www.everydayim.com/",
+  "http://www.leduchamp.com/",
+  "http://grandpanoclothes.com/",
+  "http://www.haneke.net/",
+  "http://instantostrich.com/",
+  "http://r33b.net/",
+  "http://randomcolour.com/",
+  "http://cat-bounce.com/",
+  "http://cachemonet.com/",
+  "http://www.sadforjapan.com/",
+  "http://www.taghua.com/",
+  "http://chrismckenzie.com/",
+  "http://hasthelargehadroncolliderdestroyedtheworldyet.com/",
+  "http://ninjaflex.com/",
+  "http://iloveyoulikeafatladylovesapples.com/",
+  "http://ihasabucket.com/",
+  "http://corndogoncorndog.com/",
+  "http://giantbatfarts.com/",
+  "http://www.ringingtelephone.com/",
+  "http://www.pointerpointer.com/",
+  "http://www.pleasedonate.biz/",
+  "http://imaninja.com/",
+  "http://willthefuturebeaweso.me/",
+  "http://salmonofcapistrano.com/",
+  "http://www.ismycomputeron.com/",
+  "http://www.ooooiiii.com/",
+  "http://www.wwwdotcom.com/",
+  "http://www.nullingthevoid.com/",
+  "http://www.muchbetterthanthis.com/",
+  "http://www.ouaismaisbon.ch/",
+  "http://iamawesome.com/",
+  "http://www.pleaselike.com/",
+  "http://crouton.net/",
+  "http://corgiorgy.com/",
+  "http://www.electricboogiewoogie.com/",
+  "http://www.nelson-haha.com/",
+  "http://www.wutdafuk.com/",
+  "http://unicodesnowmanforyou.com/",
+  "http://tencents.info/",
+  "http://intotime.com/",
+  "http://leekspin.com/",
+  "http://minecraftstal.com/",
+  "http://www.riddlydiddly.com/",
+  "http://www.patience-is-a-virtue.org/",
+  "http://whitetrash.nl/",
+  "http://www.theendofreason.com/",
+  "http://zombo.com",
+  "http://secretsfornicotine.com/",
+  "http://pixelsfighting.com/",
+  "http://crapo.la/",
+  "http://baconsizzling.com/",
+  "http://isitwhite.com/",
+  "http://noot.space/",
+  "http://tomsdog.com/",
+  "http://goat.com/",
+  "https://www.dialupsound.com/",
+  "http://computerpowertest.com/",
+  "http://www.eeyup.com/",
+  "http://www.nevernowhere.com/",
+  "http://make-everything-ok.com/",
+  "http://thenicestplaceontheinter.net/",
+  "http://www.nyan.cat/",
+  "http://zombo.com/",
+  "http://gprime.net/game.php/dodgethedot",
+  "http://blank.org/",
+  "http://www.thedancinglion.com/",
+  "http://touchpianist.com/",
+  "http://www.whatsmystarbucksname.com/",
+  "http://time.tetrasign.com/emojiclock/",
+  "http://2015.tetrasign.com/",
+  "http://www.youcanseethemilkyway.com/",
+  "http://kolor.moro.es/",
+  "http://foaas.com/"
+];
+
 /* ---------- State ---------- */
 
 let repos = [];
@@ -355,7 +449,6 @@ function setupLanguage() {
       if (!SUPPORTED_LANGS.includes(langCode)) return;
       setLanguage(langCode);
 
-      // FIXED: use correct key so no ReferenceError & gate can hide
       localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
       gate.hidden = true;
     });
@@ -577,7 +670,6 @@ function setupSearch() {
     } else if (state.activeTab === "media") {
       renderMedia();
     }
-    // when activeTab === "playground", search does nothing visible (which is fine)
   });
 }
 
@@ -666,7 +758,6 @@ async function loadProjectOverrides() {
 
 async function loadGitHubReposWithCache() {
   try {
-    // Always try live GitHub first
     const res = await fetch(API_URL);
     if (!res.ok) {
       throw new Error("GitHub HTTP " + res.status);
@@ -962,7 +1053,7 @@ function guessProjectType(repo, override) {
 
   // Priority: Game > Mobile > API > School > Website > Other
   if (isGame) return "game";
-  if (isMobile) return "mobile"; // Mobile wins over API now
+  if (isMobile) return "mobile";
   if (isApi) return "api";
   if (isSchool) return "school";
   if (isWebsite) return "website";
@@ -1293,14 +1384,12 @@ async function loadMedia() {
     const items = Array.isArray(data) ? data : data.items || [];
 
     mediaItems = items.map((item, index) => {
-      // Accept path, url or src
       let path =
         item.path ||
         item.url ||
         item.src ||
         "";
 
-      // If no path is present, try to reconstruct from fileName + type
       if (!path) {
         const fileName =
           item.fileName ||
@@ -1447,7 +1536,6 @@ function createVolumeRow(mediaEl) {
   valueLabel.className = "media-volume-value";
   valueLabel.textContent = "100%";
 
-  // ensure default volume is max
   mediaEl.volume = 1;
 
   slider.addEventListener("input", () => {
@@ -1463,7 +1551,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- volume slider is appended inside .media-preview ---- */
+/* ---- media rendering (with "only one video playing" logic) ---- */
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1508,12 +1596,18 @@ function renderMedia() {
       video.playsInline = true;
       video.preload = "metadata";
 
+      // 🔇 pause other videos when this one starts playing
+      video.addEventListener("play", () => {
+        document.querySelectorAll("video").forEach((v) => {
+          if (v !== video) v.pause();
+        });
+      });
+
       const wrapper = document.createElement("div");
       wrapper.className = "media-player-wrapper";
       wrapper.appendChild(video);
       preview.appendChild(wrapper);
 
-      // big custom volume slider for this video – inside preview box
       const volumeRow = createVolumeRow(video);
       preview.appendChild(volumeRow);
     } else if (item.type === "audio") {
@@ -1527,7 +1621,6 @@ function renderMedia() {
       wrapper.appendChild(audio);
       preview.appendChild(wrapper);
 
-      // big custom volume slider for this audio – inside preview box
       const volumeRow = createVolumeRow(audio);
       preview.appendChild(volumeRow);
     }
@@ -1680,7 +1773,9 @@ function setupPlaygroundRandomButton() {
   if (!btn) return;
 
   btn.addEventListener("click", () => {
-    // Just launch the site in a new tab – no “powered by” text anywhere
-    window.open("https://theuselessweb.com/", "_blank", "noopener,noreferrer");
+    if (!USELESS_WEB_URLS.length) return;
+    const idx = Math.floor(Math.random() * USELESS_WEB_URLS.length);
+    const url = USELESS_WEB_URLS[idx];
+    window.open(url, "_blank", "noopener,noreferrer");
   });
 }
