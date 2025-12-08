@@ -60,6 +60,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projecten",
     tabMedia: "Media",
+    tabPlayground: "Speeltuin",
     searchLabel: "Zoeken",
     filterTypeLabel: "Type",
     typeAll: "Alles",
@@ -94,6 +95,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projects",
     tabMedia: "Media",
+    tabPlayground: "Playground",
     searchLabel: "Search",
     filterTypeLabel: "Type",
     typeAll: "All",
@@ -127,6 +129,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projekte",
     tabMedia: "Medien",
+    tabPlayground: "Spielplatz",
     searchLabel: "Suchen",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
@@ -162,6 +165,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projekty",
     tabMedia: "Media",
+    tabPlayground: "Plac zabaw",
     searchLabel: "Szukaj",
     filterTypeLabel: "Typ",
     typeAll: "Wszystko",
@@ -196,6 +200,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Projeler",
     tabMedia: "Medya",
+    tabPlayground: "Oyun Alanı",
     searchLabel: "Ara",
     filterTypeLabel: "Tür",
     typeAll: "Hepsi",
@@ -230,6 +235,7 @@ const I18N = {
     aboutP2: "",
     tabProjects: "Proyectos",
     tabMedia: "Media",
+    tabPlayground: "Playground",
     searchLabel: "Buscar",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
@@ -319,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearch();
   setupImageModal();
   setupFooterCopyright();
+  setupPlayground();
 
   loadProjects();
   loadMedia();
@@ -433,13 +440,26 @@ function updateLanguageGateActive() {
   });
 }
 
+/* ---------- Tabs helper ---------- */
+
+function setTabsMode(mode) {
+  const tabs = document.querySelector(".tabs");
+  if (!tabs) return;
+  tabs.classList.remove("tabs-projects", "tabs-media", "tabs-playground");
+  tabs.classList.add(`tabs-${mode}`);
+}
+
 /* ---------- Tabs & filters visibility ---------- */
 
 function setupTabsAndFilters() {
   const projectsTab = document.getElementById("projectsTab");
   const mediaTab = document.getElementById("mediaTab");
+  const playgroundTab = document.getElementById("playgroundTab");
+
   const projectsView = document.getElementById("projectsView");
   const mediaView = document.getElementById("mediaView");
+  const playgroundView = document.getElementById("playgroundView");
+
   const projectFilters = document.getElementById("projectFilters");
   const mediaFilters = document.getElementById("mediaFilters");
 
@@ -449,14 +469,16 @@ function setupTabsAndFilters() {
     state.activeTab = "projects";
     projectsTab.classList.add("active");
     mediaTab.classList.remove("active");
+    if (playgroundTab) playgroundTab.classList.remove("active");
+
     projectsView.style.display = "";
     mediaView.style.display = "none";
+    if (playgroundView) playgroundView.style.display = "none";
+
     if (projectFilters) projectFilters.hidden = false;
     if (mediaFilters) mediaFilters.hidden = true;
 
-    const tabs = document.querySelector(".tabs");
-    if (tabs) tabs.classList.remove("tabs-media");
-
+    setTabsMode("projects");
     renderProjects();
   }
 
@@ -464,19 +486,40 @@ function setupTabsAndFilters() {
     state.activeTab = "media";
     mediaTab.classList.add("active");
     projectsTab.classList.remove("active");
+    if (playgroundTab) playgroundTab.classList.remove("active");
+
     mediaView.style.display = "";
     projectsView.style.display = "none";
+    if (playgroundView) playgroundView.style.display = "none";
+
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = false;
 
-    const tabs = document.querySelector(".tabs");
-    if (tabs) tabs.classList.add("tabs-media");
-
+    setTabsMode("media");
     renderMedia();
+  }
+
+  function showPlayground() {
+    state.activeTab = "playground";
+    if (playgroundTab) playgroundTab.classList.add("active");
+    projectsTab.classList.remove("active");
+    mediaTab.classList.remove("active");
+
+    if (playgroundView) playgroundView.style.display = "";
+    projectsView.style.display = "none";
+    mediaView.style.display = "none";
+
+    if (projectFilters) projectFilters.hidden = true;
+    if (mediaFilters) mediaFilters.hidden = true;
+
+    setTabsMode("playground");
   }
 
   projectsTab.addEventListener("click", showProjects);
   mediaTab.addEventListener("click", showMedia);
+  if (playgroundTab) {
+    playgroundTab.addEventListener("click", showPlayground);
+  }
 
   // default
   showProjects();
@@ -525,8 +568,10 @@ function setupSearch() {
     state.search = searchEl.value.trim();
     if (state.activeTab === "projects") {
       renderProjects();
-    } else {
+    } else if (state.activeTab === "media") {
       renderMedia();
+    } else {
+      // playground: search not used (yet)
     }
   });
 }
@@ -780,20 +825,20 @@ function isSecurityProject(repo, override, languages) {
     "crypt",
     "crypto",
     "2fa",
-    "mfa"
+    "mfa",
+    "pentest",
+    "penetration",
+    "vulnerability",
+    "devops"
   ];
 
   const hasSecurityWord = securityWords.some((w) => text.includes(w));
-
-  // extra: internship-style security projects in .NET
-  const internshipWords = ["internship", "stage", "werkplek", "afstudeer", "trainee"];
-  const hasInternshipWord = internshipWords.some((w) => text.includes(w));
 
   const hasDotNet =
     (languages || []).some((l) => l.toLowerCase().includes(".net")) ||
     (repo.language || "").toLowerCase() === "c#";
 
-  return hasDotNet && (hasSecurityWord || hasInternshipWord);
+  return hasDotNet && hasSecurityWord;
 }
 
 function guessProjectType(repo, override) {
@@ -801,20 +846,18 @@ function guessProjectType(repo, override) {
     return override.type;
   }
 
-  const name = (repo.name || "").toLowerCase();
+  const nameRaw = repo.name || "";
+  const name = nameRaw.toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const joined = `${name} ${desc}`;
   const lang = (repo.language || "").toLowerCase();
 
-  // explicit overrides inside JS
-  const forcedTypes = {
-    videoshare: "api" // VideoShare is backend/API even if heuristics say website
-  };
-  if (forcedTypes[name]) {
-    return forcedTypes[name];
-  }
-
   const has = (words) => words.some((w) => joined.includes(w));
+
+  // Explicit special cases
+  if (name.includes("videoshare")) {
+    return "api"; // Force VideoShare to API / Backend
+  }
 
   if (
     name.includes("kolonisten") ||
@@ -878,7 +921,9 @@ function guessProjectType(repo, override) {
     "opdracht",
     "assignment",
     "project for school",
-    "school project"
+    "school project",
+    "internship",
+    "stage"
   ]);
 
   const isWebsite =
@@ -903,7 +948,7 @@ function guessProjectType(repo, override) {
     ]);
 
   if (isGame) return "game";
-  // prefer Mobile over API when both apply (fixes mobile apps misclassified as API)
+  // mobile first so mobile apps that mention API don't get stuck as API
   if (isMobile) return "mobile";
   if (isApi) return "api";
   if (isSchool) return "school";
@@ -1405,7 +1450,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- UPDATED: volume slider is appended inside .media-preview ---- */
+/* ---- volume slider is appended inside .media-preview ---- */
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1422,7 +1467,7 @@ function renderMedia() {
 
   filtered.forEach((item) => {
     const card = document.createElement("article");
-    card.className = `media-card media-card-${item.type}`;
+    card.className = "media-card";
 
     const title = document.createElement("h3");
     title.className = "media-title";
@@ -1524,6 +1569,18 @@ function renderMedia() {
 
     grid.appendChild(card);
   });
+}
+
+/* ---------- Playground ---------- */
+
+function setupPlayground() {
+  const randomBtn = document.getElementById("randomSiteButton");
+  if (randomBtn) {
+    randomBtn.addEventListener("click", () => {
+      // use theuselessweb.com’s randomizer
+      window.open("https://theuselessweb.com/", "_blank", "noopener,noreferrer");
+    });
+  }
 }
 
 /* ---------- Image modal ---------- */
