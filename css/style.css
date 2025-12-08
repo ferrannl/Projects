@@ -348,6 +348,20 @@ body {
   border-color: rgba(255, 69, 0, 0.9);
 }
 
+/* --- Fix Tumblr OLD chip ("Kadaver") so it matches all others --- */
+.social-chip.social-tumblr-old {
+  border-color: #b0172f;        /* your accent red */
+  background: rgba(176, 23, 47, 0.15); /* soft red tint like others */
+  color: var(--text);           /* normal text color */
+}
+
+/* Make the label itself red (edgy, matches border) */
+.social-chip.social-tumblr-old .social-label {
+  color: #b0172f;
+  font-weight: 600;
+}
+
+
 
 /* ---------- About section ---------- */
 
