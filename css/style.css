@@ -1099,30 +1099,32 @@ body {
 }
 
 /* Paint card: full big embed */
-/* Playground wrapper: square, nice card, black bg */
+
+/* Wrapper: stays a normal rounded card, no forced square */
 .playground-embed {
   position: relative;
   width: 100%;
-  max-width: 960px;            /* or whatever fits your layout */
+  max-width: 960px;
   margin: 1.5rem auto 0;
-  aspect-ratio: 1 / 1;         /* 🔲 this makes it square */
-  background: #02040f;         /* dark background */
+  background: #02040f;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
   border: 1px solid var(--border-subtle);
 }
 
-
+/* Base iframe styling inside playground */
 .playground-embed iframe {
-  position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
   border: none;
   display: block;
 }
 
+/* ⭐ ONLY MS Paint (paint.js.org) iframe is forced to be square */
+.playground-embed iframe[src*="paint.js.org"] {
+  aspect-ratio: 1 / 1;
+  height: auto;
+}
 
 /* Random card centered content */
 .playground-card.playground-random {
