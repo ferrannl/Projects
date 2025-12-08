@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-08T10:56:53.605800Z",
+  "generatedAt": "2025-12-08T10:58:03.121427Z",
   "items": [
     {
       "src": "media/images/Lost Woods - Ocarina tabs.png",
@@ -20,11 +20,6 @@
       "src": "media/videos/Just Brabant Things.mp4",
       "type": "video",
       "title": "Just Brabant Things"
-    },
-    {
-      "src": "media/audio/MANA.mp3",
-      "type": "audio",
-      "title": "MANA"
     }
   ]
 }
