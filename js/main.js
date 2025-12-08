@@ -152,6 +152,12 @@ const I18N = {
     aboutP1:
       "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
+    playgroundRandomTitle: "Random website-knop",
+    playgroundRandomText:
+      "Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
+    randomButtonLabel: "Neem me mee naar een willekeurige website",
     tabProjects: "Projecten",
     tabMedia: "Media",
     tabPlayground: "Playground",
@@ -187,6 +193,12 @@ const I18N = {
     aboutP1:
       "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
+    playgroundPaintTitle: "MS Paint Playground",
+    playgroundPaintText: "MS Paint remake, have fun drawing!",
+    playgroundRandomTitle: "Random Website Button",
+    playgroundRandomText:
+      "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
+    randomButtonLabel: "Take me to a random website",
     tabProjects: "Projects",
     tabMedia: "Media",
     tabPlayground: "Playground",
@@ -221,6 +233,12 @@ const I18N = {
     aboutP1:
       "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
     aboutP2: "",
+    playgroundPaintTitle: "MS-Paint-Playground",
+    playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
+    playgroundRandomTitle: "Zufällige-Website-Button",
+    playgroundRandomText:
+      "Neugierig oder gelangweilt? Klick auf den Button und es öffnet sich eine zufällige, verrückte Website in einem neuen Tab.",
+    randomButtonLabel: "Bring mich zu einer zufälligen Website",
     tabProjects: "Projekte",
     tabMedia: "Medien",
     tabPlayground: "Playground",
@@ -257,6 +275,12 @@ const I18N = {
     aboutP1:
       "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
     aboutP2: "",
+    playgroundPaintTitle: "Plac zabaw MS Paint",
+    playgroundPaintText: "Remake MS Paint, miłej zabawy przy rysowaniu!",
+    playgroundRandomTitle: "Przycisk losowej strony",
+    playgroundRandomText:
+      "Nudzisz się lub jesteś ciekawy? Kliknij przycisk, a otworzy się losowa, dziwna strona w nowej karcie.",
+    randomButtonLabel: "Zabierz mnie na losową stronę",
     tabProjects: "Projekty",
     tabMedia: "Media",
     tabPlayground: "Playground",
@@ -292,6 +316,12 @@ const I18N = {
     aboutP1:
       "Selam 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir developer’ım. Kendime ve başkalarına yardımcı olmak için web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
     aboutP2: "",
+    playgroundPaintTitle: "MS Paint Oyun Alanı",
+    playgroundPaintText: "MS Paint yeniden yapımı, keyifle çiz!",
+    playgroundRandomTitle: "Rastgele Site Butonu",
+    playgroundRandomText:
+      "Meraklı veya sıkılmış mısın? Butona tıkla, yeni sekmede rastgele garip bir site açılsın.",
+    randomButtonLabel: "Beni rastgele bir siteye götür",
     tabProjects: "Projeler",
     tabMedia: "Medya",
     tabPlayground: "Playground",
@@ -327,6 +357,13 @@ const I18N = {
     aboutP1:
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
     aboutP2: "",
+    playgroundPaintTitle: "Playground de MS Paint",
+    playgroundPaintText:
+      "Remake de MS Paint, ¡diviértete dibujando!",
+    playgroundRandomTitle: "Botón de web aleatoria",
+    playgroundRandomText:
+      "¿Curioso o aburrido? Pulsa el botón y se abrirá una web rara al azar en una nueva pestaña.",
+    randomButtonLabel: "Llévame a una web aleatoria",
     tabProjects: "Proyectos",
     tabMedia: "Media",
     tabPlayground: "Playground",
@@ -601,8 +638,10 @@ function setupTabsAndFilters() {
   )
     return;
 
+  const tabsContainer = document.querySelector(".tabs");
+
   function updateTabsVisual(mode) {
-    const tabs = document.querySelector(".tabs");
+    const tabs = tabsContainer;
     if (!tabs) return;
     tabs.classList.remove("tabs-media", "tabs-playground");
     if (mode === "media") {
@@ -610,6 +649,17 @@ function setupTabsAndFilters() {
     } else if (mode === "playground") {
       tabs.classList.add("tabs-playground");
     }
+  }
+
+  // NEW: bind gradient pill to the active tab's exact position/width
+  function updateTabsPill(activeButton) {
+    if (!tabsContainer || !activeButton) return;
+    const tabsRect = tabsContainer.getBoundingClientRect();
+    const btnRect = activeButton.getBoundingClientRect();
+    const left = btnRect.left - tabsRect.left;
+    const width = btnRect.width;
+    tabsContainer.style.setProperty("--pill-left", `${left}px`);
+    tabsContainer.style.setProperty("--pill-width", `${width}px`);
   }
 
   function showProjects() {
@@ -629,6 +679,7 @@ function setupTabsAndFilters() {
     updateTabsVisual("projects");
     updateSearchPlaceholder();
     renderProjects();
+    updateTabsPill(projectsTab);
   }
 
   function showMedia() {
@@ -648,6 +699,7 @@ function setupTabsAndFilters() {
     updateTabsVisual("media");
     updateSearchPlaceholder();
     renderMedia();
+    updateTabsPill(mediaTab);
   }
 
   function showPlayground() {
@@ -666,6 +718,7 @@ function setupTabsAndFilters() {
 
     updateTabsVisual("playground");
     updateSearchPlaceholder();
+    updateTabsPill(playgroundTab);
   }
 
   projectsTab.addEventListener("click", showProjects);
@@ -674,6 +727,17 @@ function setupTabsAndFilters() {
 
   // default view
   showProjects();
+
+  // keep pill aligned on resize
+  window.addEventListener("resize", () => {
+    const active =
+      state.activeTab === "media"
+        ? mediaTab
+        : state.activeTab === "playground"
+        ? playgroundTab
+        : projectsTab;
+    updateTabsPill(active);
+  });
 
   const typeFilter = document.getElementById("typeFilter");
   const languageFilter = document.getElementById("languageFilter");
