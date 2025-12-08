@@ -1,12 +1,9 @@
-// scripts/script.js
-
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
 const API_URL = `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100&sort=updated`;
 const PROJECTS_URL = "./projects/projects.json";
 const MEDIA_INDEX_URL = "./media/media.json";
-
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const RATE_LIMIT_KEY = "ferranProjectsRateLimitV2";
@@ -393,7 +390,6 @@ function setLanguage(lang) {
     searchLabelEl.textContent = dict.searchLabel;
   }
 
-  // (Optional) translate search placeholder a bit
   const searchInput = document.getElementById("search");
   if (searchInput) {
     if (lang === "nl") {
@@ -418,7 +414,7 @@ function setLanguage(lang) {
   }
 
   updateLanguageGateActive();
-  renderProjects(); // refresh type badge labels etc.
+  renderProjects();
 }
 
 function updateLanguageGateActive() {
@@ -478,10 +474,8 @@ function setupTabsAndFilters() {
   projectsTab.addEventListener("click", showProjects);
   mediaTab.addEventListener("click", showMedia);
 
-  // Default: projects
   showProjects();
 
-  // Filter listeners
   const typeFilter = document.getElementById("typeFilter");
   const languageFilter = document.getElementById("languageFilter");
   const mediaTypeFilter = document.getElementById("mediaTypeFilter");
@@ -545,7 +539,6 @@ async function loadProjects() {
     }
   });
 
-  // Hidden repos: Projects (self), Munchkin, PSO WiiU guide
   repos = apiRepos.filter((repo) => {
     if (repo.archived || repo.fork) return false;
     const name = (repo.name || "").toLowerCase();
@@ -571,13 +564,11 @@ async function loadProjects() {
 
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
 
-    // Auto-tag security-related C#/.NET multi-project as "Security"
     if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) {
       tags.push("Security");
     }
 
     const liveUrl = computeLiveUrl(repo, o);
-
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -598,11 +589,7 @@ async function loadProjects() {
   sortProjectsByLive();
   buildLanguageFilterOptions(projects);
   renderProjects();
-
-  // verify that live URLs really work (no 404 / Laravel-only repos)
   verifyLiveSites();
-
-  // load proper thumbnails from repo root images
   loadProjectThumbnails();
 }
 
@@ -621,7 +608,6 @@ async function loadProjectOverrides() {
 async function loadGitHubReposWithCache() {
   const now = Date.now();
 
-  // respect rate limit backoff
   try {
     const rateRaw = localStorage.getItem(RATE_LIMIT_KEY);
     if (rateRaw) {
@@ -634,15 +620,12 @@ async function loadGitHubReposWithCache() {
     }
   } catch (_) {}
 
-  // try cache first
   const cached = readReposFromCache();
   if (cached) {
-    // also try to refresh, but even if it fails we still have cached
     refreshReposInBackground();
     return cached;
   }
 
-  // no cache? fetch now
   return fetchReposFromGitHub();
 }
 
@@ -728,7 +711,6 @@ function formatRepoName(raw) {
 }
 
 function getLanguagesList(primary, overrideList) {
-  // If you explicitly set languages in projects.json, always trust that
   if (Array.isArray(overrideList) && overrideList.length) {
     return overrideList;
   }
@@ -751,15 +733,12 @@ function getLanguagesList(primary, overrideList) {
   } else if (p === "php") {
     list.push("PHP", "HTML", "CSS", "JS");
   } else if (p === "css") {
-    // Pure CSS project – usually still has HTML + JS around it
     list.push("CSS", "HTML", "JS");
   } else if (p === "less") {
-    // Your case: site written in Less plus other front-end bits
     list.push("Less", "HTML", "CSS", "JS", "SCSS");
   } else if (p === "scss" || p === "sass") {
     list.push("SCSS", "CSS", "HTML", "JS");
   } else {
-    // Fallback: just show whatever GitHub says
     list.push(primary);
   }
 
@@ -770,7 +749,6 @@ function buildLanguageFilterOptions(projects) {
   const select = document.getElementById("languageFilter");
   if (!select) return;
 
-  // keep first option, remove the rest
   while (select.options.length > 1) {
     select.remove(1);
   }
@@ -795,7 +773,6 @@ function buildLanguageFilterOptions(projects) {
 /* ---------- Project helpers: type, security tag, liveUrl, thumbnail ---------- */
 
 function isSecurityProject(repo, override, languages) {
-  // If you explicitly tagged it in projects.json, respect that
   if (override && Array.isArray(override.tags) && override.tags.includes("Security")) {
     return true;
   }
@@ -842,9 +819,6 @@ function guessProjectType(repo, override) {
 
   const has = (words) => words.some((w) => joined.includes(w));
 
-  // Manual boosts for your specific repos without touching projects.json:
-  // - Java Kolonisten van Katan game
-  // - Dimitri C/C++ game
   if (
     name.includes("kolonisten") ||
     name.includes("katan") ||
@@ -856,7 +830,6 @@ function guessProjectType(repo, override) {
     return "game";
   }
 
-  // GAME: explicit game-ish hints first
   const isGame = has([
     "game",
     "games",
@@ -869,7 +842,6 @@ function guessProjectType(repo, override) {
     "jigsaw"
   ]);
 
-  // API / Backend
   const isApi = has([
     "api",
     "backend",
@@ -879,7 +851,6 @@ function guessProjectType(repo, override) {
     "endpoint"
   ]);
 
-  // Mobile: only treat as mobile if it REALLY looks mobile – not just "app"
   const isMobile =
     has([
       "android",
@@ -899,7 +870,6 @@ function guessProjectType(repo, override) {
     ) &&
       has(["android", "ios", "mobile"]));
 
-  // School / study
   const isSchool = has([
     "school",
     "study",
@@ -913,7 +883,6 @@ function guessProjectType(repo, override) {
     "school project"
   ]);
 
-  // Website: PHP/Laravel/WordPress/etc are strongly considered "website"
   const isWebsite =
     lang === "html" ||
     lang === "php" ||
@@ -958,7 +927,6 @@ function computeLiveUrl(repo, override) {
   return null;
 }
 
-// Only immediate overrides; “smart” detection happens in loadProjectThumbnails
 function computeThumbnail(repo, override) {
   if (override.thumbnail || override.thumb) {
     return override.thumbnail || override.thumb;
@@ -966,7 +934,6 @@ function computeThumbnail(repo, override) {
   return null;
 }
 
-/* sort with live sites (after verification) first, then by name */
 function sortProjectsByLive() {
   projects.sort((a, b) => {
     if (a.liveUrl && !b.liveUrl) return -1;
@@ -975,7 +942,6 @@ function sortProjectsByLive() {
   });
 }
 
-/* verify that liveUrl really works – drop it if 404 / network error */
 async function verifyLiveSites() {
   const checks = projects.map(async (project) => {
     if (!project.liveUrl) return;
@@ -1019,11 +985,9 @@ function saveThumbCache() {
 
 async function checkImageExists(url) {
   try {
-    // Try HEAD first
     let res = await fetch(url, { method: "HEAD" });
     if (res.ok) return true;
 
-    // Fallback to GET if HEAD not allowed
     res = await fetch(url, { method: "GET" });
     return res.ok;
   } catch (_) {
@@ -1035,31 +999,26 @@ async function loadProjectThumbnails() {
   const promises = projects.map(async (project) => {
     const repoName = project.name;
 
-    // 1) If a thumbnail is already defined (e.g. from projects.json), verify once.
     if (project.thumbnail && !thumbCache[repoName]) {
       const ok = await checkImageExists(project.thumbnail);
       if (ok) {
         thumbCache[repoName] = project.thumbnail;
         return;
       } else {
-        // override points to non-existent file (e.g. logo.jpg); fall back to auto detection
         project.thumbnail = null;
       }
     }
 
-    // 2) Use cached thumbnail if present
     const cached = thumbCache[repoName];
     if (cached) {
       project.thumbnail = cached;
       return;
     }
 
-    // 3) Try to find a good image in the repo root
     const rootThumb = await findRepoRootThumbnail(repoName);
 
     let finalUrl = rootThumb;
     if (!finalUrl) {
-      // 4) Fallback to GitHub social preview image
       finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
     }
 
@@ -1094,7 +1053,6 @@ async function findRepoRootThumbnail(repoName) {
 
     const score = (name) => {
       const lower = name.toLowerCase();
-      // Prefer logo.png over logo.jpg if both exist
       if (lower === "logo.png") return 0;
       if (lower === "logo.jpg" || lower === "logo.jpeg") return 1;
       if (lower.startsWith("logo.")) return 2;
@@ -1172,7 +1130,6 @@ function renderProjects() {
     const titleRow = document.createElement("div");
     titleRow.className = "project-title-row";
 
-    // Thumbnail: now a simple div, not clickable
     const thumb = document.createElement("div");
     thumb.className = "project-thumb";
 
@@ -1236,7 +1193,6 @@ function renderProjects() {
     const actions = document.createElement("div");
     actions.className = "project-actions";
 
-    // GitHub button – always
     const githubBtn = document.createElement("a");
     githubBtn.href = project.githubUrl;
     githubBtn.target = "_blank";
@@ -1245,7 +1201,6 @@ function renderProjects() {
     githubBtn.innerHTML = `<span>GitHub</span>`;
     actions.appendChild(githubBtn);
 
-    // Live site – only if url present AND verified
     if (project.liveUrl) {
       const liveBtn = document.createElement("a");
       liveBtn.href = project.liveUrl;
@@ -1280,52 +1235,58 @@ async function loadMedia() {
     const data = await res.json();
     const items = Array.isArray(data) ? data : data.items || [];
 
-mediaItems = items.map((item, index) => {
-  // 1) Try direct path/url
-  let path = item.path || item.url || "";
+    mediaItems = items.map((item, index) => {
+      // 👇 FIX: also accept `src` from the generator
+      let path =
+        item.path ||
+        item.url ||
+        item.src ||
+        "";
 
-  // 2) If there is no path, try to reconstruct from name/fileName + type
-  if (!path) {
-    const fileName = item.fileName || item.name || "";
-    if (fileName) {
-      if (item.type === "image") {
-        path = `media/images/${fileName}`;
-      } else if (item.type === "video") {
-        path = `media/videos/${fileName}`;
-      } else if (item.type === "audio") {
-        path = `media/audio/${fileName}`;
-      } else {
-        // default bucket if type is unknown
-        path = `media/${fileName}`;
+      if (!path) {
+        const fileName =
+          item.fileName ||
+          item.name ||
+          item.title ||
+          "";
+        if (fileName) {
+          const lowerType = (item.type || "").toLowerCase();
+          if (lowerType === "image") {
+            path = `media/images/${fileName}`;
+          } else if (lowerType === "video") {
+            path = `media/videos/${fileName}`;
+          } else if (lowerType === "audio") {
+            path = `media/audio/${fileName}`;
+          } else {
+            path = `media/${fileName}`;
+          }
+        }
       }
-    }
-  }
 
-  const title =
-    item.title ||
-    item.name ||
-    item.fileName ||
-    (path ? path.split("/").pop() : "") ||
-    `Media ${index + 1}`;
+      const title =
+        item.title ||
+        item.name ||
+        item.fileName ||
+        (path ? path.split("/").pop() : "") ||
+        `Media ${index + 1}`;
 
-  const format =
-    (item.format ||
-      (path.split(".").pop() || "").toLowerCase()) || "";
+      const format =
+        (item.format ||
+          (path.split(".").pop() || "").toLowerCase()) || "";
 
-  let type = item.type;
-  if (!type) {
-    type = guessMediaType(path);
-  }
+      let type = item.type;
+      if (!type) {
+        type = guessMediaType(path);
+      }
 
-  return {
-    id: index,
-    title,
-    path,
-    type,
-    format
-  };
-});
-
+      return {
+        id: index,
+        title,
+        path,
+        type,
+        format
+      };
+    });
 
     buildMediaFilterOptions(mediaItems);
     renderMedia();
@@ -1355,7 +1316,6 @@ function buildMediaFilterOptions(items) {
   const formatSelect = document.getElementById("mediaFormatFilter");
   if (!typeSelect || !formatSelect) return;
 
-  // type
   while (typeSelect.options.length > 1) typeSelect.remove(1);
   const typeSet = new Set();
   items.forEach((i) => typeSet.add(i.type));
@@ -1368,7 +1328,6 @@ function buildMediaFilterOptions(items) {
       typeSelect.appendChild(opt);
     });
 
-  // format
   while (formatSelect.options.length > 1) formatSelect.remove(1);
   const formatSet = new Set();
   items.forEach((i) => {
@@ -1506,14 +1465,13 @@ function renderMedia() {
   });
 }
 
-/* ---------- Image modal (projects + media) ---------- */
+/* ---------- Image modal ---------- */
 
 function setupImageModal() {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
 
   modal.addEventListener("click", (event) => {
-    // click outside inner box closes
     if (event.target === modal) {
       closeImageModal();
     }
@@ -1593,6 +1551,5 @@ function setupFooterCopyright() {
   const el = document.getElementById("footerCopyright");
   if (!el) return;
   const year = new Date().getFullYear();
-  // only year, © is in HTML
   el.textContent = `${year}`;
 }
