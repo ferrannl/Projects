@@ -1,10 +1,20 @@
 {
-  "generatedAt": "2025-12-08T10:28:55.782497Z",
+  "generatedAt": "2025-12-08T10:30:15.743749Z",
   "items": [
+    {
+      "src": "media/images/Lost Woods - Ocarina tabs.png",
+      "type": "image",
+      "title": "Lost Woods   Ocarina tabs"
+    },
     {
       "src": "media/images/Lost woods tab.png",
       "type": "image",
       "title": "Lost woods tab"
+    },
+    {
+      "src": "media/images/Zelda's Lullaby - Ocarina tabs.jpg",
+      "type": "image",
+      "title": "Zelda's Lullaby   Ocarina tabs"
     },
     {
       "src": "media/images/Zeldas lullaby tab.jpg",
