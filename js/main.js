@@ -18,84 +18,84 @@ const THUMB_CACHE_KEY = "ferranProjectsThumbsV2";
 /* ---------- Random useless websites list ---------- */
 
 const USELESS_WEB_URLS = [
- "https://pointerpointer.com/",
- "https://checkboxrace.com/",
- "https://hackertyper.com/",
- "https://papertoilet.com/",
- "https://cat-bounce.com/",
- "https://puginarug.com/",
- "https://longdogechallenge.com/",
- "https://endless.horse/",
- "https://strobe.cool/",
- "https://mondrianandme.com/",
- "https://omfgdogs.com/",
- "https://thezen.zone/",
- "https://theuselessweb.site/",
- "https://ismypcstillon.com/",
- "https://isitchristmas.com/",
- "https://alwaysjudgeabookbyitscover.com/",
- "https://smashthewalls.com/",
- "https://dont-even.net/",
- "http://cant-not-tweet-this.com/",
- "https://nooooooooooooooo.com/",
- "https://zoomquilt.org/",
- "https://zoomquilt2.com/",
- "https://koalastothemax.com/",
- "https://weirdorconfusing.com/",
- "https://purrli.com/",
- "https://drawminos.com/",
- "https://neal.fun/size-of-space/",
- "https://neal.fun/deep-sea/",
- "https://neal.fun/candle-problem/",
- "https://www.rrrgggbbb.com/",
- "https://www.crossdivisions.com/",
- "https://www.kanyezone.com/",
- "https://findtheinvisiblecow.com/",
- "https://quickdraw.withgoogle.com/",
- "https://snake.cafe/",
- "https://flappybird.io/",
- "https://chihuahuaspin.com/",
- "https://dogs.are.the.most.moe/",
- "https://whatthefluffgame.com/",
- "https://www.hereistoday.com/",
- "https://doughnutkitten.com/",
- "https://thequietplaceproject.xyz/thequietplace/",
- "https://eelslap.com/",
- "https://fallingfalling.com/",
- "https://beesbeesbees.com/",
- "https://burymewithmymoney.com/",
- "https://www.partridgegetslucky.com/",
- "http://heeeeeeeey.com/",
- "http://thatsthefinger.com/",
- "http://eelslap.com/",
- "http://www.staggeringbeauty.com/",
- "http://burymewithmymoney.com/",
- "http://www.fallingfalling.com/",
- "http://ducksarethebest.com/",
- "http://www.trypap.com/",
- "http://www.republiquedesmangues.fr/",
- "http://www.movenowthinklater.com/",
- "http://www.partridgegetslucky.com/",
- "http://www.rrrgggbbb.com/",
- "http://beesbeesbees.com/",
- "http://www.sanger.dk/",
- "http://www.koalastothemax.com/",
- "http://www.everydayim.com/",
- "http://www.leduchamp.com/",
- "http://grandpanoclothes.com/",
- "http://www.haneke.net/",
- "https://cheese.com/random/",
- "https://cantunsee.space/",
- "https://neal.fun/walls/",
- "https://neal.fun/spend/",
- "https://onesandzeros.online/",
- "https://thatsthefinger.com/",
- "https://pointerpointer.com/",
- "https://trypap.com/",
- "https://heeeeeeeey.com/",
- "https://hooooooooo.com/",
- "https://www.breakglassforfun.com/",
- "https://drawabezier.com/"
+  "https://pointerpointer.com/",
+  "https://checkboxrace.com/",
+  "https://hackertyper.com/",
+  "https://papertoilet.com/",
+  "https://cat-bounce.com/",
+  "https://puginarug.com/",
+  "https://longdogechallenge.com/",
+  "https://endless.horse/",
+  "https://strobe.cool/",
+  "https://mondrianandme.com/",
+  "https://omfgdogs.com/",
+  "https://thezen.zone/",
+  "https://theuselessweb.site/",
+  "https://ismypcstillon.com/",
+  "https://isitchristmas.com/",
+  "https://alwaysjudgeabookbyitscover.com/",
+  "https://smashthewalls.com/",
+  "https://dont-even.net/",
+  "http://cant-not-tweet-this.com/",
+  "https://nooooooooooooooo.com/",
+  "https://zoomquilt.org/",
+  "https://zoomquilt2.com/",
+  "https://koalastothemax.com/",
+  "https://weirdorconfusing.com/",
+  "https://purrli.com/",
+  "https://drawminos.com/",
+  "https://neal.fun/size-of-space/",
+  "https://neal.fun/deep-sea/",
+  "https://neal.fun/candle-problem/",
+  "https://www.rrrgggbbb.com/",
+  "https://www.crossdivisions.com/",
+  "https://www.kanyezone.com/",
+  "https://findtheinvisiblecow.com/",
+  "https://quickdraw.withgoogle.com/",
+  "https://snake.cafe/",
+  "https://flappybird.io/",
+  "https://chihuahuaspin.com/",
+  "https://dogs.are.the.most.moe/",
+  "https://whatthefluffgame.com/",
+  "https://www.hereistoday.com/",
+  "https://doughnutkitten.com/",
+  "https://thequietplaceproject.xyz/thequietplace/",
+  "https://eelslap.com/",
+  "https://fallingfalling.com/",
+  "https://beesbeesbees.com/",
+  "https://burymewithmymoney.com/",
+  "https://www.partridgegetslucky.com/",
+  "http://heeeeeeeey.com/",
+  "http://thatsthefinger.com/",
+  "http://eelslap.com/",
+  "http://www.staggeringbeauty.com/",
+  "http://burymewithmymoney.com/",
+  "http://www.fallingfalling.com/",
+  "http://ducksarethebest.com/",
+  "http://www.trypap.com/",
+  "http://www.republiquedesmangues.fr/",
+  "http://www.movenowthinklater.com/",
+  "http://www.partridgegetslucky.com/",
+  "http://www.rrrgggbbb.com/",
+  "http://beesbeesbees.com/",
+  "http://www.sanger.dk/",
+  "http://www.koalastothemax.com/",
+  "http://www.everydayim.com/",
+  "http://www.leduchamp.com/",
+  "http://grandpanoclothes.com/",
+  "http://www.haneke.net/",
+  "https://cheese.com/random/",
+  "https://cantunsee.space/",
+  "https://neal.fun/walls/",
+  "https://neal.fun/spend/",
+  "https://onesandzeros.online/",
+  "https://thatsthefinger.com/",
+  "https://pointerpointer.com/",
+  "https://trypap.com/",
+  "https://heeeeeeeey.com/",
+  "https://hooooooooo.com/",
+  "https://www.breakglassforfun.com/",
+  "https://drawabezier.com/"
 ];
 
 /* ---------- State ---------- */
@@ -131,7 +131,7 @@ const SMALL_WORDS = [
   "of"
 ];
 
-/* Languages you don't want to see at all */
+/* Languages you don't want to see */
 const BLOCKED_LANGUAGES = ["roff", "nix", "emacs lisp"];
 
 /* ---------- i18n dictionary ---------- */
@@ -587,7 +587,7 @@ function setLanguage(lang) {
     searchLabelEl.textContent = dict.searchLabel;
   }
 
-  // 🔤 language-aware + tab-aware placeholder
+  // language-aware + tab-aware placeholder
   updateSearchPlaceholder();
 
   updateLanguageGateActive();
@@ -643,7 +643,7 @@ function setupTabsAndFilters() {
     }
   }
 
-  // NEW: bind gradient pill to the active tab's exact position/width
+  // bind gradient pill to the active tab's exact position/width
   function updateTabsPill(activeButton) {
     if (!tabsContainer || !activeButton) return;
     const tabsRect = tabsContainer.getBoundingClientRect();
@@ -818,9 +818,19 @@ async function loadProjects() {
       ? o.languages
       : o.langs;
 
-    const languages = getLanguagesList(repo, overrideLangs);
+    let languages = getLanguagesList(repo.language, overrideLangs);
 
-    const type = guessProjectType(repo, o);
+    // Auto-detect ASP.NET and add it as a language if applicable
+    if (looksLikeAspNet(repo, o, languages)) {
+      const hasAspNet = languages.some(
+        (l) => String(l).toLowerCase() === "asp.net"
+      );
+      if (!hasAspNet) {
+        languages.push("ASP.NET");
+      }
+    }
+
+    const type = guessProjectType(repo, o, languages);
 
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
 
@@ -948,90 +958,54 @@ function formatRepoName(raw) {
     .join(" ");
 }
 
-/**
- * Build a language list for display & filters.
- * - Applies overrides if present
- * - Adds smart mappings (HTML → HTML/CSS/JS, C# → C#/.NET, etc.)
- * - Removes blocked langs (Roff, Nix, Emacs Lisp)
- * - Adds ASP.NET when repo smells like ASP.NET and uses .NET
- */
-function getLanguagesList(repo, overrideList) {
-  const primary = repo && repo.language ? repo.language : null;
-  const list = [];
-
-  // If overrides exist for this repo, start from those
+function getLanguagesList(primary, overrideList) {
+  // If overrides exist, use them but strip blocked langs
   if (Array.isArray(overrideList) && overrideList.length) {
-    overrideList.forEach((l) => {
-      if (l) list.push(l);
-    });
-  } else if (primary) {
-    const p = String(primary).toLowerCase();
-
-    if (p === "html") {
-      list.push("HTML", "CSS", "JS");
-    } else if (p === "javascript") {
-      list.push("JS", "HTML", "CSS");
-    } else if (p === "typescript") {
-      list.push("TypeScript", "JS", "HTML", "CSS");
-    } else if (p === "c#") {
-      // Your preferred behaviour: C# implies .NET
-      list.push("C#", ".NET");
-    } else if (p === "c++") {
-      list.push("C++", "C");
-    } else if (p === "php") {
-      list.push("PHP", "HTML", "CSS", "JS");
-    } else if (p === "css") {
-      list.push("CSS", "HTML", "JS");
-    } else if (p === "less") {
-      list.push("Less", "HTML", "CSS", "JS", "SCSS");
-    } else if (p === "scss" || p === "sass") {
-      list.push("SCSS", "CSS", "HTML", "JS");
-    } else {
-      list.push(primary);
-    }
+    return overrideList
+      .map((l) => String(l))
+      .filter(
+        (l) => !BLOCKED_LANGUAGES.includes(l.toLowerCase())
+      );
   }
 
-  // Filter out weird langs you don't care about
-  let filtered = list.filter((l) => {
-    if (!l) return false;
-    const lower = String(l).toLowerCase();
-    return !BLOCKED_LANGUAGES.includes(lower);
-  });
+  const list = [];
+  if (!primary) return list;
 
-  // ASP.NET detection heuristics
-  const text = (
-    (repo && repo.name ? repo.name : "") +
-    " " +
-    (repo && repo.description ? repo.description : "")
-  ).toLowerCase();
+  const p = String(primary).toLowerCase();
 
-  const hasDotNet = filtered.some((l) =>
-    String(l).toLowerCase().includes(".net")
+  // If primary is blocked, just return empty list
+  if (BLOCKED_LANGUAGES.includes(p)) {
+    return [];
+  }
+
+  if (p === "html") {
+    list.push("HTML", "CSS", "JS");
+  } else if (p === "javascript") {
+    list.push("JS", "HTML", "CSS");
+  } else if (p === "typescript") {
+    list.push("TypeScript", "JS", "HTML", "CSS");
+  } else if (p === "c#") {
+    // You explicitly wanted this:
+    // GitHub language C# → ["C#", ".NET"]
+    list.push("C#", ".NET");
+  } else if (p === "c++") {
+    list.push("C++", "C");
+  } else if (p === "php") {
+    list.push("PHP", "HTML", "CSS", "JS");
+  } else if (p === "css") {
+    list.push("CSS", "HTML", "JS");
+  } else if (p === "less") {
+    list.push("Less", "HTML", "CSS", "JS", "SCSS");
+  } else if (p === "scss" || p === "sass") {
+    list.push("SCSS", "CSS", "HTML", "JS");
+  } else {
+    list.push(primary);
+  }
+
+  // Final safety filter
+  return list.filter(
+    (l) => !BLOCKED_LANGUAGES.includes(String(l).toLowerCase())
   );
-  const aspNetNeedles = [
-    "aspnet",
-    "asp-net",
-    "asp.net",
-    "program.cs",
-    "startup.cs",
-    "appsettings.json",
-    ".csproj",
-    "/controllers/",
-    "controllers/"
-  ];
-
-  const looksAspNet = aspNetNeedles.some((n) => text.includes(n));
-
-  if (hasDotNet && looksAspNet) {
-    const already = filtered.some(
-      (l) => String(l).toLowerCase() === "asp.net"
-    );
-    if (!already) {
-      filtered.push("ASP.NET");
-    }
-  }
-
-  return filtered;
 }
 
 function buildLanguageFilterOptions(projects) {
@@ -1044,7 +1018,12 @@ function buildLanguageFilterOptions(projects) {
 
   const set = new Set();
   projects.forEach((p) => {
-    (p.languages || []).forEach((lang) => set.add(lang));
+    (p.languages || []).forEach((lang) => {
+      const lower = String(lang).toLowerCase();
+      if (!BLOCKED_LANGUAGES.includes(lower)) {
+        set.add(lang);
+      }
+    });
   });
 
   const sorted = Array.from(set).sort((a, b) =>
@@ -1057,6 +1036,32 @@ function buildLanguageFilterOptions(projects) {
     opt.textContent = lang;
     select.appendChild(opt);
   });
+}
+
+/**
+ * Heuristics to guess if a project is ASP.NET
+ * (we can’t see file structure here without extra API calls,
+ * so we key off names / descriptions / overrides)
+ */
+function looksLikeAspNet(repo, override, languages) {
+  const langs = (languages || []).map((l) => String(l).toLowerCase());
+  if (langs.includes("asp.net")) return true;
+
+  const overrideLangs = override && (override.languages || override.langs);
+  if (Array.isArray(overrideLangs)) {
+    const lower = overrideLangs.map((l) => String(l).toLowerCase());
+    if (lower.some((l) => l.includes("asp.net"))) return true;
+  }
+
+  const text =
+    `${repo.name || ""} ${repo.description || ""} ${
+      (override && (override.description || "")) || ""
+    }`.toLowerCase();
+
+  const patterns = ["asp.net", "aspnet", "asp-net"];
+  if (patterns.some((p) => text.includes(p))) return true;
+
+  return false;
 }
 
 /* ---------- Project helpers: type, security tag, liveUrl, thumbnail ---------- */
@@ -1111,7 +1116,7 @@ function isSecurityProject(repo, override, languages) {
   return hasDotNet && hasSecurityWord;
 }
 
-function guessProjectType(repo, override) {
+function guessProjectType(repo, override, languages) {
   if (override && override.type) {
     return override.type;
   }
@@ -1140,6 +1145,8 @@ function guessProjectType(repo, override) {
     return "game";
   }
 
+  const aspNetLike = looksLikeAspNet(repo, override, languages);
+
   const isGame = has([
     "game",
     "games",
@@ -1152,14 +1159,15 @@ function guessProjectType(repo, override) {
     "jigsaw"
   ]);
 
-  const isApi = has([
-    "api",
-    "backend",
-    "server",
-    "service",
-    "rest",
-    "endpoint"
-  ]);
+  const isApi =
+    has([
+      "api",
+      "backend",
+      "server",
+      "service",
+      "rest",
+      "endpoint"
+    ]) || aspNetLike;
 
   const isMobile =
     has([
@@ -1349,4 +1357,611 @@ async function loadProjectThumbnails() {
 
 async function findRepoRootThumbnail(repoName) {
   try {
-    const
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+
+    const files = data.filter((item) => item.type === "file");
+
+    const imageFiles = files.filter((item) => {
+      const ext = (item.name.split(".").pop() || "").toLowerCase();
+      return ["jpg", "jpeg", "png", "svg", "gif", "webp"].includes(ext);
+    });
+
+    if (!imageFiles.length) {
+      return null;
+    }
+
+    const score = (name) => {
+      const lower = name.toLowerCase();
+      if (lower === "logo.png") return 0;
+      if (lower === "logo.jpg" || lower === "logo.jpeg") return 1;
+      if (lower.startsWith("logo.")) return 2;
+      if (lower.includes("classdiagram")) return 3;
+      if (lower.includes("diagram")) return 4;
+      return 5;
+    };
+
+    imageFiles.sort((a, b) => score(a.name) - score(b.name));
+    const chosen = imageFiles[0];
+
+    const encodedName = encodeURIComponent(chosen.name);
+    return `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodedName}`;
+  } catch (err) {
+    console.error("Failed to load root thumbnail for", repoName, err);
+    return null;
+  }
+}
+
+/* ---------- Project rendering ---------- */
+
+function getFilteredProjects() {
+  const search = state.search.toLowerCase();
+  const typeFilter = state.typeFilter;
+  const langFilter = state.languageFilter;
+
+  return projects.filter((p) => {
+    if (typeFilter !== "all" && p.type !== typeFilter) return false;
+
+    if (
+      langFilter !== "all" &&
+      !p.languages.some(
+        (l) => l.toLowerCase() === langFilter.toLowerCase()
+      )
+    ) {
+      return false;
+    }
+
+    if (!search) return true;
+
+    const haystack = [
+      p.displayName,
+      p.description,
+      p.type,
+      (p.tags || []).join(" "),
+      (p.languages || []).join(" ")
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(search);
+  });
+}
+
+function renderProjects() {
+  const grid = document.getElementById("projectsGrid");
+  const emptyState = document.getElementById("emptyState");
+  if (!grid || !emptyState) return;
+
+  const filtered = getFilteredProjects();
+
+  grid.innerHTML = "";
+  if (!filtered.length) {
+    emptyState.style.display = "block";
+    return;
+  }
+  emptyState.style.display = "none";
+
+  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
+
+  filtered.forEach((project) => {
+    const card = document.createElement("article");
+    card.className = "project-card";
+
+    const titleRow = document.createElement("div");
+    titleRow.className = "project-title-row";
+
+    const thumb = document.createElement("div");
+    thumb.className = "project-thumb";
+
+    if (project.thumbnail) {
+      thumb.classList.add("has-image");
+      const img = document.createElement("img");
+      img.src = project.thumbnail;
+      img.alt = project.displayName;
+      thumb.appendChild(img);
+    } else {
+      const span = document.createElement("span");
+      span.textContent = (project.displayName || "?")
+        .charAt(0)
+        .toUpperCase();
+      thumb.appendChild(span);
+    }
+
+    const titleText = document.createElement("div");
+    titleText.className = "project-title-text";
+
+    const title = document.createElement("h3");
+    title.className = "project-title";
+    title.textContent = project.displayName;
+
+    const langP = document.createElement("p");
+    langP.className = "project-lang";
+    langP.textContent = (project.languages || []).join(" · ");
+
+    titleText.appendChild(title);
+    titleText.appendChild(langP);
+
+    titleRow.appendChild(thumb);
+    titleRow.appendChild(titleText);
+
+    const desc = document.createElement("p");
+    desc.className = "project-desc";
+    desc.textContent = project.description;
+
+    const meta = document.createElement("div");
+    meta.className = "project-meta";
+
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "badge badge-type";
+
+    const typeMap = TYPE_LABELS[project.type] || TYPE_LABELS.other;
+    const typeLabel =
+      typeMap[state.lang] ||
+      typeMap[DEFAULT_LANG] ||
+      project.type;
+    typeBadge.textContent = typeLabel;
+
+    meta.appendChild(typeBadge);
+
+    (project.tags || []).forEach((tag) => {
+      const tagBadge = document.createElement("span");
+      tagBadge.className = "badge";
+      tagBadge.textContent = tag;
+      meta.appendChild(tagBadge);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "project-actions";
+
+    const githubBtn = document.createElement("a");
+    githubBtn.href = project.githubUrl;
+    githubBtn.target = "_blank";
+    githubBtn.rel = "noopener noreferrer";
+    githubBtn.className = "btn-card";
+    githubBtn.innerHTML = `<span>GitHub</span>`;
+    actions.appendChild(githubBtn);
+
+    if (project.liveUrl) {
+      const liveBtn = document.createElement("a");
+      liveBtn.href = project.liveUrl;
+      liveBtn.target = "_blank";
+      liveBtn.rel = "noopener noreferrer";
+      liveBtn.className = "btn-card btn-card-live";
+      const label =
+        dict.btnLiveSite || I18N[DEFAULT_LANG].btnLiveSite || "Live site";
+      liveBtn.innerHTML = `<span>${label}</span>`;
+      actions.appendChild(liveBtn);
+    }
+
+    card.appendChild(titleRow);
+    card.appendChild(desc);
+    card.appendChild(meta);
+    card.appendChild(actions);
+
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- Media loading & rendering ---------- */
+
+async function loadMedia() {
+  try {
+    const res = await fetch(MEDIA_INDEX_URL);
+    if (!res.ok) {
+      mediaItems = [];
+      renderMedia();
+      return;
+    }
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : data.items || [];
+
+    mediaItems = items.map((item, index) => {
+      let path =
+        item.path ||
+        item.url ||
+        item.src ||
+        "";
+
+      if (!path) {
+        const fileName =
+          item.fileName ||
+          item.name ||
+          item.title ||
+          "";
+        if (fileName) {
+          const lowerType = (item.type || "").toLowerCase();
+          if (lowerType === "image") {
+            path = `media/images/${fileName}`;
+          } else if (lowerType === "video") {
+            path = `media/videos/${fileName}`;
+          } else if (lowerType === "audio") {
+            path = `media/audio/${fileName}`;
+          } else {
+            path = `media/${fileName}`;
+          }
+        }
+      }
+
+      const title =
+        item.title ||
+        item.name ||
+        item.fileName ||
+        (path ? path.split("/").pop() : "") ||
+        `Media ${index + 1}`;
+
+      const format =
+        (item.format ||
+          (path.split(".").pop() || "").toLowerCase()) || "";
+
+      let type = item.type;
+      if (!type) {
+        type = guessMediaType(path);
+      }
+
+      return {
+        id: index,
+        title,
+        path,
+        type,
+        format
+      };
+    });
+
+    buildMediaFilterOptions(mediaItems);
+    renderMedia();
+  } catch (err) {
+    console.error("Failed to load media index", err);
+    mediaItems = [];
+    renderMedia();
+  }
+}
+
+function guessMediaType(path) {
+  const ext = (path.split(".").pop() || "").toLowerCase();
+  if (["jpg", "jpeg", "png", "gif", "webp", "bmp"].includes(ext)) {
+    return "image";
+  }
+  if (["mp4", "webm", "mov", "m4v"].includes(ext)) {
+    return "video";
+  }
+  if (["mp3", "wav", "ogg", "flac"].includes(ext)) {
+    return "audio";
+  }
+  return "image";
+}
+
+function buildMediaFilterOptions(items) {
+  const typeSelect = document.getElementById("mediaTypeFilter");
+  const formatSelect = document.getElementById("mediaFormatFilter");
+  if (!typeSelect || !formatSelect) return;
+
+  while (typeSelect.options.length > 1) typeSelect.remove(1);
+  const typeSet = new Set();
+  items.forEach((i) => typeSet.add(i.type));
+  Array.from(typeSet)
+    .sort()
+    .forEach((t) => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+      typeSelect.appendChild(opt);
+    });
+
+  while (formatSelect.options.length > 1) formatSelect.remove(1);
+  const formatSet = new Set();
+  items.forEach((i) => {
+    if (i.format) formatSet.add(i.format.toLowerCase());
+  });
+  Array.from(formatSet)
+    .sort()
+    .forEach((f) => {
+      const opt = document.createElement("option");
+      opt.value = f;
+      opt.textContent = f.toUpperCase();
+      formatSelect.appendChild(opt);
+    });
+}
+
+function getFilteredMedia() {
+  const search = state.search.toLowerCase();
+  const typeFilter = state.mediaTypeFilter;
+  const formatFilter = state.mediaFormatFilter;
+
+  return mediaItems.filter((item) => {
+    if (typeFilter !== "all" && item.type !== typeFilter) return false;
+    if (
+      formatFilter !== "all" &&
+      item.format.toLowerCase() !== formatFilter.toLowerCase()
+    ) {
+      return false;
+    }
+
+    if (!search) return true;
+
+    const haystack = (
+      item.title +
+      " " +
+      item.path +
+      " " +
+      item.type +
+      " " +
+      item.format
+    ).toLowerCase();
+
+    return haystack.includes(search);
+  });
+}
+
+/**
+ * Create a volume control row for a given media element (audio or video).
+ * Volume: 0–100%, mapped to media.volume 0–1.
+ */
+function createVolumeRow(mediaEl) {
+  const row = document.createElement("div");
+  row.className = "media-volume-row";
+
+  const label = document.createElement("span");
+  label.className = "media-volume-label";
+  label.textContent = "Volume";
+
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = "0";
+  slider.max = "100";
+  slider.value = "100";
+  slider.className = "media-volume-slider";
+
+  const valueLabel = document.createElement("span");
+  valueLabel.className = "media-volume-value";
+  valueLabel.textContent = "100%";
+
+  mediaEl.volume = 1;
+
+  slider.addEventListener("input", () => {
+    const value = parseInt(slider.value, 10) || 0;
+    mediaEl.volume = value / 100;
+    valueLabel.textContent = `${value}%`;
+  });
+
+  row.appendChild(label);
+  row.appendChild(slider);
+  row.appendChild(valueLabel);
+
+  return row;
+}
+
+/* ---- media rendering (with "only one video playing" logic) ---- */
+function renderMedia() {
+  const grid = document.getElementById("mediaGrid");
+  const emptyState = document.getElementById("mediaEmptyState");
+  if (!grid || !emptyState) return;
+
+  const filtered = getFilteredMedia();
+
+  grid.innerHTML = "";
+  if (!filtered.length) {
+    emptyState.style.display = "block";
+    return;
+  }
+  emptyState.style.display = "none";
+
+  filtered.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "media-card";
+
+    const title = document.createElement("h3");
+    title.className = "media-title";
+    title.textContent = item.title;
+
+    const preview = document.createElement("div");
+    preview.className = "media-preview";
+
+    if (item.type === "image") {
+      preview.classList.add("clickable");
+      const img = document.createElement("img");
+      img.src = item.path;
+      img.alt = item.title;
+      preview.appendChild(img);
+
+      preview.addEventListener("click", () => {
+        openImageModal(item.path, item.title);
+      });
+    } else if (item.type === "video") {
+      preview.classList.add("media-preview-video");
+
+      const video = document.createElement("video");
+      video.src = item.path;
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+
+      // pause other videos when this one starts playing
+      video.addEventListener("play", () => {
+        document.querySelectorAll("video").forEach((v) => {
+          if (v !== video) v.pause();
+        });
+      });
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "media-player-wrapper";
+      wrapper.appendChild(video);
+      preview.appendChild(wrapper);
+
+      const volumeRow = createVolumeRow(video);
+      preview.appendChild(volumeRow);
+    } else if (item.type === "audio") {
+      const audio = document.createElement("audio");
+      audio.src = item.path;
+      audio.controls = true;
+      audio.preload = "metadata";
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "media-player-wrapper";
+      wrapper.appendChild(audio);
+      preview.appendChild(wrapper);
+
+      const volumeRow = createVolumeRow(audio);
+      preview.appendChild(volumeRow);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "media-meta";
+
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "badge-media-type";
+    typeBadge.textContent = item.type;
+
+    const formatBadge = document.createElement("span");
+    formatBadge.className = "badge-media-format";
+    formatBadge.textContent = item.format.toUpperCase();
+
+    meta.appendChild(typeBadge);
+    meta.appendChild(formatBadge);
+
+    const actions = document.createElement("div");
+    actions.className = "media-actions";
+
+    if (item.type === "image") {
+      const viewBtn = document.createElement("button");
+      viewBtn.type = "button";
+      viewBtn.className = "media-action-btn";
+      viewBtn.textContent = "View";
+      viewBtn.addEventListener("click", () => {
+        openImageModal(item.path, item.title);
+      });
+      actions.appendChild(viewBtn);
+    } else {
+      const openBtn = document.createElement("a");
+      openBtn.href = item.path;
+      openBtn.target = "_blank";
+      openBtn.rel = "noopener noreferrer";
+      openBtn.className = "media-action-btn";
+      openBtn.textContent = "Open";
+      actions.appendChild(openBtn);
+    }
+
+    const downloadBtn = document.createElement("a");
+    downloadBtn.href = item.path;
+    downloadBtn.download = "";
+    downloadBtn.className = "media-action-btn";
+    downloadBtn.textContent = "Download";
+    actions.appendChild(downloadBtn);
+
+    card.appendChild(title);
+    card.appendChild(preview);
+    card.appendChild(meta);
+    card.appendChild(actions);
+
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- Image modal ---------- */
+
+function setupImageModal() {
+  const modal = document.getElementById("imageModal");
+  if (!modal) return;
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeImageModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeImageModal();
+    }
+  });
+}
+
+function openImageModal(src, captionText) {
+  const modal = document.getElementById("imageModal");
+  if (!modal) return;
+
+  modal.innerHTML = "";
+
+  const inner = document.createElement("div");
+  inner.className = "image-modal-inner";
+
+  const figure = document.createElement("figure");
+  figure.className = "image-modal-figure";
+
+  const img = document.createElement("img");
+  img.className = "image-modal-img";
+  img.src = src;
+  img.alt = captionText || "";
+  img.addEventListener("click", () => {
+    closeImageModal();
+  });
+
+  figure.appendChild(img);
+
+  if (captionText) {
+    const caption = document.createElement("figcaption");
+    caption.className = "image-modal-caption";
+    caption.textContent = captionText;
+    figure.appendChild(caption);
+  }
+
+  inner.appendChild(figure);
+
+  const actions = document.createElement("div");
+  actions.className = "image-modal-actions";
+
+  const openTabBtn = document.createElement("a");
+  openTabBtn.href = src;
+  openTabBtn.target = "_blank";
+  openTabBtn.rel = "noopener noreferrer";
+  openTabBtn.className = "image-modal-btn";
+  openTabBtn.textContent = "Open in new tab";
+  actions.appendChild(openTabBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "image-modal-btn image-modal-close";
+  closeBtn.textContent = "Close";
+  closeBtn.addEventListener("click", closeImageModal);
+  actions.appendChild(closeBtn);
+
+  inner.appendChild(actions);
+
+  modal.appendChild(inner);
+  modal.hidden = false;
+}
+
+function closeImageModal() {
+  const modal = document.getElementById("imageModal");
+  if (!modal) return;
+  modal.hidden = true;
+}
+
+/* ---------- Footer ---------- */
+
+function setupFooterCopyright() {
+  const el = document.getElementById("footerCopyright");
+  if (!el) return;
+  const year = new Date().getFullYear();
+  el.textContent = `${year}`;
+}
+
+/* ---------- Playground random button ---------- */
+
+function setupPlaygroundRandomButton() {
+  const btn = document.getElementById("randomSiteButton");
+  if (!btn) return;
+
+  // Make it visually identical to "Live site" buttons
+  btn.classList.add("btn-card", "btn-card-live");
+
+  btn.addEventListener("click", () => {
+    if (!USELESS_WEB_URLS.length) return;
+    const idx = Math.floor(Math.random() * USELESS_WEB_URLS.length);
+    const url = USELESS_WEB_URLS[idx];
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
+}
