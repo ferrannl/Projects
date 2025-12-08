@@ -1098,32 +1098,31 @@ body {
   color: var(--text-muted);
 }
 
-/* Paint card: full big embed */
-
-/* Wrapper: stays a normal rounded card, no forced square */
+/* Paint embed wrapper – keep card rounded, but don’t clip the iframe corners */
 .playground-embed {
   position: relative;
   width: 100%;
   max-width: 960px;
   margin: 1.5rem auto 0;
   background: #02040f;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border-radius: 0;         /* wrapper itself is square */
+  overflow: visible;        /* don't clip children */
+  border: none;
+  box-shadow: none;
 }
 
-/* Base iframe styling inside playground */
+/* Base iframe styling */
 .playground-embed iframe {
+  display: block;
   width: 100%;
   border: none;
-  display: block;
 }
 
-/* ⭐ ONLY MS Paint (paint.js.org) iframe is forced to be square */
+/* ⭐ Only the MS Paint iframe is perfectly square with sharp corners */
 .playground-embed iframe[src*="paint.js.org"] {
   aspect-ratio: 1 / 1;
   height: auto;
+  border-radius: 0 !important;
 }
 
 /* Random card centered content */
