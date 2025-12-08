@@ -44,6 +44,17 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Smooth custom text selection */
+::selection {
+  background: rgba(176, 23, 47, 0.35);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: rgba(176, 23, 47, 0.35);
+  color: #ffffff;
+}
+
 .app {
   max-width: 1120px;
   margin: 0 auto;
@@ -60,6 +71,7 @@ body {
   padding: 2.4rem 1.75rem 1.6rem;
   margin-bottom: 1.75rem;
   background: linear-gradient(
+    145deg,
     145deg,
     rgba(11, 26, 61, 0.98),
     rgba(23, 16, 40, 0.98)
@@ -536,6 +548,10 @@ body {
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
+  /* Stabilise hover animation to avoid “spazzing” */
+  transform: translateZ(0);
+  will-change: transform, box-shadow, border-color, background;
+  backface-visibility: hidden;
   transition:
     transform var(--transition-med),
     box-shadow var(--transition-med),
