@@ -216,7 +216,7 @@ body {
   content: "";
   position: absolute;
   inset: -40%;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.12), transparent 55%);
+  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 55%);
   opacity: 0;
   transition: opacity var(--transition-fast);
   pointer-events: none;
@@ -337,9 +337,9 @@ body {
   position: absolute;
   inset: 0;
   display: inline-block;
-  /* slightly tinted, less stark than pure white */
   color: rgba(255, 220, 230, 0.96);
 }
+
 /* Reddit – orange glow pill */
 .social-reddit {
   background:
@@ -419,7 +419,7 @@ body {
 .tabs-section {
   margin-bottom: 1rem;
   display: flex;
-  justify-content: center; /* center the pill bar itself */
+  justify-content: center;
 }
 
 .tabs {
@@ -466,12 +466,11 @@ body {
   transition:
     color var(--transition-fast),
     transform var(--transition-fast);
-  /* make all 3 tabs equal width so the labels sit in the middle of their pill */
   flex: 1 1 0;
   text-align: center;
 }
 
-/* remove the tiny gap that pushed Media/Playground off-centre */
+/* remove gap that misaligned the pill */
 .tab-button + .tab-button {
   margin-left: 0;
 }
@@ -531,7 +530,7 @@ body {
   outline-offset: 2px;
 }
 
-/* magnifying glass – centred-ish */
+/* magnifying glass icon */
 .search-section::before {
   content: "🔍";
   position: absolute;
@@ -1084,7 +1083,7 @@ body {
 
 .playground-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr); /* always stacked: Paint then Random */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.4rem;
   align-items: start;
 }
@@ -1115,8 +1114,8 @@ body {
   max-width: 960px;
   margin: 1.5rem auto 0;
   background: #02040f;
-  border-radius: 0;         /* wrapper itself is square */
-  overflow: visible;        /* don't clip children */
+  border-radius: 0;
+  overflow: visible;
   border: none;
   box-shadow: none;
 }
@@ -1128,9 +1127,9 @@ body {
   border: none;
 }
 
-/* ⭐ Only the MS Paint iframe is perfectly square with sharp corners */
+/* Wide 16:9 MS Paint, no horizontal scroll, less vertical height */
 .playground-embed iframe[src*="paint.js.org"] {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 16 / 9;
   height: auto;
   border-radius: 0 !important;
 }
