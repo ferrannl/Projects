@@ -1391,6 +1391,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
+/* ---- UPDATED: volume slider is appended inside .media-preview ---- */
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1428,6 +1429,7 @@ function renderMedia() {
       });
     } else if (item.type === "video") {
       preview.classList.add("media-preview-video");
+
       const video = document.createElement("video");
       video.src = item.path;
       video.controls = true;
@@ -1439,9 +1441,9 @@ function renderMedia() {
       wrapper.appendChild(video);
       preview.appendChild(wrapper);
 
-      // big custom volume slider for this video
+      // big custom volume slider for this video – inside preview box
       const volumeRow = createVolumeRow(video);
-      card.appendChild(volumeRow);
+      preview.appendChild(volumeRow);
     } else if (item.type === "audio") {
       const audio = document.createElement("audio");
       audio.src = item.path;
@@ -1453,9 +1455,9 @@ function renderMedia() {
       wrapper.appendChild(audio);
       preview.appendChild(wrapper);
 
-      // big custom volume slider for this audio
+      // big custom volume slider for this audio – inside preview box
       const volumeRow = createVolumeRow(audio);
-      card.appendChild(volumeRow);
+      preview.appendChild(volumeRow);
     }
 
     const meta = document.createElement("div");
