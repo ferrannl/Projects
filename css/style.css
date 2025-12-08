@@ -318,7 +318,7 @@ body {
   border-color: rgba(53, 70, 92, 0.9);
 }
 
-/* Old Tumblr: Kadaver with red/dark red border */
+/* Old Tumblr: Kadaver with deeper red tint, but softer text */
 .social-tumblr-old {
   background:
     radial-gradient(circle at 0 0, rgba(123, 0, 16, 0.45), transparent 60%),
@@ -326,6 +326,7 @@ body {
   border-color: #7b0010;
 }
 
+/* keep the Kadaver label override, but use a softer, warmer text color */
 .social-tumblr-old .social-label {
   position: relative;
   color: transparent;
@@ -336,8 +337,17 @@ body {
   position: absolute;
   inset: 0;
   display: inline-block;
-  color: var(--text);
+  /* slightly tinted, less stark than pure white */
+  color: rgba(255, 220, 230, 0.96);
 }
+/* Reddit – orange glow pill */
+.social-reddit {
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 69, 0, 0.5), transparent 60%),
+    rgba(7, 10, 28, 0.97);
+  border-color: rgba(255, 69, 0, 0.9);
+}
+
 
 /* ---------- About section ---------- */
 
