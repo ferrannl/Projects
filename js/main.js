@@ -785,11 +785,15 @@ function isSecurityProject(repo, override, languages) {
 
   const hasSecurityWord = securityWords.some((w) => text.includes(w));
 
+  // extra: internship-style security projects in .NET
+  const internshipWords = ["internship", "stage", "werkplek", "afstudeer", "trainee"];
+  const hasInternshipWord = internshipWords.some((w) => text.includes(w));
+
   const hasDotNet =
     (languages || []).some((l) => l.toLowerCase().includes(".net")) ||
     (repo.language || "").toLowerCase() === "c#";
 
-  return hasDotNet && hasSecurityWord;
+  return hasDotNet && (hasSecurityWord || hasInternshipWord);
 }
 
 function guessProjectType(repo, override) {
@@ -801,6 +805,14 @@ function guessProjectType(repo, override) {
   const desc = (repo.description || "").toLowerCase();
   const joined = `${name} ${desc}`;
   const lang = (repo.language || "").toLowerCase();
+
+  // explicit overrides inside JS
+  const forcedTypes = {
+    videoshare: "api" // VideoShare is backend/API even if heuristics say website
+  };
+  if (forcedTypes[name]) {
+    return forcedTypes[name];
+  }
 
   const has = (words) => words.some((w) => joined.includes(w));
 
@@ -848,7 +860,8 @@ function guessProjectType(repo, override) {
       "swiftui",
       "react native",
       "react-native",
-      "flutter"
+      "flutter",
+      "mobile"
     ]) ||
     (["kotlin", "swift", "objective-c", "objective c", "dart"].includes(
       lang
@@ -890,8 +903,9 @@ function guessProjectType(repo, override) {
     ]);
 
   if (isGame) return "game";
-  if (isApi) return "api";
+  // prefer Mobile over API when both apply (fixes mobile apps misclassified as API)
   if (isMobile) return "mobile";
+  if (isApi) return "api";
   if (isSchool) return "school";
   if (isWebsite) return "website";
 
@@ -1408,7 +1422,7 @@ function renderMedia() {
 
   filtered.forEach((item) => {
     const card = document.createElement("article");
-    card.className = "media-card";
+    card.className = `media-card media-card-${item.type}`;
 
     const title = document.createElement("h3");
     title.className = "media-title";
