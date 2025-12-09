@@ -21,15 +21,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Full history so rebase / pull works correctly
+          # Full history so rebase works correctly
           fetch-depth: 0
-
-      - name: Sync with remote main
-        run: |
-          # Make sure we are on main (in case default changes later, adjust this)
-          git checkout main
-          # Rebase local main onto the latest remote main
-          git pull --rebase origin main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -43,7 +36,28 @@ jobs:
         run: python python/update_media.py
 
       - name: Commit and push if changed
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update media.json"
-          file_pattern: "media/media.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if media.json actually changed
+          if git diff --quiet -- media/media.json; then
+            echo "No changes in media.json – nothing to commit."
+            exit 0
+          fi
+
+          # Configure commit identity
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Stage and commit the file
+          git add media/media.json
+          git commit -m "chore: update media.json"
+
+          # Figure out current branch name (main, or whatever triggered the workflow)
+          BRANCH="${GITHUB_REF_NAME:-main}"
+
+          # Rebase on top of the latest remote branch to avoid non-fast-forward errors
+          git pull --rebase origin "$BRANCH"
+
+          # Push the rebased commit
+          git push origin "$BRANCH"
