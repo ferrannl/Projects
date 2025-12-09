@@ -134,6 +134,39 @@ const SMALL_WORDS = [
 /* Languages you don't want to see */
 const BLOCKED_LANGUAGES = ["roff", "nix", "emacs lisp"];
 
+/* ---------- Avatar "music playing" helpers ---------- */
+
+function setAvatarPlaying(isPlaying) {
+  const avatar = document.querySelector(".profile-avatar");
+  if (!avatar) return;
+  avatar.classList.toggle("profile-avatar--playing", isPlaying);
+}
+
+/**
+ * Checks if any HTML5 audio/video is currently playing
+ * and updates the avatar ring class.
+ */
+function updateAvatarPlayingFromMedia() {
+  const mediaEls = document.querySelectorAll("audio, video");
+  const anyPlaying = Array.from(mediaEls).some(
+    (el) => !el.paused && !el.ended && el.currentTime > 0
+  );
+  setAvatarPlaying(anyPlaying);
+}
+
+/**
+ * Attach play/pause hooks to a media element
+ * so it can drive the avatar animation.
+ */
+function attachMediaPlaybackHooks(mediaElement) {
+  if (!mediaElement) return;
+
+  mediaElement.addEventListener("play", updateAvatarPlayingFromMedia);
+  mediaElement.addEventListener("playing", updateAvatarPlayingFromMedia);
+  mediaElement.addEventListener("pause", updateAvatarPlayingFromMedia);
+  mediaElement.addEventListener("ended", updateAvatarPlayingFromMedia);
+}
+
 /* ---------- Secret background video (YouTube API globals) ---------- */
 
 let bgPlayer = null;
@@ -1802,7 +1835,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- media rendering (with "only one video playing" logic) ---- */
+/* ---- media rendering (with "only one video playing" logic + avatar hooks) ---- */
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1861,6 +1894,9 @@ function renderMedia() {
         });
       });
 
+      // tie this video to the avatar ring
+      attachMediaPlaybackHooks(video);
+
       const wrapper = document.createElement("div");
       wrapper.className = "media-player-wrapper";
       wrapper.appendChild(video);
@@ -1873,6 +1909,9 @@ function renderMedia() {
       audio.src = item.path;
       audio.controls = true;
       audio.preload = "metadata";
+
+      // tie this audio to the avatar ring
+      attachMediaPlaybackHooks(audio);
 
       const wrapper = document.createElement("div");
       wrapper.className = "media-player-wrapper";
@@ -1933,6 +1972,9 @@ function renderMedia() {
 
     grid.appendChild(card);
   });
+
+  // After rendering, ensure avatar ring reflects any currently playing media
+  updateAvatarPlayingFromMedia();
 }
 
 /* ---------- Image modal ---------- */
