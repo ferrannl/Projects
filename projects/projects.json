@@ -1,7 +1,7 @@
 [
   {
     "name": "Address-Distance-Calculator",
-    "description": "Address Distance Calculator C# ASP.NET Core Web API for creating, reading, updating and deleting addresses, and calculating the distance in kilometers between Dutch addresses using the Bing Maps REST API and GeoCoordinatePortable.  .NET 5 · ASP.NET Core Web API · Entity Framework Core · SQLite · Bing Maps REST Locations API",
+    "description": "Address Distance Calculator Web API for creating, reading, updating and deleting addresses, and calculating the distance in kilometers between Dutch addresses using the Bing Maps REST API and GeoCoordinatePortable.",
     "language": "C#",
     "languages": [
       "C#"
@@ -13,7 +13,7 @@
   },
   {
     "name": "AvanSync",
-    "description": "AvanSync is a C++ client–server application that demonstrates core concepts from the CPPLS2 course: networking, concurrency, modular design and unit testing. The repository is structured as a Visual Studio solution with three main projects:",
+    "description": "AvanSync is a client–server application that demonstrates core C++ concepts: networking, concurrency, modular design and unit testing.",
     "language": "C++",
     "languages": [
       "C++",
@@ -26,7 +26,7 @@
   },
   {
     "name": "Broadway-Boogie-Weggie",
-    "description": "School assignment Advanced Algorithms – a desktop application that demonstrates and visualizes different algorithms, built with C# .NET and WPF.",
+    "description": "A desktop application that demonstrates and visualizes different algorithms, built with C# .NET and WPF.",
     "language": "C#",
     "languages": [
       "C#"
@@ -64,7 +64,7 @@
   },
   {
     "name": "DevOps",
-    "description": "DevOps project that ties together a small API, frontend and a full Docker-based infrastructure with reverse proxying, monitoring and CI/CD.",
+    "description": "Project that ties together a small API, frontend and a full Docker-based infrastructure with reverse proxying, monitoring and CI/CD.",
     "language": "TypeScript",
     "languages": [
       "TypeScript",
@@ -79,7 +79,7 @@
   },
   {
     "name": "Dimitri",
-    "description": "This repository contains the code and configuration for the Dimitri project, created as part of a software-architecture course. The focus of the project is on clean modular design, separation of concerns and applying common architectural patterns in C++.",
+    "description": "Dimitri is both a game and its own custom engine, built with a modular structure, clear separation between engine and gameplay logic, and a focus on extensibility and maintainable design.",
     "language": "C++",
     "languages": [
       "C++",
@@ -92,7 +92,7 @@
   },
   {
     "name": "Ecobit-Internship",
-    "description": "A C#/.NET multi-project solution created as part of a third-year internship at Ecobit (Nijmegen). The project showcases a layered architecture with separation between UI, Domain, and Database logic.",
+    "description": "Multi‑project solution that implements a layered architecture with clear separation between UI, domain, and database logic. It was designed to manage user details, borrowed items, and return deadlines, providing notifications when time was running out or overdue. ",
     "language": "C#",
     "languages": [
       "C#",
@@ -121,7 +121,7 @@
   },
   {
     "name": "Flat-Galaxy-Society",
-    "description": "Flat Galaxy Society is a C#/.NET project that models this alternative universe. It was created as an Advanced Design Patterns assignment and demonstrates clean architecture, object-oriented modeling, and test-driven development inside a playful, fictional domain.",
+    "description": "Project that models a fictional two‑dimensional universe where planets are round but flat. It demonstrates clean architecture, object‑oriented modeling, and test‑driven development within a playful, experimental domain.",
     "language": "C#",
     "languages": [
       "C#"
@@ -199,7 +199,7 @@
   },
   {
     "name": "Linear-Algebra",
-    "description": "Linear Algebra – Space Simulation (IIIN-LINAL) Linal Eindopdracht for the course Lineaire Algebra (IIIN-LINAL) Made using C++ and SDL. Author: Ferran Hendriks",
+    "description": "Linear Algebra – Space Simulation for the course Lineaire Algebra (IIIN-LINAL) Made using C++ and SDL. Author: Ferran Hendriks",
     "language": "C",
     "languages": [
       "C",
