@@ -1,3 +1,4 @@
+// js/main.js
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -1778,6 +1779,14 @@ function renderMedia() {
       video.controls = true;
       video.playsInline = true;
       video.preload = "metadata";
+
+      // make specific short clip loop ("whichkid v2")
+      if (
+        (item.title && item.title.toLowerCase().includes("whichkid v2")) ||
+        (item.path && item.path.toLowerCase().includes("whichkid"))
+      ) {
+        video.loop = true;
+      }
 
       // pause other videos when this one starts playing
       video.addEventListener("play", () => {
