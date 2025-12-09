@@ -424,11 +424,24 @@ body.bg-video-active .bg-video-overlay {
   justify-content: center;
 }
 
+/* Outer wrapper – holds the spinning ring via ::before */
 .profile-avatar-inner {
+  position: relative;
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  padding: 4px;
+  padding: 4px; /* thickness of the ring */
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+  background: transparent;
+  overflow: visible;
+}
+
+/* The actual gradient ring that will spin */
+.profile-avatar-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
   background: conic-gradient(
     from 180deg,
     #0b1a3d,
@@ -438,16 +451,35 @@ body.bg-video-active .bg-video-overlay {
     #b0172f 75%,
     #050716 100%
   );
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+  transform-origin: center;
+  z-index: 0;
 }
 
+/* The real profile picture – stays still */
 .profile-avatar-inner img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
   display: block;
   border: 2px solid rgba(5, 7, 18, 0.9);
+  background: #000;
+}
+
+/* When music is playing, spin ONLY the ring, not the image */
+.profile-avatar--playing .profile-avatar-inner::before {
+  animation: avatarRingSpin 1.6s linear infinite;
+}
+
+@keyframes avatarRingSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---------- Tabs with sliding pill ---------- */
