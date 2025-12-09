@@ -1,6 +1,11 @@
 {
-  "generatedAt": "2025-12-09T03:47:13.220226Z",
+  "generatedAt": "2025-12-09T19:02:20.721494Z",
   "items": [
+    {
+      "src": "media/images/E-DUBBLE Be A King.jpg",
+      "type": "image",
+      "title": "E DUBBLE Be A King"
+    },
     {
       "src": "media/images/Lost Woods - Ocarina tabs.png",
       "type": "image",
@@ -15,6 +20,11 @@
       "src": "media/images/Zelda's Lullaby - Ocarina tabs.jpg",
       "type": "image",
       "title": "Zelda's Lullaby   Ocarina tabs"
+    },
+    {
+      "src": "media/images/kabels.jpeg",
+      "type": "image",
+      "title": "kabels"
     },
     {
       "src": "media/videos/De Computer.mp4",
