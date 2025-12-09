@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-12-09T19:02:20.721494Z",
+  "generatedAt": "2025-12-09T19:07:10.323597Z",
   "items": [
     {
       "src": "media/images/E-DUBBLE Be A King.jpg",
@@ -57,9 +57,24 @@
       "title": "witchkid v2"
     },
     {
+      "src": "media/audio/Beste Leben.mp3",
+      "type": "audio",
+      "title": "Beste Leben"
+    },
+    {
+      "src": "media/audio/Dengoo Fever.mp3",
+      "type": "audio",
+      "title": "Dengoo Fever"
+    },
+    {
       "src": "media/audio/MANA.mp3",
       "type": "audio",
       "title": "MANA"
+    },
+    {
+      "src": "media/audio/Marioana.mp3",
+      "type": "audio",
+      "title": "Marioana"
     }
   ]
 }
