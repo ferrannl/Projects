@@ -334,6 +334,18 @@
     "thumbnailUrl": ""
   },
   {
+    "name": "TagMan",
+    "description": "",
+    "language": "Java",
+    "languages": [
+      "Java"
+    ],
+    "hasPages": false,
+    "pagesUrl": "",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "VideoShare",
     "description": "ASP.NET Core & Entity Framework Core solution for a layered video sharing web application.",
     "language": "C#",
