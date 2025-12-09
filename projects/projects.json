@@ -110,8 +110,8 @@
     "languages": [
       "Less",
       "HTML",
-      "CSS",
       "JS",
+      "CSS",
       "SCSS"
     ],
     "hasPages": true,
@@ -146,7 +146,7 @@
   },
   {
     "name": "Imgur-App-Android",
-    "description": "Android Imgur client built in Java as the final assignment (“Eindopdracht”) for a Mobile Development Android course. The app demonstrates consuming a REST API, working with lists and detail views, and following common Android architecture patterns.",
+    "description": "Android Imgur client built in Java as the final assignment for a Mobile Development Android course. The app demonstrates consuming a REST API, working with lists and detail views, and following common Android architecture patterns.",
     "language": "Java",
     "languages": [
       "Java"
@@ -230,7 +230,7 @@
   },
   {
     "name": "Monsterzoo",
-    "description": "Monsterzoo is a small browser-based JavaScript game built as an Eindopdracht JavaScript (final assignment). You manage a zoo full of monsters: create them, customize them, place them on different fields, and move or delete them while dealing with changing weather conditions.",
+    "description": "Monsterzoo is a small browser-based JavaScript game built as a final assignment. You manage a zoo full of monsters: create them, customize them, place them on different fields, and move or delete them while dealing with changing weather conditions.",
     "language": "JavaScript",
     "languages": [
       "JS",
