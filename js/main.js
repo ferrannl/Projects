@@ -1,4 +1,3 @@
-// js/main.js
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -134,6 +133,43 @@ const SMALL_WORDS = [
 
 /* Languages you don't want to see */
 const BLOCKED_LANGUAGES = ["roff", "nix", "emacs lisp"];
+
+/* ---------- Secret background video (YouTube API globals) ---------- */
+
+let bgPlayer = null;
+let bgPlayerReady = false;
+
+/**
+ * Called by the YouTube IFrame API when it’s ready.
+ * We prepare a silent background player.
+ */
+function onYouTubeIframeAPIReady() {
+  const containerId = "bgVideoContainer";
+  const el = document.getElementById(containerId);
+  if (!el || !window.YT || !YT.Player) return;
+
+  bgPlayer = new YT.Player(containerId, {
+    videoId: "YeUE1G07yH8",
+    playerVars: {
+      autoplay: 0,
+      controls: 0,
+      disablekb: 1,
+      rel: 0,
+      modestbranding: 1,
+      loop: 1,
+      playlist: "YeUE1G07yH8",
+      playsinline: 1
+    },
+    events: {
+      onReady: (event) => {
+        bgPlayerReady = true;
+        try {
+          event.target.setVolume(20); // ~20% volume
+        } catch (_) {}
+      }
+    }
+  });
+}
 
 /* ---------- i18n dictionary ---------- */
 
@@ -450,6 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupImageModal();
   setupFooterCopyright();
   setupPlaygroundRandomButton();
+  setupSecretBgVideoToggle();
 
   loadProjects();
   loadMedia();
@@ -785,6 +822,39 @@ function setupSearch() {
   updateSearchPlaceholder();
 }
 
+/* ---------- Secret bg video toggle (profile picture) ---------- */
+
+function setupSecretBgVideoToggle() {
+  const avatarImg = document.querySelector(".profile-avatar-inner img");
+  const overlay = document.getElementById("bgVideoOverlay");
+  if (!avatarImg || !overlay) return;
+
+  avatarImg.style.cursor = "pointer";
+
+  avatarImg.addEventListener("click", () => {
+    if (!bgPlayerReady || !bgPlayer) {
+      // If API not ready yet, do nothing (no error).
+      return;
+    }
+
+    const isActive = !document.body.classList.contains("bg-video-active");
+    document.body.classList.toggle("bg-video-active", isActive);
+    overlay.setAttribute("aria-hidden", isActive ? "false" : "true");
+
+    try {
+      if (isActive) {
+        bgPlayer.unMute();
+        bgPlayer.setVolume(20);
+        bgPlayer.playVideo();
+      } else {
+        bgPlayer.pauseVideo();
+      }
+    } catch (_) {
+      // Ignore player errors
+    }
+  });
+}
+
 /* ---------- Projects loading (GitHub + overrides) ---------- */
 
 async function loadProjects() {
@@ -986,7 +1056,6 @@ function getLanguagesList(primary, overrideList) {
   } else if (p === "typescript") {
     list.push("TypeScript", "JS", "HTML", "CSS");
   } else if (p === "c#") {
-    // You explicitly wanted this:
     // GitHub language C# → ["C#", ".NET"]
     list.push("C#", ".NET");
   } else if (p === "c++") {
@@ -1041,8 +1110,6 @@ function buildLanguageFilterOptions(projects) {
 
 /**
  * Heuristics to guess if a project is ASP.NET
- * (we can’t see file structure here without extra API calls,
- * so we key off names / descriptions / overrides)
  */
 function looksLikeAspNet(repo, override, languages) {
   const langs = (languages || []).map((l) => String(l).toLowerCase());
@@ -1780,11 +1847,10 @@ function renderMedia() {
       video.playsInline = true;
       video.preload = "metadata";
 
-      // make specific short clip loop ("whichkid v2")
-      if (
-        (item.title && item.title.toLowerCase().includes("whichkid v2")) ||
-        (item.path && item.path.toLowerCase().includes("whichkid"))
-      ) {
+      // Loop special short video ("whichkid v2")
+      const lowerTitle = (item.title || "").toLowerCase();
+      const lowerPath = (item.path || "").toLowerCase();
+      if (lowerTitle.includes("whichkid") || lowerPath.includes("whichkid")) {
         video.loop = true;
       }
 
