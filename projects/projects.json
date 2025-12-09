@@ -335,7 +335,7 @@
   },
   {
     "name": "TagMan",
-    "description": "A Java game in which a player must run from the left to the right side of the screen as fast as possible while avoiding falling bars and walls. The game score is the total number of seconds you have left at the end of each level. When all levels have been played, the game ends.",
+    "description": "A game in which a player must run from the left to the right side of the screen as fast as possible while avoiding falling bars and walls. The game score is the total number of seconds you have left at the end of each level. When all levels have been played, the game ends.",
     "language": "Java",
     "languages": [
       "Java"
