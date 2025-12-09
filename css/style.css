@@ -1,3 +1,4 @@
+/* css/style.css */
 /* ---------- Theme tokens ---------- */
 
 :root {
@@ -1112,7 +1113,7 @@ body {
   border: none;
 }
 
-/* Wide 16:9 MS Paint, no horizontal scroll, less vertical height */
+/* Wide 16:9 MS Paint on desktop/tablet */
 .playground-embed iframe[src*="paint.js.org"] {
   aspect-ratio: 16 / 9;
   height: auto;
@@ -1504,7 +1505,12 @@ body.js-enabled .no-js-fallback {
   }
 }
 
+/* On mobile, make the Paint canvas 9:16 instead of 16:9 */
 @media (max-width: 640px) {
+  .playground-embed iframe[src*="paint.js.org"] {
+    aspect-ratio: 9 / 16;
+  }
+
   .about-section {
     margin-inline: 0;
   }
