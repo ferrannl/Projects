@@ -19,6 +19,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Full history so rebase / pull works correctly
+          fetch-depth: 0
+
+      - name: Sync with remote main
+        run: |
+          # Ensure we're on main (adjust if your default branch ever changes)
+          git checkout main
+          git pull --rebase origin main
 
       - name: Set up Python
         uses: actions/setup-python@v5
