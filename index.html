@@ -13,73 +13,80 @@
   <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
 
   <link rel="stylesheet" href="css/style.css" />
-  <script src="js/main.js" defer></script>
 </head>
 <body>
-  <!-- Language gate overlay -->
-  <div class="lang-gate-backdrop" id="langGate">
-    <div class="lang-gate-card">
-      <div class="lang-gate-logo">Ferran’s Projects</div>
-      <div class="lang-gate-title">Choose your language</div>
-      <div class="lang-gate-sub">
-        Kies je taal · Wähle deine Sprache · Elige tu idioma
-        <br />
-        <small>You can change it later with the language button at the top.</small>
-      </div>
-
-      <div class="lang-gate-buttons">
-        <button class="btn-lang" data-lang="nl">
-          <span class="flag">🇳🇱</span>
-          <span class="btn-lang-text">
-            <span class="label-main">Nederlands</span>
-            <span class="label-sub">Moedertaal</span>
-          </span>
-        </button>
-
-        <button class="btn-lang" data-lang="en">
-          <span class="flag">🇬🇧</span>
-          <span class="btn-lang-text">
-            <span class="label-main">English</span>
-            <span class="label-sub">International</span>
-          </span>
-        </button>
-
-        <button class="btn-lang" data-lang="de">
-          <span class="flag">🇩🇪</span>
-          <span class="btn-lang-text">
-            <span class="label-main">Deutsch</span>
-            <span class="label-sub">Für meine Nachbarn</span>
-          </span>
-        </button>
-
-        <button class="btn-lang" data-lang="pl">
-          <span class="flag">🇵🇱</span>
-          <span class="btn-lang-text">
-            <span class="label-main">Polski</span>
-            <span class="label-sub">właśc. Dominik Włodzimierz Czajka-Groot</span>
-          </span>
-        </button>
-
-        <button class="btn-lang" data-lang="tr">
-          <span class="flag">🇹🇷</span>
-          <span class="btn-lang-text">
-            <span class="label-main">Türkçe</span>
-            <span class="label-sub">Merhaba, hoş geldin</span>
-          </span>
-        </button>
-
-        <button class="btn-lang" data-lang="es">
-          <span class="flag">🇪🇸</span>
-          <span class="btn-lang-text">
-            <span class="label-main">Español</span>
-            <span class="label-sub">Para amigos de España y Canarias</span>
-          </span>
-        </button>
-      </div>
+  <!-- Background YouTube layer (secret toggle) -->
+  <div id="bgVideoOverlay" class="bg-video-overlay" aria-hidden="true">
+    <div class="bg-video-inner">
+      <div id="bgVideoContainer" class="bg-video-container"></div>
+      <div class="bg-video-tint"></div>
     </div>
   </div>
 
   <div class="app">
+    <!-- Language gate overlay -->
+    <div class="lang-gate-backdrop" id="langGate">
+      <div class="lang-gate-card">
+        <div class="lang-gate-logo">Ferran’s Projects</div>
+        <div class="lang-gate-title">Choose your language</div>
+        <div class="lang-gate-sub">
+          Kies je taal · Wähle deine Sprache · Elige tu idioma
+          <br />
+          <small>You can change it later with the language button at the top.</small>
+        </div>
+
+        <div class="lang-gate-buttons">
+          <button class="btn-lang" data-lang="nl">
+            <span class="flag">🇳🇱</span>
+            <span class="btn-lang-text">
+              <span class="label-main">Nederlands</span>
+              <span class="label-sub">Moedertaal</span>
+            </span>
+          </button>
+
+          <button class="btn-lang" data-lang="en">
+            <span class="flag">🇬🇧</span>
+            <span class="btn-lang-text">
+              <span class="label-main">English</span>
+              <span class="label-sub">International</span>
+            </span>
+          </button>
+
+          <button class="btn-lang" data-lang="de">
+            <span class="flag">🇩🇪</span>
+            <span class="btn-lang-text">
+              <span class="label-main">Deutsch</span>
+              <span class="label-sub">Für meine Nachbarn</span>
+            </span>
+          </button>
+
+          <button class="btn-lang" data-lang="pl">
+            <span class="flag">🇵🇱</span>
+            <span class="btn-lang-text">
+              <span class="label-main">Polski</span>
+              <span class="label-sub">właśc. Dominik Włodzimierz Czajka-Groot</span>
+            </span>
+          </button>
+
+          <button class="btn-lang" data-lang="tr">
+            <span class="flag">🇹🇷</span>
+            <span class="btn-lang-text">
+              <span class="label-main">Türkçe</span>
+              <span class="label-sub">Merhaba, hoş geldin</span>
+            </span>
+          </button>
+
+          <button class="btn-lang" data-lang="es">
+            <span class="flag">🇪🇸</span>
+            <span class="btn-lang-text">
+              <span class="label-main">Español</span>
+              <span class="label-sub">Para amigos de España y Canarias</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <header class="site-header">
       <div class="site-title-block">
         <div class="header-main-row">
@@ -98,10 +105,13 @@
             </button>
 
             <nav class="social-links" aria-label="Social links">
-              <!-- New order: GitHub → LinkedIn → Email → Discord → Instagram → Reddit → Tumblr → Kadaver Tumblr -->
               <a href="https://github.com/ferrannl" class="social-chip social-github" target="_blank" rel="noopener noreferrer">
                 <span class="social-icon"><img src="assets/github_icon.png" alt="GitHub" /></span>
                 <span class="social-label">GitHub</span>
+              </a>
+              <a href="https://www.instagram.com/kadaver_ig" class="social-chip social-instagram" target="_blank" rel="noopener noreferrer">
+                <span class="social-icon"><img src="assets/instagram_icon.png" alt="Instagram" /></span>
+                <span class="social-label">Instagram</span>
               </a>
               <a href="https://www.linkedin.com/in/fhendriksnl" class="social-chip social-linkedin" target="_blank" rel="noopener noreferrer">
                 <span class="social-icon"><img src="assets/linkedin_icon.png" alt="LinkedIn" /></span>
@@ -115,14 +125,6 @@
                 <span class="social-icon"><img src="assets/discord_icon.png" alt="Discord" /></span>
                 <span class="social-label">Discord</span>
               </a>
-              <a href="https://www.instagram.com/kadaver_ig" class="social-chip social-instagram" target="_blank" rel="noopener noreferrer">
-                <span class="social-icon"><img src="assets/instagram_icon.png" alt="Instagram" /></span>
-                <span class="social-label">Instagram</span>
-              </a>
-              <a class="social-chip social-reddit" href="https://www.reddit.com/user/PikalexNL" target="_blank" rel="noreferrer">
-                <span class="social-icon"><img src="assets/reddit_icon.png" alt="Reddit" /></span>
-                <span class="social-label">Reddit</span>
-              </a>
               <!-- Tumblr (modern) -->
               <a href="https://www.tumblr.com/kadavernl" class="social-chip social-tumblr" target="_blank" rel="noopener noreferrer">
                 <span class="social-icon"><img src="assets/tumblr_icon.png" alt="Tumblr" /></span>
@@ -132,6 +134,10 @@
               <a href="https://kadavernl.tumblr.com/" class="social-chip social-tumblr-old" target="_blank" rel="noopener noreferrer">
                 <span class="social-icon"><img src="assets/tumblr_old_icon.png" alt="Tumblr Y2K" /></span>
                 <span class="social-label">Kadaver</span>
+              </a>
+              <a class="social-chip social-reddit" href="https://www.reddit.com/user/PikalexNL" target="_blank" rel="noreferrer">
+                <span class="social-icon"><img src="assets/reddit_icon.png" alt="Reddit" /></span>
+                <span class="social-label">Reddit</span>
               </a>
             </nav>
           </div>
@@ -277,9 +283,11 @@
       <span class="footer-center"></span>
 
       <div class="footer-social-icons">
-        <!-- Same order as header: GitHub → LinkedIn → Email → Discord → Instagram → Reddit → Tumblr → Kadaver Tumblr -->
         <a href="https://github.com/ferrannl" target="_blank" rel="noopener noreferrer">
           <img src="assets/github_icon.png" alt="GitHub" />
+        </a>
+        <a href="https://www.instagram.com/ferrannl" target="_blank" rel="noopener noreferrer">
+          <img src="assets/instagram_icon.png" alt="Instagram" />
         </a>
         <a href="https://www.linkedin.com/in/fhendriksnl" target="_blank" rel="noopener noreferrer">
           <img src="assets/linkedin_icon.png" alt="LinkedIn" />
@@ -290,17 +298,14 @@
         <a href="https://discord.com/users/276441877497118721" target="_blank" rel="noopener noreferrer">
           <img src="assets/discord_icon.png" alt="Discord" />
         </a>
-        <a href="https://www.instagram.com/ferrannl" target="_blank" rel="noopener noreferrer">
-          <img src="assets/instagram_icon.png" alt="Instagram" />
-        </a>
-        <a href="https://www.reddit.com/user/PikalexNL" target="_blank" rel="noopener noreferrer">
-          <img src="assets/reddit_icon.png" alt="Reddit" />
-        </a>
         <a href="https://www.tumblr.com/kadavernl" target="_blank" rel="noopener noreferrer">
           <img src="assets/tumblr_icon.png" alt="Tumblr" />
         </a>
         <a href="https://kadavernl.tumblr.com/" target="_blank" rel="noopener noreferrer">
           <img src="assets/tumblr_old_icon.png" alt="Tumblr Y2K" />
+        </a>
+        <a href="https://www.reddit.com/user/PikalexNL" target="_blank" rel="noopener noreferrer">
+          <img src="assets/reddit_icon.png" alt="Reddit" />
         </a>
       </div>
     </footer>
@@ -309,5 +314,9 @@
       <p class="noscript-warning">JavaScript is disabled – enable it to see the interactive project &amp; media listing.</p>
     </noscript>
   </div>
+
+  <!-- Main logic + YouTube IFrame API (for secret bg video) -->
+  <script src="js/main.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
