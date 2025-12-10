@@ -357,7 +357,7 @@ If you open a PR, keep the code:
 * **X / Twitter:** [https://x.com/PikalexNL](https://x.com/PikalexNL)
 * **Twitch:** [https://twitch.tv/PikalexNL](https://twitch.tv/PikalexNL)
 * **Reddit:** [https://www.reddit.com/user/PikalexNL](https://www.reddit.com/user/PikalexNL)
-* **Discord:** `Pikalex#????` (or profile: [link in the site header])
+* **Discord:** [kadavernl](https://discord.com/users/276441877497118721)
 
 ---
 
