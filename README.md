@@ -5,7 +5,7 @@
 _All my GitHub work in one place — client websites, school projects, APIs, mobile apps, games, utilities and random experiments._
 
 [![GitHub followers](https://img.shields.io/badge/Followers-0-blue?style=flat-square)](https://github.com/ferrannl)
-[![Public repos](https://img.shields.io/badge/Public%20repos-0-brightgreen?style=flat-square)](https://github.com/ferrannl?tab=repositories)
+[![Public repos](https://img.shields.io/badge/Public%20repos-28-brightgreen?style=flat-square)](https://github.com/ferrannl?tab=repositories)
 [![Profile views](https://komarev.com/ghpvc/?username=ferrannl&style=flat-square)](https://github.com/ferrannl)
 
 > **Live site:**  
@@ -238,7 +238,7 @@ jobs:
             );
 
             // 4) Ensure a "Last updated" footer exists
-            if (readme.includes("Last updated:")) {
+            if (readme.includes("Last updated: 2025-12-10 20:26:32 UTC
               readme = readme.replace(/Last updated:.*/, `Last updated: ${updatedAt}`);
             } else {
               readme += `\n\n---\n_Last updated: ${updatedAt}_\n`;
