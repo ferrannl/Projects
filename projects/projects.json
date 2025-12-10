@@ -284,7 +284,7 @@
   },
   {
     "name": "Speuren-met-Krul-2020",
-    "description": "A C++ console application that follows a chain of online clues, fetches and interprets a custom mini-language called Krul, and ultimately reveals a hidden secret message. This project was created as the CPPLS1 final project (Eindopdracht).",
+    "description": "C++ console application that follows a chain of online clues, fetches and interprets a custom mini-language called Krul, and ultimately reveals a hidden secret message. This project was created as the CPPLS1 final project (Eindopdracht).",
     "language": "C++",
     "languages": [
       "C++"
@@ -296,7 +296,7 @@
   },
   {
     "name": "Speuren-met-Krul-2021",
-    "description": "C++ console application created in 2021 as part of a school assignment by Ferran Hendriks (2130858).",
+    "description": "C++ console application that follows a chain of online clues, fetches and interprets a custom mini-language called Krul, and ultimately reveals a hidden secret message. This project was created as the CPPLS1 final project (Eindopdracht).",
     "language": "C++",
     "languages": [
       "C++"
