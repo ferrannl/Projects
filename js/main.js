@@ -6,14 +6,14 @@ const PROJECTS_URL = "./projects/projects.json";
 const MEDIA_INDEX_URL = "./media/media.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
+const THUMB_CACHE_KEY = "ferranProjectsThumbsV3";
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
-// Thumbnail cache key (bumped to V2 so old logo.jpg entries are dropped)
-const THUMB_CACHE_KEY = "ferranProjectsThumbsV2";
+const POSTBOARD_STORAGE_KEY = "ferranProjectsPostboardV1";
 
 /* ---------- Random useless websites list ---------- */
 
@@ -67,17 +67,13 @@ const USELESS_WEB_URLS = [
   "https://www.partridgegetslucky.com/",
   "http://heeeeeeeey.com/",
   "http://thatsthefinger.com/",
-  "http://eelslap.com/",
   "http://www.staggeringbeauty.com/",
-  "http://burymewithmymoney.com/",
   "http://www.fallingfalling.com/",
   "http://ducksarethebest.com/",
   "http://www.trypap.com/",
   "http://www.republiquedesmangues.fr/",
   "http://www.movenowthinklater.com/",
-  "http://www.partridgegetslucky.com/",
   "http://www.rrrgggbbb.com/",
-  "http://beesbeesbees.com/",
   "http://www.sanger.dk/",
   "http://www.koalastothemax.com/",
   "http://www.everydayim.com/",
@@ -89,10 +85,6 @@ const USELESS_WEB_URLS = [
   "https://neal.fun/walls/",
   "https://neal.fun/spend/",
   "https://onesandzeros.online/",
-  "https://thatsthefinger.com/",
-  "https://pointerpointer.com/",
-  "https://trypap.com/",
-  "https://heeeeeeeey.com/",
   "https://hooooooooo.com/",
   "https://www.breakglassforfun.com/",
   "https://drawabezier.com/"
@@ -104,6 +96,7 @@ let repos = [];
 let projects = [];
 let mediaItems = [];
 let thumbCache = loadThumbCache();
+let paintIframe = null;
 
 const state = {
   activeTab: "projects",
@@ -216,6 +209,17 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
+    playgroundPaintHint:
+      "Het tekenen gebeurt binnen paint.js.org. “Open” of “Save” opent de volledige app in een nieuw tabblad voor meer opties.",
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Laat een kort bericht achter (anoniem of met naam). Berichten worden lokaal in je browser opgeslagen.",
+    postboardNameLabel: "Naam (optioneel)",
+    postboardAnonymousLabel: "Anoniem posten",
+    postboardMessageLabel: "Bericht",
+    postboardSubmitLabel: "Plaatsen",
+    postboardListTitle: "Wall",
+    postboardEmpty: "Nog geen berichten. Wees de eerste!",
     playgroundRandomTitle: "Random website-knop",
     playgroundRandomText:
       "Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
@@ -257,6 +261,17 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint remake, have fun drawing!",
+    playgroundPaintHint:
+      "Drawing happens inside paint.js.org. “Open” or “Save” will open the full app in a new tab for more options.",
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Leave a small message (with or without your name). Entries are stored locally in your browser.",
+    postboardNameLabel: "Name (optional)",
+    postboardAnonymousLabel: "Post anonymously",
+    postboardMessageLabel: "Message",
+    postboardSubmitLabel: "Post",
+    postboardListTitle: "Wall",
+    postboardEmpty: "No posts yet. Be the first!",
     playgroundRandomTitle: "Random Website Button",
     playgroundRandomText:
       "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
@@ -282,8 +297,10 @@ const I18N = {
     mediaKindAudio: "Audio",
     mediaFormatLabel: "File type",
     mediaFormatAll: "All types",
-    emptyState: "No projects found with these filters. Try something else.",
-    mediaEmptyState: "No media found with these filters.",
+    emptyState:
+      "No projects found with these filters. Try something else.",
+    mediaEmptyState:
+      "No media found with these filters.",
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
     btnLiveSite: "Live site"
@@ -297,6 +314,17 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS-Paint-Playground",
     playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
+    playgroundPaintHint:
+      "Das Zeichnen findet in paint.js.org statt. „Open“ oder „Save“ öffnen die komplette App in einem neuen Tab.",
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Hinterlass eine kurze Nachricht (mit oder ohne Namen). Einträge werden lokal im Browser gespeichert.",
+    postboardNameLabel: "Name (optional)",
+    postboardAnonymousLabel: "Anonym posten",
+    postboardMessageLabel: "Nachricht",
+    postboardSubmitLabel: "Posten",
+    postboardListTitle: "Wall",
+    postboardEmpty: "Noch keine Posts. Sei der Erste!",
     playgroundRandomTitle: "Zufällige-Website-Button",
     playgroundRandomText:
       "Neugierig oder gelangweilt? Klick auf den Button und es öffnet sich eine zufällige, verrückte Website in einem neuen Tab.",
@@ -318,7 +346,7 @@ const I18N = {
     mediaTypeLabel: "Medientyp",
     mediaKindAll: "Alle",
     mediaKindImages: "Bilder",
-    mediaKindVideos: "Video’s",
+    mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
     mediaFormatLabel: "Dateityp",
     mediaFormatAll: "Alle Formate",
@@ -338,7 +366,19 @@ const I18N = {
       "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
     aboutP2: "",
     playgroundPaintTitle: "Plac zabaw MS Paint",
-    playgroundPaintText: "Remake MS Paint, miłej zabawy przy rysowaniu!",
+    playgroundPaintText:
+      "Remake MS Paint, miłej zabawy przy rysowaniu!",
+    playgroundPaintHint:
+      "Rysujesz wewnątrz paint.js.org. „Open” lub „Save” otworzą pełną aplikację w nowej karcie.",
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Zostaw krótką wiadomość (z imieniem lub anonimowo). Wpisy są przechowywane lokalnie w przeglądarce.",
+    postboardNameLabel: "Imię (opcjonalnie)",
+    postboardAnonymousLabel: "Opublikuj anonimowo",
+    postboardMessageLabel: "Wiadomość",
+    postboardSubmitLabel: "Opublikuj",
+    postboardListTitle: "Wall",
+    postboardEmpty: "Brak wpisów. Bądź pierwszy!",
     playgroundRandomTitle: "Przycisk losowej strony",
     playgroundRandomText:
       "Nudzisz się lub jesteś ciekawy? Kliknij przycisk, a otworzy się losowa, dziwna strona w nowej karcie.",
@@ -366,7 +406,8 @@ const I18N = {
     mediaFormatAll: "Wszystkie formaty",
     emptyState:
       "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
-    mediaEmptyState: "Nie znaleziono mediów dla tych filtrów.",
+    mediaEmptyState:
+      "Nie znaleziono mediów dla tych filtrów.",
     headerLangButton: "Język",
     footerBuilt: "Stworzone z ♥ przez Ferrana",
     btnLiveSite: "Strona live"
@@ -380,6 +421,17 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS Paint Oyun Alanı",
     playgroundPaintText: "MS Paint yeniden yapımı, keyifle çiz!",
+    playgroundPaintHint:
+      "Çizim paint.js.org içinde gerçekleşir. “Open” veya “Save” tam uygulamayı yeni sekmede açar.",
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Kısa bir mesaj bırak (isimle veya isimsiz). Gönderiler tarayıcında yerel olarak saklanır.",
+    postboardNameLabel: "İsim (isteğe bağlı)",
+    postboardAnonymousLabel: "Anonim gönder",
+    postboardMessageLabel: "Mesaj",
+    postboardSubmitLabel: "Gönder",
+    postboardListTitle: "Duvar",
+    postboardEmpty: "Henüz gönderi yok. İlk sen ol!",
     playgroundRandomTitle: "Rastgele Site Butonu",
     playgroundRandomText:
       "Meraklı veya sıkılmış mısın? Butona tıkla, yeni sekmede rastgele garip bir site açılsın.",
@@ -407,7 +459,8 @@ const I18N = {
     mediaFormatAll: "Tüm türler",
     emptyState:
       "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
-    mediaEmptyState: "Bu arama veya filtrelerle medya bulunamadı.",
+    mediaEmptyState:
+      "Bu arama veya filtrelerle medya bulunamadı.",
     headerLangButton: "Dil",
     footerBuilt: "♥ ile geliştirildi – Ferran",
     btnLiveSite: "Canlı site"
@@ -422,6 +475,17 @@ const I18N = {
     playgroundPaintTitle: "Playground de MS Paint",
     playgroundPaintText:
       "Remake de MS Paint, ¡diviértete dibujando!",
+    playgroundPaintHint:
+      "Se dibuja dentro de paint.js.org. “Open” o “Save” abrirán la app completa en una nueva pestaña.",
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Deja un pequeño mensaje (con o sin nombre). Las entradas se guardan localmente en tu navegador.",
+    postboardNameLabel: "Nombre (opcional)",
+    postboardAnonymousLabel: "Publicar anónimamente",
+    postboardMessageLabel: "Mensaje",
+    postboardSubmitLabel: "Publicar",
+    postboardListTitle: "Muro",
+    postboardEmpty: "Aún no hay mensajes. ¡Sé el primero!",
     playgroundRandomTitle: "Botón de web aleatoria",
     playgroundRandomText:
       "¿Curioso o aburrido? Pulsa el botón y se abrirá una web rara al azar en una nueva pestaña.",
@@ -449,7 +513,8 @@ const I18N = {
     mediaFormatAll: "Todos los tipos",
     emptyState:
       "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
-    mediaEmptyState: "No se encontró media con estos filtros.",
+    mediaEmptyState:
+      "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
     btnLiveSite: "Sitio live"
@@ -520,6 +585,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFooterCopyright();
   setupPlaygroundRandomButton();
   setupSecretBgVideoToggle();
+  setupPaintToolbar();
+  setupPostboard();
 
   loadProjects();
   loadMedia();
@@ -529,8 +596,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function getSearchPlaceholder(lang, view) {
   const tab = view || "projects";
-
-  // normalise lang
   const l = SUPPORTED_LANGS.includes(lang) ? lang : DEFAULT_LANG;
 
   if (tab === "media") {
@@ -617,9 +682,8 @@ function setupLanguage() {
   }
 
   const headerLangButton = document.getElementById("headerLangButton");
-  if (headerLangButton) {
+  if (headerLangButton && gate) {
     headerLangButton.addEventListener("click", () => {
-      if (!gate) return;
       gate.hidden = false;
       updateLanguageGateActive();
     });
@@ -658,9 +722,7 @@ function setLanguage(lang) {
     searchLabelEl.textContent = dict.searchLabel;
   }
 
-  // language-aware + tab-aware placeholder
   updateSearchPlaceholder();
-
   updateLanguageGateActive();
   renderProjects();
 }
@@ -704,13 +766,12 @@ function setupTabsAndFilters() {
   const tabsContainer = document.querySelector(".tabs");
 
   function updateTabsVisual(mode) {
-    const tabs = tabsContainer;
-    if (!tabs) return;
-    tabs.classList.remove("tabs-media", "tabs-playground");
+    if (!tabsContainer) return;
+    tabsContainer.classList.remove("tabs-media", "tabs-playground");
     if (mode === "media") {
-      tabs.classList.add("tabs-media");
+      tabsContainer.classList.add("tabs-media");
     } else if (mode === "playground") {
-      tabs.classList.add("tabs-playground");
+      tabsContainer.classList.add("tabs-playground");
     }
   }
 
@@ -851,7 +912,6 @@ function setupSearch() {
     }
   });
 
-  // ensure placeholder is correct at init
   updateSearchPlaceholder();
 }
 
@@ -866,7 +926,7 @@ function setupSecretBgVideoToggle() {
 
   avatarImg.addEventListener("click", () => {
     if (!bgPlayerReady || !bgPlayer) {
-      // If API not ready yet, do nothing (no error).
+      // If API not ready yet, do nothing
       return;
     }
 
@@ -879,8 +939,12 @@ function setupSecretBgVideoToggle() {
         bgPlayer.unMute();
         bgPlayer.setVolume(20);
         bgPlayer.playVideo();
+        // Spin avatar ring when bg video is playing
+        setAvatarPlaying(true);
       } else {
         bgPlayer.pauseVideo();
+        // When pausing bg video, fall back to HTML5 media state
+        updateAvatarPlayingFromMedia();
       }
     } catch (_) {
       // Ignore player errors
@@ -918,10 +982,7 @@ async function loadProjects() {
     const description =
       o.description || repo.description || "No description yet.";
 
-    const overrideLangs = Array.isArray(o.languages)
-      ? o.languages
-      : o.langs;
-
+    const overrideLangs = Array.isArray(o.languages) ? o.languages : o.langs;
     let languages = getLanguagesList(repo.language, overrideLangs);
 
     // Auto-detect ASP.NET and add it as a language if applicable
@@ -937,6 +998,10 @@ async function loadProjects() {
     const type = guessProjectType(repo, o, languages);
 
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
+    const categoryTags = computeCategoryTags(repo, o, languages, type);
+    categoryTags.forEach((t) => {
+      if (!tags.includes(t)) tags.push(t);
+    });
 
     if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) {
       tags.push("Security");
@@ -988,19 +1053,16 @@ async function loadGitHubReposWithCache() {
     if (!res.ok) {
       throw new Error("GitHub HTTP " + res.status);
     }
-
     const data = await res.json();
     saveReposToCache(data);
     return data;
   } catch (err) {
     console.error("GitHub fetch failed, trying cache instead:", err);
-
     const cached = readReposFromCache();
     if (cached) {
       console.warn("Using cached GitHub repos");
       return cached;
     }
-
     console.warn("No cached repos available, returning empty list");
     return [];
   }
@@ -1026,12 +1088,9 @@ function readReposFromCache() {
   }
 }
 
-function saveReposToCache(repos) {
+function saveReposToCache(reposToSave) {
   try {
-    const payload = {
-      timestamp: Date.now(),
-      repos
-    };
+    const payload = { timestamp: Date.now(), repos: reposToSave };
     localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
   } catch (err) {
     console.error("Error saving repos to cache:", err);
@@ -1089,7 +1148,6 @@ function getLanguagesList(primary, overrideList) {
   } else if (p === "typescript") {
     list.push("TypeScript", "JS", "HTML", "CSS");
   } else if (p === "c#") {
-    // GitHub language C# → ["C#", ".NET"]
     list.push("C#", ".NET");
   } else if (p === "c++") {
     list.push("C++", "C");
@@ -1111,7 +1169,7 @@ function getLanguagesList(primary, overrideList) {
   );
 }
 
-function buildLanguageFilterOptions(projects) {
+function buildLanguageFilterOptions(projectsList) {
   const select = document.getElementById("languageFilter");
   if (!select) return;
 
@@ -1120,7 +1178,7 @@ function buildLanguageFilterOptions(projects) {
   }
 
   const set = new Set();
-  projects.forEach((p) => {
+  projectsList.forEach((p) => {
     (p.languages || []).forEach((lang) => {
       const lower = String(lang).toLowerCase();
       if (!BLOCKED_LANGUAGES.includes(lower)) {
@@ -1141,9 +1199,8 @@ function buildLanguageFilterOptions(projects) {
   });
 }
 
-/**
- * Heuristics to guess if a project is ASP.NET
- */
+/* ---------- Type helpers ---------- */
+
 function looksLikeAspNet(repo, override, languages) {
   const langs = (languages || []).map((l) => String(l).toLowerCase());
   if (langs.includes("asp.net")) return true;
@@ -1154,10 +1211,9 @@ function looksLikeAspNet(repo, override, languages) {
     if (lower.some((l) => l.includes("asp.net"))) return true;
   }
 
-  const text =
-    `${repo.name || ""} ${repo.description || ""} ${
-      (override && (override.description || "")) || ""
-    }`.toLowerCase();
+  const text = `${repo.name || ""} ${repo.description || ""} ${
+    (override && (override.description || "")) || ""
+  }`.toLowerCase();
 
   const patterns = ["asp.net", "aspnet", "asp-net"];
   if (patterns.some((p) => text.includes(p))) return true;
@@ -1165,63 +1221,7 @@ function looksLikeAspNet(repo, override, languages) {
   return false;
 }
 
-/* ---------- Project helpers: type, security tag, liveUrl, thumbnail ---------- */
-
-function isSecurityProject(repo, override, languages) {
-  if (
-    override &&
-    Array.isArray(override.tags) &&
-    override.tags.includes("Security")
-  ) {
-    return true;
-  }
-
-  const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
-  const securityWords = [
-    "security",
-    "secure",
-    "auth",
-    "authentication",
-    "authorization",
-    "oauth",
-    "jwt",
-    "token",
-    "password",
-    "passwort",
-    "wachtwoord",
-    "hash",
-    "encrypt",
-    "encryption",
-    "crypt",
-    "crypto",
-    "2fa",
-    "mfa",
-    "devops",
-    "owasp",
-    "vuln",
-    "vulnerability",
-    "pentest",
-    "penetration test",
-    "internship",
-    "intern",
-    "stage",
-    "praktijk"
-  ];
-
-  const hasSecurityWord = securityWords.some((w) => text.includes(w));
-
-  const hasDotNet =
-    (languages || []).some((l) => l.toLowerCase().includes(".net")) ||
-    (repo.language || "").toLowerCase() === "c#";
-
-  return hasDotNet && hasSecurityWord;
-}
-
-function guessProjectType(repo, override, languages) {
-  if (override && override.type) {
-    return override.type;
-  }
-
+function computeTypeFlags(repo, override, languages) {
   const name = (repo.name || "").toLowerCase();
   const desc = (repo.description || "").toLowerCase();
   const joined = `${name} ${desc}`;
@@ -1229,26 +1229,9 @@ function guessProjectType(repo, override, languages) {
 
   const has = (words) => words.some((w) => joined.includes(w));
 
-  // explicit overrides by name
-  if (name.includes("videoshare") || name.includes("video-share")) {
-    return "api"; // VideoShare is backend / API
-  }
-
-  // Game hints
-  if (
-    name.includes("kolonisten") ||
-    name.includes("katan") ||
-    name.includes("catan")
-  ) {
-    return "game";
-  }
-  if (name.includes("dimitri")) {
-    return "game";
-  }
-
   const aspNetLike = looksLikeAspNet(repo, override, languages);
 
-  const isGame = has([
+  let isGame = has([
     "game",
     "games",
     "spel",
@@ -1260,17 +1243,16 @@ function guessProjectType(repo, override, languages) {
     "jigsaw"
   ]);
 
-  const isApi =
-    has([
-      "api",
-      "backend",
-      "server",
-      "service",
-      "rest",
-      "endpoint"
-    ]) || aspNetLike;
+  let isApi = has([
+    "api",
+    "backend",
+    "server",
+    "service",
+    "rest",
+    "endpoint"
+  ]) || aspNetLike;
 
-  const isMobile =
+  let isMobile =
     has([
       "android",
       "ios",
@@ -1285,29 +1267,26 @@ function guessProjectType(repo, override, languages) {
       "flutter",
       "mobile"
     ]) ||
-    (["kotlin", "swift", "objective-c", "objective c", "dart"].includes(
-      lang
-    ) &&
+    (["kotlin", "swift", "objective-c", "objective c", "dart"].includes(lang) &&
       has(["android", "ios", "mobile"]));
 
-  const isSchool =
-    has([
-      "school",
-      "study",
-      "studie",
-      "uni",
-      "university",
-      "hogeschool",
-      "opdracht",
-      "assignment",
-      "project for school",
-      "school project",
-      "stage",
-      "internship",
-      "praktijk"
-    ]);
+  let isSchool = has([
+    "school",
+    "study",
+    "studie",
+    "uni",
+    "university",
+    "hogeschool",
+    "opdracht",
+    "assignment",
+    "project for school",
+    "school project",
+    "stage",
+    "internship",
+    "praktijk"
+  ]);
 
-  const isWebsite =
+  let isWebsite =
     lang === "html" ||
     lang === "php" ||
     lang === "vue" ||
@@ -1328,20 +1307,130 @@ function guessProjectType(repo, override, languages) {
       "shop"
     ]);
 
+  // special cases by name
+  if (name.includes("videoshare") || name.includes("video-share")) {
+    isApi = true;
+  }
+
+  if (
+    name.includes("kolonisten") ||
+    name.includes("katan") ||
+    name.includes("catan") ||
+    name.includes("dimitri")
+  ) {
+    isGame = true;
+  }
+
+  return { isGame, isMobile, isApi, isSchool, isWebsite };
+}
+
+function guessProjectType(repo, override, languages) {
+  if (override && override.type) {
+    return override.type;
+  }
+
+  const flags = computeTypeFlags(repo, override, languages);
+
   // Priority: Game > Mobile > API > School > Website > Other
-  if (isGame) return "game";
-  if (isMobile) return "mobile";
-  if (isApi) return "api";
-  if (isSchool) return "school";
-  if (isWebsite) return "website";
+  if (flags.isGame) return "game";
+  if (flags.isMobile) return "mobile";
+  if (flags.isApi) return "api";
+  if (flags.isSchool) return "school";
+  if (flags.isWebsite) return "website";
 
   return "other";
 }
 
-function computeLiveUrl(repo, override) {
-  const raw = (override.liveUrl || repo.homepage || "").trim();
-  if (raw) return raw;
+function computeCategoryTags(repo, override, languages, primaryType) {
+  const flags = computeTypeFlags(repo, override, languages);
+  const tags = [];
 
+  if (flags.isGame && primaryType !== "game") tags.push("Game");
+  if (flags.isMobile && primaryType !== "mobile") tags.push("Mobile");
+  if (flags.isApi && primaryType !== "api") tags.push("API / Backend");
+  if (flags.isSchool && primaryType !== "school")
+    tags.push("School / Study");
+  if (flags.isWebsite && primaryType !== "website")
+    tags.push("Website");
+
+  const text = `${repo.name || ""} ${repo.description || ""} ${
+    (override && override.description) || ""
+  }`.toLowerCase();
+
+  const algoWords = [
+    "algorithm",
+    "algoritme",
+    "sorting",
+    "sortering",
+    "pathfinding",
+    "dijkstra",
+    "bfs",
+    "dfs",
+    "graph",
+    "queue",
+    "stack"
+  ];
+  if (algoWords.some((w) => text.includes(w))) {
+    if (!tags.includes("Algorithms")) tags.push("Algorithms");
+  }
+
+  return tags;
+}
+
+/* ---------- Project helpers: type, security tag, liveUrl, thumbnail ---------- */
+
+function isSecurityProject(repo, override, languages) {
+  if (
+    override &&
+    Array.isArray(override.tags) &&
+    override.tags.includes("Security")
+  ) {
+    return true;
+  }
+
+  const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
+
+  // Narrower list: remove internship/devops/etc so Ecobit Internship doesn't get hit
+  const securityWords = [
+    "security",
+    "secure",
+    "auth",
+    "authentication",
+    "authorization",
+    "oauth",
+    "jwt",
+    "token",
+    "password",
+    "passwort",
+    "wachtwoord",
+    "hash",
+    "encrypt",
+    "encryption",
+    "crypt",
+    "crypto",
+    "2fa",
+    "mfa",
+    "owasp",
+    "vuln",
+    "vulnerability",
+    "pentest",
+    "penetration test"
+  ];
+
+  const hasSecurityWord = securityWords.some((w) => text.includes(w));
+
+  const hasDotNet =
+    (languages || []).some((l) => l.toLowerCase().includes(".net")) ||
+    (repo.language || "").toLowerCase() === "c#";
+
+  return hasDotNet && hasSecurityWord;
+}
+
+function computeLiveUrl(repo, override) {
+  const rawOverride = (override.liveUrl || "").trim();
+  if (rawOverride) return rawOverride;
+
+  // Only treat GitHub Pages (or explicit override.hasLive) as valid live sites.
   const hasLive =
     override.hasLive !== undefined ? !!override.hasLive : !!repo.has_pages;
 
@@ -1370,7 +1459,6 @@ function sortProjectsByLive() {
 async function verifyLiveSites() {
   const checks = projects.map(async (project) => {
     if (!project.liveUrl) return;
-
     try {
       const res = await fetch(project.liveUrl, {
         method: "GET",
@@ -1478,12 +1566,18 @@ async function findRepoRootThumbnail(repoName) {
 
     const score = (name) => {
       const lower = name.toLowerCase();
-      if (lower === "logo.png") return 0;
-      if (lower === "logo.jpg" || lower === "logo.jpeg") return 1;
-      if (lower.startsWith("logo.")) return 2;
-      if (lower.includes("classdiagram")) return 3;
-      if (lower.includes("diagram")) return 4;
-      return 5;
+      if (lower === "logo.gif") return 0;
+      if (lower === "logo.png") return 1;
+      if (
+        lower === "logo.jpg" ||
+        lower === "logo.jpeg" ||
+        lower === "logo.webp"
+      )
+        return 2;
+      if (lower.startsWith("logo.")) return 3;
+      if (lower.includes("classdiagram")) return 4;
+      if (lower.includes("diagram")) return 5;
+      return 6;
     };
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
@@ -1623,7 +1717,7 @@ function renderProjects() {
     githubBtn.target = "_blank";
     githubBtn.rel = "noopener noreferrer";
     githubBtn.className = "btn-card";
-    githubBtn.innerHTML = `<span>GitHub</span>`;
+    githubBtn.innerHTML = "<span>GitHub</span>";
     actions.appendChild(githubBtn);
 
     if (project.liveUrl) {
@@ -1633,7 +1727,9 @@ function renderProjects() {
       liveBtn.rel = "noopener noreferrer";
       liveBtn.className = "btn-card btn-card-live";
       const label =
-        dict.btnLiveSite || I18N[DEFAULT_LANG].btnLiveSite || "Live site";
+        dict.btnLiveSite ||
+        I18N[DEFAULT_LANG].btnLiveSite ||
+        "Live site";
       liveBtn.innerHTML = `<span>${label}</span>`;
       actions.appendChild(liveBtn);
     }
@@ -1661,18 +1757,11 @@ async function loadMedia() {
     const items = Array.isArray(data) ? data : data.items || [];
 
     mediaItems = items.map((item, index) => {
-      let path =
-        item.path ||
-        item.url ||
-        item.src ||
-        "";
+      let path = item.path || item.url || item.src || "";
 
       if (!path) {
         const fileName =
-          item.fileName ||
-          item.name ||
-          item.title ||
-          "";
+          item.fileName || item.name || item.title || "";
         if (fileName) {
           const lowerType = (item.type || "").toLowerCase();
           if (lowerType === "image") {
@@ -1695,8 +1784,9 @@ async function loadMedia() {
         `Media ${index + 1}`;
 
       const format =
-        (item.format ||
-          (path.split(".").pop() || "").toLowerCase()) || "";
+        item.format ||
+        (path.split(".").pop() || "").toLowerCase() ||
+        "";
 
       let type = item.type;
       if (!type) {
@@ -1836,6 +1926,7 @@ function createVolumeRow(mediaEl) {
 }
 
 /* ---- media rendering (with "only one video playing" logic + avatar hooks) ---- */
+
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1880,13 +1971,6 @@ function renderMedia() {
       video.playsInline = true;
       video.preload = "metadata";
 
-      // Loop special short video ("whichkid v2")
-      const lowerTitle = (item.title || "").toLowerCase();
-      const lowerPath = (item.path || "").toLowerCase();
-      if (lowerTitle.includes("whichkid") || lowerPath.includes("whichkid")) {
-        video.loop = true;
-      }
-
       // pause other videos when this one starts playing
       video.addEventListener("play", () => {
         document.querySelectorAll("video").forEach((v) => {
@@ -1904,6 +1988,59 @@ function renderMedia() {
 
       const volumeRow = createVolumeRow(video);
       preview.appendChild(volumeRow);
+
+      // Loop toggle button per video
+      const loopBtn = document.createElement("button");
+      loopBtn.type = "button";
+      loopBtn.className = "media-action-btn media-loop-btn";
+      loopBtn.textContent = "🔁 Loop";
+      loopBtn.title = "Toggle loop";
+
+      loopBtn.addEventListener("click", () => {
+        video.loop = !video.loop;
+        loopBtn.classList.toggle("is-active", video.loop);
+      });
+
+      const meta = document.createElement("div");
+      meta.className = "media-meta";
+
+      const typeBadge = document.createElement("span");
+      typeBadge.className = "badge-media-type";
+      typeBadge.textContent = item.type;
+
+      const formatBadge = document.createElement("span");
+      formatBadge.className = "badge-media-format";
+      formatBadge.textContent = item.format.toUpperCase();
+
+      meta.appendChild(typeBadge);
+      meta.appendChild(formatBadge);
+
+      const actions = document.createElement("div");
+      actions.className = "media-actions";
+
+      const openBtn = document.createElement("a");
+      openBtn.href = item.path;
+      openBtn.target = "_blank";
+      openBtn.rel = "noopener noreferrer";
+      openBtn.className = "media-action-btn";
+      openBtn.textContent = "Open";
+
+      const downloadBtn = document.createElement("a");
+      downloadBtn.href = item.path;
+      downloadBtn.download = "";
+      downloadBtn.className = "media-action-btn";
+      downloadBtn.textContent = "Download";
+
+      actions.appendChild(openBtn);
+      actions.appendChild(downloadBtn);
+      actions.appendChild(loopBtn);
+
+      card.appendChild(title);
+      card.appendChild(preview);
+      card.appendChild(meta);
+      card.appendChild(actions);
+      grid.appendChild(card);
+      return;
     } else if (item.type === "audio") {
       const audio = document.createElement("audio");
       audio.src = item.path;
@@ -1922,55 +2059,56 @@ function renderMedia() {
       preview.appendChild(volumeRow);
     }
 
-    const meta = document.createElement("div");
-    meta.className = "media-meta";
+    if (item.type !== "video") {
+      const meta = document.createElement("div");
+      meta.className = "media-meta";
 
-    const typeBadge = document.createElement("span");
-    typeBadge.className = "badge-media-type";
-    typeBadge.textContent = item.type;
+      const typeBadge = document.createElement("span");
+      typeBadge.className = "badge-media-type";
+      typeBadge.textContent = item.type;
 
-    const formatBadge = document.createElement("span");
-    formatBadge.className = "badge-media-format";
-    formatBadge.textContent = item.format.toUpperCase();
+      const formatBadge = document.createElement("span");
+      formatBadge.className = "badge-media-format";
+      formatBadge.textContent = item.format.toUpperCase();
 
-    meta.appendChild(typeBadge);
-    meta.appendChild(formatBadge);
+      meta.appendChild(typeBadge);
+      meta.appendChild(formatBadge);
 
-    const actions = document.createElement("div");
-    actions.className = "media-actions";
+      const actions = document.createElement("div");
+      actions.className = "media-actions";
 
-    if (item.type === "image") {
-      const viewBtn = document.createElement("button");
-      viewBtn.type = "button";
-      viewBtn.className = "media-action-btn";
-      viewBtn.textContent = "View";
-      viewBtn.addEventListener("click", () => {
-        openImageModal(item.path, item.title);
-      });
-      actions.appendChild(viewBtn);
-    } else {
-      const openBtn = document.createElement("a");
-      openBtn.href = item.path;
-      openBtn.target = "_blank";
-      openBtn.rel = "noopener noreferrer";
-      openBtn.className = "media-action-btn";
-      openBtn.textContent = "Open";
-      actions.appendChild(openBtn);
+      if (item.type === "image") {
+        const viewBtn = document.createElement("button");
+        viewBtn.type = "button";
+        viewBtn.className = "media-action-btn";
+        viewBtn.textContent = "View";
+        viewBtn.addEventListener("click", () => {
+          openImageModal(item.path, item.title);
+        });
+        actions.appendChild(viewBtn);
+      } else {
+        const openBtn = document.createElement("a");
+        openBtn.href = item.path;
+        openBtn.target = "_blank";
+        openBtn.rel = "noopener noreferrer";
+        openBtn.className = "media-action-btn";
+        openBtn.textContent = "Open";
+        actions.appendChild(openBtn);
+      }
+
+      const downloadBtn = document.createElement("a");
+      downloadBtn.href = item.path;
+      downloadBtn.download = "";
+      downloadBtn.className = "media-action-btn";
+      downloadBtn.textContent = "Download";
+      actions.appendChild(downloadBtn);
+
+      card.appendChild(title);
+      card.appendChild(preview);
+      card.appendChild(meta);
+      card.appendChild(actions);
+      grid.appendChild(card);
     }
-
-    const downloadBtn = document.createElement("a");
-    downloadBtn.href = item.path;
-    downloadBtn.download = "";
-    downloadBtn.className = "media-action-btn";
-    downloadBtn.textContent = "Download";
-    actions.appendChild(downloadBtn);
-
-    card.appendChild(title);
-    card.appendChild(preview);
-    card.appendChild(meta);
-    card.appendChild(actions);
-
-    grid.appendChild(card);
   });
 
   // After rendering, ensure avatar ring reflects any currently playing media
@@ -2082,3 +2220,215 @@ function setupPlaygroundRandomButton() {
     window.open(url, "_blank", "noopener,noreferrer");
   });
 }
+
+/* ---------- Paint toolbar + shortcuts ---------- */
+
+function setupPaintToolbar() {
+  const paintCard = document.querySelector(".playground-paint");
+  if (!paintCard) return;
+
+  paintIframe = paintCard.querySelector("iframe[src*='paint.js.org']");
+  const buttons = paintCard.querySelectorAll("[data-paint-action]");
+
+  buttons.forEach((btn) => {
+    const action = btn.getAttribute("data-paint-action");
+    btn.addEventListener("click", () => {
+      handlePaintAction(action);
+    });
+  });
+
+  document.addEventListener("keydown", handlePaintShortcuts);
+}
+
+function handlePaintAction(action) {
+  if (!paintIframe) return;
+
+  switch (action) {
+    case "new": {
+      const ok = window.confirm(
+        "Start a new canvas? This will clear the current drawing."
+      );
+      if (!ok) return;
+      reloadPaintIframe();
+      break;
+    }
+    case "clear": {
+      reloadPaintIframe();
+      break;
+    }
+    case "open": {
+      window.open(paintIframe.src, "_blank", "noopener,noreferrer");
+      break;
+    }
+    case "save": {
+      // Best-effort: open full paint.js.org so the user can use its own save tools
+      window.open(paintIframe.src, "_blank", "noopener,noreferrer");
+      break;
+    }
+    case "undo": {
+      // No real access to paint.js.org internals, so soft-reload as best-effort "undo"
+      reloadPaintIframe();
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+function reloadPaintIframe() {
+  if (!paintIframe) return;
+  // simple reload of the iframe to clear canvas
+  const src = paintIframe.src;
+  paintIframe.src = src;
+}
+
+function handlePaintShortcuts(event) {
+  if (state.activeTab !== "playground") return;
+
+  const target = event.target;
+  if (!target) return;
+
+  const tag = (target.tagName || "").toLowerCase();
+  const isTyping =
+    tag === "input" ||
+    tag === "textarea" ||
+    target.isContentEditable;
+  if (isTyping) return;
+
+  const key = event.key.toLowerCase();
+  const ctrl = event.ctrlKey || event.metaKey;
+  const shift = event.shiftKey;
+
+  if (!ctrl) return;
+
+  if (key === "n" && !shift) {
+    event.preventDefault();
+    handlePaintAction("new");
+  } else if (key === "n" && shift) {
+    event.preventDefault();
+    handlePaintAction("clear");
+  } else if (key === "o") {
+    event.preventDefault();
+    handlePaintAction("open");
+  } else if (key === "s") {
+    event.preventDefault();
+    handlePaintAction("save");
+  } else if (key === "z") {
+    event.preventDefault();
+    handlePaintAction("undo");
+  }
+}
+
+/* ---------- Postboard (Playground) ---------- */
+
+function setupPostboard() {
+  const form = document.getElementById("postboardForm");
+  const listEl = document.getElementById("postboardList");
+  const emptyEl = document.getElementById("postboardEmpty");
+  if (!form || !listEl || !emptyEl) return;
+
+  let messages = loadPostboardMessages();
+  renderPostboard(messages, listEl, emptyEl);
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const nameInput = document.getElementById("postboardName");
+    const anonInput = document.getElementById("postboardAnon");
+    const messageInput = document.getElementById("postboardMessage");
+
+    if (!messageInput) return;
+
+    const rawMessage = messageInput.value.trim();
+    if (!rawMessage) return;
+
+    const isAnon = anonInput && anonInput.checked;
+    const rawName = nameInput ? nameInput.value.trim() : "";
+    const name = isAnon || !rawName ? "Anonymous" : rawName;
+
+    const entry = {
+      id: Date.now(),
+      name,
+      message: rawMessage,
+      anonymous: isAnon,
+      createdAt: new Date().toISOString()
+    };
+
+    messages.unshift(entry);
+    savePostboardMessages(messages);
+    renderPostboard(messages, listEl, emptyEl);
+
+    messageInput.value = "";
+    if (nameInput && isAnon) {
+      nameInput.value = "";
+    }
+  });
+}
+
+function loadPostboardMessages() {
+  try {
+    const raw = localStorage.getItem(POSTBOARD_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+    return [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function savePostboardMessages(messages) {
+  try {
+    localStorage.setItem(POSTBOARD_STORAGE_KEY, JSON.stringify(messages));
+  } catch (_) {}
+}
+
+function renderPostboard(messages, listEl, emptyEl) {
+  listEl.innerHTML = "";
+  if (!messages.length) {
+    emptyEl.style.display = "block";
+    return;
+  }
+  emptyEl.style.display = "none";
+
+  messages.forEach((msg) => {
+    const li = document.createElement("li");
+    li.className = "postboard-item";
+
+    const header = document.createElement("div");
+    header.className = "postboard-item-header";
+
+    const author = document.createElement("span");
+    author.className = "postboard-item-author";
+    author.textContent = msg.name || "Anonymous";
+
+    const meta = document.createElement("span");
+    meta.className = "postboard-item-meta";
+
+    let dateLabel = "";
+    if (msg.createdAt) {
+      const d = new Date(msg.createdAt);
+      if (!isNaN(d.getTime())) {
+        dateLabel = d.toLocaleString(undefined, {
+          dateStyle: "short",
+          timeStyle: "short"
+        });
+      }
+    }
+    meta.textContent = dateLabel;
+
+    header.appendChild(author);
+    header.appendChild(meta);
+
+    const body = document.createElement("div");
+    body.className = "postboard-item-body";
+    body.textContent = msg.message;
+
+    li.appendChild(header);
+    li.appendChild(body);
+
+    listEl.appendChild(li);
+  });
+}
+
+/* ---------- END ---------- */
