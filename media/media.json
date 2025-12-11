@@ -1,15 +1,20 @@
 {
-  "generatedAt": "2025-12-11T10:42:59.782771Z",
+  "generatedAt": "2025-12-11T10:49:55.036164Z",
   "items": [
+    {
+      "src": "media/images/302.gif",
+      "type": "image",
+      "title": "302"
+    },
     {
       "src": "media/images/Custom Pokemon Sprites.JPG",
       "type": "image",
       "title": "Custom Pokemon Sprites"
     },
     {
-      "src": "media/images/E-DUBBLE Be A King.jpg",
+      "src": "media/images/E-DUBBLE.jpg",
       "type": "image",
-      "title": "E DUBBLE Be A King"
+      "title": "E DUBBLE"
     },
     {
       "src": "media/images/Lost Woods - Ocarina tabs.png",
@@ -32,19 +37,14 @@
       "title": "kabels"
     },
     {
-      "src": "media/images/tshirtgif.gif",
-      "type": "image",
-      "title": "tshirtgif"
-    },
-    {
       "src": "media/videos/De Computer.mp4",
       "type": "video",
       "title": "De Computer"
     },
     {
-      "src": "media/videos/Graffiti MS Paint (15-11-2011).mp4",
+      "src": "media/videos/Graffiti MS Paint (2011).mp4",
       "type": "video",
-      "title": "Graffiti MS Paint (15 11 2011)"
+      "title": "Graffiti MS Paint (2011)"
     },
     {
       "src": "media/videos/Just Brabant Things.mp4",
