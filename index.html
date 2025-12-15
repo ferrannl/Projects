@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -138,12 +139,6 @@
                 <span class="social-label">Tumblr</span>
               </a>
 
-              <!-- Tumblr (Y2K style / Kadaver) -->
-         <!--     <a href="https://kadavernl.tumblr.com/" class="social-chip social-tumblr-old" target="_blank" rel="noopener noreferrer">
-                <span class="social-icon"><img src="assets/tumblr_old_icon.png" alt="Tumblr Y2K" /></span>
-                <span class="social-label">Kadaver</span>
-              </a>
--->
               <a class="social-chip social-reddit" href="https://www.reddit.com/user/PikalexNL" target="_blank" rel="noreferrer">
                 <span class="social-icon"><img src="assets/reddit_icon.png" alt="Reddit" /></span>
                 <span class="social-label">Reddit</span>
@@ -172,6 +167,7 @@
           Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.
         </p>
         <p class="about-text" data-i18n="aboutP2"></p>
+
         <div class="profile-avatar">
           <div class="profile-avatar-inner">
             <img src="assets/profile.jpg" alt="Ferran’s profile picture" loading="lazy" />
@@ -233,13 +229,6 @@
             <option value="audio" data-i18n="mediaKindAudio">Audio</option>
           </select>
         </div>
-
-        <div class="filter-group">
-          <label for="mediaFormatFilter" data-i18n="mediaFormatLabel">Bestandstype</label>
-          <select id="mediaFormatFilter">
-            <option value="all" data-i18n="mediaFormatAll">Alle formaten</option>
-          </select>
-        </div>
       </section>
 
       <section id="projectsView" class="view-section">
@@ -264,6 +253,7 @@
             <p class="playground-text" data-i18n="playgroundPaintText">
               MS Paint remake, have fun drawing!
             </p>
+
             <div class="playground-embed">
               <iframe
                 src="https://paint.js.org/"
@@ -272,30 +262,8 @@
               ></iframe>
             </div>
 
-            <!-- Paint toolbar -->
             <div class="playground-paint-controls">
               <div class="paint-buttons-row">
-                <button
-                  type="button"
-                  class="btn-paint"
-                  data-paint-action="new"
-                >
-                  New <span class="shortcut-hint">(Ctrl+N)</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-paint"
-                  data-paint-action="open"
-                >
-                  Open <span class="shortcut-hint">(Ctrl+O)</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-paint"
-                  data-paint-action="save"
-                >
-                  Save <span class="shortcut-hint">(Ctrl+S)</span>
-                </button>
                 <button
                   type="button"
                   class="btn-paint"
@@ -303,17 +271,7 @@
                 >
                   Clear <span class="shortcut-hint">(Ctrl+Shift+N)</span>
                 </button>
-                <button
-                  type="button"
-                  class="btn-paint"
-                  data-paint-action="undo"
-                >
-                  Undo <span class="shortcut-hint">(Ctrl+Z)</span>
-                </button>
               </div>
-              <p class="playground-paint-hint" data-i18n="playgroundPaintHint">
-                Drawing happens inside paint.js.org. “Open” or “Save” will open the full app in a new tab for more options.
-              </p>
             </div>
           </article>
 
@@ -349,6 +307,10 @@
               <div class="postboard-actions">
                 <button type="submit" class="postboard-submit-btn" data-i18n="postboardSubmitLabel">
                   Post
+                </button>
+
+                <button type="button" class="postboard-email-btn" id="postboardEmailBtn">
+                  Email to Ferran
                 </button>
               </div>
             </form>
