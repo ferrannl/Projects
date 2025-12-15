@@ -7,6 +7,7 @@ const MEDIA_INDEX_URL = "./media/media.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const THUMB_CACHE_KEY = "ferranProjectsThumbsV3";
+const ASSET_CACHE_KEY = "ferranProjectsAssetsV1";
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
@@ -14,6 +15,9 @@ const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
 const POSTBOARD_STORAGE_KEY = "ferranProjectsPostboardV1";
+
+/* Where postboard messages can be “sent” (mailto fallback) */
+const POSTBOARD_EMAIL_TO = "ferranhendriks@outlook.com";
 
 /* ---------- Random useless websites list ---------- */
 
@@ -96,6 +100,7 @@ let repos = [];
 let projects = [];
 let mediaItems = [];
 let thumbCache = loadThumbCache();
+let assetCache = loadAssetCache();
 let paintIframe = null;
 
 const state = {
@@ -104,7 +109,7 @@ const state = {
   typeFilter: "all",
   languageFilter: "all",
   mediaTypeFilter: "all",
-  mediaFormatFilter: "all",
+  // mediaFormatFilter removed (no more filetype dropdown)
   lang: DEFAULT_LANG
 };
 
@@ -209,8 +214,7 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
-    playgroundPaintHint:
-      "Het tekenen gebeurt binnen paint.js.org. “Open” of “Save” opent de volledige app in een nieuw tabblad voor meer opties.",
+    playgroundPaintHint: "", // removed
     playgroundPostTitle: "Postboard",
     playgroundPostText:
       "Laat een kort bericht achter (anoniem of met naam). Berichten worden lokaal in je browser opgeslagen.",
@@ -243,14 +247,15 @@ const I18N = {
     mediaKindImages: "Afbeeldingen",
     mediaKindVideos: "Video’s",
     mediaKindAudio: "Audio",
-    mediaFormatLabel: "Bestandstype",
-    mediaFormatAll: "Alle formaten",
     emptyState:
       "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
-    btnLiveSite: "Live site"
+    btnGitHub: "Bekijk op GitHub",
+    btnLiveSite: "Live site",
+    btnDownload: "Download",
+    btnSendEmail: "Stuur via e-mail"
   },
   en: {
     subtitle:
@@ -261,8 +266,7 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint remake, have fun drawing!",
-    playgroundPaintHint:
-      "Drawing happens inside paint.js.org. “Open” or “Save” will open the full app in a new tab for more options.",
+    playgroundPaintHint: "", // removed
     playgroundPostTitle: "Postboard",
     playgroundPostText:
       "Leave a small message (with or without your name). Entries are stored locally in your browser.",
@@ -295,15 +299,14 @@ const I18N = {
     mediaKindImages: "Images",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
-    mediaFormatLabel: "File type",
-    mediaFormatAll: "All types",
-    emptyState:
-      "No projects found with these filters. Try something else.",
-    mediaEmptyState:
-      "No media found with these filters.",
+    emptyState: "No projects found with these filters. Try something else.",
+    mediaEmptyState: "No media found with these filters.",
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
-    btnLiveSite: "Live site"
+    btnGitHub: "View on GitHub",
+    btnLiveSite: "Live site",
+    btnDownload: "Download",
+    btnSendEmail: "Send via email"
   },
   de: {
     subtitle:
@@ -314,8 +317,7 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS-Paint-Playground",
     playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
-    playgroundPaintHint:
-      "Das Zeichnen findet in paint.js.org statt. „Open“ oder „Save“ öffnen die komplette App in einem neuen Tab.",
+    playgroundPaintHint: "", // removed
     playgroundPostTitle: "Postboard",
     playgroundPostText:
       "Hinterlass eine kurze Nachricht (mit oder ohne Namen). Einträge werden lokal im Browser gespeichert.",
@@ -348,15 +350,16 @@ const I18N = {
     mediaKindImages: "Bilder",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
-    mediaFormatLabel: "Dateityp",
-    mediaFormatAll: "Alle Formate",
     emptyState:
       "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
     mediaEmptyState:
       "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
-    btnLiveSite: "Live-Seite"
+    btnGitHub: "Auf GitHub ansehen",
+    btnLiveSite: "Live-Seite",
+    btnDownload: "Download",
+    btnSendEmail: "Per E-Mail senden"
   },
   pl: {
     subtitle:
@@ -366,10 +369,8 @@ const I18N = {
       "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
     aboutP2: "",
     playgroundPaintTitle: "Plac zabaw MS Paint",
-    playgroundPaintText:
-      "Remake MS Paint, miłej zabawy przy rysowaniu!",
-    playgroundPaintHint:
-      "Rysujesz wewnątrz paint.js.org. „Open” lub „Save” otworzą pełną aplikację w nowej karcie.",
+    playgroundPaintText: "Remake MS Paint, miłej zabawy przy rysowaniu!",
+    playgroundPaintHint: "", // removed
     playgroundPostTitle: "Postboard",
     playgroundPostText:
       "Zostaw krótką wiadomość (z imieniem lub anonimowo). Wpisy są przechowywane lokalnie w przeglądarce.",
@@ -402,15 +403,16 @@ const I18N = {
     mediaKindImages: "Obrazy",
     mediaKindVideos: "Wideo",
     mediaKindAudio: "Audio",
-    mediaFormatLabel: "Typ pliku",
-    mediaFormatAll: "Wszystkie formaty",
     emptyState:
       "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
     mediaEmptyState:
       "Nie znaleziono mediów dla tych filtrów.",
     headerLangButton: "Język",
     footerBuilt: "Stworzone z ♥ przez Ferrana",
-    btnLiveSite: "Strona live"
+    btnGitHub: "Zobacz na GitHub",
+    btnLiveSite: "Strona live",
+    btnDownload: "Pobierz",
+    btnSendEmail: "Wyślij e-mailem"
   },
   tr: {
     subtitle:
@@ -421,8 +423,7 @@ const I18N = {
     aboutP2: "",
     playgroundPaintTitle: "MS Paint Oyun Alanı",
     playgroundPaintText: "MS Paint yeniden yapımı, keyifle çiz!",
-    playgroundPaintHint:
-      "Çizim paint.js.org içinde gerçekleşir. “Open” veya “Save” tam uygulamayı yeni sekmede açar.",
+    playgroundPaintHint: "", // removed
     playgroundPostTitle: "Postboard",
     playgroundPostText:
       "Kısa bir mesaj bırak (isimle veya isimsiz). Gönderiler tarayıcında yerel olarak saklanır.",
@@ -455,15 +456,16 @@ const I18N = {
     mediaKindImages: "Görseller",
     mediaKindVideos: "Videolar",
     mediaKindAudio: "Ses",
-    mediaFormatLabel: "Dosya türü",
-    mediaFormatAll: "Tüm türler",
     emptyState:
       "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
     mediaEmptyState:
       "Bu arama veya filtrelerle medya bulunamadı.",
     headerLangButton: "Dil",
     footerBuilt: "♥ ile geliştirildi – Ferran",
-    btnLiveSite: "Canlı site"
+    btnGitHub: "GitHub’da görüntüle",
+    btnLiveSite: "Canlı site",
+    btnDownload: "İndir",
+    btnSendEmail: "E-posta ile gönder"
   },
   es: {
     subtitle:
@@ -473,10 +475,8 @@ const I18N = {
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
     aboutP2: "",
     playgroundPaintTitle: "Playground de MS Paint",
-    playgroundPaintText:
-      "Remake de MS Paint, ¡diviértete dibujando!",
-    playgroundPaintHint:
-      "Se dibuja dentro de paint.js.org. “Open” o “Save” abrirán la app completa en una nueva pestaña.",
+    playgroundPaintText: "Remake de MS Paint, ¡diviértete dibujando!",
+    playgroundPaintHint: "", // removed
     playgroundPostTitle: "Postboard",
     playgroundPostText:
       "Deja un pequeño mensaje (con o sin nombre). Las entradas se guardan localmente en tu navegador.",
@@ -509,67 +509,16 @@ const I18N = {
     mediaKindImages: "Imágenes",
     mediaKindVideos: "Vídeos",
     mediaKindAudio: "Audio",
-    mediaFormatLabel: "Tipo de archivo",
-    mediaFormatAll: "Todos los tipos",
     emptyState:
       "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
     mediaEmptyState:
       "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
-    btnLiveSite: "Sitio live"
-  }
-};
-
-/* Type labels for the type-badge, by language */
-const TYPE_LABELS = {
-  website: {
-    nl: "Website",
-    en: "Website",
-    de: "Website",
-    pl: "Strona WWW",
-    tr: "Web sitesi",
-    es: "Sitio web"
-  },
-  mobile: {
-    nl: "Mobiel",
-    en: "Mobile",
-    de: "Mobile",
-    pl: "Mobilne",
-    tr: "Mobil",
-    es: "Móvil"
-  },
-  api: {
-    nl: "API / Backend",
-    en: "API / Backend",
-    de: "API / Backend",
-    pl: "API / Backend",
-    tr: "API / Backend",
-    es: "API / Backend"
-  },
-  school: {
-    nl: "School / Studie",
-    en: "School / Study",
-    de: "Schule / Studium",
-    pl: "Szkoła / Studia",
-    tr: "Okul / Çalışma",
-    es: "Escuela / Estudio"
-  },
-  game: {
-    nl: "Game",
-    en: "Game",
-    de: "Game",
-    pl: "Gra",
-    tr: "Oyun",
-    es: "Juego"
-  },
-  other: {
-    nl: "Overig",
-    en: "Other",
-    de: "Sonstiges",
-    pl: "Inne",
-    tr: "Diğer",
-    es: "Otros"
+    btnGitHub: "Ver en GitHub",
+    btnLiveSite: "Sitio live",
+    btnDownload: "Descargar",
+    btnSendEmail: "Enviar por email"
   }
 };
 
@@ -578,6 +527,10 @@ const TYPE_LABELS = {
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("js-enabled");
 
+  // If the filetype dropdown still exists in HTML, hide it (JS-only patch).
+  const mediaFormatGroup = document.getElementById("mediaFormatFilter")?.closest(".filter-group");
+  if (mediaFormatGroup) mediaFormatGroup.style.display = "none";
+
   setupLanguage();
   setupTabsAndFilters();
   setupSearch();
@@ -585,7 +538,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFooterCopyright();
   setupPlaygroundRandomButton();
   setupSecretBgVideoToggle();
-  setupPaintToolbar();
+  setupPaintToolbar(); // now only uses CLEAR
   setupPostboard();
 
   loadProjects();
@@ -599,51 +552,29 @@ function getSearchPlaceholder(lang, view) {
   const l = SUPPORTED_LANGS.includes(lang) ? lang : DEFAULT_LANG;
 
   if (tab === "media") {
-    if (l === "nl") {
-      return "Zoek in media op titel of bestandsnaam…";
-    } else if (l === "de") {
-      return "Suche in Medien nach Titel oder Dateiname…";
-    } else if (l === "pl") {
-      return "Szukaj w mediach po tytule lub nazwie pliku…";
-    } else if (l === "tr") {
-      return "Medya içinde başlık veya dosya adına göre ara…";
-    } else if (l === "es") {
-      return "Busca en media por título o nombre de archivo…";
-    } else {
-      return "Search media by title or filename…";
-    }
+    if (l === "nl") return "Zoek in media op titel of bestandsnaam…";
+    if (l === "de") return "Suche in Medien nach Titel oder Dateiname…";
+    if (l === "pl") return "Szukaj w mediach po tytule lub nazwie pliku…";
+    if (l === "tr") return "Medya içinde başlık veya dosya adına göre ara…";
+    if (l === "es") return "Busca en media por título o nombre de archivo…";
+    return "Search media by title or filename…";
   }
 
   if (tab === "playground") {
-    if (l === "nl") {
-      return "Zoek in Playground-tools op naam of beschrijving…";
-    } else if (l === "de") {
-      return "Suche in Playground-Tools nach Name oder Beschreibung…";
-    } else if (l === "pl") {
-      return "Szukaj narzędzi Playground po nazwie lub opisie…";
-    } else if (l === "tr") {
-      return "Playground araçlarında ada veya açıklamaya göre ara…";
-    } else if (l === "es") {
-      return "Busca herramientas del Playground por nombre o descripción…";
-    } else {
-      return "Search playground tools by name or description…";
-    }
+    if (l === "nl") return "Zoek in Playground-tools op naam of beschrijving…";
+    if (l === "de") return "Suche in Playground-Tools nach Name oder Beschreibung…";
+    if (l === "pl") return "Szukaj narzędzi Playground po nazwie lub opisie…";
+    if (l === "tr") return "Playground araçlarında ada veya açıklamaya göre ara…";
+    if (l === "es") return "Busca herramientas del Playground por nombre o descripción…";
+    return "Search playground tools by name or description…";
   }
 
-  // default: projects
-  if (l === "nl") {
-    return "Zoek in projecten op naam, beschrijving, programmeertaal of tags…";
-  } else if (l === "de") {
-    return "Suche in Projekten nach Name, Beschreibung, Sprache oder Tags…";
-  } else if (l === "pl") {
-    return "Szukaj projektów po nazwie, opisie, języku lub tagach…";
-  } else if (l === "tr") {
-    return "Projelerde ada, açıklamaya, dile veya etiketlere göre ara…";
-  } else if (l === "es") {
-    return "Busca proyectos por nombre, descripción, lenguaje o etiquetas…";
-  } else {
-    return "Search projects by name, description, language or tags…";
-  }
+  if (l === "nl") return "Zoek in projecten op naam, beschrijving, programmeertaal of tags…";
+  if (l === "de") return "Suche in Projekten nach Name, Beschreibung, Sprache oder Tags…";
+  if (l === "pl") return "Szukaj projektów po nazwie, opisie, języku lub tagach…";
+  if (l === "tr") return "Projelerde ada, açıklamaya, dile veya etiketlere göre ara…";
+  if (l === "es") return "Busca proyectos por nombre, descripción, lenguaje o etiquetas…";
+  return "Search projects by name, description, language or tags…";
 }
 
 function updateSearchPlaceholder() {
@@ -658,24 +589,20 @@ function setupLanguage() {
   const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
   const gateSeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
 
-  const initialLang = SUPPORTED_LANGS.includes(savedLang)
-    ? savedLang
-    : DEFAULT_LANG;
+  const initialLang = SUPPORTED_LANGS.includes(savedLang) ? savedLang : DEFAULT_LANG;
   state.lang = initialLang;
 
   const gate = document.getElementById("langGate");
   if (gate) {
-    if (gateSeen) {
-      gate.hidden = true;
-    }
+    if (gateSeen) gate.hidden = true;
 
     gate.addEventListener("click", (event) => {
       const btn = event.target.closest(".btn-lang");
       if (!btn) return;
       const langCode = btn.dataset.lang;
       if (!SUPPORTED_LANGS.includes(langCode)) return;
-      setLanguage(langCode);
 
+      setLanguage(langCode);
       localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
       gate.hidden = true;
     });
@@ -704,38 +631,24 @@ function setLanguage(lang) {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
     const value = dict[key];
-    if (typeof value === "string") {
-      el.textContent = value;
-    }
+    if (typeof value === "string") el.textContent = value;
   });
 
   document.querySelectorAll("[data-i18n-footer-built]").forEach((el) => {
-    const key = "footerBuilt";
-    const value = dict[key];
-    if (typeof value === "string") {
-      el.textContent = value;
-    }
+    const value = dict.footerBuilt;
+    if (typeof value === "string") el.textContent = value;
   });
-
-  const searchLabelEl = document.querySelector("[data-i18n='searchLabel']");
-  if (searchLabelEl && dict.searchLabel) {
-    searchLabelEl.textContent = dict.searchLabel;
-  }
 
   updateSearchPlaceholder();
   updateLanguageGateActive();
   renderProjects();
+  renderMedia();
 }
 
 function updateLanguageGateActive() {
-  const buttons = document.querySelectorAll(".btn-lang");
-  buttons.forEach((btn) => {
+  document.querySelectorAll(".btn-lang").forEach((btn) => {
     const code = btn.dataset.lang;
-    if (code === state.lang) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
+    btn.classList.toggle("active", code === state.lang);
   });
 }
 
@@ -753,29 +666,17 @@ function setupTabsAndFilters() {
   const projectFilters = document.getElementById("projectFilters");
   const mediaFilters = document.getElementById("mediaFilters");
 
-  if (
-    !projectsTab ||
-    !mediaTab ||
-    !playgroundTab ||
-    !projectsView ||
-    !mediaView ||
-    !playgroundView
-  )
-    return;
+  if (!projectsTab || !mediaTab || !playgroundTab || !projectsView || !mediaView || !playgroundView) return;
 
   const tabsContainer = document.querySelector(".tabs");
 
   function updateTabsVisual(mode) {
     if (!tabsContainer) return;
     tabsContainer.classList.remove("tabs-media", "tabs-playground");
-    if (mode === "media") {
-      tabsContainer.classList.add("tabs-media");
-    } else if (mode === "playground") {
-      tabsContainer.classList.add("tabs-playground");
-    }
+    if (mode === "media") tabsContainer.classList.add("tabs-media");
+    if (mode === "playground") tabsContainer.classList.add("tabs-playground");
   }
 
-  // bind gradient pill to the active tab's exact position/width
   function updateTabsPill(activeButton) {
     if (!tabsContainer || !activeButton) return;
     const tabsRect = tabsContainer.getBoundingClientRect();
@@ -788,7 +689,6 @@ function setupTabsAndFilters() {
 
   function showProjects() {
     state.activeTab = "projects";
-
     projectsTab.classList.add("active");
     mediaTab.classList.remove("active");
     playgroundTab.classList.remove("active");
@@ -808,7 +708,6 @@ function setupTabsAndFilters() {
 
   function showMedia() {
     state.activeTab = "media";
-
     mediaTab.classList.add("active");
     projectsTab.classList.remove("active");
     playgroundTab.classList.remove("active");
@@ -828,7 +727,6 @@ function setupTabsAndFilters() {
 
   function showPlayground() {
     state.activeTab = "playground";
-
     playgroundTab.classList.add("active");
     projectsTab.classList.remove("active");
     mediaTab.classList.remove("active");
@@ -849,24 +747,18 @@ function setupTabsAndFilters() {
   mediaTab.addEventListener("click", showMedia);
   playgroundTab.addEventListener("click", showPlayground);
 
-  // default view
   showProjects();
 
-  // keep pill aligned on resize
   window.addEventListener("resize", () => {
     const active =
-      state.activeTab === "media"
-        ? mediaTab
-        : state.activeTab === "playground"
-        ? playgroundTab
-        : projectsTab;
+      state.activeTab === "media" ? mediaTab :
+      state.activeTab === "playground" ? playgroundTab : projectsTab;
     updateTabsPill(active);
   });
 
   const typeFilter = document.getElementById("typeFilter");
   const languageFilter = document.getElementById("languageFilter");
   const mediaTypeFilter = document.getElementById("mediaTypeFilter");
-  const mediaFormatFilter = document.getElementById("mediaFormatFilter");
 
   if (typeFilter) {
     typeFilter.addEventListener("change", () => {
@@ -888,13 +780,6 @@ function setupTabsAndFilters() {
       renderMedia();
     });
   }
-
-  if (mediaFormatFilter) {
-    mediaFormatFilter.addEventListener("change", () => {
-      state.mediaFormatFilter = mediaFormatFilter.value;
-      renderMedia();
-    });
-  }
 }
 
 /* ---------- Search ---------- */
@@ -905,11 +790,8 @@ function setupSearch() {
 
   searchEl.addEventListener("input", () => {
     state.search = searchEl.value.trim();
-    if (state.activeTab === "projects") {
-      renderProjects();
-    } else if (state.activeTab === "media") {
-      renderMedia();
-    }
+    if (state.activeTab === "projects") renderProjects();
+    if (state.activeTab === "media") renderMedia();
   });
 
   updateSearchPlaceholder();
@@ -925,10 +807,7 @@ function setupSecretBgVideoToggle() {
   avatarImg.style.cursor = "pointer";
 
   avatarImg.addEventListener("click", () => {
-    if (!bgPlayerReady || !bgPlayer) {
-      // If API not ready yet, do nothing
-      return;
-    }
+    if (!bgPlayerReady || !bgPlayer) return;
 
     const isActive = !document.body.classList.contains("bg-video-active");
     document.body.classList.toggle("bg-video-active", isActive);
@@ -939,16 +818,12 @@ function setupSecretBgVideoToggle() {
         bgPlayer.unMute();
         bgPlayer.setVolume(20);
         bgPlayer.playVideo();
-        // Spin avatar ring when bg video is playing
         setAvatarPlaying(true);
       } else {
         bgPlayer.pauseVideo();
-        // When pausing bg video, fall back to HTML5 media state
         updateAvatarPlayingFromMedia();
       }
-    } catch (_) {
-      // Ignore player errors
-    }
+    } catch (_) {}
   });
 }
 
@@ -960,12 +835,9 @@ async function loadProjects() {
 
   const overridesByName = {};
   overrides.forEach((o) => {
-    if (o && o.name) {
-      overridesByName[o.name.toLowerCase()] = o;
-    }
+    if (o && o.name) overridesByName[o.name.toLowerCase()] = o;
   });
 
-  // Hidden repos: Projects (self), Munchkin, PSO WiiU guide
   repos = apiRepos.filter((repo) => {
     if (repo.archived || repo.fork) return false;
     const name = (repo.name || "").toLowerCase();
@@ -976,36 +848,24 @@ async function loadProjects() {
   });
 
   projects = repos.map((repo) => {
-    const o = overridesByName[repo.name.toLowerCase()] || {};
+    const o = overridesByName[(repo.name || "").toLowerCase()] || {};
 
     const displayName = formatRepoName(o.displayName || repo.name || "");
-    const description =
-      o.description || repo.description || "No description yet.";
+    const description = o.description || repo.description || "No description yet.";
 
     const overrideLangs = Array.isArray(o.languages) ? o.languages : o.langs;
     let languages = getLanguagesList(repo.language, overrideLangs);
 
-    // Auto-detect ASP.NET and add it as a language if applicable
     if (looksLikeAspNet(repo, o, languages)) {
-      const hasAspNet = languages.some(
-        (l) => String(l).toLowerCase() === "asp.net"
-      );
-      if (!hasAspNet) {
-        languages.push("ASP.NET");
-      }
+      const hasAspNet = languages.some((l) => String(l).toLowerCase() === "asp.net");
+      if (!hasAspNet) languages.push("ASP.NET");
     }
 
     const type = guessProjectType(repo, o, languages);
 
+    // Keep ONLY custom tags (no auto “Website / School / Study” category-tags)
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
-    const categoryTags = computeCategoryTags(repo, o, languages, type);
-    categoryTags.forEach((t) => {
-      if (!tags.includes(t)) tags.push(t);
-    });
-
-    if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) {
-      tags.push("Security");
-    }
+    if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) tags.push("Security");
 
     const liveUrl = computeLiveUrl(repo, o);
     const thumbnail = computeThumbnail(repo, o);
@@ -1021,7 +881,9 @@ async function loadProjects() {
       tags,
       liveUrl,
       githubUrl: repo.html_url,
-      thumbnail
+      thumbnail,
+      downloadUrl: null,
+      downloadLabel: null
     };
   });
 
@@ -1031,6 +893,9 @@ async function loadProjects() {
 
   verifyLiveSites();
   loadProjectThumbnails();
+
+  // Add .jar/.apk download buttons (best-effort, cached)
+  loadProjectDownloadAssets();
 }
 
 async function loadProjectOverrides() {
@@ -1050,20 +915,14 @@ async function loadProjectOverrides() {
 async function loadGitHubReposWithCache() {
   try {
     const res = await fetch(API_URL);
-    if (!res.ok) {
-      throw new Error("GitHub HTTP " + res.status);
-    }
+    if (!res.ok) throw new Error("GitHub HTTP " + res.status);
     const data = await res.json();
     saveReposToCache(data);
     return data;
   } catch (err) {
     console.error("GitHub fetch failed, trying cache instead:", err);
     const cached = readReposFromCache();
-    if (cached) {
-      console.warn("Using cached GitHub repos");
-      return cached;
-    }
-    console.warn("No cached repos available, returning empty list");
+    if (cached) return cached;
     return [];
   }
 }
@@ -1074,12 +933,8 @@ function readReposFromCache() {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
 
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-    if (parsed && Array.isArray(parsed.repos)) {
-      return parsed.repos;
-    }
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && Array.isArray(parsed.repos)) return parsed.repos;
 
     return null;
   } catch (err) {
@@ -1112,91 +967,61 @@ function formatRepoName(raw) {
       if (lw === "api") return "API";
       if (lw === "asp.net") return "ASP.NET";
 
-      if (SMALL_WORDS.includes(lw) && index !== 0) {
-        return lw;
-      }
-
+      if (SMALL_WORDS.includes(lw) && index !== 0) return lw;
       return w.charAt(0).toUpperCase() + w.slice(1);
     })
     .join(" ");
 }
 
 function getLanguagesList(primary, overrideList) {
-  // If overrides exist, use them but strip blocked langs
   if (Array.isArray(overrideList) && overrideList.length) {
     return overrideList
       .map((l) => String(l))
-      .filter(
-        (l) => !BLOCKED_LANGUAGES.includes(l.toLowerCase())
-      );
+      .filter((l) => !BLOCKED_LANGUAGES.includes(l.toLowerCase()));
   }
 
   const list = [];
   if (!primary) return list;
 
   const p = String(primary).toLowerCase();
+  if (BLOCKED_LANGUAGES.includes(p)) return [];
 
-  // If primary is blocked, just return empty list
-  if (BLOCKED_LANGUAGES.includes(p)) {
-    return [];
-  }
+  if (p === "html") list.push("HTML", "CSS", "JS");
+  else if (p === "javascript") list.push("JS", "HTML", "CSS");
+  else if (p === "typescript") list.push("TypeScript", "JS", "HTML", "CSS");
+  else if (p === "c#") list.push("C#", ".NET");
+  else if (p === "c++") list.push("C++", "C");
+  else if (p === "php") list.push("PHP", "HTML", "CSS", "JS");
+  else if (p === "css") list.push("CSS", "HTML", "JS");
+  else if (p === "less") list.push("Less", "HTML", "CSS", "JS", "SCSS");
+  else if (p === "scss" || p === "sass") list.push("SCSS", "CSS", "HTML", "JS");
+  else list.push(primary);
 
-  if (p === "html") {
-    list.push("HTML", "CSS", "JS");
-  } else if (p === "javascript") {
-    list.push("JS", "HTML", "CSS");
-  } else if (p === "typescript") {
-    list.push("TypeScript", "JS", "HTML", "CSS");
-  } else if (p === "c#") {
-    list.push("C#", ".NET");
-  } else if (p === "c++") {
-    list.push("C++", "C");
-  } else if (p === "php") {
-    list.push("PHP", "HTML", "CSS", "JS");
-  } else if (p === "css") {
-    list.push("CSS", "HTML", "JS");
-  } else if (p === "less") {
-    list.push("Less", "HTML", "CSS", "JS", "SCSS");
-  } else if (p === "scss" || p === "sass") {
-    list.push("SCSS", "CSS", "HTML", "JS");
-  } else {
-    list.push(primary);
-  }
-
-  // Final safety filter
-  return list.filter(
-    (l) => !BLOCKED_LANGUAGES.includes(String(l).toLowerCase())
-  );
+  return list.filter((l) => !BLOCKED_LANGUAGES.includes(String(l).toLowerCase()));
 }
 
 function buildLanguageFilterOptions(projectsList) {
   const select = document.getElementById("languageFilter");
   if (!select) return;
 
-  while (select.options.length > 1) {
-    select.remove(1);
-  }
+  while (select.options.length > 1) select.remove(1);
 
   const set = new Set();
   projectsList.forEach((p) => {
     (p.languages || []).forEach((lang) => {
       const lower = String(lang).toLowerCase();
-      if (!BLOCKED_LANGUAGES.includes(lower)) {
-        set.add(lang);
-      }
+      if (!BLOCKED_LANGUAGES.includes(lower)) set.add(lang);
     });
   });
 
-  const sorted = Array.from(set).sort((a, b) =>
-    a.localeCompare(b, "en")
-  );
-
-  sorted.forEach((lang) => {
-    const opt = document.createElement("option");
-    opt.value = lang;
-    opt.textContent = lang;
-    select.appendChild(opt);
-  });
+  Array.from(set)
+    .sort((a, b) => a.localeCompare(b, "en"))
+    .forEach((lang) => {
+      const opt = document.createElement("option");
+      opt.value = lang;
+      opt.textContent = lang;
+      select.appendChild(opt);
+    });
 }
 
 /* ---------- Type helpers ---------- */
@@ -1211,14 +1036,8 @@ function looksLikeAspNet(repo, override, languages) {
     if (lower.some((l) => l.includes("asp.net"))) return true;
   }
 
-  const text = `${repo.name || ""} ${repo.description || ""} ${
-    (override && (override.description || "")) || ""
-  }`.toLowerCase();
-
-  const patterns = ["asp.net", "aspnet", "asp-net"];
-  if (patterns.some((p) => text.includes(p))) return true;
-
-  return false;
+  const text = `${repo.name || ""} ${repo.description || ""} ${(override && (override.description || "")) || ""}`.toLowerCase();
+  return ["asp.net", "aspnet", "asp-net"].some((p) => text.includes(p));
 }
 
 function computeTypeFlags(repo, override, languages) {
@@ -1228,47 +1047,14 @@ function computeTypeFlags(repo, override, languages) {
   const lang = (repo.language || "").toLowerCase();
 
   const has = (words) => words.some((w) => joined.includes(w));
-
   const aspNetLike = looksLikeAspNet(repo, override, languages);
 
-  let isGame = has([
-    "game",
-    "games",
-    "spel",
-    "sudoku",
-    "unity",
-    "platformer",
-    "puzzle",
-    "rpg",
-    "jigsaw"
-  ]);
-
-  let isApi = has([
-    "api",
-    "backend",
-    "server",
-    "service",
-    "rest",
-    "endpoint"
-  ]) || aspNetLike;
+  let isGame = has(["game", "games", "spel", "sudoku", "unity", "platformer", "puzzle", "rpg", "jigsaw"]);
+  let isApi = has(["api", "backend", "server", "service", "rest", "endpoint"]) || aspNetLike;
 
   let isMobile =
-    has([
-      "android",
-      "ios",
-      "xamarin",
-      "apk",
-      "play store",
-      "playstore",
-      "xcode",
-      "swiftui",
-      "react native",
-      "react-native",
-      "flutter",
-      "mobile"
-    ]) ||
-    (["kotlin", "swift", "objective-c", "objective c", "dart"].includes(lang) &&
-      has(["android", "ios", "mobile"]));
+    has(["android", "ios", "xamarin", "apk", "play store", "playstore", "xcode", "swiftui", "react native", "react-native", "flutter", "mobile"]) ||
+    (["kotlin", "swift", "objective-c", "objective c", "dart"].includes(lang) && has(["android", "ios", "mobile"]));
 
   let isSchool = has([
     "school",
@@ -1291,106 +1077,32 @@ function computeTypeFlags(repo, override, languages) {
     lang === "php" ||
     lang === "vue" ||
     lang === "asp.net" ||
-    has([
-      "website",
-      "web site",
-      "webpage",
-      "web page",
-      "web",
-      "site",
-      "landing",
-      "portfolio",
-      "page",
-      "laravel",
-      "wordpress",
-      "webshop",
-      "shop"
-    ]);
+    has(["website", "web site", "webpage", "web page", "web", "site", "landing", "portfolio", "page", "laravel", "wordpress", "webshop", "shop"]);
 
-  // special cases by name
-  if (name.includes("videoshare") || name.includes("video-share")) {
-    isApi = true;
-  }
-
-  if (
-    name.includes("kolonisten") ||
-    name.includes("katan") ||
-    name.includes("catan") ||
-    name.includes("dimitri")
-  ) {
-    isGame = true;
-  }
+  if (name.includes("videoshare") || name.includes("video-share")) isApi = true;
+  if (name.includes("kolonisten") || name.includes("katan") || name.includes("catan") || name.includes("dimitri")) isGame = true;
 
   return { isGame, isMobile, isApi, isSchool, isWebsite };
 }
 
 function guessProjectType(repo, override, languages) {
-  if (override && override.type) {
-    return override.type;
-  }
+  if (override && override.type) return override.type;
 
   const flags = computeTypeFlags(repo, override, languages);
-
-  // Priority: Game > Mobile > API > School > Website > Other
   if (flags.isGame) return "game";
   if (flags.isMobile) return "mobile";
   if (flags.isApi) return "api";
   if (flags.isSchool) return "school";
   if (flags.isWebsite) return "website";
-
   return "other";
 }
 
-function computeCategoryTags(repo, override, languages, primaryType) {
-  const flags = computeTypeFlags(repo, override, languages);
-  const tags = [];
-
-  if (flags.isGame && primaryType !== "game") tags.push("Game");
-  if (flags.isMobile && primaryType !== "mobile") tags.push("Mobile");
-  if (flags.isApi && primaryType !== "api") tags.push("API / Backend");
-  if (flags.isSchool && primaryType !== "school")
-    tags.push("School / Study");
-  if (flags.isWebsite && primaryType !== "website")
-    tags.push("Website");
-
-  const text = `${repo.name || ""} ${repo.description || ""} ${
-    (override && override.description) || ""
-  }`.toLowerCase();
-
-  const algoWords = [
-    "algorithm",
-    "algoritme",
-    "sorting",
-    "sortering",
-    "pathfinding",
-    "dijkstra",
-    "bfs",
-    "dfs",
-    "graph",
-    "queue",
-    "stack"
-  ];
-  if (algoWords.some((w) => text.includes(w))) {
-    if (!tags.includes("Algorithms")) tags.push("Algorithms");
-  }
-
-  return tags;
-}
-
-/* ---------- Project helpers: type, security tag, liveUrl, thumbnail ---------- */
+/* ---------- Project helpers: security tag, liveUrl, thumbnail ---------- */
 
 function isSecurityProject(repo, override, languages) {
-  if (
-    override &&
-    Array.isArray(override.tags) &&
-    override.tags.includes("Security")
-  ) {
-    return true;
-  }
+  if (override && Array.isArray(override.tags) && override.tags.includes("Security")) return true;
 
   const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
-
-  // Narrower list: remove internship/devops/etc so Ecobit Internship doesn't get hit
   const securityWords = [
     "security",
     "secure",
@@ -1418,9 +1130,8 @@ function isSecurityProject(repo, override, languages) {
   ];
 
   const hasSecurityWord = securityWords.some((w) => text.includes(w));
-
   const hasDotNet =
-    (languages || []).some((l) => l.toLowerCase().includes(".net")) ||
+    (languages || []).some((l) => String(l).toLowerCase().includes(".net")) ||
     (repo.language || "").toLowerCase() === "c#";
 
   return hasDotNet && hasSecurityWord;
@@ -1430,21 +1141,13 @@ function computeLiveUrl(repo, override) {
   const rawOverride = (override.liveUrl || "").trim();
   if (rawOverride) return rawOverride;
 
-  // Only treat GitHub Pages (or explicit override.hasLive) as valid live sites.
-  const hasLive =
-    override.hasLive !== undefined ? !!override.hasLive : !!repo.has_pages;
-
-  if (hasLive) {
-    return `https://${GITHUB_USER}.github.io/${repo.name}/`;
-  }
-
+  const hasLive = override.hasLive !== undefined ? !!override.hasLive : !!repo.has_pages;
+  if (hasLive) return `https://${GITHUB_USER}.github.io/${repo.name}/`;
   return null;
 }
 
 function computeThumbnail(repo, override) {
-  if (override.thumbnail || override.thumb) {
-    return override.thumbnail || override.thumb;
-  }
+  if (override.thumbnail || override.thumb) return override.thumbnail || override.thumb;
   return null;
 }
 
@@ -1460,13 +1163,8 @@ async function verifyLiveSites() {
   const checks = projects.map(async (project) => {
     if (!project.liveUrl) return;
     try {
-      const res = await fetch(project.liveUrl, {
-        method: "GET",
-        redirect: "follow"
-      });
-      if (!res.ok) {
-        project.liveUrl = null;
-      }
+      const res = await fetch(project.liveUrl, { method: "GET", redirect: "follow" });
+      if (!res.ok) project.liveUrl = null;
     } catch (_) {
       project.liveUrl = null;
     }
@@ -1500,7 +1198,6 @@ async function checkImageExists(url) {
   try {
     let res = await fetch(url, { method: "HEAD" });
     if (res.ok) return true;
-
     res = await fetch(url, { method: "GET" });
     return res.ok;
   } catch (_) {
@@ -1529,11 +1226,8 @@ async function loadProjectThumbnails() {
     }
 
     const rootThumb = await findRepoRootThumbnail(repoName);
-
     let finalUrl = rootThumb;
-    if (!finalUrl) {
-      finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
-    }
+    if (!finalUrl) finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
 
     project.thumbnail = finalUrl;
     thumbCache[repoName] = finalUrl;
@@ -1546,34 +1240,24 @@ async function loadProjectThumbnails() {
 
 async function findRepoRootThumbnail(repoName) {
   try {
-    const res = await fetch(
-      `https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`
-    );
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`);
     if (!res.ok) return null;
     const data = await res.json();
     if (!Array.isArray(data)) return null;
 
     const files = data.filter((item) => item.type === "file");
-
     const imageFiles = files.filter((item) => {
       const ext = (item.name.split(".").pop() || "").toLowerCase();
       return ["jpg", "jpeg", "png", "svg", "gif", "webp"].includes(ext);
     });
 
-    if (!imageFiles.length) {
-      return null;
-    }
+    if (!imageFiles.length) return null;
 
     const score = (name) => {
       const lower = name.toLowerCase();
       if (lower === "logo.gif") return 0;
       if (lower === "logo.png") return 1;
-      if (
-        lower === "logo.jpg" ||
-        lower === "logo.jpeg" ||
-        lower === "logo.webp"
-      )
-        return 2;
+      if (lower === "logo.jpg" || lower === "logo.jpeg" || lower === "logo.webp") return 2;
       if (lower.startsWith("logo.")) return 3;
       if (lower.includes("classdiagram")) return 4;
       if (lower.includes("diagram")) return 5;
@@ -1582,13 +1266,105 @@ async function findRepoRootThumbnail(repoName) {
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
     const chosen = imageFiles[0];
-
     const encodedName = encodeURIComponent(chosen.name);
     return `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodedName}`;
   } catch (err) {
     console.error("Failed to load root thumbnail for", repoName, err);
     return null;
   }
+}
+
+/* ---------- Download asset helpers (.jar/.apk in repo root) ---------- */
+
+function loadAssetCache() {
+  try {
+    const raw = localStorage.getItem(ASSET_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveAssetCache() {
+  try {
+    localStorage.setItem(ASSET_CACHE_KEY, JSON.stringify(assetCache));
+  } catch (_) {}
+}
+
+function isDownloadableExt(name) {
+  const lower = String(name || "").toLowerCase();
+  return lower.endsWith(".jar") || lower.endsWith(".apk");
+}
+
+function pickBestAsset(files) {
+  // Prefer .jar over .apk, and prefer “release”/“build”/“dist” names
+  const scored = files.map((f) => {
+    const n = (f.name || "").toLowerCase();
+    let s = 100;
+    if (n.endsWith(".jar")) s -= 10;
+    if (n.includes("release")) s -= 6;
+    if (n.includes("build")) s -= 4;
+    if (n.includes("dist")) s -= 3;
+    if (n.includes("final")) s -= 2;
+    return { f, s };
+  });
+  scored.sort((a, b) => a.s - b.s);
+  return scored[0]?.f || null;
+}
+
+async function findRepoRootDownloadAsset(repoName) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+
+    const files = data.filter((item) => item.type === "file" && isDownloadableExt(item.name));
+    if (!files.length) return null;
+
+    const chosen = pickBestAsset(files);
+    if (!chosen) return null;
+
+    const fileName = chosen.name;
+    const ext = (fileName.split(".").pop() || "").toLowerCase();
+    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodeURIComponent(fileName)}`;
+    return { url, ext };
+  } catch (err) {
+    console.error("Failed to detect download asset for", repoName, err);
+    return null;
+  }
+}
+
+async function loadProjectDownloadAssets() {
+  // Limit concurrency a bit (avoid hammering API)
+  const queue = [...projects];
+  const workers = Array.from({ length: 4 }).map(async () => {
+    while (queue.length) {
+      const project = queue.shift();
+      if (!project) continue;
+
+      const repoName = project.name;
+      const cached = assetCache[repoName];
+      if (cached && cached.url) {
+        project.downloadUrl = cached.url;
+        project.downloadLabel = cached.ext ? cached.ext.toUpperCase() : "Download";
+        continue;
+      }
+
+      const found = await findRepoRootDownloadAsset(repoName);
+      if (found && found.url) {
+        project.downloadUrl = found.url;
+        project.downloadLabel = found.ext ? found.ext.toUpperCase() : "Download";
+        assetCache[repoName] = found;
+        saveAssetCache();
+      }
+    }
+  });
+
+  await Promise.all(workers);
+  renderProjects();
 }
 
 /* ---------- Project rendering ---------- */
@@ -1603,24 +1379,17 @@ function getFilteredProjects() {
 
     if (
       langFilter !== "all" &&
-      !p.languages.some(
-        (l) => l.toLowerCase() === langFilter.toLowerCase()
-      )
-    ) {
-      return false;
-    }
+      !p.languages.some((l) => String(l).toLowerCase() === String(langFilter).toLowerCase())
+    ) return false;
 
     if (!search) return true;
 
     const haystack = [
       p.displayName,
       p.description,
-      p.type,
       (p.tags || []).join(" "),
       (p.languages || []).join(" ")
-    ]
-      .join(" ")
-      .toLowerCase();
+    ].join(" ").toLowerCase();
 
     return haystack.includes(search);
   });
@@ -1632,8 +1401,8 @@ function renderProjects() {
   if (!grid || !emptyState) return;
 
   const filtered = getFilteredProjects();
-
   grid.innerHTML = "";
+
   if (!filtered.length) {
     emptyState.style.display = "block";
     return;
@@ -1660,9 +1429,7 @@ function renderProjects() {
       thumb.appendChild(img);
     } else {
       const span = document.createElement("span");
-      span.textContent = (project.displayName || "?")
-        .charAt(0)
-        .toUpperCase();
+      span.textContent = (project.displayName || "?").charAt(0).toUpperCase();
       thumb.appendChild(span);
     }
 
@@ -1687,20 +1454,9 @@ function renderProjects() {
     desc.className = "project-desc";
     desc.textContent = project.description;
 
+    // Meta: keep ONLY custom tags (no “Website/School/Study” type-badges)
     const meta = document.createElement("div");
     meta.className = "project-meta";
-
-    const typeBadge = document.createElement("span");
-    typeBadge.className = "badge badge-type";
-
-    const typeMap = TYPE_LABELS[project.type] || TYPE_LABELS.other;
-    const typeLabel =
-      typeMap[state.lang] ||
-      typeMap[DEFAULT_LANG] ||
-      project.type;
-    typeBadge.textContent = typeLabel;
-
-    meta.appendChild(typeBadge);
 
     (project.tags || []).forEach((tag) => {
       const tagBadge = document.createElement("span");
@@ -1717,7 +1473,7 @@ function renderProjects() {
     githubBtn.target = "_blank";
     githubBtn.rel = "noopener noreferrer";
     githubBtn.className = "btn-card";
-    githubBtn.innerHTML = "<span>GitHub</span>";
+    githubBtn.innerHTML = `<span>${dict.btnGitHub || "View on GitHub"}</span>`;
     actions.appendChild(githubBtn);
 
     if (project.liveUrl) {
@@ -1726,19 +1482,30 @@ function renderProjects() {
       liveBtn.target = "_blank";
       liveBtn.rel = "noopener noreferrer";
       liveBtn.className = "btn-card btn-card-live";
-      const label =
-        dict.btnLiveSite ||
-        I18N[DEFAULT_LANG].btnLiveSite ||
-        "Live site";
-      liveBtn.innerHTML = `<span>${label}</span>`;
+      liveBtn.innerHTML = `<span>${dict.btnLiveSite || "Live site"}</span>`;
       actions.appendChild(liveBtn);
+    }
+
+    // Download button if repo has .jar/.apk in root
+    if (project.downloadUrl) {
+      const dlBtn = document.createElement("a");
+      dlBtn.href = project.downloadUrl;
+      dlBtn.target = "_blank";
+      dlBtn.rel = "noopener noreferrer";
+      dlBtn.className = "btn-card";
+      const label = dict.btnDownload || "Download";
+      const suffix = project.downloadLabel ? ` ${project.downloadLabel}` : "";
+      dlBtn.innerHTML = `<span>${label}${suffix}</span>`;
+      actions.appendChild(dlBtn);
     }
 
     card.appendChild(titleRow);
     card.appendChild(desc);
-    card.appendChild(meta);
-    card.appendChild(actions);
 
+    // Only append meta if there are custom tags
+    if (project.tags && project.tags.length) card.appendChild(meta);
+
+    card.appendChild(actions);
     grid.appendChild(card);
   });
 }
@@ -1753,6 +1520,7 @@ async function loadMedia() {
       renderMedia();
       return;
     }
+
     const data = await res.json();
     const items = Array.isArray(data) ? data : data.items || [];
 
@@ -1760,19 +1528,13 @@ async function loadMedia() {
       let path = item.path || item.url || item.src || "";
 
       if (!path) {
-        const fileName =
-          item.fileName || item.name || item.title || "";
+        const fileName = item.fileName || item.name || item.title || "";
         if (fileName) {
           const lowerType = (item.type || "").toLowerCase();
-          if (lowerType === "image") {
-            path = `media/images/${fileName}`;
-          } else if (lowerType === "video") {
-            path = `media/videos/${fileName}`;
-          } else if (lowerType === "audio") {
-            path = `media/audio/${fileName}`;
-          } else {
-            path = `media/${fileName}`;
-          }
+          if (lowerType === "image") path = `media/images/${fileName}`;
+          else if (lowerType === "video") path = `media/videos/${fileName}`;
+          else if (lowerType === "audio") path = `media/audio/${fileName}`;
+          else path = `media/${fileName}`;
         }
       }
 
@@ -1783,26 +1545,15 @@ async function loadMedia() {
         (path ? path.split("/").pop() : "") ||
         `Media ${index + 1}`;
 
-      const format =
-        item.format ||
-        (path.split(".").pop() || "").toLowerCase() ||
-        "";
+      const format = (item.format || (path.split(".").pop() || "").toLowerCase() || "").toLowerCase();
 
       let type = item.type;
-      if (!type) {
-        type = guessMediaType(path);
-      }
+      if (!type) type = guessMediaType(path);
 
-      return {
-        id: index,
-        title,
-        path,
-        type,
-        format
-      };
+      return { id: index, title, path, type, format };
     });
 
-    buildMediaFilterOptions(mediaItems);
+    buildMediaTypeFilterOptions(mediaItems); // only type now
     renderMedia();
   } catch (err) {
     console.error("Failed to load media index", err);
@@ -1813,26 +1564,21 @@ async function loadMedia() {
 
 function guessMediaType(path) {
   const ext = (path.split(".").pop() || "").toLowerCase();
-  if (["jpg", "jpeg", "png", "gif", "webp", "bmp"].includes(ext)) {
-    return "image";
-  }
-  if (["mp4", "webm", "mov", "m4v"].includes(ext)) {
-    return "video";
-  }
-  if (["mp3", "wav", "ogg", "flac"].includes(ext)) {
-    return "audio";
-  }
+  if (["jpg", "jpeg", "png", "gif", "webp", "bmp"].includes(ext)) return "image";
+  if (["mp4", "webm", "mov", "m4v"].includes(ext)) return "video";
+  if (["mp3", "wav", "ogg", "flac"].includes(ext)) return "audio";
   return "image";
 }
 
-function buildMediaFilterOptions(items) {
+function buildMediaTypeFilterOptions(items) {
   const typeSelect = document.getElementById("mediaTypeFilter");
-  const formatSelect = document.getElementById("mediaFormatFilter");
-  if (!typeSelect || !formatSelect) return;
+  if (!typeSelect) return;
 
   while (typeSelect.options.length > 1) typeSelect.remove(1);
+
   const typeSet = new Set();
   items.forEach((i) => typeSet.add(i.type));
+
   Array.from(typeSet)
     .sort()
     .forEach((t) => {
@@ -1841,48 +1587,18 @@ function buildMediaFilterOptions(items) {
       opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
       typeSelect.appendChild(opt);
     });
-
-  while (formatSelect.options.length > 1) formatSelect.remove(1);
-  const formatSet = new Set();
-  items.forEach((i) => {
-    if (i.format) formatSet.add(i.format.toLowerCase());
-  });
-  Array.from(formatSet)
-    .sort()
-    .forEach((f) => {
-      const opt = document.createElement("option");
-      opt.value = f;
-      opt.textContent = f.toUpperCase();
-      formatSelect.appendChild(opt);
-    });
 }
 
 function getFilteredMedia() {
   const search = state.search.toLowerCase();
   const typeFilter = state.mediaTypeFilter;
-  const formatFilter = state.mediaFormatFilter;
 
   return mediaItems.filter((item) => {
     if (typeFilter !== "all" && item.type !== typeFilter) return false;
-    if (
-      formatFilter !== "all" &&
-      item.format.toLowerCase() !== formatFilter.toLowerCase()
-    ) {
-      return false;
-    }
 
     if (!search) return true;
 
-    const haystack = (
-      item.title +
-      " " +
-      item.path +
-      " " +
-      item.type +
-      " " +
-      item.format
-    ).toLowerCase();
-
+    const haystack = (item.title + " " + item.path).toLowerCase();
     return haystack.includes(search);
   });
 }
@@ -1925,7 +1641,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- media rendering (with "only one video playing" logic + avatar hooks) ---- */
+/* ---- media rendering (no type/format badges; no format filter) ---- */
 
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
@@ -1959,9 +1675,7 @@ function renderMedia() {
       img.alt = item.title;
       preview.appendChild(img);
 
-      preview.addEventListener("click", () => {
-        openImageModal(item.path, item.title);
-      });
+      preview.addEventListener("click", () => openImageModal(item.path, item.title));
     } else if (item.type === "video") {
       preview.classList.add("media-preview-video");
 
@@ -1971,14 +1685,12 @@ function renderMedia() {
       video.playsInline = true;
       video.preload = "metadata";
 
-      // pause other videos when this one starts playing
       video.addEventListener("play", () => {
         document.querySelectorAll("video").forEach((v) => {
           if (v !== video) v.pause();
         });
       });
 
-      // tie this video to the avatar ring
       attachMediaPlaybackHooks(video);
 
       const wrapper = document.createElement("div");
@@ -1989,31 +1701,15 @@ function renderMedia() {
       const volumeRow = createVolumeRow(video);
       preview.appendChild(volumeRow);
 
-      // Loop toggle button per video
       const loopBtn = document.createElement("button");
       loopBtn.type = "button";
       loopBtn.className = "media-action-btn media-loop-btn";
       loopBtn.textContent = "🔁 Loop";
       loopBtn.title = "Toggle loop";
-
       loopBtn.addEventListener("click", () => {
         video.loop = !video.loop;
         loopBtn.classList.toggle("is-active", video.loop);
       });
-
-      const meta = document.createElement("div");
-      meta.className = "media-meta";
-
-      const typeBadge = document.createElement("span");
-      typeBadge.className = "badge-media-type";
-      typeBadge.textContent = item.type;
-
-      const formatBadge = document.createElement("span");
-      formatBadge.className = "badge-media-format";
-      formatBadge.textContent = item.format.toUpperCase();
-
-      meta.appendChild(typeBadge);
-      meta.appendChild(formatBadge);
 
       const actions = document.createElement("div");
       actions.className = "media-actions";
@@ -2037,7 +1733,6 @@ function renderMedia() {
 
       card.appendChild(title);
       card.appendChild(preview);
-      card.appendChild(meta);
       card.appendChild(actions);
       grid.appendChild(card);
       return;
@@ -2047,7 +1742,6 @@ function renderMedia() {
       audio.controls = true;
       audio.preload = "metadata";
 
-      // tie this audio to the avatar ring
       attachMediaPlaybackHooks(audio);
 
       const wrapper = document.createElement("div");
@@ -2059,59 +1753,39 @@ function renderMedia() {
       preview.appendChild(volumeRow);
     }
 
-    if (item.type !== "video") {
-      const meta = document.createElement("div");
-      meta.className = "media-meta";
+    const actions = document.createElement("div");
+    actions.className = "media-actions";
 
-      const typeBadge = document.createElement("span");
-      typeBadge.className = "badge-media-type";
-      typeBadge.textContent = item.type;
-
-      const formatBadge = document.createElement("span");
-      formatBadge.className = "badge-media-format";
-      formatBadge.textContent = item.format.toUpperCase();
-
-      meta.appendChild(typeBadge);
-      meta.appendChild(formatBadge);
-
-      const actions = document.createElement("div");
-      actions.className = "media-actions";
-
-      if (item.type === "image") {
-        const viewBtn = document.createElement("button");
-        viewBtn.type = "button";
-        viewBtn.className = "media-action-btn";
-        viewBtn.textContent = "View";
-        viewBtn.addEventListener("click", () => {
-          openImageModal(item.path, item.title);
-        });
-        actions.appendChild(viewBtn);
-      } else {
-        const openBtn = document.createElement("a");
-        openBtn.href = item.path;
-        openBtn.target = "_blank";
-        openBtn.rel = "noopener noreferrer";
-        openBtn.className = "media-action-btn";
-        openBtn.textContent = "Open";
-        actions.appendChild(openBtn);
-      }
-
-      const downloadBtn = document.createElement("a");
-      downloadBtn.href = item.path;
-      downloadBtn.download = "";
-      downloadBtn.className = "media-action-btn";
-      downloadBtn.textContent = "Download";
-      actions.appendChild(downloadBtn);
-
-      card.appendChild(title);
-      card.appendChild(preview);
-      card.appendChild(meta);
-      card.appendChild(actions);
-      grid.appendChild(card);
+    if (item.type === "image") {
+      const viewBtn = document.createElement("button");
+      viewBtn.type = "button";
+      viewBtn.className = "media-action-btn";
+      viewBtn.textContent = "View";
+      viewBtn.addEventListener("click", () => openImageModal(item.path, item.title));
+      actions.appendChild(viewBtn);
+    } else {
+      const openBtn = document.createElement("a");
+      openBtn.href = item.path;
+      openBtn.target = "_blank";
+      openBtn.rel = "noopener noreferrer";
+      openBtn.className = "media-action-btn";
+      openBtn.textContent = "Open";
+      actions.appendChild(openBtn);
     }
+
+    const downloadBtn = document.createElement("a");
+    downloadBtn.href = item.path;
+    downloadBtn.download = "";
+    downloadBtn.className = "media-action-btn";
+    downloadBtn.textContent = "Download";
+    actions.appendChild(downloadBtn);
+
+    card.appendChild(title);
+    card.appendChild(preview);
+    card.appendChild(actions);
+    grid.appendChild(card);
   });
 
-  // After rendering, ensure avatar ring reflects any currently playing media
   updateAvatarPlayingFromMedia();
 }
 
@@ -2122,15 +1796,11 @@ function setupImageModal() {
   if (!modal) return;
 
   modal.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closeImageModal();
-    }
+    if (event.target === modal) closeImageModal();
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeImageModal();
-    }
+    if (event.key === "Escape") closeImageModal();
   });
 }
 
@@ -2150,9 +1820,7 @@ function openImageModal(src, captionText) {
   img.className = "image-modal-img";
   img.src = src;
   img.alt = captionText || "";
-  img.addEventListener("click", () => {
-    closeImageModal();
-  });
+  img.addEventListener("click", closeImageModal);
 
   figure.appendChild(img);
 
@@ -2184,7 +1852,6 @@ function openImageModal(src, captionText) {
   actions.appendChild(closeBtn);
 
   inner.appendChild(actions);
-
   modal.appendChild(inner);
   modal.hidden = false;
 }
@@ -2200,8 +1867,7 @@ function closeImageModal() {
 function setupFooterCopyright() {
   const el = document.getElementById("footerCopyright");
   if (!el) return;
-  const year = new Date().getFullYear();
-  el.textContent = `${year}`;
+  el.textContent = `${new Date().getFullYear()}`;
 }
 
 /* ---------- Playground random button ---------- */
@@ -2210,7 +1876,6 @@ function setupPlaygroundRandomButton() {
   const btn = document.getElementById("randomSiteButton");
   if (!btn) return;
 
-  // Make it visually identical to "Live site" buttons
   btn.classList.add("btn-card", "btn-card-live");
 
   btn.addEventListener("click", () => {
@@ -2221,21 +1886,28 @@ function setupPlaygroundRandomButton() {
   });
 }
 
-/* ---------- Paint toolbar + shortcuts ---------- */
+/* ---------- Paint toolbar + shortcuts (ONLY CLEAR + confirm) ---------- */
 
 function setupPaintToolbar() {
   const paintCard = document.querySelector(".playground-paint");
   if (!paintCard) return;
 
   paintIframe = paintCard.querySelector("iframe[src*='paint.js.org']");
-  const buttons = paintCard.querySelectorAll("[data-paint-action]");
 
+  // Remove all buttons except CLEAR (JS-only patch)
+  const buttons = paintCard.querySelectorAll("[data-paint-action]");
   buttons.forEach((btn) => {
     const action = btn.getAttribute("data-paint-action");
-    btn.addEventListener("click", () => {
-      handlePaintAction(action);
-    });
+    if (action !== "clear") {
+      btn.remove();
+    } else {
+      btn.addEventListener("click", () => handlePaintAction("clear"));
+    }
   });
+
+  // Remove hint text line (JS-only patch)
+  const hint = paintCard.querySelector(".playground-paint-hint");
+  if (hint) hint.remove();
 
   document.addEventListener("keydown", handlePaintShortcuts);
 }
@@ -2243,56 +1915,26 @@ function setupPaintToolbar() {
 function handlePaintAction(action) {
   if (!paintIframe) return;
 
-  switch (action) {
-    case "new": {
-      const ok = window.confirm(
-        "Start a new canvas? This will clear the current drawing."
-      );
-      if (!ok) return;
-      reloadPaintIframe();
-      break;
-    }
-    case "clear": {
-      reloadPaintIframe();
-      break;
-    }
-    case "open": {
-      window.open(paintIframe.src, "_blank", "noopener,noreferrer");
-      break;
-    }
-    case "save": {
-      // Best-effort: open full paint.js.org so the user can use its own save tools
-      window.open(paintIframe.src, "_blank", "noopener,noreferrer");
-      break;
-    }
-    case "undo": {
-      // No real access to paint.js.org internals, so soft-reload as best-effort "undo"
-      reloadPaintIframe();
-      break;
-    }
-    default:
-      break;
+  if (action === "clear") {
+    const ok = window.confirm("Clear the canvas? This will reset the Paint app.");
+    if (!ok) return;
+    reloadPaintIframe();
   }
 }
 
 function reloadPaintIframe() {
   if (!paintIframe) return;
-  // simple reload of the iframe to clear canvas
   const src = paintIframe.src;
   paintIframe.src = src;
 }
 
 function handlePaintShortcuts(event) {
+  // Keep only Ctrl+Shift+N as “clear” while on playground
   if (state.activeTab !== "playground") return;
 
   const target = event.target;
-  if (!target) return;
-
-  const tag = (target.tagName || "").toLowerCase();
-  const isTyping =
-    tag === "input" ||
-    tag === "textarea" ||
-    target.isContentEditable;
+  const tag = (target?.tagName || "").toLowerCase();
+  const isTyping = tag === "input" || tag === "textarea" || target?.isContentEditable;
   if (isTyping) return;
 
   const key = event.key.toLowerCase();
@@ -2301,25 +1943,14 @@ function handlePaintShortcuts(event) {
 
   if (!ctrl) return;
 
-  if (key === "n" && !shift) {
-    event.preventDefault();
-    handlePaintAction("new");
-  } else if (key === "n" && shift) {
+  // Ctrl+Shift+N -> Clear
+  if (key === "n" && shift) {
     event.preventDefault();
     handlePaintAction("clear");
-  } else if (key === "o") {
-    event.preventDefault();
-    handlePaintAction("open");
-  } else if (key === "s") {
-    event.preventDefault();
-    handlePaintAction("save");
-  } else if (key === "z") {
-    event.preventDefault();
-    handlePaintAction("undo");
   }
 }
 
-/* ---------- Postboard (Playground) ---------- */
+/* ---------- Postboard (Playground) + “send email” (mailto fallback) ---------- */
 
 function setupPostboard() {
   const form = document.getElementById("postboardForm");
@@ -2330,13 +1961,50 @@ function setupPostboard() {
   let messages = loadPostboardMessages();
   renderPostboard(messages, listEl, emptyEl);
 
+  // Add a “Send via email” button (JS-only, placed next to Post button)
+  const actionsRow = form.querySelector(".postboard-actions");
+  if (actionsRow && !actionsRow.querySelector("[data-send-email]")) {
+    const sendBtn = document.createElement("button");
+    sendBtn.type = "button";
+    sendBtn.className = "postboard-submit-btn";
+    sendBtn.style.background = "rgba(11, 26, 61, 0.9)";
+    sendBtn.style.borderColor = "rgba(255,255,255,0.22)";
+    sendBtn.setAttribute("data-send-email", "1");
+    sendBtn.textContent =
+      (I18N[state.lang]?.btnSendEmail || I18N[DEFAULT_LANG].btnSendEmail || "Send via email");
+
+    sendBtn.addEventListener("click", () => {
+      const nameInput = document.getElementById("postboardName");
+      const anonInput = document.getElementById("postboardAnon");
+      const messageInput = document.getElementById("postboardMessage");
+
+      const rawMessage = (messageInput?.value || "").trim();
+      if (!rawMessage) {
+        alert("Write a message first 🙂");
+        return;
+      }
+
+      const isAnon = !!anonInput?.checked;
+      const rawName = (nameInput?.value || "").trim();
+      const name = isAnon || !rawName ? "Anonymous" : rawName;
+
+      const subject = encodeURIComponent("Postboard message");
+      const body = encodeURIComponent(
+        `From: ${name}\n\nMessage:\n${rawMessage}\n\n— Sent from Ferran’s Projects Postboard`
+      );
+
+      window.location.href = `mailto:${encodeURIComponent(POSTBOARD_EMAIL_TO)}?subject=${subject}&body=${body}`;
+    });
+
+    actionsRow.appendChild(sendBtn);
+  }
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const nameInput = document.getElementById("postboardName");
     const anonInput = document.getElementById("postboardAnon");
     const messageInput = document.getElementById("postboardMessage");
-
     if (!messageInput) return;
 
     const rawMessage = messageInput.value.trim();
@@ -2359,9 +2027,7 @@ function setupPostboard() {
     renderPostboard(messages, listEl, emptyEl);
 
     messageInput.value = "";
-    if (nameInput && isAnon) {
-      nameInput.value = "";
-    }
+    if (nameInput && isAnon) nameInput.value = "";
   });
 }
 
@@ -2370,8 +2036,7 @@ function loadPostboardMessages() {
     const raw = localStorage.getItem(POSTBOARD_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed;
-    return [];
+    return Array.isArray(parsed) ? parsed : [];
   } catch (_) {
     return [];
   }
@@ -2409,10 +2074,7 @@ function renderPostboard(messages, listEl, emptyEl) {
     if (msg.createdAt) {
       const d = new Date(msg.createdAt);
       if (!isNaN(d.getTime())) {
-        dateLabel = d.toLocaleString(undefined, {
-          dateStyle: "short",
-          timeStyle: "short"
-        });
+        dateLabel = d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
       }
     }
     meta.textContent = dateLabel;
