@@ -169,6 +169,20 @@
     "thumbnailUrl": ""
   },
   {
+    "name": "kerstquiz-2025",
+    "description": "Temporary Christmas Quiz for the fam",
+    "language": "JavaScript",
+    "languages": [
+      "JS",
+      "CSS",
+      "HTML"
+    ],
+    "hasPages": true,
+    "pagesUrl": "https://ferrannl.github.io/kerstquiz-2025/",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "kmintapp",
     "description": "kmintapp is a C++ application built on top of a reusable simulation framework (libkmint). It is an agent-based 2D simulation: autonomous entities move around a world, make decisions based on their environment, and interact according to simple rules. The project was built as an educational / course assignment",
     "language": "C++",
