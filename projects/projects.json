@@ -170,7 +170,7 @@
   },
   {
     "name": "kerstquiz-2025",
-    "description": "Temporary Christmas Quiz for the fam",
+    "description": "2025's Family Christmas Quiz",
     "language": "JavaScript",
     "languages": [
       "JS",
@@ -356,6 +356,20 @@
     ],
     "hasPages": false,
     "pagesUrl": "",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
+    "name": "Tea-Topics",
+    "description": "Web app that displays “Tea Topics” (conversation starters)",
+    "language": "JavaScript",
+    "languages": [
+      "JS",
+      "CSS",
+      "HTML"
+    ],
+    "hasPages": true,
+    "pagesUrl": "https://ferrannl.github.io/Tea-Topics/",
     "tags": [],
     "thumbnailUrl": ""
   },
