@@ -91,19 +91,6 @@
     "thumbnailUrl": ""
   },
   {
-    "name": "Ecobit-Internship",
-    "description": "Multi‑project solution that implements a layered architecture with clear separation between UI, domain, and database logic. It was designed to manage user details, borrowed items, and return deadlines, providing notifications when time was running out or overdue. ",
-    "language": "C#",
-    "languages": [
-      "C#",
-      "TSQL"
-    ],
-    "hasPages": false,
-    "pagesUrl": "",
-    "tags": [],
-    "thumbnailUrl": ""
-  },
-  {
     "name": "elegant-barbershop",
     "description": "Website suggestion for Elegant Barbershop",
     "language": "Less",
