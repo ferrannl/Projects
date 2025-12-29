@@ -612,7 +612,7 @@ body.bg-video-active .bg-video-overlay {
   align-items: start;
 }
 
-/* ---------- Project cards + thumbnails (Option 2: bigger without layout breaking) ---------- */
+/* ---------- Project cards + thumbnails ---------- */
 
 .project-card {
   position: relative;
@@ -667,10 +667,10 @@ body.bg-video-active .bg-video-overlay {
   margin-bottom: 0.55rem;
 }
 
-/* 🔹 Option 2 — Visueel groter zonder layout te breken (aanrader) */
+/* 🔹 tiny bump bigger */
 .project-thumb {
-  width: 96px;   /* was 88 */
-  height: 96px;  /* was 88 */
+  width: 102px;   /* was 96 */
+  height: 102px;  /* was 96 */
   border-radius: 16px;
   box-shadow: 0 14px 38px rgba(0, 0, 0, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -702,8 +702,8 @@ body.bg-video-active .bg-video-overlay {
 }
 
 .project-thumb.has-image img {
-  width: 96px;   /* match container */
-  height: 96px;
+  width: 102px;   /* match container */
+  height: 102px;
   border-radius: 16px;
   object-fit: cover;
   display: block;
@@ -1483,11 +1483,11 @@ body.js-enabled .no-js-fallback { display: none; }
   /* On mobile: make Paint field tall 9:16 instead of 16:9 */
   .playground-embed iframe[src*="paint.js.org"] { aspect-ratio: 9 / 16; }
 
-  /* Mobile: slightly smaller project thumbs so it stays clean */
+  /* Mobile: slightly bigger thumbs */
   .project-thumb,
   .project-thumb.has-image img {
-    width: 82px;
-    height: 82px;
+    width: 86px;   /* was 82 */
+    height: 86px;  /* was 82 */
     border-radius: 14px;
   }
 }
