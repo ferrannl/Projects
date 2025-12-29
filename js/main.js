@@ -43,8 +43,6 @@ const USELESS_WEB_URLS = [
   "https://puginarug.com",
   "https://wowenwilsonquiz.com",
   "https://findtheinvisiblecow.com",
-
-  // Neal.fun (mobile-friendly interactives)
   "https://neal.fun/deep-sea/",
   "https://neal.fun/spend/",
   "https://neal.fun/password-game/",
