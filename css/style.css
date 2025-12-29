@@ -1383,3 +1383,38 @@ body.js-enabled .no-js-fallback { display: none; }
 @media (max-width: 480px) {
   .lang-gate-card { padding: 1.4rem 1.1rem 1.1rem; }
 }
+
+/* ------------------------------------------------------------------ */
+/* ✅ HARD THUMB OVERRIDE (PUT THIS AT THE VERY BOTTOM)                 */
+/* This prevents any other "img { width:100% }" or layout changes from  */
+/* making the project thumbnail full-size.                              */
+/* ------------------------------------------------------------------ */
+
+.project-title-row .project-thumb,
+.project-card .project-thumb {
+  width: 84px !important;
+  height: 84px !important;
+  max-width: 84px !important;
+  max-height: 84px !important;
+  flex: 0 0 84px !important;
+}
+
+.project-title-row .project-thumb img,
+.project-card .project-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* If your JS sometimes renders: <img class="project-thumb" ...> */
+img.project-thumb {
+  width: 84px !important;
+  height: 84px !important;
+  max-width: 84px !important;
+  max-height: 84px !important;
+  object-fit: cover !important;
+  border-radius: 16px;
+  display: block !important;
+  flex: 0 0 84px !important;
+}
