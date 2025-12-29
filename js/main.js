@@ -1,3 +1,4 @@
+
 /* js/main.js */
 /* ---------- Config ---------- */
 
@@ -7,7 +8,7 @@ const PROJECTS_URL = "./projects/projects.json";
 const MEDIA_INDEX_URL = "./media/media.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
-const THUMB_CACHE_KEY = "ferranProjectsThumbsV3";
+const THUMB_CACHE_KEY = "ferranProjectsThumbsV4"; // bump key (new thumb logic)
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "es"];
 const DEFAULT_LANG = "nl";
@@ -178,7 +179,6 @@ const I18N = {
 
     modalOpenNewTab: "Openen in nieuw tabblad",
     modalClose: "Sluiten",
-    modalHint: "Klik buiten de afbeelding of druk op Esc om te sluiten.",
 
     mediaOpen: "Openen",
     mediaDownload: "Download",
@@ -239,7 +239,6 @@ const I18N = {
 
     modalOpenNewTab: "Open in new tab",
     modalClose: "Close",
-    modalHint: "Click outside the image or press Esc to close.",
 
     mediaOpen: "Open",
     mediaDownload: "Download",
@@ -300,7 +299,6 @@ const I18N = {
 
     modalOpenNewTab: "In neuem Tab öffnen",
     modalClose: "Schließen",
-    modalHint: "Klicke außerhalb des Bildes oder drücke Esc zum Schließen.",
 
     mediaOpen: "Öffnen",
     mediaDownload: "Download",
@@ -361,7 +359,6 @@ const I18N = {
 
     modalOpenNewTab: "Abrir en una nueva pestaña",
     modalClose: "Cerrar",
-    modalHint: "Haz clic fuera de la imagen o pulsa Esc para cerrar.",
 
     mediaOpen: "Abrir",
     mediaDownload: "Descargar",
@@ -907,23 +904,36 @@ function saveThumbCache() {
   } catch (_) {}
 }
 
-async function checkImageExists(url) {
+/**
+ * "exists" check: try HEAD, fallback GET.
+ * For GIF specifically: do GET (some CDNs/proxies behave weird on HEAD).
+ */
+async function checkImageExists(url, preferGet = false) {
   try {
-    let res = await fetch(url, { method: "HEAD" });
-    if (res.ok) return true;
-    res = await fetch(url, { method: "GET" });
-    return res.ok;
+    if (!preferGet) {
+      let res = await fetch(url, { method: "HEAD", cache: "no-store" });
+      if (res.ok) return true;
+    }
+    const res2 = await fetch(url, { method: "GET", cache: "no-store" });
+    return res2.ok;
   } catch (_) {
     return false;
   }
+}
+
+/** cache-busting without breaking raw URLs */
+function withBust(url) {
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}v=${Date.now()}`;
 }
 
 async function loadProjectThumbnails() {
   const promises = projects.map(async (project) => {
     const repoName = project.name;
 
+    // 1) explicit override thumb
     if (project.thumbnail && !thumbCache[repoName]) {
-      const ok = await checkImageExists(project.thumbnail);
+      const ok = await checkImageExists(project.thumbnail, project.thumbnail.toLowerCase().endsWith(".gif"));
       if (ok) {
         thumbCache[repoName] = project.thumbnail;
         return;
@@ -932,14 +942,18 @@ async function loadProjectThumbnails() {
       }
     }
 
+    // 2) cached
     const cached = thumbCache[repoName];
     if (cached) {
       project.thumbnail = cached;
       return;
     }
 
+    // 3) try repo root (logo.gif highest priority)
     const rootThumb = await findRepoRootThumbnail(repoName);
     let finalUrl = rootThumb;
+
+    // 4) fallback: GitHub opengraph
     if (!finalUrl) finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
 
     project.thumbnail = finalUrl;
@@ -968,19 +982,63 @@ async function findRepoRootThumbnail(repoName) {
 
     const score = (name) => {
       const lower = name.toLowerCase();
+
+      // ✅ ABSOLUTE prio: logo.gif
       if (lower === "logo.gif") return 0;
+
+      // next: common logo formats
       if (lower === "logo.png") return 1;
-      if (lower === "logo.jpg" || lower === "logo.jpeg" || lower === "logo.webp") return 2;
-      if (lower.startsWith("logo.")) return 3;
-      if (lower.includes("classdiagram")) return 4;
-      if (lower.includes("diagram")) return 5;
-      return 6;
+      if (lower === "logo.jpg" || lower === "logo.jpeg") return 2;
+      if (lower === "logo.webp") return 3;
+      if (lower === "logo.svg") return 4;
+
+      // other "logo.*"
+      if (lower.startsWith("logo.")) return 5;
+
+      // other common thumbs
+      if (lower === "thumbnail.png" || lower === "thumb.png") return 6;
+      if (lower === "preview.png") return 7;
+
+      // avoid diagrams
+      if (lower.includes("classdiagram")) return 20;
+      if (lower.includes("diagram")) return 21;
+
+      return 50;
     };
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
     const chosen = imageFiles[0];
+
     const encodedName = encodeURIComponent(chosen.name);
-    return `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodedName}`;
+    const raw = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodedName}`;
+
+    // For GIF: validate with GET, and if flaky -> bust query once
+    const isGif = (chosen.name || "").toLowerCase().endsWith(".gif");
+    if (isGif) {
+      const ok = await checkImageExists(raw, true);
+      if (ok) return raw;
+
+      const busted = withBust(raw);
+      const ok2 = await checkImageExists(busted, true);
+      if (ok2) return busted;
+
+      // if gif fails, try next best: logo.png/jpg/etc if available
+      const fallbackOrder = ["logo.png", "logo.jpg", "logo.jpeg", "logo.webp", "logo.svg"];
+      const map = new Map(imageFiles.map((f) => [f.name.toLowerCase(), f]));
+      for (const fname of fallbackOrder) {
+        const f = map.get(fname);
+        if (!f) continue;
+        const u = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodeURIComponent(f.name)}`;
+        const okf = await checkImageExists(u, false);
+        if (okf) return u;
+      }
+      return null;
+    }
+
+    // non-gif: normal check
+    const ok = await checkImageExists(raw, false);
+    if (!ok) return null;
+    return raw;
   } catch (err) {
     console.error("Failed to load root thumbnail for", repoName, err);
     return null;
@@ -1046,6 +1104,15 @@ function renderProjects() {
       const img = document.createElement("img");
       img.src = project.thumbnail;
       img.alt = project.displayName;
+
+      // 🔥 runtime fallback: if image fails, try bust once (helps logo.gif)
+      img.addEventListener("error", () => {
+        // prevent loop
+        if (img.dataset.busted === "1") return;
+        img.dataset.busted = "1";
+        img.src = withBust(project.thumbnail);
+      });
+
       thumb.appendChild(img);
     } else {
       const span = document.createElement("span");
@@ -1435,14 +1502,7 @@ function openImageModal(src, captionText) {
 
   inner.appendChild(actions);
 
-  // Optional hint line (kept in caption area styling)
-  if (dict.modalHint) {
-    const hint = document.createElement("div");
-    hint.className = "image-modal-caption";
-    hint.style.marginTop = "0";
-    hint.textContent = dict.modalHint;
-    inner.appendChild(hint);
-  }
+  // ✅ hint removed (no "click outside / Esc" text)
 
   modal.appendChild(inner);
   modal.hidden = false;
