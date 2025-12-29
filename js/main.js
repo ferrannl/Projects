@@ -1,4 +1,8 @@
 /* js/main.js */
+/* =========================================================
+   Ferran’s Projects — Cleaned + synced with current CSS/HTML
+   Key change: Projects render with a FIXED banner thumbnail
+   ========================================================= */
 
 /* ---------- Config ---------- */
 
@@ -16,7 +20,7 @@ const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
-/* ---------- Random useless websites list ---------- */
+/* ---------- Random fun websites list ---------- */
 
 const USELESS_WEB_URLS = [
   "https://corndog.io",
@@ -40,7 +44,7 @@ const USELESS_WEB_URLS = [
   "https://wowenwilsonquiz.com",
   "https://findtheinvisiblecow.com",
 
-  // Neal.fun (super mobile-friendly interactives)
+  // Neal.fun (mobile-friendly interactives)
   "https://neal.fun/deep-sea/",
   "https://neal.fun/spend/",
   "https://neal.fun/password-game/",
@@ -88,26 +92,12 @@ const state = {
   lang: DEFAULT_LANG
 };
 
-/* Small words not capitalized in titles (except first word) */
-const SMALL_WORDS = [
-  "voor",
-  "na",
-  "met",
-  "door",
-  "en",
-  "of",
-  "und",
-  "mit",
-  "von",
-  "the",
-  "and",
-  "of"
-];
-
-/* Languages you don't want to see */
+const SMALL_WORDS = ["voor", "na", "met", "door", "en", "of", "und", "mit", "von", "the", "and", "of"];
 const BLOCKED_LANGUAGES = ["roff", "nix", "emacs lisp"];
 
-/* ---------- Avatar "music playing" helpers ---------- */
+/* =========================================================
+   Avatar “playing” helpers
+   ========================================================= */
 
 function setAvatarPlaying(isPlaying) {
   const avatar = document.querySelector(".profile-avatar");
@@ -115,10 +105,6 @@ function setAvatarPlaying(isPlaying) {
   avatar.classList.toggle("profile-avatar--playing", isPlaying);
 }
 
-/**
- * Checks if any HTML5 audio/video is currently playing
- * and updates the avatar ring class.
- */
 function updateAvatarPlayingFromMedia() {
   const mediaEls = document.querySelectorAll("audio, video");
   const anyPlaying = Array.from(mediaEls).some(
@@ -127,28 +113,21 @@ function updateAvatarPlayingFromMedia() {
   setAvatarPlaying(anyPlaying);
 }
 
-/**
- * Attach play/pause hooks to a media element
- * so it can drive the avatar animation.
- */
 function attachMediaPlaybackHooks(mediaElement) {
   if (!mediaElement) return;
-
   mediaElement.addEventListener("play", updateAvatarPlayingFromMedia);
   mediaElement.addEventListener("playing", updateAvatarPlayingFromMedia);
   mediaElement.addEventListener("pause", updateAvatarPlayingFromMedia);
   mediaElement.addEventListener("ended", updateAvatarPlayingFromMedia);
 }
 
-/* ---------- Secret background video (YouTube API globals) ---------- */
+/* =========================================================
+   Secret background video (YouTube API globals)
+   ========================================================= */
 
 let bgPlayer = null;
 let bgPlayerReady = false;
 
-/**
- * Called by the YouTube IFrame API when it’s ready.
- * We prepare a silent background player.
- */
 function onYouTubeIframeAPIReady() {
   const containerId = "bgVideoContainer";
   const el = document.getElementById(containerId);
@@ -169,15 +148,15 @@ function onYouTubeIframeAPIReady() {
     events: {
       onReady: (event) => {
         bgPlayerReady = true;
-        try {
-          event.target.setVolume(20); // ~20% volume
-        } catch (_) {}
+        try { event.target.setVolume(20); } catch (_) {}
       }
     }
   });
 }
 
-/* ---------- i18n dictionary ---------- */
+/* =========================================================
+   i18n dictionary
+   ========================================================= */
 
 const I18N = {
   nl: {
@@ -457,14 +436,12 @@ const I18N = {
   }
 };
 
-/* ---------- Init ---------- */
+/* =========================================================
+   Init
+   ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("js-enabled");
-
-  // If the filetype dropdown still exists in HTML, hide it (JS-only patch).
-  const mediaFormatGroup = document.getElementById("mediaFormatFilter")?.closest(".filter-group");
-  if (mediaFormatGroup) mediaFormatGroup.style.display = "none";
 
   setupLanguage();
   setupTabsAndFilters();
@@ -473,13 +450,15 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFooterCopyright();
   setupPlaygroundRandomButton();
   setupSecretBgVideoToggle();
-  setupPaintToolbar(); // only uses CLEAR
+  setupPaintToolbar();
 
   loadProjects();
   loadMedia();
 });
 
-/* ---------- Helpers: search placeholder per lang + tab ---------- */
+/* =========================================================
+   Search placeholder per lang + tab
+   ========================================================= */
 
 function getSearchPlaceholder(lang, view) {
   const tab = view || "projects";
@@ -511,7 +490,9 @@ function updateSearchPlaceholder() {
   searchInput.placeholder = getSearchPlaceholder(state.lang, state.activeTab);
 }
 
-/* ---------- Language / gate ---------- */
+/* =========================================================
+   Language / gate
+   ========================================================= */
 
 function setupLanguage() {
   const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
@@ -550,9 +531,7 @@ function setupLanguage() {
 
 function setLanguage(lang) {
   state.lang = lang;
-  try {
-    localStorage.setItem(LANG_STORAGE_KEY, lang);
-  } catch (_) {}
+  try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (_) {}
 
   const dict = I18N[lang] || I18N[DEFAULT_LANG] || {};
 
@@ -580,7 +559,9 @@ function updateLanguageGateActive() {
   });
 }
 
-/* ---------- Tabs & filters visibility ---------- */
+/* =========================================================
+   Tabs & filters visibility
+   ========================================================= */
 
 function setupTabsAndFilters() {
   const projectsTab = document.getElementById("projectsTab");
@@ -597,13 +578,6 @@ function setupTabsAndFilters() {
   if (!projectsTab || !mediaTab || !playgroundTab || !projectsView || !mediaView || !playgroundView) return;
 
   const tabsContainer = document.querySelector(".tabs");
-
-  function updateTabsVisual(mode) {
-    if (!tabsContainer) return;
-    tabsContainer.classList.remove("tabs-media", "tabs-playground");
-    if (mode === "media") tabsContainer.classList.add("tabs-media");
-    if (mode === "playground") tabsContainer.classList.add("tabs-playground");
-  }
 
   function updateTabsPill(activeButton) {
     if (!tabsContainer || !activeButton) return;
@@ -628,7 +602,6 @@ function setupTabsAndFilters() {
     if (projectFilters) projectFilters.hidden = false;
     if (mediaFilters) mediaFilters.hidden = true;
 
-    updateTabsVisual("projects");
     updateSearchPlaceholder();
     renderProjects();
     updateTabsPill(projectsTab);
@@ -647,7 +620,6 @@ function setupTabsAndFilters() {
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = false;
 
-    updateTabsVisual("media");
     updateSearchPlaceholder();
     renderMedia();
     updateTabsPill(mediaTab);
@@ -666,7 +638,6 @@ function setupTabsAndFilters() {
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = true;
 
-    updateTabsVisual("playground");
     updateSearchPlaceholder();
     updateTabsPill(playgroundTab);
   }
@@ -710,7 +681,9 @@ function setupTabsAndFilters() {
   }
 }
 
-/* ---------- Search ---------- */
+/* =========================================================
+   Search
+   ========================================================= */
 
 function setupSearch() {
   const searchEl = document.getElementById("search");
@@ -725,14 +698,14 @@ function setupSearch() {
   updateSearchPlaceholder();
 }
 
-/* ---------- Secret bg video toggle (profile picture) ---------- */
+/* =========================================================
+   Secret bg video toggle (profile picture)
+   ========================================================= */
 
 function setupSecretBgVideoToggle() {
   const avatarImg = document.querySelector(".profile-avatar-inner img");
   const overlay = document.getElementById("bgVideoOverlay");
   if (!avatarImg || !overlay) return;
-
-  avatarImg.style.cursor = "pointer";
 
   avatarImg.addEventListener("click", () => {
     if (!bgPlayerReady || !bgPlayer) return;
@@ -755,7 +728,9 @@ function setupSecretBgVideoToggle() {
   });
 }
 
-/* ---------- Projects loading (GitHub + overrides) ---------- */
+/* =========================================================
+   Projects loading (GitHub + overrides)
+   ========================================================= */
 
 async function loadProjects() {
   const overrides = await loadProjectOverrides();
@@ -791,7 +766,7 @@ async function loadProjects() {
 
     const type = guessProjectType(repo, o, languages);
 
-    // Keep ONLY custom tags
+    // Keep ONLY custom tags (+ optional Security hint)
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
     if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) tags.push("Security");
 
@@ -836,7 +811,7 @@ async function loadProjectOverrides() {
   }
 }
 
-/* ---------- GitHub repo loading (simplified cache) ---------- */
+/* ---------- GitHub repo loading (simple cache) ---------- */
 
 async function loadGitHubReposWithCache() {
   try {
@@ -878,7 +853,9 @@ function saveReposToCache(reposToSave) {
   }
 }
 
-/* ---------- Name / language helpers ---------- */
+/* =========================================================
+   Name / language helpers
+   ========================================================= */
 
 function formatRepoName(raw) {
   if (!raw) return "";
@@ -888,11 +865,9 @@ function formatRepoName(raw) {
   return words
     .map((w, index) => {
       const lw = w.toLowerCase();
-
       if (lw === "ios") return "iOS";
       if (lw === "api") return "API";
       if (lw === "asp.net") return "ASP.NET";
-
       if (SMALL_WORDS.includes(lw) && index !== 0) return lw;
       return w.charAt(0).toUpperCase() + w.slice(1);
     })
@@ -950,7 +925,9 @@ function buildLanguageFilterOptions(projectsList) {
     });
 }
 
-/* ---------- Type helpers ---------- */
+/* =========================================================
+   Type helpers
+   ========================================================= */
 
 function looksLikeAspNet(repo, override, languages) {
   const langs = (languages || []).map((l) => String(l).toLowerCase());
@@ -1023,7 +1000,9 @@ function guessProjectType(repo, override, languages) {
   return "other";
 }
 
-/* ---------- Project helpers: security tag, liveUrl, thumbnail ---------- */
+/* =========================================================
+   Project helpers: security tag, liveUrl, thumbnail
+   ========================================================= */
 
 function isSecurityProject(repo, override, languages) {
   if (override && Array.isArray(override.tags) && override.tags.includes("Security")) return true;
@@ -1081,7 +1060,9 @@ async function verifyLiveSites() {
   renderProjects();
 }
 
-/* ---------- Thumbnail helpers (root images) ---------- */
+/* =========================================================
+   Thumbnails (root images) + cache
+   ========================================================= */
 
 function loadThumbCache() {
   try {
@@ -1095,9 +1076,7 @@ function loadThumbCache() {
 }
 
 function saveThumbCache() {
-  try {
-    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache));
-  } catch (_) {}
+  try { localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache)); } catch (_) {}
 }
 
 async function checkImageExists(url) {
@@ -1133,6 +1112,7 @@ async function loadProjectThumbnails() {
 
     const rootThumb = await findRepoRootThumbnail(repoName);
     let finalUrl = rootThumb;
+
     if (!finalUrl) finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
 
     project.thumbnail = finalUrl;
@@ -1184,7 +1164,9 @@ async function findRepoRootThumbnail(repoName) {
   }
 }
 
-/* ---------- Download asset helpers (.jar/.apk in repo root) ---------- */
+/* =========================================================
+   Download asset helpers (.jar/.apk in repo root)
+   ========================================================= */
 
 function loadAssetCache() {
   try {
@@ -1198,9 +1180,7 @@ function loadAssetCache() {
 }
 
 function saveAssetCache() {
-  try {
-    localStorage.setItem(ASSET_CACHE_KEY, JSON.stringify(assetCache));
-  } catch (_) {}
+  try { localStorage.setItem(ASSET_CACHE_KEY, JSON.stringify(assetCache)); } catch (_) {}
 }
 
 function isDownloadableExt(name) {
@@ -1275,7 +1255,9 @@ async function loadProjectDownloadAssets() {
   renderProjects();
 }
 
-/* ---------- Project rendering (bigger cards + banner thumbs + click-to-enlarge) ---------- */
+/* =========================================================
+   Project rendering (banner thumbs + click-to-enlarge)
+   ========================================================= */
 
 function getFilteredProjects() {
   const search = state.search.toLowerCase();
@@ -1321,7 +1303,7 @@ function renderProjects() {
 
   filtered.forEach((project) => {
     const card = document.createElement("article");
-    card.className = "project-card project-card--big";
+    card.className = "project-card";
 
     // Banner thumbnail (click to enlarge)
     const banner = document.createElement("button");
@@ -1346,7 +1328,6 @@ function renderProjects() {
       openImageModal(project.thumbnail, project.displayName);
     });
 
-    // Content area
     const content = document.createElement("div");
     content.className = "project-content";
 
@@ -1418,12 +1399,13 @@ function renderProjects() {
 
     card.appendChild(banner);
     card.appendChild(content);
-
     grid.appendChild(card);
   });
 }
 
-/* ---------- Media loading & rendering ---------- */
+/* =========================================================
+   Media loading & rendering
+   ========================================================= */
 
 async function loadMedia() {
   try {
@@ -1515,10 +1497,7 @@ function getFilteredMedia() {
   });
 }
 
-/**
- * Create a volume control row for a given media element (audio or video).
- * Volume: 0–100%, mapped to media.volume 0–1.
- */
+/* Volume row for audio/video */
 function createVolumeRow(mediaEl, dict) {
   const row = document.createElement("div");
   row.className = "media-volume-row";
@@ -1553,8 +1532,6 @@ function createVolumeRow(mediaEl, dict) {
   return row;
 }
 
-/* ---- media rendering ---- */
-
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1588,11 +1565,8 @@ function renderMedia() {
       img.src = item.path;
       img.alt = item.title;
       preview.appendChild(img);
-
       preview.addEventListener("click", () => openImageModal(item.path, item.title));
     } else if (item.type === "video") {
-      preview.classList.add("media-preview-video");
-
       const video = document.createElement("video");
       video.src = item.path;
       video.controls = true;
@@ -1615,16 +1589,6 @@ function renderMedia() {
       const volumeRow = createVolumeRow(video, dict);
       preview.appendChild(volumeRow);
 
-      const loopBtn = document.createElement("button");
-      loopBtn.type = "button";
-      loopBtn.className = "media-action-btn media-loop-btn";
-      loopBtn.textContent = dict.mediaLoop || "🔁 Loop";
-      loopBtn.title = "Toggle loop";
-      loopBtn.addEventListener("click", () => {
-        video.loop = !video.loop;
-        loopBtn.classList.toggle("is-active", video.loop);
-      });
-
       const actions = document.createElement("div");
       actions.className = "media-actions";
 
@@ -1640,6 +1604,16 @@ function renderMedia() {
       downloadBtn.download = "";
       downloadBtn.className = "media-action-btn";
       downloadBtn.textContent = dict.mediaDownload || "Download";
+
+      const loopBtn = document.createElement("button");
+      loopBtn.type = "button";
+      loopBtn.className = "media-action-btn media-loop-btn";
+      loopBtn.textContent = dict.mediaLoop || "🔁 Loop";
+      loopBtn.title = "Toggle loop";
+      loopBtn.addEventListener("click", () => {
+        video.loop = !video.loop;
+        loopBtn.classList.toggle("is-active", video.loop);
+      });
 
       actions.appendChild(openBtn);
       actions.appendChild(downloadBtn);
@@ -1703,7 +1677,9 @@ function renderMedia() {
   updateAvatarPlayingFromMedia();
 }
 
-/* ---------- Image modal ---------- */
+/* =========================================================
+   Image modal
+   ========================================================= */
 
 function setupImageModal() {
   const modal = document.getElementById("imageModal");
@@ -1723,7 +1699,6 @@ function openImageModal(src, captionText) {
   if (!modal) return;
 
   const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
-
   modal.innerHTML = "";
 
   const inner = document.createElement("div");
@@ -1778,7 +1753,9 @@ function closeImageModal() {
   modal.hidden = true;
 }
 
-/* ---------- Footer ---------- */
+/* =========================================================
+   Footer
+   ========================================================= */
 
 function setupFooterCopyright() {
   const el = document.getElementById("footerCopyright");
@@ -1786,7 +1763,9 @@ function setupFooterCopyright() {
   el.textContent = `${new Date().getFullYear()}`;
 }
 
-/* ---------- Playground random button ---------- */
+/* =========================================================
+   Playground random button
+   ========================================================= */
 
 function setupPlaygroundRandomButton() {
   const btn = document.getElementById("randomSiteButton");
@@ -1802,28 +1781,19 @@ function setupPlaygroundRandomButton() {
   });
 }
 
-/* ---------- Paint toolbar + shortcuts (ONLY CLEAR + confirm) ---------- */
+/* =========================================================
+   Paint toolbar + shortcuts (ONLY CLEAR + confirm)
+   ========================================================= */
 
 function setupPaintToolbar() {
   const paintCard = document.querySelector(".playground-paint");
   if (!paintCard) return;
 
   paintIframe = paintCard.querySelector("iframe[src*='paint.js.org']");
-
-  const buttons = paintCard.querySelectorAll("[data-paint-action]");
-  buttons.forEach((btn) => {
-    const action = btn.getAttribute("data-paint-action");
-    if (action !== "clear") {
-      btn.remove();
-    } else {
-      btn.addEventListener("click", () => handlePaintAction("clear"));
-    }
-  });
-
-  const hint = paintCard.querySelector(".playground-paint-hint");
-  if (hint) hint.remove();
-
   document.addEventListener("keydown", handlePaintShortcuts);
+
+  const clearBtn = paintCard.querySelector("[data-paint-action='clear']");
+  if (clearBtn) clearBtn.addEventListener("click", () => handlePaintAction("clear"));
 }
 
 function handlePaintAction(action) {
@@ -1864,4 +1834,6 @@ function handlePaintShortcuts(event) {
   }
 }
 
-/* ---------- END ---------- */
+/* =========================================================
+   END
+   ========================================================= */
