@@ -1,9 +1,3 @@
-/* js/main.js */
-/* =========================================================
-   Ferran’s Projects — Cleaned + synced with current CSS/HTML
-   Key change: Projects render with a FIXED banner thumbnail
-   ========================================================= */
-
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -15,61 +9,89 @@ const CACHE_KEY = "ferranProjectsCacheV2";
 const THUMB_CACHE_KEY = "ferranProjectsThumbsV3";
 const ASSET_CACHE_KEY = "ferranProjectsAssetsV1";
 
-const SUPPORTED_LANGS = ["nl", "en", "de", "es"];
+const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
 const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
-/* ---------- Random fun websites list ---------- */
+const POSTBOARD_STORAGE_KEY = "ferranProjectsPostboardV1";
+
+/* Where postboard messages can be “sent” (mailto fallback) */
+const POSTBOARD_EMAIL_TO = "ferranhendriks@outlook.com";
+
+/* ---------- Random useless websites list ---------- */
 
 const USELESS_WEB_URLS = [
-  "https://corndog.io",
-  "https://eelslap.com",
-  "https://heeeeeeeey.com",
-  "https://pointerpointer.com",
-  "https://www.bouncingdvdlogo.com",
-  "https://www.koalastothemax.com",
-  "https://www.rrrgggbbb.com",
-  "https://www.trypap.com",
-  "https://www.cat-bounce.com",
-  "https://www.donothingfor2minutes.com",
-  "https://www.fallingfalling.com",
-  "https://www.zoomquilt.org",
-  "https://www.zoomquilt2.com",
-  "https://endless.horse",
-  "https://papertoilet.com",
-  "https://isitchristmas.com",
-  "https://beesbeesbeesbees.com",
-  "https://puginarug.com",
-  "https://wowenwilsonquiz.com",
-  "https://findtheinvisiblecow.com",
+  "https://pointerpointer.com/",
+  "https://checkboxrace.com/",
+  "https://hackertyper.com/",
+  "https://papertoilet.com/",
+  "https://cat-bounce.com/",
+  "https://puginarug.com/",
+  "https://longdogechallenge.com/",
+  "https://endless.horse/",
+  "https://strobe.cool/",
+  "https://mondrianandme.com/",
+  "https://omfgdogs.com/",
+  "https://thezen.zone/",
+  "https://theuselessweb.site/",
+  "https://ismypcstillon.com/",
+  "https://isitchristmas.com/",
+  "https://alwaysjudgeabookbyitscover.com/",
+  "https://smashthewalls.com/",
+  "https://dont-even.net/",
+  "http://cant-not-tweet-this.com/",
+  "https://nooooooooooooooo.com/",
+  "https://zoomquilt.org/",
+  "https://zoomquilt2.com/",
+  "https://koalastothemax.com/",
+  "https://weirdorconfusing.com/",
+  "https://purrli.com/",
+  "https://drawminos.com/",
+  "https://neal.fun/size-of-space/",
   "https://neal.fun/deep-sea/",
+  "https://neal.fun/candle-problem/",
+  "https://www.rrrgggbbb.com/",
+  "https://www.crossdivisions.com/",
+  "https://www.kanyezone.com/",
+  "https://findtheinvisiblecow.com/",
+  "https://quickdraw.withgoogle.com/",
+  "https://snake.cafe/",
+  "https://flappybird.io/",
+  "https://chihuahuaspin.com/",
+  "https://dogs.are.the.most.moe/",
+  "https://whatthefluffgame.com/",
+  "https://www.hereistoday.com/",
+  "https://doughnutkitten.com/",
+  "https://thequietplaceproject.xyz/thequietplace/",
+  "https://eelslap.com/",
+  "https://fallingfalling.com/",
+  "https://beesbeesbees.com/",
+  "https://burymewithmymoney.com/",
+  "https://www.partridgegetslucky.com/",
+  "http://heeeeeeeey.com/",
+  "http://thatsthefinger.com/",
+  "http://www.staggeringbeauty.com/",
+  "http://www.fallingfalling.com/",
+  "http://ducksarethebest.com/",
+  "http://www.trypap.com/",
+  "http://www.republiquedesmangues.fr/",
+  "http://www.movenowthinklater.com/",
+  "http://www.rrrgggbbb.com/",
+  "http://www.sanger.dk/",
+  "http://www.koalastothemax.com/",
+  "http://www.everydayim.com/",
+  "http://www.leduchamp.com/",
+  "http://grandpanoclothes.com/",
+  "http://www.haneke.net/",
+  "https://cheese.com/random/",
+  "https://cantunsee.space/",
+  "https://neal.fun/walls/",
   "https://neal.fun/spend/",
-  "https://neal.fun/password-game/",
-  "https://neal.fun/dark-patterns/",
-  "https://neal.fun/absurd-trolley-problems/",
-  "https://neal.fun/infinite-craft/",
-  "https://neal.fun/space-elevator/",
-  "https://neal.fun/life-checklist/",
-  "https://neal.fun/where-does-the-day-go/",
-  "https://neal.fun/wonders-of-street-view/",
-  "https://neal.fun/lets-settle-this/",
-  "https://neal.fun/ambient-chaos/",
-  "https://neal.fun/universe-forecast/",
-  "https://neal.fun/sun-vs-moon/",
-  "https://neal.fun/earth-view/",
-  "https://neal.fun/baby-map/",
-  "https://neal.fun/design-the-next-iphone/",
-  "https://neal.fun/printing-money/",
-  "https://neal.fun/logos-from-memory/",
-  "https://neal.fun/auction-game/",
-  "https://neal.fun/asteroid-launcher/",
-  "https://neal.fun/rocks/",
-  "https://neal.fun/the-weight-of-the-internet/",
-  "https://neal.fun/how-many-days/",
-  "https://neal.fun/how-many-emojis/",
-  "https://neal.fun/speed/",
-  "https://neal.fun/size-of-space/"
+  "https://onesandzeros.online/",
+  "https://hooooooooo.com/",
+  "https://www.breakglassforfun.com/",
+  "https://drawabezier.com/"
 ];
 
 /* ---------- State ---------- */
@@ -87,15 +109,30 @@ const state = {
   typeFilter: "all",
   languageFilter: "all",
   mediaTypeFilter: "all",
+  // mediaFormatFilter removed (no more filetype dropdown)
   lang: DEFAULT_LANG
 };
 
-const SMALL_WORDS = ["voor", "na", "met", "door", "en", "of", "und", "mit", "von", "the", "and", "of"];
+/* Small words not capitalized in titles (except first word) */
+const SMALL_WORDS = [
+  "voor",
+  "na",
+  "met",
+  "door",
+  "en",
+  "of",
+  "und",
+  "mit",
+  "von",
+  "the",
+  "and",
+  "of"
+];
+
+/* Languages you don't want to see */
 const BLOCKED_LANGUAGES = ["roff", "nix", "emacs lisp"];
 
-/* =========================================================
-   Avatar “playing” helpers
-   ========================================================= */
+/* ---------- Avatar "music playing" helpers ---------- */
 
 function setAvatarPlaying(isPlaying) {
   const avatar = document.querySelector(".profile-avatar");
@@ -103,6 +140,10 @@ function setAvatarPlaying(isPlaying) {
   avatar.classList.toggle("profile-avatar--playing", isPlaying);
 }
 
+/**
+ * Checks if any HTML5 audio/video is currently playing
+ * and updates the avatar ring class.
+ */
 function updateAvatarPlayingFromMedia() {
   const mediaEls = document.querySelectorAll("audio, video");
   const anyPlaying = Array.from(mediaEls).some(
@@ -111,21 +152,28 @@ function updateAvatarPlayingFromMedia() {
   setAvatarPlaying(anyPlaying);
 }
 
+/**
+ * Attach play/pause hooks to a media element
+ * so it can drive the avatar animation.
+ */
 function attachMediaPlaybackHooks(mediaElement) {
   if (!mediaElement) return;
+
   mediaElement.addEventListener("play", updateAvatarPlayingFromMedia);
   mediaElement.addEventListener("playing", updateAvatarPlayingFromMedia);
   mediaElement.addEventListener("pause", updateAvatarPlayingFromMedia);
   mediaElement.addEventListener("ended", updateAvatarPlayingFromMedia);
 }
 
-/* =========================================================
-   Secret background video (YouTube API globals)
-   ========================================================= */
+/* ---------- Secret background video (YouTube API globals) ---------- */
 
 let bgPlayer = null;
 let bgPlayerReady = false;
 
+/**
+ * Called by the YouTube IFrame API when it’s ready.
+ * We prepare a silent background player.
+ */
 function onYouTubeIframeAPIReady() {
   const containerId = "bgVideoContainer";
   const el = document.getElementById(containerId);
@@ -146,47 +194,43 @@ function onYouTubeIframeAPIReady() {
     events: {
       onReady: (event) => {
         bgPlayerReady = true;
-        try { event.target.setVolume(20); } catch (_) {}
+        try {
+          event.target.setVolume(20); // ~20% volume
+        } catch (_) {}
       }
     }
   });
 }
 
-/* =========================================================
-   i18n dictionary
-   ========================================================= */
+/* ---------- i18n dictionary ---------- */
 
 const I18N = {
   nl: {
-    gateTitle: "Kies je taal",
-    gateHint: "Je kunt dit later wijzigen met de taalknop bovenaan.",
-    gateNlSub: "Moedertaal",
-    gateEnSub: "Internationaal",
-    gateDeSub: "Voor mijn buren",
-    gateEsSub: "Voor vrienden uit Spanje en de Canarische Eilanden",
-
     subtitle:
-      "Op deze website vind je al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
+      "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
     aboutTitle: "Over mij",
     aboutP1:
       "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
-
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
-    paintClearButton: "Wissen",
-    paintClearShortcutHint: "(Ctrl+Shift+N)",
-    confirmClear: "Canvas wissen? Dit reset de Paint-app.",
-
+    playgroundPaintHint: "", // removed
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Laat een kort bericht achter (anoniem of met naam). Berichten worden lokaal in je browser opgeslagen.",
+    postboardNameLabel: "Naam (optioneel)",
+    postboardAnonymousLabel: "Anoniem posten",
+    postboardMessageLabel: "Bericht",
+    postboardSubmitLabel: "Plaatsen",
+    postboardListTitle: "Wall",
+    postboardEmpty: "Nog geen berichten. Wees de eerste!",
     playgroundRandomTitle: "Random website-knop",
     playgroundRandomText:
       "Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
     randomButtonLabel: "Neem me mee naar een willekeurige website",
-
     tabProjects: "Projecten",
     tabMedia: "Media",
     tabPlayground: "Playground",
-
     searchLabel: "Zoeken",
     filterTypeLabel: "Type",
     typeAll: "Alles",
@@ -196,66 +240,49 @@ const I18N = {
     typeSchool: "School / Studie",
     typeGame: "Game",
     typeOther: "Overig",
-
     filterLanguageLabel: "Taal",
     languageFilterAll: "Alle talen",
-
     mediaTypeLabel: "Media type",
     mediaKindAll: "Alles",
     mediaKindImages: "Afbeeldingen",
     mediaKindVideos: "Video’s",
     mediaKindAudio: "Audio",
-
-    emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+    emptyState:
+      "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
-
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
-
     btnGitHub: "Bekijk op GitHub",
     btnLiveSite: "Live site",
     btnDownload: "Download",
-
-    mediaVolume: "Volume",
-    mediaOpen: "Openen",
-    mediaDownload: "Download",
-    mediaView: "Bekijken",
-    mediaLoop: "🔁 Loop",
-
-    modalOpenNewTab: "Openen in nieuw tabblad",
-    modalClose: "Sluiten"
+    btnSendEmail: "Stuur via e-mail"
   },
-
   en: {
-    gateTitle: "Choose your language",
-    gateHint: "You can change it later with the language button at the top.",
-    gateNlSub: "Native",
-    gateEnSub: "International",
-    gateDeSub: "For my neighbors",
-    gateEsSub: "For friends in Spain and the Canaries",
-
     subtitle:
-      "On this website you can find all my programming and coding projects in one place – websites, apps, school projects, guides, APIs and more.",
+      "All my programming and coding projects in one place – websites, apps, school projects, guides, APIs and more.",
     aboutTitle: "About me",
     aboutP1:
       "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
-
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint remake, have fun drawing!",
-    paintClearButton: "Clear",
-    paintClearShortcutHint: "(Ctrl+Shift+N)",
-    confirmClear: "Clear the canvas? This will reset the Paint app.",
-
+    playgroundPaintHint: "", // removed
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Leave a small message (with or without your name). Entries are stored locally in your browser.",
+    postboardNameLabel: "Name (optional)",
+    postboardAnonymousLabel: "Post anonymously",
+    postboardMessageLabel: "Message",
+    postboardSubmitLabel: "Post",
+    postboardListTitle: "Wall",
+    postboardEmpty: "No posts yet. Be the first!",
     playgroundRandomTitle: "Random Website Button",
     playgroundRandomText:
       "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
     randomButtonLabel: "Take me to a random website",
-
     tabProjects: "Projects",
     tabMedia: "Media",
     tabPlayground: "Playground",
-
     searchLabel: "Search",
     filterTypeLabel: "Type",
     typeAll: "All",
@@ -265,66 +292,48 @@ const I18N = {
     typeSchool: "School / Study",
     typeGame: "Game",
     typeOther: "Other",
-
     filterLanguageLabel: "Language",
     languageFilterAll: "All languages",
-
     mediaTypeLabel: "Media type",
     mediaKindAll: "All",
     mediaKindImages: "Images",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
-
     emptyState: "No projects found with these filters. Try something else.",
     mediaEmptyState: "No media found with these filters.",
-
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
-
     btnGitHub: "View on GitHub",
     btnLiveSite: "Live site",
     btnDownload: "Download",
-
-    mediaVolume: "Volume",
-    mediaOpen: "Open",
-    mediaDownload: "Download",
-    mediaView: "View",
-    mediaLoop: "🔁 Loop",
-
-    modalOpenNewTab: "Open in new tab",
-    modalClose: "Close"
+    btnSendEmail: "Send via email"
   },
-
   de: {
-    gateTitle: "Sprache auswählen",
-    gateHint: "Du kannst die Sprache später oben über die Sprachschaltfläche ändern.",
-    gateNlSub: "Muttersprache",
-    gateEnSub: "International",
-    gateDeSub: "Für meine Nachbarn",
-    gateEsSub: "Für Freunde aus Spanien & den Kanaren",
-
     subtitle:
-      "Auf dieser Website findest du all meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Schulprojekte, Guides, APIs und mehr.",
+      "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Schulprojekte, Guides, APIs und mehr.",
     aboutTitle: "Über mich",
     aboutP1:
       "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
     aboutP2: "",
-
     playgroundPaintTitle: "MS-Paint-Playground",
     playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
-    paintClearButton: "Leeren",
-    paintClearShortcutHint: "(Strg+Umschalt+N)",
-    confirmClear: "Canvas leeren? Das setzt die Paint-App zurück.",
-
+    playgroundPaintHint: "", // removed
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Hinterlass eine kurze Nachricht (mit oder ohne Namen). Einträge werden lokal im Browser gespeichert.",
+    postboardNameLabel: "Name (optional)",
+    postboardAnonymousLabel: "Anonym posten",
+    postboardMessageLabel: "Nachricht",
+    postboardSubmitLabel: "Posten",
+    postboardListTitle: "Wall",
+    postboardEmpty: "Noch keine Posts. Sei der Erste!",
     playgroundRandomTitle: "Zufällige-Website-Button",
     playgroundRandomText:
       "Neugierig oder gelangweilt? Klick auf den Button und es öffnet sich eine zufällige, verrückte Website in einem neuen Tab.",
     randomButtonLabel: "Bring mich zu einer zufälligen Website",
-
     tabProjects: "Projekte",
     tabMedia: "Medien",
     tabPlayground: "Playground",
-
     searchLabel: "Suchen",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
@@ -334,66 +343,156 @@ const I18N = {
     typeSchool: "Schule / Studium",
     typeGame: "Game",
     typeOther: "Sonstiges",
-
     filterLanguageLabel: "Sprache",
     languageFilterAll: "Alle Sprachen",
-
     mediaTypeLabel: "Medientyp",
     mediaKindAll: "Alle",
     mediaKindImages: "Bilder",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
-
-    emptyState: "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
-    mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
-
+    emptyState:
+      "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
+    mediaEmptyState:
+      "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
-
     btnGitHub: "Auf GitHub ansehen",
     btnLiveSite: "Live-Seite",
     btnDownload: "Download",
-
-    mediaVolume: "Lautstärke",
-    mediaOpen: "Öffnen",
-    mediaDownload: "Download",
-    mediaView: "Ansehen",
-    mediaLoop: "🔁 Loop",
-
-    modalOpenNewTab: "In neuem Tab öffnen",
-    modalClose: "Schließen"
+    btnSendEmail: "Per E-Mail senden"
   },
-
-  es: {
-    gateTitle: "Elige tu idioma",
-    gateHint: "Puedes cambiarlo después con el botón de idioma arriba.",
-    gateNlSub: "Nativo",
-    gateEnSub: "Internacional",
-    gateDeSub: "Para mis vecinos",
-    gateEsSub: "Para amigos de España y Canarias",
-
+  pl: {
     subtitle:
-      "En esta web encontrarás todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
+      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
+    aboutTitle: "O mnie",
+    aboutP1:
+      "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
+    aboutP2: "",
+    playgroundPaintTitle: "Plac zabaw MS Paint",
+    playgroundPaintText: "Remake MS Paint, miłej zabawy przy rysowaniu!",
+    playgroundPaintHint: "", // removed
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Zostaw krótką wiadomość (z imieniem lub anonimowo). Wpisy są przechowywane lokalnie w przeglądarce.",
+    postboardNameLabel: "Imię (opcjonalnie)",
+    postboardAnonymousLabel: "Opublikuj anonimowo",
+    postboardMessageLabel: "Wiadomość",
+    postboardSubmitLabel: "Opublikuj",
+    postboardListTitle: "Wall",
+    postboardEmpty: "Brak wpisów. Bądź pierwszy!",
+    playgroundRandomTitle: "Przycisk losowej strony",
+    playgroundRandomText:
+      "Nudzisz się lub jesteś ciekawy? Kliknij przycisk, a otworzy się losowa, dziwna strona w nowej karcie.",
+    randomButtonLabel: "Zabierz mnie na losową stronę",
+    tabProjects: "Projekty",
+    tabMedia: "Media",
+    tabPlayground: "Playground",
+    searchLabel: "Szukaj",
+    filterTypeLabel: "Typ",
+    typeAll: "Wszystko",
+    typeWebsite: "Strony WWW",
+    typeMobile: "Mobilne",
+    typeApi: "API / Backend",
+    typeSchool: "Szkoła / Studia",
+    typeGame: "Gra",
+    typeOther: "Inne",
+    filterLanguageLabel: "Język",
+    languageFilterAll: "Wszystkie języki",
+    mediaTypeLabel: "Typ medium",
+    mediaKindAll: "Wszystko",
+    mediaKindImages: "Obrazy",
+    mediaKindVideos: "Wideo",
+    mediaKindAudio: "Audio",
+    emptyState:
+      "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
+    mediaEmptyState:
+      "Nie znaleziono mediów dla tych filtrów.",
+    headerLangButton: "Język",
+    footerBuilt: "Stworzone z ♥ przez Ferrana",
+    btnGitHub: "Zobacz na GitHub",
+    btnLiveSite: "Strona live",
+    btnDownload: "Pobierz",
+    btnSendEmail: "Wyślij e-mailem"
+  },
+  tr: {
+    subtitle:
+      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
+    aboutTitle: "Hakkımda",
+    aboutP1:
+      "Selam 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir developer’ım. Kendime ve başkalarına yardımcı olmak için web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
+    aboutP2: "",
+    playgroundPaintTitle: "MS Paint Oyun Alanı",
+    playgroundPaintText: "MS Paint yeniden yapımı, keyifle çiz!",
+    playgroundPaintHint: "", // removed
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Kısa bir mesaj bırak (isimle veya isimsiz). Gönderiler tarayıcında yerel olarak saklanır.",
+    postboardNameLabel: "İsim (isteğe bağlı)",
+    postboardAnonymousLabel: "Anonim gönder",
+    postboardMessageLabel: "Mesaj",
+    postboardSubmitLabel: "Gönder",
+    postboardListTitle: "Duvar",
+    postboardEmpty: "Henüz gönderi yok. İlk sen ol!",
+    playgroundRandomTitle: "Rastgele Site Butonu",
+    playgroundRandomText:
+      "Meraklı veya sıkılmış mısın? Butona tıkla, yeni sekmede rastgele garip bir site açılsın.",
+    randomButtonLabel: "Beni rastgele bir siteye götür",
+    tabProjects: "Projeler",
+    tabMedia: "Medya",
+    tabPlayground: "Playground",
+    searchLabel: "Ara",
+    filterTypeLabel: "Tür",
+    typeAll: "Hepsi",
+    typeWebsite: "Web siteleri",
+    typeMobile: "Mobil",
+    typeApi: "API’ler / Backend",
+    typeSchool: "Okul / Çalışma",
+    typeGame: "Oyun",
+    typeOther: "Diğer",
+    filterLanguageLabel: "Dil",
+    languageFilterAll: "Tüm diller",
+    mediaTypeLabel: "Medya türü",
+    mediaKindAll: "Hepsi",
+    mediaKindImages: "Görseller",
+    mediaKindVideos: "Videolar",
+    mediaKindAudio: "Ses",
+    emptyState:
+      "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
+    mediaEmptyState:
+      "Bu arama veya filtrelerle medya bulunamadı.",
+    headerLangButton: "Dil",
+    footerBuilt: "♥ ile geliştirildi – Ferran",
+    btnGitHub: "GitHub’da görüntüle",
+    btnLiveSite: "Canlı site",
+    btnDownload: "İndir",
+    btnSendEmail: "E-posta ile gönder"
+  },
+  es: {
+    subtitle:
+      "Todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
     aboutTitle: "Sobre mí",
     aboutP1:
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
     aboutP2: "",
-
     playgroundPaintTitle: "Playground de MS Paint",
     playgroundPaintText: "Remake de MS Paint, ¡diviértete dibujando!",
-    paintClearButton: "Borrar",
-    paintClearShortcutHint: "(Ctrl+Shift+N)",
-    confirmClear: "¿Borrar el lienzo? Esto reiniciará la app de Paint.",
-
+    playgroundPaintHint: "", // removed
+    playgroundPostTitle: "Postboard",
+    playgroundPostText:
+      "Deja un pequeño mensaje (con o sin nombre). Las entradas se guardan localmente en tu navegador.",
+    postboardNameLabel: "Nombre (opcional)",
+    postboardAnonymousLabel: "Publicar anónimamente",
+    postboardMessageLabel: "Mensaje",
+    postboardSubmitLabel: "Publicar",
+    postboardListTitle: "Muro",
+    postboardEmpty: "Aún no hay mensajes. ¡Sé el primero!",
     playgroundRandomTitle: "Botón de web aleatoria",
     playgroundRandomText:
       "¿Curioso o aburrido? Pulsa el botón y se abrirá una web rara al azar en una nueva pestaña.",
     randomButtonLabel: "Llévame a una web aleatoria",
-
     tabProjects: "Proyectos",
     tabMedia: "Media",
     tabPlayground: "Playground",
-
     searchLabel: "Buscar",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
@@ -403,43 +502,34 @@ const I18N = {
     typeSchool: "Escuela / Estudio",
     typeGame: "Juego",
     typeOther: "Otros",
-
     filterLanguageLabel: "Idioma",
     languageFilterAll: "Todos los idiomas",
-
     mediaTypeLabel: "Tipo de media",
     mediaKindAll: "Todo",
     mediaKindImages: "Imágenes",
     mediaKindVideos: "Vídeos",
     mediaKindAudio: "Audio",
-
-    emptyState: "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
-    mediaEmptyState: "No se encontró media con estos filtros.",
-
+    emptyState:
+      "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
+    mediaEmptyState:
+      "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
-
     btnGitHub: "Ver en GitHub",
     btnLiveSite: "Sitio live",
     btnDownload: "Descargar",
-
-    mediaVolume: "Volumen",
-    mediaOpen: "Abrir",
-    mediaDownload: "Descargar",
-    mediaView: "Ver",
-    mediaLoop: "🔁 Loop",
-
-    modalOpenNewTab: "Abrir en nueva pestaña",
-    modalClose: "Cerrar"
+    btnSendEmail: "Enviar por email"
   }
 };
 
-/* =========================================================
-   Init
-   ========================================================= */
+/* ---------- Init ---------- */
 
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("js-enabled");
+
+  // If the filetype dropdown still exists in HTML, hide it (JS-only patch).
+  const mediaFormatGroup = document.getElementById("mediaFormatFilter")?.closest(".filter-group");
+  if (mediaFormatGroup) mediaFormatGroup.style.display = "none";
 
   setupLanguage();
   setupTabsAndFilters();
@@ -448,15 +538,14 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFooterCopyright();
   setupPlaygroundRandomButton();
   setupSecretBgVideoToggle();
-  setupPaintToolbar();
+  setupPaintToolbar(); // now only uses CLEAR
+  setupPostboard();
 
   loadProjects();
   loadMedia();
 });
 
-/* =========================================================
-   Search placeholder per lang + tab
-   ========================================================= */
+/* ---------- Helpers: search placeholder per lang + tab ---------- */
 
 function getSearchPlaceholder(lang, view) {
   const tab = view || "projects";
@@ -465,6 +554,8 @@ function getSearchPlaceholder(lang, view) {
   if (tab === "media") {
     if (l === "nl") return "Zoek in media op titel of bestandsnaam…";
     if (l === "de") return "Suche in Medien nach Titel oder Dateiname…";
+    if (l === "pl") return "Szukaj w mediach po tytule lub nazwie pliku…";
+    if (l === "tr") return "Medya içinde başlık veya dosya adına göre ara…";
     if (l === "es") return "Busca en media por título o nombre de archivo…";
     return "Search media by title or filename…";
   }
@@ -472,12 +563,16 @@ function getSearchPlaceholder(lang, view) {
   if (tab === "playground") {
     if (l === "nl") return "Zoek in Playground-tools op naam of beschrijving…";
     if (l === "de") return "Suche in Playground-Tools nach Name oder Beschreibung…";
+    if (l === "pl") return "Szukaj narzędzi Playground po nazwie lub opisie…";
+    if (l === "tr") return "Playground araçlarında ada veya açıklamaya göre ara…";
     if (l === "es") return "Busca herramientas del Playground por nombre o descripción…";
     return "Search playground tools by name or description…";
   }
 
   if (l === "nl") return "Zoek in projecten op naam, beschrijving, programmeertaal of tags…";
   if (l === "de") return "Suche in Projekten nach Name, Beschreibung, Sprache oder Tags…";
+  if (l === "pl") return "Szukaj projektów po nazwie, opisie, języku lub tagach…";
+  if (l === "tr") return "Projelerde ada, açıklamaya, dile veya etiketlere göre ara…";
   if (l === "es") return "Busca proyectos por nombre, descripción, lenguaje o etiquetas…";
   return "Search projects by name, description, language or tags…";
 }
@@ -488,9 +583,7 @@ function updateSearchPlaceholder() {
   searchInput.placeholder = getSearchPlaceholder(state.lang, state.activeTab);
 }
 
-/* =========================================================
-   Language / gate
-   ========================================================= */
+/* ---------- Language / gate ---------- */
 
 function setupLanguage() {
   const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
@@ -529,7 +622,9 @@ function setupLanguage() {
 
 function setLanguage(lang) {
   state.lang = lang;
-  try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (_) {}
+  try {
+    localStorage.setItem(LANG_STORAGE_KEY, lang);
+  } catch (_) {}
 
   const dict = I18N[lang] || I18N[DEFAULT_LANG] || {};
 
@@ -557,9 +652,7 @@ function updateLanguageGateActive() {
   });
 }
 
-/* =========================================================
-   Tabs & filters visibility
-   ========================================================= */
+/* ---------- Tabs & filters visibility ---------- */
 
 function setupTabsAndFilters() {
   const projectsTab = document.getElementById("projectsTab");
@@ -576,6 +669,13 @@ function setupTabsAndFilters() {
   if (!projectsTab || !mediaTab || !playgroundTab || !projectsView || !mediaView || !playgroundView) return;
 
   const tabsContainer = document.querySelector(".tabs");
+
+  function updateTabsVisual(mode) {
+    if (!tabsContainer) return;
+    tabsContainer.classList.remove("tabs-media", "tabs-playground");
+    if (mode === "media") tabsContainer.classList.add("tabs-media");
+    if (mode === "playground") tabsContainer.classList.add("tabs-playground");
+  }
 
   function updateTabsPill(activeButton) {
     if (!tabsContainer || !activeButton) return;
@@ -600,6 +700,7 @@ function setupTabsAndFilters() {
     if (projectFilters) projectFilters.hidden = false;
     if (mediaFilters) mediaFilters.hidden = true;
 
+    updateTabsVisual("projects");
     updateSearchPlaceholder();
     renderProjects();
     updateTabsPill(projectsTab);
@@ -618,6 +719,7 @@ function setupTabsAndFilters() {
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = false;
 
+    updateTabsVisual("media");
     updateSearchPlaceholder();
     renderMedia();
     updateTabsPill(mediaTab);
@@ -636,6 +738,7 @@ function setupTabsAndFilters() {
     if (projectFilters) projectFilters.hidden = true;
     if (mediaFilters) mediaFilters.hidden = true;
 
+    updateTabsVisual("playground");
     updateSearchPlaceholder();
     updateTabsPill(playgroundTab);
   }
@@ -679,9 +782,7 @@ function setupTabsAndFilters() {
   }
 }
 
-/* =========================================================
-   Search
-   ========================================================= */
+/* ---------- Search ---------- */
 
 function setupSearch() {
   const searchEl = document.getElementById("search");
@@ -696,14 +797,14 @@ function setupSearch() {
   updateSearchPlaceholder();
 }
 
-/* =========================================================
-   Secret bg video toggle (profile picture)
-   ========================================================= */
+/* ---------- Secret bg video toggle (profile picture) ---------- */
 
 function setupSecretBgVideoToggle() {
   const avatarImg = document.querySelector(".profile-avatar-inner img");
   const overlay = document.getElementById("bgVideoOverlay");
   if (!avatarImg || !overlay) return;
+
+  avatarImg.style.cursor = "pointer";
 
   avatarImg.addEventListener("click", () => {
     if (!bgPlayerReady || !bgPlayer) return;
@@ -726,9 +827,7 @@ function setupSecretBgVideoToggle() {
   });
 }
 
-/* =========================================================
-   Projects loading (GitHub + overrides)
-   ========================================================= */
+/* ---------- Projects loading (GitHub + overrides) ---------- */
 
 async function loadProjects() {
   const overrides = await loadProjectOverrides();
@@ -764,7 +863,7 @@ async function loadProjects() {
 
     const type = guessProjectType(repo, o, languages);
 
-    // Keep ONLY custom tags (+ optional Security hint)
+    // Keep ONLY custom tags (no auto “Website / School / Study” category-tags)
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
     if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) tags.push("Security");
 
@@ -794,6 +893,8 @@ async function loadProjects() {
 
   verifyLiveSites();
   loadProjectThumbnails();
+
+  // Add .jar/.apk download buttons (best-effort, cached)
   loadProjectDownloadAssets();
 }
 
@@ -809,7 +910,7 @@ async function loadProjectOverrides() {
   }
 }
 
-/* ---------- GitHub repo loading (simple cache) ---------- */
+/* ---------- GitHub repo loading (simplified cache) ---------- */
 
 async function loadGitHubReposWithCache() {
   try {
@@ -851,9 +952,7 @@ function saveReposToCache(reposToSave) {
   }
 }
 
-/* =========================================================
-   Name / language helpers
-   ========================================================= */
+/* ---------- Name / language helpers ---------- */
 
 function formatRepoName(raw) {
   if (!raw) return "";
@@ -863,9 +962,11 @@ function formatRepoName(raw) {
   return words
     .map((w, index) => {
       const lw = w.toLowerCase();
+
       if (lw === "ios") return "iOS";
       if (lw === "api") return "API";
       if (lw === "asp.net") return "ASP.NET";
+
       if (SMALL_WORDS.includes(lw) && index !== 0) return lw;
       return w.charAt(0).toUpperCase() + w.slice(1);
     })
@@ -923,9 +1024,7 @@ function buildLanguageFilterOptions(projectsList) {
     });
 }
 
-/* =========================================================
-   Type helpers
-   ========================================================= */
+/* ---------- Type helpers ---------- */
 
 function looksLikeAspNet(repo, override, languages) {
   const langs = (languages || []).map((l) => String(l).toLowerCase());
@@ -998,18 +1097,36 @@ function guessProjectType(repo, override, languages) {
   return "other";
 }
 
-/* =========================================================
-   Project helpers: security tag, liveUrl, thumbnail
-   ========================================================= */
+/* ---------- Project helpers: security tag, liveUrl, thumbnail ---------- */
 
 function isSecurityProject(repo, override, languages) {
   if (override && Array.isArray(override.tags) && override.tags.includes("Security")) return true;
 
   const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
   const securityWords = [
-    "security","secure","auth","authentication","authorization","oauth","jwt","token",
-    "password","passwort","wachtwoord","hash","encrypt","encryption","crypt","crypto",
-    "2fa","mfa","owasp","vuln","vulnerability","pentest","penetration test"
+    "security",
+    "secure",
+    "auth",
+    "authentication",
+    "authorization",
+    "oauth",
+    "jwt",
+    "token",
+    "password",
+    "passwort",
+    "wachtwoord",
+    "hash",
+    "encrypt",
+    "encryption",
+    "crypt",
+    "crypto",
+    "2fa",
+    "mfa",
+    "owasp",
+    "vuln",
+    "vulnerability",
+    "pentest",
+    "penetration test"
   ];
 
   const hasSecurityWord = securityWords.some((w) => text.includes(w));
@@ -1058,9 +1175,7 @@ async function verifyLiveSites() {
   renderProjects();
 }
 
-/* =========================================================
-   Thumbnails (root images) + cache
-   ========================================================= */
+/* ---------- Thumbnail helpers (root images) ---------- */
 
 function loadThumbCache() {
   try {
@@ -1074,7 +1189,9 @@ function loadThumbCache() {
 }
 
 function saveThumbCache() {
-  try { localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache)); } catch (_) {}
+  try {
+    localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache));
+  } catch (_) {}
 }
 
 async function checkImageExists(url) {
@@ -1110,7 +1227,6 @@ async function loadProjectThumbnails() {
 
     const rootThumb = await findRepoRootThumbnail(repoName);
     let finalUrl = rootThumb;
-
     if (!finalUrl) finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
 
     project.thumbnail = finalUrl;
@@ -1143,13 +1259,9 @@ async function findRepoRootThumbnail(repoName) {
       if (lower === "logo.png") return 1;
       if (lower === "logo.jpg" || lower === "logo.jpeg" || lower === "logo.webp") return 2;
       if (lower.startsWith("logo.")) return 3;
-      if (lower.includes("banner")) return 3;
-      if (lower.includes("cover")) return 4;
-      if (lower.includes("screenshot")) return 5;
-      if (lower.includes("preview")) return 5;
-      if (lower.includes("classdiagram")) return 6;
-      if (lower.includes("diagram")) return 7;
-      return 8;
+      if (lower.includes("classdiagram")) return 4;
+      if (lower.includes("diagram")) return 5;
+      return 6;
     };
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
@@ -1162,9 +1274,7 @@ async function findRepoRootThumbnail(repoName) {
   }
 }
 
-/* =========================================================
-   Download asset helpers (.jar/.apk in repo root)
-   ========================================================= */
+/* ---------- Download asset helpers (.jar/.apk in repo root) ---------- */
 
 function loadAssetCache() {
   try {
@@ -1178,7 +1288,9 @@ function loadAssetCache() {
 }
 
 function saveAssetCache() {
-  try { localStorage.setItem(ASSET_CACHE_KEY, JSON.stringify(assetCache)); } catch (_) {}
+  try {
+    localStorage.setItem(ASSET_CACHE_KEY, JSON.stringify(assetCache));
+  } catch (_) {}
 }
 
 function isDownloadableExt(name) {
@@ -1187,6 +1299,7 @@ function isDownloadableExt(name) {
 }
 
 function pickBestAsset(files) {
+  // Prefer .jar over .apk, and prefer “release”/“build”/“dist” names
   const scored = files.map((f) => {
     const n = (f.name || "").toLowerCase();
     let s = 100;
@@ -1225,6 +1338,7 @@ async function findRepoRootDownloadAsset(repoName) {
 }
 
 async function loadProjectDownloadAssets() {
+  // Limit concurrency a bit (avoid hammering API)
   const queue = [...projects];
   const workers = Array.from({ length: 4 }).map(async () => {
     while (queue.length) {
@@ -1253,9 +1367,7 @@ async function loadProjectDownloadAssets() {
   renderProjects();
 }
 
-/* =========================================================
-   Project rendering (banner thumbs + click-to-enlarge)
-   ========================================================= */
+/* ---------- Project rendering ---------- */
 
 function getFilteredProjects() {
   const search = state.search.toLowerCase();
@@ -1303,34 +1415,26 @@ function renderProjects() {
     const card = document.createElement("article");
     card.className = "project-card";
 
-    // Banner thumbnail (click to enlarge)
-    const banner = document.createElement("button");
-    banner.type = "button";
-    banner.className = "project-banner";
-    banner.setAttribute("aria-label", `Preview: ${project.displayName}`);
+    const titleRow = document.createElement("div");
+    titleRow.className = "project-title-row";
+
+    const thumb = document.createElement("div");
+    thumb.className = "project-thumb";
 
     if (project.thumbnail) {
+      thumb.classList.add("has-image");
       const img = document.createElement("img");
       img.src = project.thumbnail;
       img.alt = project.displayName;
-      banner.appendChild(img);
+      thumb.appendChild(img);
     } else {
-      const placeholder = document.createElement("div");
-      placeholder.className = "project-banner-fallback";
-      placeholder.textContent = (project.displayName || "?").charAt(0).toUpperCase();
-      banner.appendChild(placeholder);
+      const span = document.createElement("span");
+      span.textContent = (project.displayName || "?").charAt(0).toUpperCase();
+      thumb.appendChild(span);
     }
 
-    banner.addEventListener("click", () => {
-      if (!project.thumbnail) return;
-      openImageModal(project.thumbnail, project.displayName);
-    });
-
-    const content = document.createElement("div");
-    content.className = "project-content";
-
-    const headerRow = document.createElement("div");
-    headerRow.className = "project-header-row";
+    const titleText = document.createElement("div");
+    titleText.className = "project-title-text";
 
     const title = document.createElement("h3");
     title.className = "project-title";
@@ -1340,16 +1444,20 @@ function renderProjects() {
     langP.className = "project-lang";
     langP.textContent = (project.languages || []).join(" · ");
 
-    headerRow.appendChild(title);
-    headerRow.appendChild(langP);
+    titleText.appendChild(title);
+    titleText.appendChild(langP);
+
+    titleRow.appendChild(thumb);
+    titleRow.appendChild(titleText);
 
     const desc = document.createElement("p");
     desc.className = "project-desc";
     desc.textContent = project.description;
 
-    // Tags
+    // Meta: keep ONLY custom tags (no “Website/School/Study” type-badges)
     const meta = document.createElement("div");
     meta.className = "project-meta";
+
     (project.tags || []).forEach((tag) => {
       const tagBadge = document.createElement("span");
       tagBadge.className = "badge";
@@ -1378,6 +1486,7 @@ function renderProjects() {
       actions.appendChild(liveBtn);
     }
 
+    // Download button if repo has .jar/.apk in root
     if (project.downloadUrl) {
       const dlBtn = document.createElement("a");
       dlBtn.href = project.downloadUrl;
@@ -1390,20 +1499,18 @@ function renderProjects() {
       actions.appendChild(dlBtn);
     }
 
-    content.appendChild(headerRow);
-    content.appendChild(desc);
-    if (project.tags && project.tags.length) content.appendChild(meta);
-    content.appendChild(actions);
+    card.appendChild(titleRow);
+    card.appendChild(desc);
 
-    card.appendChild(banner);
-    card.appendChild(content);
+    // Only append meta if there are custom tags
+    if (project.tags && project.tags.length) card.appendChild(meta);
+
+    card.appendChild(actions);
     grid.appendChild(card);
   });
 }
 
-/* =========================================================
-   Media loading & rendering
-   ========================================================= */
+/* ---------- Media loading & rendering ---------- */
 
 async function loadMedia() {
   try {
@@ -1446,7 +1553,7 @@ async function loadMedia() {
       return { id: index, title, path, type, format };
     });
 
-    buildMediaTypeFilterOptions(mediaItems);
+    buildMediaTypeFilterOptions(mediaItems); // only type now
     renderMedia();
   } catch (err) {
     console.error("Failed to load media index", err);
@@ -1488,6 +1595,7 @@ function getFilteredMedia() {
 
   return mediaItems.filter((item) => {
     if (typeFilter !== "all" && item.type !== typeFilter) return false;
+
     if (!search) return true;
 
     const haystack = (item.title + " " + item.path).toLowerCase();
@@ -1495,14 +1603,17 @@ function getFilteredMedia() {
   });
 }
 
-/* Volume row for audio/video */
-function createVolumeRow(mediaEl, dict) {
+/**
+ * Create a volume control row for a given media element (audio or video).
+ * Volume: 0–100%, mapped to media.volume 0–1.
+ */
+function createVolumeRow(mediaEl) {
   const row = document.createElement("div");
   row.className = "media-volume-row";
 
   const label = document.createElement("span");
   label.className = "media-volume-label";
-  label.textContent = dict.mediaVolume || "Volume";
+  label.textContent = "Volume";
 
   const slider = document.createElement("input");
   slider.type = "range";
@@ -1530,6 +1641,8 @@ function createVolumeRow(mediaEl, dict) {
   return row;
 }
 
+/* ---- media rendering (no type/format badges; no format filter) ---- */
+
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
   const emptyState = document.getElementById("mediaEmptyState");
@@ -1543,8 +1656,6 @@ function renderMedia() {
     return;
   }
   emptyState.style.display = "none";
-
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
 
   filtered.forEach((item) => {
     const card = document.createElement("article");
@@ -1563,8 +1674,11 @@ function renderMedia() {
       img.src = item.path;
       img.alt = item.title;
       preview.appendChild(img);
+
       preview.addEventListener("click", () => openImageModal(item.path, item.title));
     } else if (item.type === "video") {
+      preview.classList.add("media-preview-video");
+
       const video = document.createElement("video");
       video.src = item.path;
       video.controls = true;
@@ -1584,8 +1698,18 @@ function renderMedia() {
       wrapper.appendChild(video);
       preview.appendChild(wrapper);
 
-      const volumeRow = createVolumeRow(video, dict);
+      const volumeRow = createVolumeRow(video);
       preview.appendChild(volumeRow);
+
+      const loopBtn = document.createElement("button");
+      loopBtn.type = "button";
+      loopBtn.className = "media-action-btn media-loop-btn";
+      loopBtn.textContent = "🔁 Loop";
+      loopBtn.title = "Toggle loop";
+      loopBtn.addEventListener("click", () => {
+        video.loop = !video.loop;
+        loopBtn.classList.toggle("is-active", video.loop);
+      });
 
       const actions = document.createElement("div");
       actions.className = "media-actions";
@@ -1595,23 +1719,13 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = dict.mediaOpen || "Open";
+      openBtn.textContent = "Open";
 
       const downloadBtn = document.createElement("a");
       downloadBtn.href = item.path;
       downloadBtn.download = "";
       downloadBtn.className = "media-action-btn";
-      downloadBtn.textContent = dict.mediaDownload || "Download";
-
-      const loopBtn = document.createElement("button");
-      loopBtn.type = "button";
-      loopBtn.className = "media-action-btn media-loop-btn";
-      loopBtn.textContent = dict.mediaLoop || "🔁 Loop";
-      loopBtn.title = "Toggle loop";
-      loopBtn.addEventListener("click", () => {
-        video.loop = !video.loop;
-        loopBtn.classList.toggle("is-active", video.loop);
-      });
+      downloadBtn.textContent = "Download";
 
       actions.appendChild(openBtn);
       actions.appendChild(downloadBtn);
@@ -1635,7 +1749,7 @@ function renderMedia() {
       wrapper.appendChild(audio);
       preview.appendChild(wrapper);
 
-      const volumeRow = createVolumeRow(audio, dict);
+      const volumeRow = createVolumeRow(audio);
       preview.appendChild(volumeRow);
     }
 
@@ -1646,7 +1760,7 @@ function renderMedia() {
       const viewBtn = document.createElement("button");
       viewBtn.type = "button";
       viewBtn.className = "media-action-btn";
-      viewBtn.textContent = dict.mediaView || "View";
+      viewBtn.textContent = "View";
       viewBtn.addEventListener("click", () => openImageModal(item.path, item.title));
       actions.appendChild(viewBtn);
     } else {
@@ -1655,7 +1769,7 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = dict.mediaOpen || "Open";
+      openBtn.textContent = "Open";
       actions.appendChild(openBtn);
     }
 
@@ -1663,7 +1777,7 @@ function renderMedia() {
     downloadBtn.href = item.path;
     downloadBtn.download = "";
     downloadBtn.className = "media-action-btn";
-    downloadBtn.textContent = dict.mediaDownload || "Download";
+    downloadBtn.textContent = "Download";
     actions.appendChild(downloadBtn);
 
     card.appendChild(title);
@@ -1675,9 +1789,7 @@ function renderMedia() {
   updateAvatarPlayingFromMedia();
 }
 
-/* =========================================================
-   Image modal
-   ========================================================= */
+/* ---------- Image modal ---------- */
 
 function setupImageModal() {
   const modal = document.getElementById("imageModal");
@@ -1696,7 +1808,6 @@ function openImageModal(src, captionText) {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
 
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
   modal.innerHTML = "";
 
   const inner = document.createElement("div");
@@ -1730,13 +1841,13 @@ function openImageModal(src, captionText) {
   openTabBtn.target = "_blank";
   openTabBtn.rel = "noopener noreferrer";
   openTabBtn.className = "image-modal-btn";
-  openTabBtn.textContent = dict.modalOpenNewTab || "Open in new tab";
+  openTabBtn.textContent = "Open in new tab";
   actions.appendChild(openTabBtn);
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.className = "image-modal-btn image-modal-close";
-  closeBtn.textContent = dict.modalClose || "Close";
+  closeBtn.textContent = "Close";
   closeBtn.addEventListener("click", closeImageModal);
   actions.appendChild(closeBtn);
 
@@ -1751,9 +1862,7 @@ function closeImageModal() {
   modal.hidden = true;
 }
 
-/* =========================================================
-   Footer
-   ========================================================= */
+/* ---------- Footer ---------- */
 
 function setupFooterCopyright() {
   const el = document.getElementById("footerCopyright");
@@ -1761,9 +1870,7 @@ function setupFooterCopyright() {
   el.textContent = `${new Date().getFullYear()}`;
 }
 
-/* =========================================================
-   Playground random button
-   ========================================================= */
+/* ---------- Playground random button ---------- */
 
 function setupPlaygroundRandomButton() {
   const btn = document.getElementById("randomSiteButton");
@@ -1779,27 +1886,37 @@ function setupPlaygroundRandomButton() {
   });
 }
 
-/* =========================================================
-   Paint toolbar + shortcuts (ONLY CLEAR + confirm)
-   ========================================================= */
+/* ---------- Paint toolbar + shortcuts (ONLY CLEAR + confirm) ---------- */
 
 function setupPaintToolbar() {
   const paintCard = document.querySelector(".playground-paint");
   if (!paintCard) return;
 
   paintIframe = paintCard.querySelector("iframe[src*='paint.js.org']");
-  document.addEventListener("keydown", handlePaintShortcuts);
 
-  const clearBtn = paintCard.querySelector("[data-paint-action='clear']");
-  if (clearBtn) clearBtn.addEventListener("click", () => handlePaintAction("clear"));
+  // Remove all buttons except CLEAR (JS-only patch)
+  const buttons = paintCard.querySelectorAll("[data-paint-action]");
+  buttons.forEach((btn) => {
+    const action = btn.getAttribute("data-paint-action");
+    if (action !== "clear") {
+      btn.remove();
+    } else {
+      btn.addEventListener("click", () => handlePaintAction("clear"));
+    }
+  });
+
+  // Remove hint text line (JS-only patch)
+  const hint = paintCard.querySelector(".playground-paint-hint");
+  if (hint) hint.remove();
+
+  document.addEventListener("keydown", handlePaintShortcuts);
 }
 
 function handlePaintAction(action) {
   if (!paintIframe) return;
 
   if (action === "clear") {
-    const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
-    const ok = window.confirm(dict.confirmClear || "Clear the canvas? This will reset the Paint app.");
+    const ok = window.confirm("Clear the canvas? This will reset the Paint app.");
     if (!ok) return;
     reloadPaintIframe();
   }
@@ -1812,6 +1929,7 @@ function reloadPaintIframe() {
 }
 
 function handlePaintShortcuts(event) {
+  // Keep only Ctrl+Shift+N as “clear” while on playground
   if (state.activeTab !== "playground") return;
 
   const target = event.target;
@@ -1832,6 +1950,147 @@ function handlePaintShortcuts(event) {
   }
 }
 
-/* =========================================================
-   END
-   ========================================================= */
+/* ---------- Postboard (Playground) + “send email” (mailto fallback) ---------- */
+
+function setupPostboard() {
+  const form = document.getElementById("postboardForm");
+  const listEl = document.getElementById("postboardList");
+  const emptyEl = document.getElementById("postboardEmpty");
+  if (!form || !listEl || !emptyEl) return;
+
+  let messages = loadPostboardMessages();
+  renderPostboard(messages, listEl, emptyEl);
+
+  // Add a “Send via email” button (JS-only, placed next to Post button)
+  const actionsRow = form.querySelector(".postboard-actions");
+  if (actionsRow && !actionsRow.querySelector("[data-send-email]")) {
+    const sendBtn = document.createElement("button");
+    sendBtn.type = "button";
+    sendBtn.className = "postboard-submit-btn";
+    sendBtn.style.background = "rgba(11, 26, 61, 0.9)";
+    sendBtn.style.borderColor = "rgba(255,255,255,0.22)";
+    sendBtn.setAttribute("data-send-email", "1");
+    sendBtn.textContent =
+      (I18N[state.lang]?.btnSendEmail || I18N[DEFAULT_LANG].btnSendEmail || "Send via email");
+
+    sendBtn.addEventListener("click", () => {
+      const nameInput = document.getElementById("postboardName");
+      const anonInput = document.getElementById("postboardAnon");
+      const messageInput = document.getElementById("postboardMessage");
+
+      const rawMessage = (messageInput?.value || "").trim();
+      if (!rawMessage) {
+        alert("Write a message first 🙂");
+        return;
+      }
+
+      const isAnon = !!anonInput?.checked;
+      const rawName = (nameInput?.value || "").trim();
+      const name = isAnon || !rawName ? "Anonymous" : rawName;
+
+      const subject = encodeURIComponent("Postboard message");
+      const body = encodeURIComponent(
+        `From: ${name}\n\nMessage:\n${rawMessage}\n\n— Sent from Ferran’s Projects Postboard`
+      );
+
+      window.location.href = `mailto:${encodeURIComponent(POSTBOARD_EMAIL_TO)}?subject=${subject}&body=${body}`;
+    });
+
+    actionsRow.appendChild(sendBtn);
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const nameInput = document.getElementById("postboardName");
+    const anonInput = document.getElementById("postboardAnon");
+    const messageInput = document.getElementById("postboardMessage");
+    if (!messageInput) return;
+
+    const rawMessage = messageInput.value.trim();
+    if (!rawMessage) return;
+
+    const isAnon = anonInput && anonInput.checked;
+    const rawName = nameInput ? nameInput.value.trim() : "";
+    const name = isAnon || !rawName ? "Anonymous" : rawName;
+
+    const entry = {
+      id: Date.now(),
+      name,
+      message: rawMessage,
+      anonymous: isAnon,
+      createdAt: new Date().toISOString()
+    };
+
+    messages.unshift(entry);
+    savePostboardMessages(messages);
+    renderPostboard(messages, listEl, emptyEl);
+
+    messageInput.value = "";
+    if (nameInput && isAnon) nameInput.value = "";
+  });
+}
+
+function loadPostboardMessages() {
+  try {
+    const raw = localStorage.getItem(POSTBOARD_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function savePostboardMessages(messages) {
+  try {
+    localStorage.setItem(POSTBOARD_STORAGE_KEY, JSON.stringify(messages));
+  } catch (_) {}
+}
+
+function renderPostboard(messages, listEl, emptyEl) {
+  listEl.innerHTML = "";
+  if (!messages.length) {
+    emptyEl.style.display = "block";
+    return;
+  }
+  emptyEl.style.display = "none";
+
+  messages.forEach((msg) => {
+    const li = document.createElement("li");
+    li.className = "postboard-item";
+
+    const header = document.createElement("div");
+    header.className = "postboard-item-header";
+
+    const author = document.createElement("span");
+    author.className = "postboard-item-author";
+    author.textContent = msg.name || "Anonymous";
+
+    const meta = document.createElement("span");
+    meta.className = "postboard-item-meta";
+
+    let dateLabel = "";
+    if (msg.createdAt) {
+      const d = new Date(msg.createdAt);
+      if (!isNaN(d.getTime())) {
+        dateLabel = d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
+      }
+    }
+    meta.textContent = dateLabel;
+
+    header.appendChild(author);
+    header.appendChild(meta);
+
+    const body = document.createElement("div");
+    body.className = "postboard-item-body";
+    body.textContent = msg.message;
+
+    li.appendChild(header);
+    li.appendChild(body);
+
+    listEl.appendChild(li);
+  });
+}
+
+/* ---------- END ---------- */
