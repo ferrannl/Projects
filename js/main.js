@@ -1,3 +1,5 @@
+/* js/main.js */
+
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -9,15 +11,10 @@ const CACHE_KEY = "ferranProjectsCacheV2";
 const THUMB_CACHE_KEY = "ferranProjectsThumbsV3";
 const ASSET_CACHE_KEY = "ferranProjectsAssetsV1";
 
-const SUPPORTED_LANGS = ["nl", "en", "de", "pl", "tr", "es"];
+const SUPPORTED_LANGS = ["nl", "en", "de", "es"];
 const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
-
-const POSTBOARD_STORAGE_KEY = "ferranProjectsPostboardV1";
-
-/* Where postboard messages can be “sent” (mailto fallback) */
-const POSTBOARD_EMAIL_TO = "ferranhendriks@outlook.com";
 
 /* ---------- Random useless websites list ---------- */
 
@@ -88,7 +85,6 @@ const state = {
   typeFilter: "all",
   languageFilter: "all",
   mediaTypeFilter: "all",
-  // mediaFormatFilter removed (no more filetype dropdown)
   lang: DEFAULT_LANG
 };
 
@@ -185,31 +181,35 @@ function onYouTubeIframeAPIReady() {
 
 const I18N = {
   nl: {
+    gateTitle: "Kies je taal",
+    gateHint: "Je kunt dit later wijzigen met de taalknop bovenaan.",
+    gateNlSub: "Moedertaal",
+    gateEnSub: "Internationaal",
+    gateDeSub: "Voor mijn buren",
+    gateEsSub: "Voor vrienden uit Spanje en de Canarische Eilanden",
+
     subtitle:
-      "Al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
+      "Op deze website vind je al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
     aboutTitle: "Over mij",
     aboutP1:
       "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
+
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Laat een kort bericht achter (anoniem of met naam). Berichten worden lokaal in je browser opgeslagen.",
-    postboardNameLabel: "Naam (optioneel)",
-    postboardAnonymousLabel: "Anoniem posten",
-    postboardMessageLabel: "Bericht",
-    postboardSubmitLabel: "Plaatsen",
-    postboardListTitle: "Wall",
-    postboardEmpty: "Nog geen berichten. Wees de eerste!",
+    paintClearButton: "Wissen",
+    paintClearShortcutHint: "(Ctrl+Shift+N)",
+    confirmClear: "Canvas wissen? Dit reset de Paint-app.",
+
     playgroundRandomTitle: "Random website-knop",
     playgroundRandomText:
       "Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
     randomButtonLabel: "Neem me mee naar een willekeurige website",
+
     tabProjects: "Projecten",
     tabMedia: "Media",
     tabPlayground: "Playground",
+
     searchLabel: "Zoeken",
     filterTypeLabel: "Type",
     typeAll: "Alles",
@@ -219,49 +219,66 @@ const I18N = {
     typeSchool: "School / Studie",
     typeGame: "Game",
     typeOther: "Overig",
+
     filterLanguageLabel: "Taal",
     languageFilterAll: "Alle talen",
+
     mediaTypeLabel: "Media type",
     mediaKindAll: "Alles",
     mediaKindImages: "Afbeeldingen",
     mediaKindVideos: "Video’s",
     mediaKindAudio: "Audio",
-    emptyState:
-      "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
+
+    emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
+
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
+
     btnGitHub: "Bekijk op GitHub",
     btnLiveSite: "Live site",
     btnDownload: "Download",
-    btnSendEmail: "Stuur via e-mail"
+
+    mediaVolume: "Volume",
+    mediaOpen: "Openen",
+    mediaDownload: "Download",
+    mediaView: "Bekijken",
+    mediaLoop: "🔁 Loop",
+
+    modalOpenNewTab: "Openen in nieuw tabblad",
+    modalClose: "Sluiten"
   },
+
   en: {
+    gateTitle: "Choose your language",
+    gateHint: "You can change it later with the language button at the top.",
+    gateNlSub: "Native",
+    gateEnSub: "International",
+    gateDeSub: "For my neighbors",
+    gateEsSub: "For friends in Spain and the Canaries",
+
     subtitle:
-      "All my programming and coding projects in one place – websites, apps, school projects, guides, APIs and more.",
+      "On this website you can find all my programming and coding projects in one place – websites, apps, school projects, guides, APIs and more.",
     aboutTitle: "About me",
     aboutP1:
       "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
+
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint remake, have fun drawing!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Leave a small message (with or without your name). Entries are stored locally in your browser.",
-    postboardNameLabel: "Name (optional)",
-    postboardAnonymousLabel: "Post anonymously",
-    postboardMessageLabel: "Message",
-    postboardSubmitLabel: "Post",
-    postboardListTitle: "Wall",
-    postboardEmpty: "No posts yet. Be the first!",
+    paintClearButton: "Clear",
+    paintClearShortcutHint: "(Ctrl+Shift+N)",
+    confirmClear: "Clear the canvas? This will reset the Paint app.",
+
     playgroundRandomTitle: "Random Website Button",
     playgroundRandomText:
       "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
     randomButtonLabel: "Take me to a random website",
+
     tabProjects: "Projects",
     tabMedia: "Media",
     tabPlayground: "Playground",
+
     searchLabel: "Search",
     filterTypeLabel: "Type",
     typeAll: "All",
@@ -271,48 +288,66 @@ const I18N = {
     typeSchool: "School / Study",
     typeGame: "Game",
     typeOther: "Other",
+
     filterLanguageLabel: "Language",
     languageFilterAll: "All languages",
+
     mediaTypeLabel: "Media type",
     mediaKindAll: "All",
     mediaKindImages: "Images",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
+
     emptyState: "No projects found with these filters. Try something else.",
     mediaEmptyState: "No media found with these filters.",
+
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
+
     btnGitHub: "View on GitHub",
     btnLiveSite: "Live site",
     btnDownload: "Download",
-    btnSendEmail: "Send via email"
+
+    mediaVolume: "Volume",
+    mediaOpen: "Open",
+    mediaDownload: "Download",
+    mediaView: "View",
+    mediaLoop: "🔁 Loop",
+
+    modalOpenNewTab: "Open in new tab",
+    modalClose: "Close"
   },
+
   de: {
+    gateTitle: "Sprache auswählen",
+    gateHint: "Du kannst die Sprache später oben über die Sprachschaltfläche ändern.",
+    gateNlSub: "Muttersprache",
+    gateEnSub: "International",
+    gateDeSub: "Für meine Nachbarn",
+    gateEsSub: "Für Freunde aus Spanien & den Kanaren",
+
     subtitle:
-      "Alle meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Schulprojekte, Guides, APIs und mehr.",
+      "Auf dieser Website findest du all meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Schulprojekte, Guides, APIs und mehr.",
     aboutTitle: "Über mich",
     aboutP1:
       "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
     aboutP2: "",
+
     playgroundPaintTitle: "MS-Paint-Playground",
     playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Hinterlass eine kurze Nachricht (mit oder ohne Namen). Einträge werden lokal im Browser gespeichert.",
-    postboardNameLabel: "Name (optional)",
-    postboardAnonymousLabel: "Anonym posten",
-    postboardMessageLabel: "Nachricht",
-    postboardSubmitLabel: "Posten",
-    postboardListTitle: "Wall",
-    postboardEmpty: "Noch keine Posts. Sei der Erste!",
+    paintClearButton: "Leeren",
+    paintClearShortcutHint: "(Strg+Umschalt+N)",
+    confirmClear: "Canvas leeren? Das setzt die Paint-App zurück.",
+
     playgroundRandomTitle: "Zufällige-Website-Button",
     playgroundRandomText:
       "Neugierig oder gelangweilt? Klick auf den Button und es öffnet sich eine zufällige, verrückte Website in einem neuen Tab.",
     randomButtonLabel: "Bring mich zu einer zufälligen Website",
+
     tabProjects: "Projekte",
     tabMedia: "Medien",
     tabPlayground: "Playground",
+
     searchLabel: "Suchen",
     filterTypeLabel: "Typ",
     typeAll: "Alle",
@@ -322,50 +357,66 @@ const I18N = {
     typeSchool: "Schule / Studium",
     typeGame: "Game",
     typeOther: "Sonstiges",
+
     filterLanguageLabel: "Sprache",
     languageFilterAll: "Alle Sprachen",
+
     mediaTypeLabel: "Medientyp",
     mediaKindAll: "Alle",
     mediaKindImages: "Bilder",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
-    emptyState:
-      "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
-    mediaEmptyState:
-      "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
+
+    emptyState: "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
+    mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
+
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
+
     btnGitHub: "Auf GitHub ansehen",
     btnLiveSite: "Live-Seite",
     btnDownload: "Download",
-    btnSendEmail: "Per E-Mail senden"
+
+    mediaVolume: "Lautstärke",
+    mediaOpen: "Öffnen",
+    mediaDownload: "Download",
+    mediaView: "Ansehen",
+    mediaLoop: "🔁 Loop",
+
+    modalOpenNewTab: "In neuem Tab öffnen",
+    modalClose: "Schließen"
   },
+
   es: {
+    gateTitle: "Elige tu idioma",
+    gateHint: "Puedes cambiarlo después con el botón de idioma arriba.",
+    gateNlSub: "Nativo",
+    gateEnSub: "Internacional",
+    gateDeSub: "Para mis vecinos",
+    gateEsSub: "Para amigos de España y Canarias",
+
     subtitle:
-      "Todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
+      "En esta web encontrarás todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
     aboutTitle: "Sobre mí",
     aboutP1:
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
     aboutP2: "",
+
     playgroundPaintTitle: "Playground de MS Paint",
     playgroundPaintText: "Remake de MS Paint, ¡diviértete dibujando!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Deja un pequeño mensaje (con o sin nombre). Las entradas se guardan localmente en tu navegador.",
-    postboardNameLabel: "Nombre (opcional)",
-    postboardAnonymousLabel: "Publicar anónimamente",
-    postboardMessageLabel: "Mensaje",
-    postboardSubmitLabel: "Publicar",
-    postboardListTitle: "Muro",
-    postboardEmpty: "Aún no hay mensajes. ¡Sé el primero!",
+    paintClearButton: "Borrar",
+    paintClearShortcutHint: "(Ctrl+Shift+N)",
+    confirmClear: "¿Borrar el lienzo? Esto reiniciará la app de Paint.",
+
     playgroundRandomTitle: "Botón de web aleatoria",
     playgroundRandomText:
       "¿Curioso o aburrido? Pulsa el botón y se abrirá una web rara al azar en una nueva pestaña.",
     randomButtonLabel: "Llévame a una web aleatoria",
+
     tabProjects: "Proyectos",
     tabMedia: "Media",
     tabPlayground: "Playground",
+
     searchLabel: "Buscar",
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
@@ -375,23 +426,34 @@ const I18N = {
     typeSchool: "Escuela / Estudio",
     typeGame: "Juego",
     typeOther: "Otros",
+
     filterLanguageLabel: "Idioma",
     languageFilterAll: "Todos los idiomas",
+
     mediaTypeLabel: "Tipo de media",
     mediaKindAll: "Todo",
     mediaKindImages: "Imágenes",
     mediaKindVideos: "Vídeos",
     mediaKindAudio: "Audio",
-    emptyState:
-      "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
-    mediaEmptyState:
-      "No se encontró media con estos filtros.",
+
+    emptyState: "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
+    mediaEmptyState: "No se encontró media con estos filtros.",
+
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
+
     btnGitHub: "Ver en GitHub",
     btnLiveSite: "Sitio live",
     btnDownload: "Descargar",
-    btnSendEmail: "Enviar por email"
+
+    mediaVolume: "Volumen",
+    mediaOpen: "Abrir",
+    mediaDownload: "Descargar",
+    mediaView: "Ver",
+    mediaLoop: "🔁 Loop",
+
+    modalOpenNewTab: "Abrir en nueva pestaña",
+    modalClose: "Cerrar"
   }
 };
 
@@ -411,8 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFooterCopyright();
   setupPlaygroundRandomButton();
   setupSecretBgVideoToggle();
-  setupPaintToolbar(); // now only uses CLEAR
-  setupPostboard();
+  setupPaintToolbar(); // only uses CLEAR
 
   loadProjects();
   loadMedia();
@@ -730,7 +791,7 @@ async function loadProjects() {
 
     const type = guessProjectType(repo, o, languages);
 
-    // Keep ONLY custom tags (no auto “Website / School / Study” category-tags)
+    // Keep ONLY custom tags
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
     if (isSecurityProject(repo, o, languages) && !tags.includes("Security")) tags.push("Security");
 
@@ -760,8 +821,6 @@ async function loadProjects() {
 
   verifyLiveSites();
   loadProjectThumbnails();
-
-  // Add .jar/.apk download buttons (best-effort, cached)
   loadProjectDownloadAssets();
 }
 
@@ -971,29 +1030,9 @@ function isSecurityProject(repo, override, languages) {
 
   const text = `${repo.name || ""} ${repo.description || ""}`.toLowerCase();
   const securityWords = [
-    "security",
-    "secure",
-    "auth",
-    "authentication",
-    "authorization",
-    "oauth",
-    "jwt",
-    "token",
-    "password",
-    "passwort",
-    "wachtwoord",
-    "hash",
-    "encrypt",
-    "encryption",
-    "crypt",
-    "crypto",
-    "2fa",
-    "mfa",
-    "owasp",
-    "vuln",
-    "vulnerability",
-    "pentest",
-    "penetration test"
+    "security","secure","auth","authentication","authorization","oauth","jwt","token",
+    "password","passwort","wachtwoord","hash","encrypt","encryption","crypt","crypto",
+    "2fa","mfa","owasp","vuln","vulnerability","pentest","penetration test"
   ];
 
   const hasSecurityWord = securityWords.some((w) => text.includes(w));
@@ -1126,9 +1165,13 @@ async function findRepoRootThumbnail(repoName) {
       if (lower === "logo.png") return 1;
       if (lower === "logo.jpg" || lower === "logo.jpeg" || lower === "logo.webp") return 2;
       if (lower.startsWith("logo.")) return 3;
-      if (lower.includes("classdiagram")) return 4;
-      if (lower.includes("diagram")) return 5;
-      return 6;
+      if (lower.includes("banner")) return 3;
+      if (lower.includes("cover")) return 4;
+      if (lower.includes("screenshot")) return 5;
+      if (lower.includes("preview")) return 5;
+      if (lower.includes("classdiagram")) return 6;
+      if (lower.includes("diagram")) return 7;
+      return 8;
     };
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
@@ -1166,7 +1209,6 @@ function isDownloadableExt(name) {
 }
 
 function pickBestAsset(files) {
-  // Prefer .jar over .apk, and prefer “release”/“build”/“dist” names
   const scored = files.map((f) => {
     const n = (f.name || "").toLowerCase();
     let s = 100;
@@ -1205,7 +1247,6 @@ async function findRepoRootDownloadAsset(repoName) {
 }
 
 async function loadProjectDownloadAssets() {
-  // Limit concurrency a bit (avoid hammering API)
   const queue = [...projects];
   const workers = Array.from({ length: 4 }).map(async () => {
     while (queue.length) {
@@ -1234,7 +1275,7 @@ async function loadProjectDownloadAssets() {
   renderProjects();
 }
 
-/* ---------- Project rendering ---------- */
+/* ---------- Project rendering (bigger cards + banner thumbs + click-to-enlarge) ---------- */
 
 function getFilteredProjects() {
   const search = state.search.toLowerCase();
@@ -1280,28 +1321,37 @@ function renderProjects() {
 
   filtered.forEach((project) => {
     const card = document.createElement("article");
-    card.className = "project-card";
+    card.className = "project-card project-card--big";
 
-    const titleRow = document.createElement("div");
-    titleRow.className = "project-title-row";
-
-    const thumb = document.createElement("div");
-    thumb.className = "project-thumb";
+    // Banner thumbnail (click to enlarge)
+    const banner = document.createElement("button");
+    banner.type = "button";
+    banner.className = "project-banner";
+    banner.setAttribute("aria-label", `Preview: ${project.displayName}`);
 
     if (project.thumbnail) {
-      thumb.classList.add("has-image");
       const img = document.createElement("img");
       img.src = project.thumbnail;
       img.alt = project.displayName;
-      thumb.appendChild(img);
+      banner.appendChild(img);
     } else {
-      const span = document.createElement("span");
-      span.textContent = (project.displayName || "?").charAt(0).toUpperCase();
-      thumb.appendChild(span);
+      const placeholder = document.createElement("div");
+      placeholder.className = "project-banner-fallback";
+      placeholder.textContent = (project.displayName || "?").charAt(0).toUpperCase();
+      banner.appendChild(placeholder);
     }
 
-    const titleText = document.createElement("div");
-    titleText.className = "project-title-text";
+    banner.addEventListener("click", () => {
+      if (!project.thumbnail) return;
+      openImageModal(project.thumbnail, project.displayName);
+    });
+
+    // Content area
+    const content = document.createElement("div");
+    content.className = "project-content";
+
+    const headerRow = document.createElement("div");
+    headerRow.className = "project-header-row";
 
     const title = document.createElement("h3");
     title.className = "project-title";
@@ -1311,20 +1361,16 @@ function renderProjects() {
     langP.className = "project-lang";
     langP.textContent = (project.languages || []).join(" · ");
 
-    titleText.appendChild(title);
-    titleText.appendChild(langP);
-
-    titleRow.appendChild(thumb);
-    titleRow.appendChild(titleText);
+    headerRow.appendChild(title);
+    headerRow.appendChild(langP);
 
     const desc = document.createElement("p");
     desc.className = "project-desc";
     desc.textContent = project.description;
 
-    // Meta: keep ONLY custom tags (no “Website/School/Study” type-badges)
+    // Tags
     const meta = document.createElement("div");
     meta.className = "project-meta";
-
     (project.tags || []).forEach((tag) => {
       const tagBadge = document.createElement("span");
       tagBadge.className = "badge";
@@ -1353,7 +1399,6 @@ function renderProjects() {
       actions.appendChild(liveBtn);
     }
 
-    // Download button if repo has .jar/.apk in root
     if (project.downloadUrl) {
       const dlBtn = document.createElement("a");
       dlBtn.href = project.downloadUrl;
@@ -1366,13 +1411,14 @@ function renderProjects() {
       actions.appendChild(dlBtn);
     }
 
-    card.appendChild(titleRow);
-    card.appendChild(desc);
+    content.appendChild(headerRow);
+    content.appendChild(desc);
+    if (project.tags && project.tags.length) content.appendChild(meta);
+    content.appendChild(actions);
 
-    // Only append meta if there are custom tags
-    if (project.tags && project.tags.length) card.appendChild(meta);
+    card.appendChild(banner);
+    card.appendChild(content);
 
-    card.appendChild(actions);
     grid.appendChild(card);
   });
 }
@@ -1420,7 +1466,7 @@ async function loadMedia() {
       return { id: index, title, path, type, format };
     });
 
-    buildMediaTypeFilterOptions(mediaItems); // only type now
+    buildMediaTypeFilterOptions(mediaItems);
     renderMedia();
   } catch (err) {
     console.error("Failed to load media index", err);
@@ -1462,7 +1508,6 @@ function getFilteredMedia() {
 
   return mediaItems.filter((item) => {
     if (typeFilter !== "all" && item.type !== typeFilter) return false;
-
     if (!search) return true;
 
     const haystack = (item.title + " " + item.path).toLowerCase();
@@ -1474,13 +1519,13 @@ function getFilteredMedia() {
  * Create a volume control row for a given media element (audio or video).
  * Volume: 0–100%, mapped to media.volume 0–1.
  */
-function createVolumeRow(mediaEl) {
+function createVolumeRow(mediaEl, dict) {
   const row = document.createElement("div");
   row.className = "media-volume-row";
 
   const label = document.createElement("span");
   label.className = "media-volume-label";
-  label.textContent = "Volume";
+  label.textContent = dict.mediaVolume || "Volume";
 
   const slider = document.createElement("input");
   slider.type = "range";
@@ -1508,7 +1553,7 @@ function createVolumeRow(mediaEl) {
   return row;
 }
 
-/* ---- media rendering (no type/format badges; no format filter) ---- */
+/* ---- media rendering ---- */
 
 function renderMedia() {
   const grid = document.getElementById("mediaGrid");
@@ -1523,6 +1568,8 @@ function renderMedia() {
     return;
   }
   emptyState.style.display = "none";
+
+  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
 
   filtered.forEach((item) => {
     const card = document.createElement("article");
@@ -1565,13 +1612,13 @@ function renderMedia() {
       wrapper.appendChild(video);
       preview.appendChild(wrapper);
 
-      const volumeRow = createVolumeRow(video);
+      const volumeRow = createVolumeRow(video, dict);
       preview.appendChild(volumeRow);
 
       const loopBtn = document.createElement("button");
       loopBtn.type = "button";
       loopBtn.className = "media-action-btn media-loop-btn";
-      loopBtn.textContent = "🔁 Loop";
+      loopBtn.textContent = dict.mediaLoop || "🔁 Loop";
       loopBtn.title = "Toggle loop";
       loopBtn.addEventListener("click", () => {
         video.loop = !video.loop;
@@ -1586,13 +1633,13 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = "Open";
+      openBtn.textContent = dict.mediaOpen || "Open";
 
       const downloadBtn = document.createElement("a");
       downloadBtn.href = item.path;
       downloadBtn.download = "";
       downloadBtn.className = "media-action-btn";
-      downloadBtn.textContent = "Download";
+      downloadBtn.textContent = dict.mediaDownload || "Download";
 
       actions.appendChild(openBtn);
       actions.appendChild(downloadBtn);
@@ -1616,7 +1663,7 @@ function renderMedia() {
       wrapper.appendChild(audio);
       preview.appendChild(wrapper);
 
-      const volumeRow = createVolumeRow(audio);
+      const volumeRow = createVolumeRow(audio, dict);
       preview.appendChild(volumeRow);
     }
 
@@ -1627,7 +1674,7 @@ function renderMedia() {
       const viewBtn = document.createElement("button");
       viewBtn.type = "button";
       viewBtn.className = "media-action-btn";
-      viewBtn.textContent = "View";
+      viewBtn.textContent = dict.mediaView || "View";
       viewBtn.addEventListener("click", () => openImageModal(item.path, item.title));
       actions.appendChild(viewBtn);
     } else {
@@ -1636,7 +1683,7 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = "Open";
+      openBtn.textContent = dict.mediaOpen || "Open";
       actions.appendChild(openBtn);
     }
 
@@ -1644,7 +1691,7 @@ function renderMedia() {
     downloadBtn.href = item.path;
     downloadBtn.download = "";
     downloadBtn.className = "media-action-btn";
-    downloadBtn.textContent = "Download";
+    downloadBtn.textContent = dict.mediaDownload || "Download";
     actions.appendChild(downloadBtn);
 
     card.appendChild(title);
@@ -1674,6 +1721,8 @@ function setupImageModal() {
 function openImageModal(src, captionText) {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
+
+  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
 
   modal.innerHTML = "";
 
@@ -1708,13 +1757,13 @@ function openImageModal(src, captionText) {
   openTabBtn.target = "_blank";
   openTabBtn.rel = "noopener noreferrer";
   openTabBtn.className = "image-modal-btn";
-  openTabBtn.textContent = "Open in new tab";
+  openTabBtn.textContent = dict.modalOpenNewTab || "Open in new tab";
   actions.appendChild(openTabBtn);
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.className = "image-modal-btn image-modal-close";
-  closeBtn.textContent = "Close";
+  closeBtn.textContent = dict.modalClose || "Close";
   closeBtn.addEventListener("click", closeImageModal);
   actions.appendChild(closeBtn);
 
@@ -1761,7 +1810,6 @@ function setupPaintToolbar() {
 
   paintIframe = paintCard.querySelector("iframe[src*='paint.js.org']");
 
-  // Remove all buttons except CLEAR (JS-only patch)
   const buttons = paintCard.querySelectorAll("[data-paint-action]");
   buttons.forEach((btn) => {
     const action = btn.getAttribute("data-paint-action");
@@ -1772,7 +1820,6 @@ function setupPaintToolbar() {
     }
   });
 
-  // Remove hint text line (JS-only patch)
   const hint = paintCard.querySelector(".playground-paint-hint");
   if (hint) hint.remove();
 
@@ -1783,7 +1830,8 @@ function handlePaintAction(action) {
   if (!paintIframe) return;
 
   if (action === "clear") {
-    const ok = window.confirm("Clear the canvas? This will reset the Paint app.");
+    const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
+    const ok = window.confirm(dict.confirmClear || "Clear the canvas? This will reset the Paint app.");
     if (!ok) return;
     reloadPaintIframe();
   }
@@ -1796,7 +1844,6 @@ function reloadPaintIframe() {
 }
 
 function handlePaintShortcuts(event) {
-  // Keep only Ctrl+Shift+N as “clear” while on playground
   if (state.activeTab !== "playground") return;
 
   const target = event.target;
@@ -1815,149 +1862,6 @@ function handlePaintShortcuts(event) {
     event.preventDefault();
     handlePaintAction("clear");
   }
-}
-
-/* ---------- Postboard (Playground) + “send email” (mailto fallback) ---------- */
-
-function setupPostboard() {
-  const form = document.getElementById("postboardForm");
-  const listEl = document.getElementById("postboardList");
-  const emptyEl = document.getElementById("postboardEmpty");
-  if (!form || !listEl || !emptyEl) return;
-
-  let messages = loadPostboardMessages();
-  renderPostboard(messages, listEl, emptyEl);
-
-  // Add a “Send via email” button (JS-only, placed next to Post button)
-  const actionsRow = form.querySelector(".postboard-actions");
-  if (actionsRow && !actionsRow.querySelector("[data-send-email]")) {
-    const sendBtn = document.createElement("button");
-    sendBtn.type = "button";
-    sendBtn.className = "postboard-submit-btn";
-    sendBtn.style.background = "rgba(11, 26, 61, 0.9)";
-    sendBtn.style.borderColor = "rgba(255,255,255,0.22)";
-    sendBtn.setAttribute("data-send-email", "1");
-    sendBtn.textContent =
-      (I18N[state.lang]?.btnSendEmail || I18N[DEFAULT_LANG].btnSendEmail || "Send via email");
-
-    sendBtn.addEventListener("click", () => {
-      const nameInput = document.getElementById("postboardName");
-      const anonInput = document.getElementById("postboardAnon");
-      const messageInput = document.getElementById("postboardMessage");
-
-      const rawMessage = (messageInput?.value || "").trim();
-      if (!rawMessage) {
-        alert("Write a message first 🙂");
-        return;
-      }
-
-      const isAnon = !!anonInput?.checked;
-      const rawName = (nameInput?.value || "").trim();
-      const name = isAnon || !rawName ? "Anonymous" : rawName;
-
-      const subject = encodeURIComponent("Postboard message");
-      const body = encodeURIComponent(
-        `From: ${name}\n\nMessage:\n${rawMessage}\n\n— Sent from Ferran’s Projects Postboard`
-      );
-
-      window.location.href = `mailto:${encodeURIComponent(POSTBOARD_EMAIL_TO)}?subject=${subject}&body=${body}`;
-    });
-
-    actionsRow.appendChild(sendBtn);
-  }
-
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const nameInput = document.getElementById("postboardName");
-    const anonInput = document.getElementById("postboardAnon");
-    const messageInput = document.getElementById("postboardMessage");
-    if (!messageInput) return;
-
-    const rawMessage = messageInput.value.trim();
-    if (!rawMessage) return;
-
-    const isAnon = anonInput && anonInput.checked;
-    const rawName = nameInput ? nameInput.value.trim() : "";
-    const name = isAnon || !rawName ? "Anonymous" : rawName;
-
-    const entry = {
-      id: Date.now(),
-      name,
-      message: rawMessage,
-      anonymous: isAnon,
-      createdAt: new Date().toISOString()
-    };
-
-    messages.unshift(entry);
-    savePostboardMessages(messages);
-    renderPostboard(messages, listEl, emptyEl);
-
-    messageInput.value = "";
-    if (nameInput && isAnon) nameInput.value = "";
-  });
-}
-
-function loadPostboardMessages() {
-  try {
-    const raw = localStorage.getItem(POSTBOARD_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (_) {
-    return [];
-  }
-}
-
-function savePostboardMessages(messages) {
-  try {
-    localStorage.setItem(POSTBOARD_STORAGE_KEY, JSON.stringify(messages));
-  } catch (_) {}
-}
-
-function renderPostboard(messages, listEl, emptyEl) {
-  listEl.innerHTML = "";
-  if (!messages.length) {
-    emptyEl.style.display = "block";
-    return;
-  }
-  emptyEl.style.display = "none";
-
-  messages.forEach((msg) => {
-    const li = document.createElement("li");
-    li.className = "postboard-item";
-
-    const header = document.createElement("div");
-    header.className = "postboard-item-header";
-
-    const author = document.createElement("span");
-    author.className = "postboard-item-author";
-    author.textContent = msg.name || "Anonymous";
-
-    const meta = document.createElement("span");
-    meta.className = "postboard-item-meta";
-
-    let dateLabel = "";
-    if (msg.createdAt) {
-      const d = new Date(msg.createdAt);
-      if (!isNaN(d.getTime())) {
-        dateLabel = d.toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
-      }
-    }
-    meta.textContent = dateLabel;
-
-    header.appendChild(author);
-    header.appendChild(meta);
-
-    const body = document.createElement("div");
-    body.className = "postboard-item-body";
-    body.textContent = msg.message;
-
-    li.appendChild(header);
-    li.appendChild(body);
-
-    listEl.appendChild(li);
-  });
 }
 
 /* ---------- END ---------- */
