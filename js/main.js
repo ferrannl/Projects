@@ -340,112 +340,6 @@ const I18N = {
     btnDownload: "Download",
     btnSendEmail: "Per E-Mail senden"
   },
-  pl: {
-    subtitle:
-      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
-    aboutTitle: "O mnie",
-    aboutP1:
-      "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
-    aboutP2: "",
-    playgroundPaintTitle: "Plac zabaw MS Paint",
-    playgroundPaintText: "Remake MS Paint, miłej zabawy przy rysowaniu!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Zostaw krótką wiadomość (z imieniem lub anonimowo). Wpisy są przechowywane lokalnie w przeglądarce.",
-    postboardNameLabel: "Imię (opcjonalnie)",
-    postboardAnonymousLabel: "Opublikuj anonimowo",
-    postboardMessageLabel: "Wiadomość",
-    postboardSubmitLabel: "Opublikuj",
-    postboardListTitle: "Wall",
-    postboardEmpty: "Brak wpisów. Bądź pierwszy!",
-    playgroundRandomTitle: "Przycisk losowej strony",
-    playgroundRandomText:
-      "Nudzisz się lub jesteś ciekawy? Kliknij przycisk, a otworzy się losowa, dziwna strona w nowej karcie.",
-    randomButtonLabel: "Zabierz mnie na losową stronę",
-    tabProjects: "Projekty",
-    tabMedia: "Media",
-    tabPlayground: "Playground",
-    searchLabel: "Szukaj",
-    filterTypeLabel: "Typ",
-    typeAll: "Wszystko",
-    typeWebsite: "Strony WWW",
-    typeMobile: "Mobilne",
-    typeApi: "API / Backend",
-    typeSchool: "Szkoła / Studia",
-    typeGame: "Gra",
-    typeOther: "Inne",
-    filterLanguageLabel: "Język",
-    languageFilterAll: "Wszystkie języki",
-    mediaTypeLabel: "Typ medium",
-    mediaKindAll: "Wszystko",
-    mediaKindImages: "Obrazy",
-    mediaKindVideos: "Wideo",
-    mediaKindAudio: "Audio",
-    emptyState:
-      "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
-    mediaEmptyState:
-      "Nie znaleziono mediów dla tych filtrów.",
-    headerLangButton: "Język",
-    footerBuilt: "Stworzone z ♥ przez Ferrana",
-    btnGitHub: "Zobacz na GitHub",
-    btnLiveSite: "Strona live",
-    btnDownload: "Pobierz",
-    btnSendEmail: "Wyślij e-mailem"
-  },
-  tr: {
-    subtitle:
-      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
-    aboutTitle: "Hakkımda",
-    aboutP1:
-      "Selam 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir developer’ım. Kendime ve başkalarına yardımcı olmak için web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
-    aboutP2: "",
-    playgroundPaintTitle: "MS Paint Oyun Alanı",
-    playgroundPaintText: "MS Paint yeniden yapımı, keyifle çiz!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Kısa bir mesaj bırak (isimle veya isimsiz). Gönderiler tarayıcında yerel olarak saklanır.",
-    postboardNameLabel: "İsim (isteğe bağlı)",
-    postboardAnonymousLabel: "Anonim gönder",
-    postboardMessageLabel: "Mesaj",
-    postboardSubmitLabel: "Gönder",
-    postboardListTitle: "Duvar",
-    postboardEmpty: "Henüz gönderi yok. İlk sen ol!",
-    playgroundRandomTitle: "Rastgele Site Butonu",
-    playgroundRandomText:
-      "Meraklı veya sıkılmış mısın? Butona tıkla, yeni sekmede rastgele garip bir site açılsın.",
-    randomButtonLabel: "Beni rastgele bir siteye götür",
-    tabProjects: "Projeler",
-    tabMedia: "Medya",
-    tabPlayground: "Playground",
-    searchLabel: "Ara",
-    filterTypeLabel: "Tür",
-    typeAll: "Hepsi",
-    typeWebsite: "Web siteleri",
-    typeMobile: "Mobil",
-    typeApi: "API’ler / Backend",
-    typeSchool: "Okul / Çalışma",
-    typeGame: "Oyun",
-    typeOther: "Diğer",
-    filterLanguageLabel: "Dil",
-    languageFilterAll: "Tüm diller",
-    mediaTypeLabel: "Medya türü",
-    mediaKindAll: "Hepsi",
-    mediaKindImages: "Görseller",
-    mediaKindVideos: "Videolar",
-    mediaKindAudio: "Ses",
-    emptyState:
-      "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
-    mediaEmptyState:
-      "Bu arama veya filtrelerle medya bulunamadı.",
-    headerLangButton: "Dil",
-    footerBuilt: "♥ ile geliştirildi – Ferran",
-    btnGitHub: "GitHub’da görüntüle",
-    btnLiveSite: "Canlı site",
-    btnDownload: "İndir",
-    btnSendEmail: "E-posta ile gönder"
-  },
   es: {
     subtitle:
       "Todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
@@ -533,8 +427,6 @@ function getSearchPlaceholder(lang, view) {
   if (tab === "media") {
     if (l === "nl") return "Zoek in media op titel of bestandsnaam…";
     if (l === "de") return "Suche in Medien nach Titel oder Dateiname…";
-    if (l === "pl") return "Szukaj w mediach po tytule lub nazwie pliku…";
-    if (l === "tr") return "Medya içinde başlık veya dosya adına göre ara…";
     if (l === "es") return "Busca en media por título o nombre de archivo…";
     return "Search media by title or filename…";
   }
@@ -542,16 +434,12 @@ function getSearchPlaceholder(lang, view) {
   if (tab === "playground") {
     if (l === "nl") return "Zoek in Playground-tools op naam of beschrijving…";
     if (l === "de") return "Suche in Playground-Tools nach Name oder Beschreibung…";
-    if (l === "pl") return "Szukaj narzędzi Playground po nazwie lub opisie…";
-    if (l === "tr") return "Playground araçlarında ada veya açıklamaya göre ara…";
     if (l === "es") return "Busca herramientas del Playground por nombre o descripción…";
     return "Search playground tools by name or description…";
   }
 
   if (l === "nl") return "Zoek in projecten op naam, beschrijving, programmeertaal of tags…";
   if (l === "de") return "Suche in Projekten nach Name, Beschreibung, Sprache oder Tags…";
-  if (l === "pl") return "Szukaj projektów po nazwie, opisie, języku lub tagach…";
-  if (l === "tr") return "Projelerde ada, açıklamaya, dile veya etiketlere göre ara…";
   if (l === "es") return "Busca proyectos por nombre, descripción, lenguaje o etiquetas…";
   return "Search projects by name, description, language or tags…";
 }
