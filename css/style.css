@@ -1,4 +1,9 @@
 /* css/style.css */
+/* =========================================================
+   Ferran’s Projects — Cleaned + synced with current JS/HTML
+   Fix: project thumbnails now render as a FIXED banner
+   ========================================================= */
+
 /* ---------- Theme tokens ---------- */
 
 :root {
@@ -9,15 +14,22 @@
   --accent: #b0172f;
   --accent-soft: rgba(176, 23, 47, 0.35);
   --accent-alt: #3f7bff;
+
   --text: #f8f8ff;
   --text-muted: #a6aac7;
+
   --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
   --radius-lg: 18px;
   --radius-pill: 999px;
+
   --transition-fast: 160ms ease-out;
   --transition-med: 220ms ease-out;
+
   --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", sans-serif;
+
+  /* Project banner sizing (this is the thumbnail fix) */
+  --project-banner-h: 150px;
 }
 
 *,
@@ -48,7 +60,6 @@ body {
   background: rgba(176, 23, 47, 0.35);
   color: #ffffff;
 }
-
 ::-moz-selection {
   background: rgba(176, 23, 47, 0.35);
   color: #ffffff;
@@ -63,7 +74,9 @@ body {
   z-index: 1;
 }
 
-/* ---------- Background YouTube video layer ---------- */
+/* =========================================================
+   Background YouTube video layer
+   ========================================================= */
 
 .bg-video-overlay {
   position: fixed;
@@ -71,7 +84,7 @@ body {
   z-index: 0;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 220ms ease-out;
+  transition: opacity var(--transition-med);
 }
 
 .bg-video-inner {
@@ -110,7 +123,138 @@ body.bg-video-active .bg-video-overlay {
   opacity: 1;
 }
 
-/* ---------- Header ---------- */
+/* =========================================================
+   Language gate
+   ========================================================= */
+
+.lang-gate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 10, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.lang-gate-backdrop[hidden] {
+  display: none !important;
+}
+
+.lang-gate-card {
+  width: min(560px, 96vw);
+  background: rgba(7, 10, 28, 0.98);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.85);
+  padding: 1.6rem 1.35rem 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.lang-gate-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at top right, rgba(176, 23, 47, 0.35), transparent 60%),
+    radial-gradient(circle at bottom left, rgba(11, 26, 61, 0.38), transparent 60%);
+  opacity: 0.9;
+  pointer-events: none;
+  filter: blur(4px);
+}
+
+.lang-gate-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.lang-gate-logo {
+  font-weight: 720;
+  letter-spacing: 0.03em;
+  opacity: 0.95;
+  margin-bottom: 0.6rem;
+}
+
+.lang-gate-title {
+  font-size: 1.25rem;
+  font-weight: 750;
+  margin-bottom: 0.35rem;
+}
+
+.lang-gate-sub {
+  color: var(--text-muted);
+  line-height: 1.45;
+  font-size: 0.92rem;
+  margin-bottom: 1.15rem;
+}
+
+.lang-gate-sub small {
+  display: block;
+  margin-top: 0.45rem;
+  opacity: 0.9;
+}
+
+.lang-gate-buttons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.btn-lang {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(4, 7, 24, 0.92);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.btn-lang:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.75);
+}
+
+.btn-lang.active {
+  border-color: rgba(176, 23, 47, 0.8);
+  background:
+    radial-gradient(circle at 0 0, rgba(176, 23, 47, 0.22), transparent 55%),
+    rgba(4, 7, 24, 0.95);
+}
+
+.btn-lang .flag {
+  font-size: 1.25rem;
+}
+
+.btn-lang-text {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.btn-lang .label-main {
+  font-weight: 700;
+}
+
+.btn-lang .label-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
 
 .site-header {
   position: relative;
@@ -147,10 +291,6 @@ body.bg-video-active .bg-video-overlay {
   z-index: 1;
 }
 
-.site-title-block {
-  min-width: 0;
-}
-
 .header-main-row {
   display: flex;
   align-items: flex-start;
@@ -176,7 +316,6 @@ body.bg-video-active .bg-video-overlay {
 }
 
 /* Header actions: socials block */
-
 .header-actions {
   display: flex;
   flex-direction: column;
@@ -186,12 +325,11 @@ body.bg-video-active .bg-video-overlay {
 }
 
 /* 🌐 language pill – fixed top-right of viewport */
-
 .lang-switch-main {
   position: fixed;
   top: 0.75rem;
   right: 0.75rem;
-  z-index: 500;
+  z-index: 1500;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -219,16 +357,7 @@ body.bg-video-active .bg-video-overlay {
   color: var(--text);
 }
 
-.lang-switch-icon {
-  font-size: 0.95rem;
-}
-
-.lang-switch-label {
-  font-size: 0.8rem;
-}
-
 /* Socials – left-aligned, wrap nicely */
-
 .social-links {
   display: flex;
   flex-wrap: wrap;
@@ -256,21 +385,10 @@ body.bg-video-active .bg-video-overlay {
     border-color var(--transition-fast),
     color var(--transition-fast),
     transform var(--transition-fast),
-    box-shadow var(--transition-fast),
-    filter var(--transition-fast);
+    box-shadow var(--transition-fast);
   white-space: nowrap;
   position: relative;
   overflow: hidden;
-}
-
-.social-chip::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 55%);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  pointer-events: none;
 }
 
 .social-chip:hover {
@@ -278,10 +396,6 @@ body.bg-video-active .bg-video-overlay {
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.75);
   color: var(--text);
   border-color: rgba(255, 255, 255, 0.4);
-}
-
-.social-chip:hover::before {
-  opacity: 0.35;
 }
 
 .social-icon {
@@ -304,55 +418,37 @@ body.bg-video-active .bg-video-overlay {
   display: block;
 }
 
-.social-label {
-  position: relative;
-  z-index: 1;
-}
-
 /* subtle platform tints */
-
 .social-github {
   background:
     radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.16), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: rgba(255, 255, 255, 0.7);
 }
-
 .social-linkedin {
   background:
     radial-gradient(circle at 0 0, rgba(11, 102, 194, 0.35), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: rgba(11, 102, 194, 0.85);
 }
-
 .social-outlook {
   background:
     radial-gradient(circle at 0 0, rgba(255, 150, 0, 0.35), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: rgba(255, 150, 0, 0.9);
 }
-
 .social-discord {
   background:
     radial-gradient(circle at 0 0, rgba(88, 101, 242, 0.5), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: rgba(88, 101, 242, 0.9);
 }
-
 .social-tumblr {
   background:
     radial-gradient(circle at 0 0, rgba(53, 70, 92, 0.55), transparent 60%),
     rgba(7, 10, 28, 0.97);
   border-color: rgba(53, 70, 92, 0.9);
 }
-
-.social-tumblr-old {
-  background:
-    radial-gradient(circle at 0 0, rgba(123, 0, 16, 0.45), transparent 60%),
-    rgba(7, 10, 28, 0.97);
-  border-color: #7b0010;
-}
-
 .social-reddit {
   background:
     radial-gradient(circle at 0 0, rgba(255, 69, 0, 0.5), transparent 60%),
@@ -360,21 +456,9 @@ body.bg-video-active .bg-video-overlay {
   border-color: rgba(255, 69, 0, 0.9);
 }
 
-.social-twitch {
-  background:
-    radial-gradient(circle at 0 0, rgba(145, 70, 255, 0.5), transparent 60%),
-    rgba(7, 10, 28, 0.97);
-  border-color: rgba(145, 70, 255, 0.9);
-}
-
-.social-x {
-  background:
-    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.2), transparent 60%),
-    rgba(7, 10, 28, 0.97);
-  border-color: rgba(255, 255, 255, 0.7);
-}
-
-/* ---------- About section ---------- */
+/* =========================================================
+   About section
+   ========================================================= */
 
 .page-main {
   margin-top: 0.5rem;
@@ -406,7 +490,6 @@ body.bg-video-active .bg-video-overlay {
 }
 
 /* Profile avatar */
-
 .profile-avatar {
   margin-top: 1.1rem;
   display: flex;
@@ -419,13 +502,13 @@ body.bg-video-active .bg-video-overlay {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  padding: 4px; /* thickness of the ring */
+  padding: 4px; /* ring thickness */
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
   background: transparent;
   overflow: visible;
 }
 
-/* The actual gradient ring that will spin */
+/* The gradient ring */
 .profile-avatar-inner::before {
   content: "";
   position: absolute;
@@ -444,7 +527,7 @@ body.bg-video-active .bg-video-overlay {
   z-index: 0;
 }
 
-/* The real profile picture – stays still */
+/* The profile picture */
 .profile-avatar-inner img {
   position: relative;
   z-index: 1;
@@ -458,7 +541,7 @@ body.bg-video-active .bg-video-overlay {
   cursor: pointer;
 }
 
-/* When "music" / bg video is playing, spin ONLY the ring, not the image */
+/* Spin ONLY the ring when playing */
 .profile-avatar--playing .profile-avatar-inner::before {
   animation: avatarRingSpin 1.6s linear infinite;
 }
@@ -468,7 +551,9 @@ body.bg-video-active .bg-video-overlay {
   to { transform: rotate(360deg); }
 }
 
-/* ---------- Tabs with sliding pill ---------- */
+/* =========================================================
+   Tabs (sliding pill)
+   ========================================================= */
 
 .tabs-section {
   margin-bottom: 1rem;
@@ -487,7 +572,7 @@ body.bg-video-active .bg-video-overlay {
   overflow: hidden;
 }
 
-/* sliding pill background – bound to active tab via CSS vars */
+/* sliding pill */
 .tabs::before {
   content: "";
   position: absolute;
@@ -524,13 +609,13 @@ body.bg-video-active .bg-video-overlay {
   text-align: center;
 }
 
-/* remove gap that misaligned the pill */
-.tab-button + .tab-button { margin-left: 0; }
-
 .tab-button:hover { transform: translateY(-1px); }
 .tab-button.active { color: var(--text); }
+.tab-button + .tab-button { margin-left: 0; }
 
-/* ---------- Search ---------- */
+/* =========================================================
+   Search
+   ========================================================= */
 
 .search-section {
   margin-bottom: 1rem;
@@ -587,7 +672,9 @@ body.bg-video-active .bg-video-overlay {
   pointer-events: none;
 }
 
-/* ---------- Filters ---------- */
+/* =========================================================
+   Filters
+   ========================================================= */
 
 .filters-section {
   margin-bottom: 0.5rem;
@@ -629,30 +716,38 @@ body.bg-video-active .bg-video-overlay {
   display: none !important;
 }
 
-/* ---------- Cards grid ---------- */
+/* =========================================================
+   Cards grid
+   ========================================================= */
 
 .view-section { margin-top: 0.75rem; }
 
-/* bigger cards, but not “giant thumbnail” */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 1.2rem;
   align-items: start;
 }
 
-/* ---------- Project cards + thumbnails ---------- */
+/* =========================================================
+   Project cards (NEW markup: banner + content)
+   THIS IS THE THUMBNAIL FIX
+   ========================================================= */
 
 .project-card {
   position: relative;
-  padding: 1.15rem 1.2rem 1.15rem;
   background: var(--card-bg);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   overflow: hidden;
+
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+
   transform: translateZ(0);
-  will-change: transform, box-shadow, border-color, background;
   backface-visibility: hidden;
   transition:
     transform var(--transition-med),
@@ -686,71 +781,77 @@ body.bg-video-active .bg-video-overlay {
 
 .project-card:hover::before { opacity: 0.5; }
 
-.project-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  margin-bottom: 0.55rem;
-}
-
-/* ✅ THUMB FIX: locked box size (not full-card) */
-.project-thumb {
-  width: 84px;
-  height: 84px;
+/* Banner button (thumbnail) */
+.project-banner {
+  width: 100%;
+  height: var(--project-banner-h);
   border-radius: 16px;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.18);
   overflow: hidden;
-  flex-shrink: 0;
-  background: radial-gradient(
-    circle at 0 0,
-    rgba(176, 23, 47, 0.8),
-    rgba(11, 26, 61, 1)
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer; /* clickable for enlarge */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.2);
+
+  display: block;
   padding: 0;
+  cursor: zoom-in;
+
+  /* remove native button look */
+  appearance: none;
+  -webkit-appearance: none;
   outline: none;
 }
 
-.project-thumb span {
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #ffffff;
+.project-banner:focus-visible {
+  outline: 2px solid rgba(176, 23, 47, 0.9);
+  outline-offset: 2px;
 }
 
-.project-thumb.has-image {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(0, 0, 0, 0.15);
-}
-
-/* ✅ THUMB FIX: image fills the 84x84 box */
-.project-thumb.has-image img {
+.project-banner img {
   width: 100%;
   height: 100%;
-  border-radius: 16px;
-  object-fit: cover;
   display: block;
-  background-color: #ffffff;
+  object-fit: cover;           /* THIS prevents “super tall” images */
   transform: scale(1);
-  transition: transform 160ms ease-out;
+  transition: transform var(--transition-fast);
 }
 
-.project-card:hover .project-thumb.has-image img { transform: scale(1.05); }
+.project-card:hover .project-banner img {
+  transform: scale(1.03);
+}
 
-.project-title-text {
+/* fallback letter inside banner */
+.project-banner-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background:
+    radial-gradient(circle at 0 0, rgba(176, 23, 47, 0.65), transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(11, 26, 61, 0.75), transparent 55%),
+    rgba(4, 7, 24, 0.95);
+}
+
+/* Content area */
+.project-content {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.project-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   min-width: 0;
 }
 
 .project-title {
-  font-size: 1.05rem;
-  font-weight: 650;
+  font-size: 1.08rem;
+  font-weight: 720;
   margin: 0;
   word-break: break-word;
 }
@@ -759,22 +860,42 @@ body.bg-video-active .bg-video-overlay {
   font-size: 0.82rem;
   color: rgba(193, 232, 255, 0.95);
   margin: 0;
+  word-break: break-word;
 }
 
-/* more description space */
 .project-desc {
-  margin: 0 0 0.85rem;
+  margin: 0;
   font-size: 0.94rem;
   color: var(--text-muted);
   line-height: 1.5;
+
   display: -webkit-box;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+/* tags */
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(4, 7, 24, 0.92);
+  color: rgba(235, 238, 255, 0.92);
+  font-size: 0.74rem;
+}
+
+/* actions */
 .project-actions {
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -798,6 +919,13 @@ body.bg-video-active .bg-video-overlay {
     border-color var(--transition-fast),
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
+}
+
+.btn-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
 /* Live site – fancy 360° highlight ring */
@@ -858,26 +986,17 @@ body.bg-video-active .bg-video-overlay {
 .btn-card-live:hover::before,
 .btn-card-live:focus-visible::before { opacity: 0.9; }
 
-@media (hover: none) {
-  .btn-card-live::before { opacity: 0.45; }
-}
-
 @keyframes liveGlowSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-.btn-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-}
-
-/* ---------- Media cards ---------- */
+/* =========================================================
+   Media cards
+   ========================================================= */
 
 .media-grid {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 1.6rem;
   margin-top: 0.4rem;
   align-items: start;
@@ -896,7 +1015,7 @@ body.bg-video-active .bg-video-overlay {
 
 .media-title {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 520;
   margin: 0;
   word-break: break-word;
 }
@@ -915,12 +1034,11 @@ body.bg-video-active .bg-video-overlay {
   align-items: stretch;
 }
 
-.media-player-wrapper { width: 100%; }
-
 .media-preview.clickable { cursor: zoom-in; }
-
-.media-preview.clickable img { transition: transform 160ms ease-out; }
+.media-preview.clickable img { transition: transform var(--transition-fast); }
 .media-preview.clickable:hover img { transform: scale(1.02); }
+
+.media-player-wrapper { width: 100%; }
 
 .media-preview img,
 .media-preview video {
@@ -929,7 +1047,7 @@ body.bg-video-active .bg-video-overlay {
   display: block;
 }
 
-/* Images: keep them a bit smaller so tall images don't take the whole screen */
+/* Images: keep them smaller so tall images don't take the whole screen */
 .media-preview img {
   max-height: 320px;
   object-fit: contain;
@@ -996,24 +1114,6 @@ body.bg-video-active .bg-video-overlay {
   cursor: pointer;
 }
 
-/* IE/Edge legacy */
-.media-volume-slider::-ms-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 0 3px rgba(176, 23, 47, 0.35);
-  cursor: pointer;
-}
-
-.media-volume-slider::-moz-range-track { background: transparent; }
-.media-volume-slider::-ms-track {
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
-}
-
 .media-volume-value {
   font-size: 0.78rem;
   color: var(--text-muted);
@@ -1022,7 +1122,6 @@ body.bg-video-active .bg-video-overlay {
 }
 
 /* actions */
-
 .media-actions {
   margin-top: 0.1rem;
   display: flex;
@@ -1057,16 +1156,15 @@ body.bg-video-active .bg-video-overlay {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
-/* Loop button for videos */
-.media-loop-btn { position: relative; }
-
 .media-loop-btn.is-active {
   border-color: rgba(176, 23, 47, 0.9);
   background: rgba(176, 23, 47, 0.12);
   color: #fff;
 }
 
-/* ---------- Playground ---------- */
+/* =========================================================
+   Playground
+   ========================================================= */
 
 #playgroundView { margin-top: 0.75rem; }
 
@@ -1096,7 +1194,7 @@ body.bg-video-active .bg-video-overlay {
   color: var(--text-muted);
 }
 
-/* Paint embed wrapper – keep card rounded, but don’t clip the iframe corners */
+/* Paint embed wrapper */
 .playground-embed {
   position: relative;
   width: 100%;
@@ -1109,21 +1207,18 @@ body.bg-video-active .bg-video-overlay {
   box-shadow: none;
 }
 
-/* Base iframe styling */
 .playground-embed iframe {
   display: block;
   width: 100%;
   border: none;
 }
 
-/* Wide 16:9 MS Paint, no horizontal scroll */
 .playground-embed iframe[src*="paint.js.org"] {
   aspect-ratio: 16 / 9;
   height: auto;
   border-radius: 0 !important;
 }
 
-/* Paint toolbar */
 .playground-paint-controls { margin-top: 1rem; }
 
 .paint-buttons-row {
@@ -1162,7 +1257,9 @@ body.bg-video-active .bg-video-overlay {
   color: var(--text-muted);
 }
 
-/* ---------- Empty state ---------- */
+/* =========================================================
+   Empty state / No-JS
+   ========================================================= */
 
 .empty-state {
   margin-top: 1.5rem;
@@ -1171,7 +1268,21 @@ body.bg-video-active .bg-video-overlay {
   font-size: 0.95rem;
 }
 
-/* ---------- Footer ---------- */
+.no-js-fallback {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  background: rgba(11, 15, 32, 0.85);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+body.js-enabled .no-js-fallback { display: none; }
+
+/* =========================================================
+   Footer
+   ========================================================= */
 
 .site-footer {
   margin-top: 2rem;
@@ -1206,16 +1317,14 @@ body.bg-video-active .bg-video-overlay {
   gap: 0.55rem;
 }
 
-.footer-social-icons a { text-decoration: none; }
-
 .footer-social-icons img {
   width: 24px;
   height: 24px;
   display: block;
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.6));
   transition:
-    transform 160ms ease-out,
-    opacity 160ms ease-out;
+    transform var(--transition-fast),
+    opacity var(--transition-fast);
 }
 
 .footer-social-icons img:hover {
@@ -1223,7 +1332,9 @@ body.bg-video-active .bg-video-overlay {
   opacity: 0.9;
 }
 
-/* ---------- Fullscreen image modal + controls ---------- */
+/* =========================================================
+   Fullscreen image modal
+   ========================================================= */
 
 .image-modal {
   position: fixed;
@@ -1302,21 +1413,9 @@ body.bg-video-active .bg-video-overlay {
 
 .image-modal-close { border-color: rgba(176, 23, 47, 0.9); }
 
-/* ---------- No-JS fallback ---------- */
-
-.no-js-fallback {
-  margin-top: 1.5rem;
-  padding: 0.9rem 1rem;
-  border-radius: 14px;
-  background: rgba(11, 15, 32, 0.85);
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  color: var(--text-muted);
-  font-size: 0.88rem;
-}
-
-body.js-enabled .no-js-fallback { display: none; }
-
-/* ---------- Accessibility ---------- */
+/* =========================================================
+   Accessibility
+   ========================================================= */
 
 .sr-only {
   position: absolute;
@@ -1330,11 +1429,9 @@ body.js-enabled .no-js-fallback { display: none; }
   border: 0;
 }
 
-/* ---------- Responsive tweaks ---------- */
-
-@media (max-width: 900px) {
-  .playground-grid { grid-template-columns: minmax(0, 1fr); }
-}
+/* =========================================================
+   Responsive tweaks
+   ========================================================= */
 
 @media (max-width: 800px) {
   .site-header { padding: 2.6rem 1.3rem 1.4rem; }
@@ -1348,6 +1445,8 @@ body.js-enabled .no-js-fallback { display: none; }
     top: 0.65rem;
     right: 0.65rem;
   }
+
+  :root { --project-banner-h: 140px; }
 }
 
 @media (max-width: 640px) {
@@ -1363,58 +1462,8 @@ body.js-enabled .no-js-fallback { display: none; }
     text-align: left;
   }
 
-  /* On mobile: slightly smaller media images */
   .media-preview img { max-height: 220px; }
-
-  /* On mobile: make Paint field tall 9:16 instead of 16:9 */
   .playground-embed iframe[src*="paint.js.org"] { aspect-ratio: 9 / 16; }
 
-  /* On mobile, keep project thumbs slightly smaller */
-  .project-thumb {
-    width: 72px;
-    height: 72px;
-    border-radius: 14px;
-  }
-  .project-thumb.has-image img {
-    border-radius: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .lang-gate-card { padding: 1.4rem 1.1rem 1.1rem; }
-}
-
-/* ------------------------------------------------------------------ */
-/* ✅ HARD THUMB OVERRIDE (PUT THIS AT THE VERY BOTTOM)                 */
-/* This prevents any other "img { width:100% }" or layout changes from  */
-/* making the project thumbnail full-size.                              */
-/* ------------------------------------------------------------------ */
-
-.project-title-row .project-thumb,
-.project-card .project-thumb {
-  width: 84px !important;
-  height: 84px !important;
-  max-width: 84px !important;
-  max-height: 84px !important;
-  flex: 0 0 84px !important;
-}
-
-.project-title-row .project-thumb img,
-.project-card .project-thumb img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-}
-
-/* If your JS sometimes renders: <img class="project-thumb" ...> */
-img.project-thumb {
-  width: 84px !important;
-  height: 84px !important;
-  max-width: 84px !important;
-  max-height: 84px !important;
-  object-fit: cover !important;
-  border-radius: 16px;
-  display: block !important;
-  flex: 0 0 84px !important;
+  :root { --project-banner-h: 130px; }
 }
