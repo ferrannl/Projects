@@ -22,76 +22,55 @@ const POSTBOARD_EMAIL_TO = "ferranhendriks@outlook.com";
 /* ---------- Random useless websites list ---------- */
 
 const USELESS_WEB_URLS = [
-  "https://pointerpointer.com/",
-  "https://checkboxrace.com/",
-  "https://hackertyper.com/",
-  "https://papertoilet.com/",
-  "https://cat-bounce.com/",
-  "https://puginarug.com/",
-  "https://longdogechallenge.com/",
-  "https://endless.horse/",
-  "https://strobe.cool/",
-  "https://mondrianandme.com/",
-  "https://omfgdogs.com/",
-  "https://thezen.zone/",
-  "https://theuselessweb.site/",
-  "https://ismypcstillon.com/",
-  "https://isitchristmas.com/",
-  "https://alwaysjudgeabookbyitscover.com/",
-  "https://smashthewalls.com/",
-  "https://dont-even.net/",
-  "http://cant-not-tweet-this.com/",
-  "https://nooooooooooooooo.com/",
-  "https://zoomquilt.org/",
-  "https://zoomquilt2.com/",
-  "https://koalastothemax.com/",
-  "https://weirdorconfusing.com/",
-  "https://purrli.com/",
-  "https://drawminos.com/",
-  "https://neal.fun/size-of-space/",
+  "https://corndog.io",
+  "https://eelslap.com",
+  "https://heeeeeeeey.com",
+  "https://pointerpointer.com",
+  "https://www.bouncingdvdlogo.com",
+  "https://www.koalastothemax.com",
+  "https://www.rrrgggbbb.com",
+  "https://www.trypap.com",
+  "https://www.cat-bounce.com",
+  "https://www.donothingfor2minutes.com",
+  "https://www.fallingfalling.com",
+  "https://www.zoomquilt.org",
+  "https://www.zoomquilt2.com",
+  "https://endless.horse",
+  "https://papertoilet.com",
+  "https://isitchristmas.com",
+  "https://beesbeesbeesbees.com",
+  "https://puginarug.com",
+  "https://wowenwilsonquiz.com",
+  "https://findtheinvisiblecow.com",
+
+  // Neal.fun (super mobile-friendly interactives)
   "https://neal.fun/deep-sea/",
-  "https://neal.fun/candle-problem/",
-  "https://www.rrrgggbbb.com/",
-  "https://www.crossdivisions.com/",
-  "https://www.kanyezone.com/",
-  "https://findtheinvisiblecow.com/",
-  "https://quickdraw.withgoogle.com/",
-  "https://snake.cafe/",
-  "https://flappybird.io/",
-  "https://chihuahuaspin.com/",
-  "https://dogs.are.the.most.moe/",
-  "https://whatthefluffgame.com/",
-  "https://www.hereistoday.com/",
-  "https://doughnutkitten.com/",
-  "https://thequietplaceproject.xyz/thequietplace/",
-  "https://eelslap.com/",
-  "https://fallingfalling.com/",
-  "https://beesbeesbees.com/",
-  "https://burymewithmymoney.com/",
-  "https://www.partridgegetslucky.com/",
-  "http://heeeeeeeey.com/",
-  "http://thatsthefinger.com/",
-  "http://www.staggeringbeauty.com/",
-  "http://www.fallingfalling.com/",
-  "http://ducksarethebest.com/",
-  "http://www.trypap.com/",
-  "http://www.republiquedesmangues.fr/",
-  "http://www.movenowthinklater.com/",
-  "http://www.rrrgggbbb.com/",
-  "http://www.sanger.dk/",
-  "http://www.koalastothemax.com/",
-  "http://www.everydayim.com/",
-  "http://www.leduchamp.com/",
-  "http://grandpanoclothes.com/",
-  "http://www.haneke.net/",
-  "https://cheese.com/random/",
-  "https://cantunsee.space/",
-  "https://neal.fun/walls/",
   "https://neal.fun/spend/",
-  "https://onesandzeros.online/",
-  "https://hooooooooo.com/",
-  "https://www.breakglassforfun.com/",
-  "https://drawabezier.com/"
+  "https://neal.fun/password-game/",
+  "https://neal.fun/dark-patterns/",
+  "https://neal.fun/absurd-trolley-problems/",
+  "https://neal.fun/infinite-craft/",
+  "https://neal.fun/space-elevator/",
+  "https://neal.fun/life-checklist/",
+  "https://neal.fun/where-does-the-day-go/",
+  "https://neal.fun/wonders-of-street-view/",
+  "https://neal.fun/lets-settle-this/",
+  "https://neal.fun/ambient-chaos/",
+  "https://neal.fun/universe-forecast/",
+  "https://neal.fun/sun-vs-moon/",
+  "https://neal.fun/earth-view/",
+  "https://neal.fun/baby-map/",
+  "https://neal.fun/design-the-next-iphone/",
+  "https://neal.fun/printing-money/",
+  "https://neal.fun/logos-from-memory/",
+  "https://neal.fun/auction-game/",
+  "https://neal.fun/asteroid-launcher/",
+  "https://neal.fun/rocks/",
+  "https://neal.fun/the-weight-of-the-internet/",
+  "https://neal.fun/how-many-days/",
+  "https://neal.fun/how-many-emojis/",
+  "https://neal.fun/speed/",
+  "https://neal.fun/size-of-space/"
 ];
 
 /* ---------- State ---------- */
@@ -361,112 +340,6 @@ const I18N = {
     btnDownload: "Download",
     btnSendEmail: "Per E-Mail senden"
   },
-  pl: {
-    subtitle:
-      "Wszystkie moje projekty programistyczne w jednym miejscu – strony WWW, aplikacje, projekty szkolne, poradniki, API i więcej.",
-    aboutTitle: "O mnie",
-    aboutP1:
-      "Cześć 👋🏻 tu Ferran. Jestem holenderskim 🇳🇱 developerem z Utrechtu / ’s-Hertogenbosch. Lubię tworzyć strony WWW, aplikacje i małe narzędzia pomagające mnie i innym.",
-    aboutP2: "",
-    playgroundPaintTitle: "Plac zabaw MS Paint",
-    playgroundPaintText: "Remake MS Paint, miłej zabawy przy rysowaniu!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Zostaw krótką wiadomość (z imieniem lub anonimowo). Wpisy są przechowywane lokalnie w przeglądarce.",
-    postboardNameLabel: "Imię (opcjonalnie)",
-    postboardAnonymousLabel: "Opublikuj anonimowo",
-    postboardMessageLabel: "Wiadomość",
-    postboardSubmitLabel: "Opublikuj",
-    postboardListTitle: "Wall",
-    postboardEmpty: "Brak wpisów. Bądź pierwszy!",
-    playgroundRandomTitle: "Przycisk losowej strony",
-    playgroundRandomText:
-      "Nudzisz się lub jesteś ciekawy? Kliknij przycisk, a otworzy się losowa, dziwna strona w nowej karcie.",
-    randomButtonLabel: "Zabierz mnie na losową stronę",
-    tabProjects: "Projekty",
-    tabMedia: "Media",
-    tabPlayground: "Playground",
-    searchLabel: "Szukaj",
-    filterTypeLabel: "Typ",
-    typeAll: "Wszystko",
-    typeWebsite: "Strony WWW",
-    typeMobile: "Mobilne",
-    typeApi: "API / Backend",
-    typeSchool: "Szkoła / Studia",
-    typeGame: "Gra",
-    typeOther: "Inne",
-    filterLanguageLabel: "Język",
-    languageFilterAll: "Wszystkie języki",
-    mediaTypeLabel: "Typ medium",
-    mediaKindAll: "Wszystko",
-    mediaKindImages: "Obrazy",
-    mediaKindVideos: "Wideo",
-    mediaKindAudio: "Audio",
-    emptyState:
-      "Nie znaleziono projektów dla tych filtrów. Spróbuj czegoś innego.",
-    mediaEmptyState:
-      "Nie znaleziono mediów dla tych filtrów.",
-    headerLangButton: "Język",
-    footerBuilt: "Stworzone z ♥ przez Ferrana",
-    btnGitHub: "Zobacz na GitHub",
-    btnLiveSite: "Strona live",
-    btnDownload: "Pobierz",
-    btnSendEmail: "Wyślij e-mailem"
-  },
-  tr: {
-    subtitle:
-      "Tüm programlama projelerim tek bir yerde – web siteleri, uygulamalar, okul projeleri, rehberler, API’ler ve daha fazlası.",
-    aboutTitle: "Hakkımda",
-    aboutP1:
-      "Selam 👋🏻 ben Ferran. Utrecht / ’s-Hertogenbosch’ta yaşayan Hollandalı 🇳🇱 bir developer’ım. Kendime ve başkalarına yardımcı olmak için web siteleri, uygulamalar ve küçük araçlar geliştirmeyi seviyorum.",
-    aboutP2: "",
-    playgroundPaintTitle: "MS Paint Oyun Alanı",
-    playgroundPaintText: "MS Paint yeniden yapımı, keyifle çiz!",
-    playgroundPaintHint: "", // removed
-    playgroundPostTitle: "Postboard",
-    playgroundPostText:
-      "Kısa bir mesaj bırak (isimle veya isimsiz). Gönderiler tarayıcında yerel olarak saklanır.",
-    postboardNameLabel: "İsim (isteğe bağlı)",
-    postboardAnonymousLabel: "Anonim gönder",
-    postboardMessageLabel: "Mesaj",
-    postboardSubmitLabel: "Gönder",
-    postboardListTitle: "Duvar",
-    postboardEmpty: "Henüz gönderi yok. İlk sen ol!",
-    playgroundRandomTitle: "Rastgele Site Butonu",
-    playgroundRandomText:
-      "Meraklı veya sıkılmış mısın? Butona tıkla, yeni sekmede rastgele garip bir site açılsın.",
-    randomButtonLabel: "Beni rastgele bir siteye götür",
-    tabProjects: "Projeler",
-    tabMedia: "Medya",
-    tabPlayground: "Playground",
-    searchLabel: "Ara",
-    filterTypeLabel: "Tür",
-    typeAll: "Hepsi",
-    typeWebsite: "Web siteleri",
-    typeMobile: "Mobil",
-    typeApi: "API’ler / Backend",
-    typeSchool: "Okul / Çalışma",
-    typeGame: "Oyun",
-    typeOther: "Diğer",
-    filterLanguageLabel: "Dil",
-    languageFilterAll: "Tüm diller",
-    mediaTypeLabel: "Medya türü",
-    mediaKindAll: "Hepsi",
-    mediaKindImages: "Görseller",
-    mediaKindVideos: "Videolar",
-    mediaKindAudio: "Ses",
-    emptyState:
-      "Bu arama veya filtrelerle proje bulunamadı. Başka bir şey dene.",
-    mediaEmptyState:
-      "Bu arama veya filtrelerle medya bulunamadı.",
-    headerLangButton: "Dil",
-    footerBuilt: "♥ ile geliştirildi – Ferran",
-    btnGitHub: "GitHub’da görüntüle",
-    btnLiveSite: "Canlı site",
-    btnDownload: "İndir",
-    btnSendEmail: "E-posta ile gönder"
-  },
   es: {
     subtitle:
       "Todos mis proyectos de programación en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
@@ -554,8 +427,6 @@ function getSearchPlaceholder(lang, view) {
   if (tab === "media") {
     if (l === "nl") return "Zoek in media op titel of bestandsnaam…";
     if (l === "de") return "Suche in Medien nach Titel oder Dateiname…";
-    if (l === "pl") return "Szukaj w mediach po tytule lub nazwie pliku…";
-    if (l === "tr") return "Medya içinde başlık veya dosya adına göre ara…";
     if (l === "es") return "Busca en media por título o nombre de archivo…";
     return "Search media by title or filename…";
   }
@@ -563,16 +434,12 @@ function getSearchPlaceholder(lang, view) {
   if (tab === "playground") {
     if (l === "nl") return "Zoek in Playground-tools op naam of beschrijving…";
     if (l === "de") return "Suche in Playground-Tools nach Name oder Beschreibung…";
-    if (l === "pl") return "Szukaj narzędzi Playground po nazwie lub opisie…";
-    if (l === "tr") return "Playground araçlarında ada veya açıklamaya göre ara…";
     if (l === "es") return "Busca herramientas del Playground por nombre o descripción…";
     return "Search playground tools by name or description…";
   }
 
   if (l === "nl") return "Zoek in projecten op naam, beschrijving, programmeertaal of tags…";
   if (l === "de") return "Suche in Projekten nach Name, Beschreibung, Sprache oder Tags…";
-  if (l === "pl") return "Szukaj projektów po nazwie, opisie, języku lub tagach…";
-  if (l === "tr") return "Projelerde ada, açıklamaya, dile veya etiketlere göre ara…";
   if (l === "es") return "Busca proyectos por nombre, descripción, lenguaje o etiquetas…";
   return "Search projects by name, description, language or tags…";
 }
