@@ -230,19 +230,6 @@
     "thumbnailUrl": ""
   },
   {
-    "name": "Monsterzoo",
-    "description": "Monsterzoo is a small browser-based JavaScript game built as a final assignment. You manage a zoo full of monsters: create them, customize them, place them on different fields, and move or delete them while dealing with changing weather conditions.",
-    "language": "JavaScript",
-    "languages": [
-      "JS",
-      "HTML"
-    ],
-    "hasPages": true,
-    "pagesUrl": "https://ferrannl.github.io/Monsterzoo/",
-    "tags": [],
-    "thumbnailUrl": ""
-  },
-  {
     "name": "Munchkin",
     "description": "We have made this website as an assignment from Avans Hogeschool in 's-Hertogenbosch. copyright 2017 © Ferran Hendiks & Xia de Visser",
     "language": "SCSS",
