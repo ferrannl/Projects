@@ -1,17 +1,5 @@
 [
   {
-    "name": "Address-Distance-Calculator",
-    "description": "Address Distance Calculator Web API for creating, reading, updating and deleting addresses, and calculating the distance in kilometers between Dutch addresses using the Bing Maps REST API and GeoCoordinatePortable.",
-    "language": "C#",
-    "languages": [
-      "C#"
-    ],
-    "hasPages": false,
-    "pagesUrl": "",
-    "tags": [],
-    "thumbnailUrl": ""
-  },
-  {
     "name": "AvanSync",
     "description": "AvanSync is a client–server application that demonstrates core C++ concepts: networking, concurrency, modular design and unit testing.",
     "language": "C++",
@@ -38,7 +26,7 @@
   },
   {
     "name": "Cafeteria-Churreria-San-Pedro",
-    "description": "Website for Cafeteria Churreria San Pedro in Tenerife",
+    "description": "Website for Cafeteria Churreria San Pedro in Tenerife. Located in El Sauzal on Tenerife’s north coast, Cafetería Churrería San Pedro is a charming local café and churrería known for its freshly made churros paired with rich coffee and traditional Spanish café fare.",
     "language": "HTML",
     "languages": [
       "HTML",
@@ -92,7 +80,7 @@
   },
   {
     "name": "elegant-barbershop",
-    "description": "Website suggestion for Elegant Barbershop",
+    "description": "Website suggestion for Elegant Barbershop. Elegant Barbershop is a highly rated barber shop located on Hinthamerstraat in the center of ’s-Hertogenbosch, known for its professional and friendly barbering services.",
     "language": "Less",
     "languages": [
       "Less",
@@ -145,7 +133,7 @@
   },
   {
     "name": "Imgur-App-iOS",
-    "description": "Simple native Imgur client for iOS, written in Swift. This project was created as an educational / exam assignment and demonstrates how to consume the Imgur API, display image feeds, and present image details in a clean UIKit app.",
+    "description": "Simple native Imgur client for iOS, written in Swift.",
     "language": "Swift",
     "languages": [
       "Swift"
@@ -170,25 +158,8 @@
     "thumbnailUrl": ""
   },
   {
-    "name": "kmintapp",
-    "description": "kmintapp is a C++ application built on top of a reusable simulation framework (libkmint). It is an agent-based 2D simulation: autonomous entities move around a world, make decisions based on their environment, and interact according to simple rules. The project was built as an educational / course assignment",
-    "language": "C++",
-    "languages": [
-      "C++",
-      "C",
-      "CMake",
-      "Nix",
-      "Shell",
-      "Emacs Lisp"
-    ],
-    "hasPages": false,
-    "pagesUrl": "",
-    "tags": [],
-    "thumbnailUrl": ""
-  },
-  {
     "name": "Kolonisten-van-Catan",
-    "description": "A Java implementation of (parts of) The Settlers of Catan, created as a project for Informatics 1 – Group I. This is an Eclipse-based project focused on practicing object-oriented programming, teamwork, and Git workflows.",
+    "description": "A Java implementation of (parts of) The Settlers of Catan. This is an Eclipse-based project.",
     "language": "Java",
     "languages": [
       "Java"
@@ -215,14 +186,14 @@
   },
   {
     "name": "meinlager",
-    "description": "Website suggestion for Mein Lager",
+    "description": "Website suggestion for Mein Lager. Meinlager in Frankfurt offers modern, secure, and flexible self-storage solutions for both private individuals and businesses.",
     "language": "HTML",
     "languages": [
       "HTML",
       "Less",
       "CSS",
-      "SCSS",
-      "JS"
+      "JS",
+      "SCSS"
     ],
     "hasPages": true,
     "pagesUrl": "https://ferrannl.github.io/meinlager/",
@@ -246,7 +217,7 @@
   },
   {
     "name": "Niks-voor-Niks",
-    "description": "Niks voor Niks is a local trade marketplace where members of a trade ring can offer and request products and services using their own virtual currency called Niksen.  This application was originally built as a school project for a real client, following Scrum / agile practices, and implemented as a full-featured Laravel 7 web application.",
+    "description": "Local trade marketplace where members of a trade ring can offer and request products and services using their own virtual currency called Niksen. Laravel 7 web application.",
     "language": "PHP",
     "languages": [
       "PHP",
@@ -271,6 +242,23 @@
     "thumbnailUrl": ""
   },
   {
+    "name": "Rabbit-Island",
+    "description": "C++ application built on top of a reusable simulation framework (libkmint). It is an agent-based 2D simulation: autonomous entities move around a world, make decisions based on their environment, and interact according to simple rules.",
+    "language": "C++",
+    "languages": [
+      "C++",
+      "C",
+      "CMake",
+      "Nix",
+      "Shell",
+      "Emacs Lisp"
+    ],
+    "hasPages": false,
+    "pagesUrl": "",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "Speuren-met-Krul-2020",
     "description": "C++ console application that follows a chain of online clues, fetches and interprets a custom mini-language called Krul, and ultimately reveals a hidden secret message. This project was created as the CPPLS1 final project (Eindopdracht).",
     "language": "C++",
@@ -291,20 +279,6 @@
     ],
     "hasPages": false,
     "pagesUrl": "",
-    "tags": [],
-    "thumbnailUrl": ""
-  },
-  {
-    "name": "Study-Mate",
-    "description": "Study-Mate is a Laravel 7 web application that lets you manage everything around a school or course program in one place: courses, teachers, exams and grades (CRUD). It was built as a final assignment (Eindopdracht) to practice full-stack Laravel development.",
-    "language": "PHP",
-    "languages": [
-      "PHP",
-      "Blade",
-      "Vue"
-    ],
-    "hasPages": true,
-    "pagesUrl": "https://ferrannl.github.io/Study-Mate/",
     "tags": [],
     "thumbnailUrl": ""
   },
