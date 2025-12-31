@@ -1,3 +1,4 @@
+
 /* css/style.css */
 /* ---------- Theme tokens ---------- */
 
@@ -667,10 +668,10 @@ body.bg-video-active .bg-video-overlay {
   margin-bottom: 0.55rem;
 }
 
-/* 🔹 tiny bump bigger + slightly wider */
+/* 🔹 tiny bump bigger (requested) */
 .project-thumb {
-  width: 112px;
-  height: 104px;
+  width: 110px;   /* was 102 */
+  height: 110px;  /* was 102 */
   border-radius: 16px;
   box-shadow: 0 14px 38px rgba(0, 0, 0, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -702,8 +703,8 @@ body.bg-video-active .bg-video-overlay {
 }
 
 .project-thumb.has-image img {
-  width: 100%;
-  height: 100%;
+  width: 110px;   /* match container */
+  height: 110px;
   border-radius: 16px;
   object-fit: cover;
   display: block;
@@ -736,7 +737,7 @@ body.bg-video-active .bg-video-overlay {
   margin: 0;
 }
 
-/* ✅ fixed-height desc block + optional fade + dots */
+/* ✅ nicer ending for long descriptions: clamp + soft fade */
 .project-desc {
   margin: 0 0 0.85rem;
   font-size: 0.95rem;
@@ -748,33 +749,9 @@ body.bg-video-active .bg-video-overlay {
   -webkit-box-orient: vertical;
   overflow: hidden;
 
-  /* same space for everyone (5 lines) */
-  min-height: calc(5 * 1.5em);
-  position: relative;
-}
-
-/* only when JS detects overflow */
-.project-desc.is-faded::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2.2em;
-  background: linear-gradient(to bottom, rgba(7, 10, 28, 0), var(--card-bg));
-  pointer-events: none;
-}
-
-.project-desc.is-faded::before {
-  content: "…";
-  position: absolute;
-  right: 0.2rem;
-  bottom: 0.05rem;
-  color: rgba(220, 224, 245, 0.78);
-  font-weight: 700;
-  pointer-events: none;
-  padding-left: 0.4rem;
-  background: linear-gradient(to right, rgba(7, 10, 28, 0), var(--card-bg) 45%);
+  /* Fade out last lines */
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 100%);
 }
 
 .project-meta {
@@ -941,7 +918,6 @@ body.bg-video-active .bg-video-overlay {
 .media-player-wrapper { width: 100%; }
 
 .media-preview.clickable { cursor: zoom-in; }
-
 .media-preview.clickable img { transition: transform 160ms ease-out; }
 .media-preview.clickable:hover img { transform: scale(1.02); }
 
@@ -1383,7 +1359,6 @@ body.bg-video-active .bg-video-overlay {
 .flag { font-size: 1.25rem; flex-shrink: 0; }
 
 .label-main { font-size: 0.9rem; font-weight: 600; }
-
 .label-sub { font-size: 0.78rem; color: var(--text-muted); }
 
 /* ---------- Fullscreen image modal + controls ---------- */
@@ -1513,14 +1488,13 @@ body.js-enabled .no-js-fallback { display: none; }
   /* On mobile: make Paint field tall 9:16 instead of 16:9 */
   .playground-embed iframe[src*="paint.js.org"] { aspect-ratio: 9 / 16; }
 
-  /* Mobile: slightly bigger thumbs (still subtle) */
-  .project-thumb {
-    width: 92px;
-    height: 86px;
+  /* Mobile: slightly bigger thumbs */
+  .project-thumb,
+  .project-thumb.has-image img {
+    width: 92px;   /* was 86 */
+    height: 92px;  /* was 86 */
     border-radius: 14px;
   }
-
-  .project-thumb.has-image img { border-radius: 14px; }
 }
 
 @media (max-width: 480px) {
