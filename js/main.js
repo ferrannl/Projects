@@ -109,14 +109,14 @@ function onYouTubeIframeAPIReady() {
       rel: 0,
       modestbranding: 1,
       loop: 1,
-      playlist: "YeUE1G07yH8",
+      playlist: "oHg5SJYRHA0",
       playsinline: 1
     },
     events: {
       onReady: (event) => {
         bgPlayerReady = true;
         try {
-          event.target.setVolume(20);
+          event.target.setVolume(30);
         } catch (_) {}
       }
     }
