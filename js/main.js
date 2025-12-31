@@ -447,6 +447,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ---------- Helpers: search placeholder per lang + tab ---------- */
 
+function applyDescriptionClampMarkers() {
+  const cards = document.querySelectorAll(".project-desc");
+  cards.forEach((p) => {
+    // reset eerst
+    p.classList.remove("is-clamped");
+
+    // Detect overflow: als de content hoger is dan het zichtbare blok
+    // kleine tolerantie voor rounding:
+    const isOverflowing = p.scrollHeight > p.clientHeight + 1;
+    if (isOverflowing) p.classList.add("is-clamped");
+  });
+}
+
 function getSearchPlaceholder(lang, view) {
   const tab = view || "projects";
   const l = SUPPORTED_LANGS.includes(lang) ? lang : DEFAULT_LANG;
@@ -1376,6 +1389,8 @@ function renderProjects() {
     card.appendChild(actions);
     grid.appendChild(card);
   });
+    // ... einde van renderProjects()
+  applyDescriptionClampMarkers();
 }
 
 /* ---------- Media loading & rendering ---------- */
