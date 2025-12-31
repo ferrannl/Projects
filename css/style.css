@@ -667,10 +667,10 @@ body.bg-video-active .bg-video-overlay {
   margin-bottom: 0.55rem;
 }
 
-/* 🔹 tiny bump bigger */
+/* 🔹 tiny bump bigger + slightly wider */
 .project-thumb {
-  width: 102px;   /* was 96 */
-  height: 102px;  /* was 96 */
+  width: 112px;
+  height: 104px;
   border-radius: 16px;
   box-shadow: 0 14px 38px rgba(0, 0, 0, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -702,8 +702,8 @@ body.bg-video-active .bg-video-overlay {
 }
 
 .project-thumb.has-image img {
-  width: 102px;   /* match container */
-  height: 102px;
+  width: 100%;
+  height: 100%;
   border-radius: 16px;
   object-fit: cover;
   display: block;
@@ -736,15 +736,45 @@ body.bg-video-active .bg-video-overlay {
   margin: 0;
 }
 
+/* ✅ fixed-height desc block + optional fade + dots */
 .project-desc {
   margin: 0 0 0.85rem;
   font-size: 0.95rem;
   color: var(--text-muted);
   line-height: 1.5;
+
   display: -webkit-box;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
+
+  /* same space for everyone (5 lines) */
+  min-height: calc(5 * 1.5em);
+  position: relative;
+}
+
+/* only when JS detects overflow */
+.project-desc.is-faded::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.2em;
+  background: linear-gradient(to bottom, rgba(7, 10, 28, 0), var(--card-bg));
+  pointer-events: none;
+}
+
+.project-desc.is-faded::before {
+  content: "…";
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.05rem;
+  color: rgba(220, 224, 245, 0.78);
+  font-weight: 700;
+  pointer-events: none;
+  padding-left: 0.4rem;
+  background: linear-gradient(to right, rgba(7, 10, 28, 0), var(--card-bg) 45%);
 }
 
 .project-meta {
@@ -1483,13 +1513,14 @@ body.js-enabled .no-js-fallback { display: none; }
   /* On mobile: make Paint field tall 9:16 instead of 16:9 */
   .playground-embed iframe[src*="paint.js.org"] { aspect-ratio: 9 / 16; }
 
-  /* Mobile: slightly bigger thumbs */
-  .project-thumb,
-  .project-thumb.has-image img {
-    width: 86px;   /* was 82 */
-    height: 86px;  /* was 82 */
+  /* Mobile: slightly bigger thumbs (still subtle) */
+  .project-thumb {
+    width: 92px;
+    height: 86px;
     border-radius: 14px;
   }
+
+  .project-thumb.has-image img { border-radius: 14px; }
 }
 
 @media (max-width: 480px) {
