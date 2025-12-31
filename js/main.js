@@ -1,4 +1,3 @@
-
 /* js/main.js */
 /* ---------- Config ---------- */
 
@@ -134,8 +133,7 @@ const I18N = {
     gateEnSub: "Internationaal",
     gateDeSub: "Voor mijn buren",
     gateEsSub: "Voor vrienden uit Spanje en de Canarische Eilanden",
-    subtitle:
-      "Op deze website vind je al mijn programmeer- en codeprojecten op één plek – websites, apps, schoolopdrachten, guides, API’s en meer.",
+    subtitle: "Op deze website vind je een selectie van mijn projecten op één plek.",
     aboutTitle: "Over mij",
     aboutP1:
       "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
@@ -169,8 +167,8 @@ const I18N = {
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
-    btnGitHub: "Bekijk op GitHub",
-    btnLiveSite: "Live site",
+    btnGitHub: "Bekijk code",
+    btnLiveSite: "Bekijk live website",
     btnDownload: "Download",
 
     paintClearButton: "Wissen",
@@ -194,8 +192,7 @@ const I18N = {
     gateEnSub: "International",
     gateDeSub: "For my neighbors",
     gateEsSub: "For friends from Spain & the Canary Islands",
-    subtitle:
-      "On this website you can find all my programming and coding projects in one place – websites, apps, school projects, guides, APIs and more.",
+    subtitle: "On this website you can find a selection of my projects in one place.",
     aboutTitle: "About me",
     aboutP1:
       "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
@@ -229,8 +226,8 @@ const I18N = {
     mediaEmptyState: "No media found with these filters.",
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
-    btnGitHub: "View on GitHub",
-    btnLiveSite: "Live site",
+    btnGitHub: "View code",
+    btnLiveSite: "View live website",
     btnDownload: "Download",
 
     paintClearButton: "Clear",
@@ -254,8 +251,7 @@ const I18N = {
     gateEnSub: "International",
     gateDeSub: "Für meine Nachbarn",
     gateEsSub: "Für Freunde aus Spanien & den Kanaren",
-    subtitle:
-      "Auf dieser Website findest du all meine Programmier- und Coding-Projekte an einem Ort – Websites, Apps, Schulprojekte, Guides, APIs und mehr.",
+    subtitle: "Auf dieser Website findest du eine Auswahl meiner Projekte an einem Ort.",
     aboutTitle: "Über mich",
     aboutP1:
       "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
@@ -289,8 +285,8 @@ const I18N = {
     mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
-    btnGitHub: "Auf GitHub ansehen",
-    btnLiveSite: "Live-Seite",
+    btnGitHub: "Code ansehen",
+    btnLiveSite: "Live-Website ansehen",
     btnDownload: "Download",
 
     paintClearButton: "Leeren",
@@ -314,8 +310,7 @@ const I18N = {
     gateEnSub: "Internacional",
     gateDeSub: "Para mis vecinos",
     gateEsSub: "Para amigos de España y Canarias",
-    subtitle:
-      "En esta web encontrarás todos mis proyectos de programación y código en un solo lugar – webs, apps, trabajos de clase, guías, APIs y más.",
+    subtitle: "En esta web encontrarás una selección de mis proyectos en un solo lugar.",
     aboutTitle: "Sobre mí",
     aboutP1:
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
@@ -349,8 +344,8 @@ const I18N = {
     mediaEmptyState: "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
-    btnGitHub: "Ver en GitHub",
-    btnLiveSite: "Sitio en vivo",
+    btnGitHub: "Ver código",
+    btnLiveSite: "Ver sitio en vivo",
     btnDownload: "Descargar",
 
     paintClearButton: "Borrar",
@@ -693,7 +688,7 @@ async function loadProjects() {
 
     const type = guessProjectType(repo, o, languages);
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
-    const liveUrl = computeLiveUrl(repo, o);
+    const liveUrl = computeLiveUrl(repo, o, languages);
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -863,13 +858,45 @@ function guessProjectType(repo, override, languages) {
 
 /* ---------- Project helpers: liveUrl, thumbnail ---------- */
 
-function computeLiveUrl(repo, override) {
+const LIVE_ALLOWED_LANGS = new Set(["html", "css", "less", "js"]);
+
+function isEligibleLiveSite(repo, override, languages) {
+  // If user explicitly set liveUrl, allow it (manual override)
+  const explicit = String(override?.liveUrl || "").trim();
+  if (explicit) return true;
+
+  const name = (repo?.name || "").toLowerCase();
+  const desc = (repo?.description || "").toLowerCase();
+  const joined = `${name} ${desc}`;
+
+  // Block obvious backend stacks
+  if (joined.includes("laravel")) return false;
+
+  const langs = Array.isArray(languages) ? languages : [];
+  const lowerLangs = langs.map((l) => String(l).toLowerCase());
+
+  // Block PHP (and therefore Laravel-ish stuff)
+  if (lowerLangs.includes("php")) return false;
+
+  // Only allow pure frontend languages
+  if (!lowerLangs.length) return false;
+  return lowerLangs.every((l) => LIVE_ALLOWED_LANGS.has(l));
+}
+
+function computeLiveUrl(repo, override, languages) {
   const rawOverride = (override.liveUrl || "").trim();
   if (rawOverride) return rawOverride;
 
-  const hasLive = override.hasLive !== undefined ? !!override.hasLive : !!repo.has_pages;
-  if (hasLive) return `https://${GITHUB_USER}.github.io/${repo.name}/`;
-  return null;
+  // allow explicit "hasLive" false to disable
+  if (override.hasLive !== undefined && !override.hasLive) return null;
+
+  const hasPages = !!repo.has_pages;
+  if (!hasPages) return null;
+
+  // Only show for pure frontend websites
+  if (!isEligibleLiveSite(repo, override, languages)) return null;
+
+  return `https://${GITHUB_USER}.github.io/${repo.name}/`;
 }
 
 function computeThumbnail(repo, override) {
@@ -1141,6 +1168,14 @@ function renderProjects() {
     desc.className = "project-desc";
     desc.textContent = project.description;
 
+    // ✅ detect overflow and only then add fade + dots
+    requestAnimationFrame(() => {
+      try {
+        const overflow = desc.scrollHeight > desc.clientHeight + 1;
+        desc.classList.toggle("is-faded", overflow);
+      } catch (_) {}
+    });
+
     const meta = document.createElement("div");
     meta.className = "project-meta";
     (project.tags || []).forEach((tag) => {
@@ -1158,7 +1193,7 @@ function renderProjects() {
     githubBtn.target = "_blank";
     githubBtn.rel = "noopener noreferrer";
     githubBtn.className = "btn-card";
-    githubBtn.innerHTML = `<span>${dict.btnGitHub || "View on GitHub"}</span>`;
+    githubBtn.innerHTML = `<span>${dict.btnGitHub || "View code"}</span>`;
     actions.appendChild(githubBtn);
 
     if (project.liveUrl) {
@@ -1167,7 +1202,7 @@ function renderProjects() {
       liveBtn.target = "_blank";
       liveBtn.rel = "noopener noreferrer";
       liveBtn.className = "btn-card btn-card-live";
-      liveBtn.innerHTML = `<span>${dict.btnLiveSite || "Live site"}</span>`;
+      liveBtn.innerHTML = `<span>${dict.btnLiveSite || "View live website"}</span>`;
       actions.appendChild(liveBtn);
     }
 
@@ -1501,8 +1536,6 @@ function openImageModal(src, captionText) {
   actions.appendChild(closeBtn);
 
   inner.appendChild(actions);
-
-  // ✅ hint removed (no "click outside / Esc" text)
 
   modal.appendChild(inner);
   modal.hidden = false;
