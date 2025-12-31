@@ -8,6 +8,7 @@ const MEDIA_INDEX_URL = "./media/media.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
 const THUMB_CACHE_KEY = "ferranProjectsThumbsV4"; // bump key (new thumb logic)
+const LIVE_CACHE_KEY = "ferranProjectsLiveIndexV1"; // cache: repoName -> { hasIndex: bool, ts: number }
 
 const SUPPORTED_LANGS = ["nl", "en", "de", "es"];
 const DEFAULT_LANG = "nl";
@@ -72,6 +73,7 @@ let repos = [];
 let projects = [];
 let mediaItems = [];
 let thumbCache = loadThumbCache();
+let liveIndexCache = loadLiveIndexCache();
 let paintIframe = null;
 
 const state = {
@@ -100,11 +102,11 @@ function onYouTubeIframeAPIReady() {
   const el = document.getElementById(containerId);
   if (!el || !window.YT || !YT.Player) return;
 
-  // ✅ new background video
-  const NEW_BG_VIDEO_ID = "oHg5SJYRHA0";
+  // NEW video
+  const VIDEO_ID = "oHg5SJYRHA0";
 
   bgPlayer = new YT.Player(containerId, {
-    videoId: NEW_BG_VIDEO_ID,
+    videoId: VIDEO_ID,
     playerVars: {
       autoplay: 0,
       controls: 0,
@@ -112,7 +114,7 @@ function onYouTubeIframeAPIReady() {
       rel: 0,
       modestbranding: 1,
       loop: 1,
-      playlist: NEW_BG_VIDEO_ID,
+      playlist: VIDEO_ID, // required for looping
       playsinline: 1
     },
     events: {
@@ -137,23 +139,27 @@ const I18N = {
     gateDeSub: "Voor mijn buren",
     gateEsSub: "Voor vrienden uit Spanje en de Canarische Eilanden",
 
-    // ✅ new subtitle
+    // UPDATED subtitle
     subtitle: "Op deze website vind je een selectie van mijn projecten op één plek.",
 
     aboutTitle: "Over mij",
     aboutP1:
       "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
     aboutP2: "",
+
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
     playgroundRandomTitle: "Random website-knop",
     playgroundRandomText:
       "Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
     randomButtonLabel: "Neem me mee naar een willekeurige website",
+
     tabProjects: "Projecten",
     tabMedia: "Media",
     tabPlayground: "Playground",
+
     searchLabel: "Zoeken",
+
     filterTypeLabel: "Type",
     typeAll: "Alles",
     typeWebsite: "Websites",
@@ -162,22 +168,25 @@ const I18N = {
     typeSchool: "School / Studie",
     typeGame: "Game",
     typeOther: "Overig",
+
     filterLanguageLabel: "Taal",
     languageFilterAll: "Alle talen",
+
     mediaTypeLabel: "Media type",
     mediaKindAll: "Alles",
     mediaKindImages: "Afbeeldingen",
     mediaKindVideos: "Video’s",
     mediaKindAudio: "Audio",
+
     emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
+
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
 
-    // ✅ renamed buttons
+    // UPDATED buttons
     btnGitHub: "Bekijk code",
     btnLiveSite: "Bekijk live website",
-
     btnDownload: "Download",
 
     paintClearButton: "Wissen",
@@ -194,6 +203,7 @@ const I18N = {
     mediaLoop: "🔁 Loop",
     mediaLoopTitle: "Loop aan/uit"
   },
+
   en: {
     gateTitle: "Choose your language",
     gateHint: "You can change it later with the language button at the top.",
@@ -202,23 +212,27 @@ const I18N = {
     gateDeSub: "For my neighbors",
     gateEsSub: "For friends from Spain & the Canary Islands",
 
-    // ✅ new subtitle
+    // UPDATED subtitle
     subtitle: "On this website you can find a selection of my projects in one place.",
 
     aboutTitle: "About me",
     aboutP1:
       "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
     aboutP2: "",
+
     playgroundPaintTitle: "MS Paint Playground",
     playgroundPaintText: "MS Paint remake, have fun drawing!",
     playgroundRandomTitle: "Random Website Button",
     playgroundRandomText:
       "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
     randomButtonLabel: "Take me to a random website",
+
     tabProjects: "Projects",
     tabMedia: "Media",
     tabPlayground: "Playground",
+
     searchLabel: "Search",
+
     filterTypeLabel: "Type",
     typeAll: "All",
     typeWebsite: "Websites",
@@ -227,22 +241,25 @@ const I18N = {
     typeSchool: "School / Study",
     typeGame: "Game",
     typeOther: "Other",
+
     filterLanguageLabel: "Language",
     languageFilterAll: "All languages",
+
     mediaTypeLabel: "Media type",
     mediaKindAll: "All",
     mediaKindImages: "Images",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
+
     emptyState: "No projects found with these filters. Try something else.",
     mediaEmptyState: "No media found with these filters.",
+
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
 
-    // ✅ renamed buttons
+    // UPDATED buttons
     btnGitHub: "View code",
-    btnLiveSite: "View live website",
-
+    btnLiveSite: "Open live website",
     btnDownload: "Download",
 
     paintClearButton: "Clear",
@@ -259,6 +276,7 @@ const I18N = {
     mediaLoop: "🔁 Loop",
     mediaLoopTitle: "Toggle loop"
   },
+
   de: {
     gateTitle: "Wähle deine Sprache",
     gateHint: "Du kannst sie später oben über die Sprach-Schaltfläche ändern.",
@@ -267,23 +285,27 @@ const I18N = {
     gateDeSub: "Für meine Nachbarn",
     gateEsSub: "Für Freunde aus Spanien & den Kanaren",
 
-    // ✅ new subtitle
+    // UPDATED subtitle
     subtitle: "Auf dieser Website findest du eine Auswahl meiner Projekte an einem Ort.",
 
     aboutTitle: "Über mich",
     aboutP1:
       "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
     aboutP2: "",
+
     playgroundPaintTitle: "MS-Paint-Playground",
     playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
     playgroundRandomTitle: "Zufällige-Website-Button",
     playgroundRandomText:
       "Neugierig oder gelangweilt? Klick auf den Button und es öffnet sich eine zufällige, verrückte Website in einem neuen Tab.",
     randomButtonLabel: "Bring mich zu einer zufälligen Website",
+
     tabProjects: "Projekte",
     tabMedia: "Medien",
     tabPlayground: "Playground",
+
     searchLabel: "Suchen",
+
     filterTypeLabel: "Typ",
     typeAll: "Alle",
     typeWebsite: "Websites",
@@ -292,22 +314,25 @@ const I18N = {
     typeSchool: "Schule / Studium",
     typeGame: "Game",
     typeOther: "Sonstiges",
+
     filterLanguageLabel: "Sprache",
     languageFilterAll: "Alle Sprachen",
+
     mediaTypeLabel: "Medientyp",
     mediaKindAll: "Alle",
     mediaKindImages: "Bilder",
     mediaKindVideos: "Videos",
     mediaKindAudio: "Audio",
+
     emptyState: "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
     mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
+
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
 
-    // ✅ renamed buttons
+    // UPDATED buttons
     btnGitHub: "Code ansehen",
-    btnLiveSite: "Live-Website ansehen",
-
+    btnLiveSite: "Live-Website öffnen",
     btnDownload: "Download",
 
     paintClearButton: "Leeren",
@@ -324,6 +349,7 @@ const I18N = {
     mediaLoop: "🔁 Loop",
     mediaLoopTitle: "Loop umschalten"
   },
+
   es: {
     gateTitle: "Elige tu idioma",
     gateHint: "Puedes cambiarlo después con el botón de idioma arriba.",
@@ -332,23 +358,27 @@ const I18N = {
     gateDeSub: "Para mis vecinos",
     gateEsSub: "Para amigos de España y Canarias",
 
-    // ✅ new subtitle
+    // UPDATED subtitle
     subtitle: "En esta web encontrarás una selección de mis proyectos en un solo lugar.",
 
     aboutTitle: "Sobre mí",
     aboutP1:
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
     aboutP2: "",
+
     playgroundPaintTitle: "Playground de MS Paint",
     playgroundPaintText: "Remake de MS Paint, ¡diviértete dibujando!",
     playgroundRandomTitle: "Botón de web aleatoria",
     playgroundRandomText:
       "¿Curioso o aburrido? Pulsa el botón y se abrirá una web rara al azar en una nueva pestaña.",
     randomButtonLabel: "Llévame a una web aleatoria",
+
     tabProjects: "Proyectos",
     tabMedia: "Media",
     tabPlayground: "Playground",
+
     searchLabel: "Buscar",
+
     filterTypeLabel: "Tipo",
     typeAll: "Todo",
     typeWebsite: "Webs",
@@ -357,22 +387,25 @@ const I18N = {
     typeSchool: "Escuela / Estudio",
     typeGame: "Juego",
     typeOther: "Otros",
+
     filterLanguageLabel: "Idioma",
     languageFilterAll: "Todos los idiomas",
+
     mediaTypeLabel: "Tipo de media",
     mediaKindAll: "Todo",
     mediaKindImages: "Imágenes",
     mediaKindVideos: "Vídeos",
     mediaKindAudio: "Audio",
+
     emptyState: "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
     mediaEmptyState: "No se encontró media con estos filtros.",
+
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
 
-    // ✅ renamed buttons
+    // UPDATED buttons
     btnGitHub: "Ver código",
-    btnLiveSite: "Ver web en vivo",
-
+    btnLiveSite: "Abrir sitio en vivo",
     btnDownload: "Descargar",
 
     paintClearButton: "Borrar",
@@ -708,17 +741,17 @@ async function loadProjects() {
   projects = repos.map((repo) => {
     const o = overridesByName[(repo.name || "").toLowerCase()] || {};
     const displayName = formatRepoName(o.displayName || repo.name || "");
-
-    // ✅ shorten very long descriptions + ellipsis
-    const rawDesc = o.description || repo.description || "No description yet.";
-    const description = shortenDescription(rawDesc);
+    const description = o.description || repo.description || "No description yet.";
 
     const overrideLangs = Array.isArray(o.languages) ? o.languages : o.langs;
-    const languages = getLanguagesList(repo.language, overrideLangs);
+    const languages = getLanguagesList(repo, overrideLangs);
 
     const type = guessProjectType(repo, o, languages);
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
-    const liveUrl = computeLiveUrl(repo, o, languages, type);
+
+    // Live URL is now resolved later (must have GitHub Pages AND index.html in repo root)
+    const liveUrl = resolveManualLiveUrl(repo, o);
+
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -729,16 +762,22 @@ async function loadProjects() {
       languages,
       type,
       tags,
-      liveUrl,
+      liveUrl,       // can be manual override now; github-pages live added later
       githubUrl: repo.html_url,
       thumbnail
     };
   });
 
+  // sort (manual live first, then later we re-sort after live checks)
   sortProjectsByLive();
   buildLanguageFilterOptions(projects);
   renderProjects();
   loadProjectThumbnails();
+
+  // ✅ after initial paint: resolve “real” GitHub Pages live URLs based on index.html
+  await resolveGitHubPagesLiveUrls();
+  sortProjectsByLive();
+  renderProjects();
 }
 
 async function loadProjectOverrides() {
@@ -804,18 +843,43 @@ function formatRepoName(raw) {
       const lw = w.toLowerCase();
       if (lw === "ios") return "iOS";
       if (lw === "api") return "API";
-      if (lw === "asp.net") return "ASP.NET";
+      if (lw === "asp.net" || lw === "aspnet") return "ASP.NET";
       if (SMALL_WORDS.includes(lw) && index !== 0) return lw;
       return w.charAt(0).toUpperCase() + w.slice(1);
     })
     .join(" ");
 }
 
-function getLanguagesList(primary, overrideList) {
+/**
+ * Improved language list:
+ * - Keeps your existing mapping (HTML -> HTML/CSS/JS, C# -> C#/.NET)
+ * - Adds framework hints from repo name/description (ASP.NET, WPF, WinForms, Java Swing, JavaFX, etc.)
+ */
+function getLanguagesList(repo, overrideList) {
+  const primary = repo?.language;
+  const name = String(repo?.name || "").toLowerCase();
+  const desc = String(repo?.description || "").toLowerCase();
+  const joined = `${name} ${desc}`;
+
+  const addIf = (arr, value, condition) => {
+    if (!condition) return;
+    if (!arr.some((x) => String(x).toLowerCase() === String(value).toLowerCase())) arr.push(value);
+  };
+
   if (Array.isArray(overrideList) && overrideList.length) {
-    return overrideList
+    const cleaned = overrideList
       .map((l) => String(l))
       .filter((l) => !BLOCKED_LANGUAGES.includes(l.toLowerCase()));
+
+    // Also enrich override list with framework hints (harmless)
+    addIf(cleaned, "ASP.NET", /asp\.net|aspnet/.test(joined));
+    addIf(cleaned, "WPF", /\bwpf\b/.test(joined));
+    addIf(cleaned, "WinForms", /winforms|windows forms/.test(joined));
+    addIf(cleaned, "Blazor", /\bblazor\b/.test(joined));
+    addIf(cleaned, "Java Swing", /\bswing\b/.test(joined));
+    addIf(cleaned, "JavaFX", /\bjavafx\b/.test(joined));
+
+    return cleaned.filter((l) => !BLOCKED_LANGUAGES.includes(String(l).toLowerCase()));
   }
 
   const list = [];
@@ -827,11 +891,31 @@ function getLanguagesList(primary, overrideList) {
   if (p === "html") list.push("HTML", "CSS", "JS");
   else if (p === "javascript") list.push("JS", "HTML", "CSS");
   else if (p === "typescript") list.push("TypeScript", "JS", "HTML", "CSS");
-  else if (p === "c#") list.push("C#", ".NET");
-  else if (p === "c++") list.push("C++", "C");
-  else if (p === "php") list.push("PHP", "HTML", "CSS", "JS");
   else if (p === "css") list.push("CSS", "HTML", "JS");
+  else if (p === "php") list.push("PHP", "HTML", "CSS", "JS");
+  else if (p === "c#") list.push("C#", ".NET");
+  else if (p === "java") list.push("Java");
+  else if (p === "c++") list.push("C++", "C");
   else list.push(primary);
+
+  // Framework enrichment (this is what you complained about)
+  if (p === "c#" || list.some((x) => String(x).toLowerCase() === "c#")) {
+    addIf(list, "ASP.NET", /asp\.net|aspnet/.test(joined));
+    addIf(list, "WPF", /\bwpf\b/.test(joined));
+    addIf(list, "WinForms", /winforms|windows forms/.test(joined));
+    addIf(list, "Blazor", /\bblazor\b/.test(joined));
+    addIf(list, "Entity Framework", /\bef\b|entity framework/.test(joined));
+  }
+
+  if (p === "java" || list.some((x) => String(x).toLowerCase() === "java")) {
+    addIf(list, "Java Swing", /\bswing\b/.test(joined));
+    addIf(list, "JavaFX", /\bjavafx\b/.test(joined));
+    addIf(list, "Spring", /\bspring\b/.test(joined));
+  }
+
+  if (p === "c++" || list.some((x) => String(x).toLowerCase() === "c++")) {
+    addIf(list, "Qt", /\bqt\b/.test(joined));
+  }
 
   return list.filter((l) => !BLOCKED_LANGUAGES.includes(String(l).toLowerCase()));
 }
@@ -876,7 +960,12 @@ function guessProjectType(repo, override, languages) {
   const isApi = has(["api", "backend", "server", "service", "rest", "endpoint"]);
   const isMobile = has(["android", "ios", "xamarin", "apk", "swiftui", "flutter", "react native", "react-native"]);
   const isSchool = has(["school", "study", "studie", "uni", "hogeschool", "opdracht", "assignment", "stage", "internship"]);
-  const isWebsite = lang === "html" || lang === "php" || has(["website", "webpage", "portfolio", "landing", "site", "page"]);
+
+  // ✅ Fix: websites should include JS/TS/CSS too (so they don't disappear under "Websites" filter)
+  const isWebsite =
+    ["html", "javascript", "typescript", "css"].includes(lang) ||
+    (Array.isArray(languages) && languages.some((l) => ["html", "css", "js", "typescript"].includes(String(l).toLowerCase()))) ||
+    has(["website", "webpage", "portfolio", "landing", "site", "page", "github pages", "gh-pages"]);
 
   if (isGame) return "game";
   if (isMobile) return "mobile";
@@ -886,94 +975,85 @@ function guessProjectType(repo, override, languages) {
   return "other";
 }
 
-/* ---------- Project helpers: description shortening, liveUrl, thumbnail ---------- */
+/* ---------- Live URL logic ---------- */
 
-function shortenDescription(text) {
-  const s = String(text || "").trim();
-  if (!s) return "";
-
-  // Keep it neat, end with ellipsis if it's long.
-  // (CSS already clamps lines; this prevents super-long paragraphs.)
-  const MAX = 220;
-  if (s.length <= MAX) return s;
-
-  // cut on a word boundary
-  const cut = s.slice(0, MAX);
-  const lastSpace = cut.lastIndexOf(" ");
-  const safe = lastSpace > 140 ? cut.slice(0, lastSpace) : cut;
-  return safe.replace(/[.,;:\s]+$/, "") + "…";
+/**
+ * Manual overrides still allowed:
+ * - override.liveUrl explicitly: always return it
+ * - override.hasLive is NOT trusted anymore for auto-detect (index.html rule wins)
+ */
+function resolveManualLiveUrl(repo, override) {
+  const rawOverride = (override?.liveUrl || "").trim();
+  if (rawOverride) return rawOverride;
+  return null; // auto live resolved later by GitHub Pages + index.html check
 }
 
-function isPureStaticWebsite(languages, repo, override, type) {
-  // Only show live site button for pure HTML/CSS/LESS/JS (and variants),
-  // NOT for PHP/Laravel etc.
-  const langs = (languages || []).map((l) => String(l).toLowerCase());
+/**
+ * Show “Open live website” only if:
+ * - repo.has_pages is true (GitHub Pages enabled)
+ * - AND index.html exists in repository root
+ */
+async function resolveGitHubPagesLiveUrls() {
+  const now = Date.now();
+  const TTL = 1000 * 60 * 60 * 24 * 7; // 7 days cache
 
-  // explicit block
-  if (langs.includes("php") || langs.includes("laravel")) return false;
+  const tasks = projects.map(async (p) => {
+    // keep manual overrides
+    if (p.liveUrl) return;
 
-  // Sometimes repo language may be PHP but languages list was overridden
-  const primary = String(repo?.language || "").toLowerCase();
-  if (primary === "php") return false;
+    // find repo object
+    const repo = repos.find((r) => String(r.name).toLowerCase() === String(p.name).toLowerCase());
+    if (!repo || !repo.has_pages) return;
 
-  // If it looks like Laravel in name/desc/tags -> block
-  const joined =
-    `${repo?.name || ""} ${repo?.description || ""} ${(override?.tags || []).join(" ")}`
-      .toLowerCase();
-  if (joined.includes("laravel")) return false;
+    // cache hit?
+    const cached = liveIndexCache[p.name];
+    if (cached && typeof cached.hasIndex === "boolean" && (now - (cached.ts || 0)) < TTL) {
+      if (cached.hasIndex) p.liveUrl = `https://${GITHUB_USER}.github.io/${p.name}/`;
+      return;
+    }
 
-  // Must be website-ish for showing live pages
-  if (type && type !== "website") {
-    // allow override later via hasLive/liveUrl, but default logic: keep it website-only
+    // check root index.html via contents API
+    const hasIndex = await repoHasRootIndexHtml(p.name);
+    liveIndexCache[p.name] = { hasIndex, ts: now };
+    saveLiveIndexCache();
+
+    if (hasIndex) {
+      p.liveUrl = `https://${GITHUB_USER}.github.io/${p.name}/`;
+    }
+  });
+
+  await Promise.all(tasks);
+}
+
+async function repoHasRootIndexHtml(repoName) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!Array.isArray(data)) return false;
+
+    return data.some((item) => item && item.type === "file" && String(item.name || "").toLowerCase() === "index.html");
+  } catch (err) {
+    console.error("Failed to check index.html for", repoName, err);
     return false;
   }
-
-  // allowed set (your request: HTML, CSS, LESS, JS)
-  const allowed = new Set(["html", "css", "less", "js", "javascript", "typescript"]);
-  if (!langs.length) return false;
-
-  // if it contains any "not-allowed" tech -> block
-  const blocked = new Set([
-    "php",
-    "laravel",
-    "c#",
-    ".net",
-    "java",
-    "python",
-    "go",
-    "rust",
-    "kotlin",
-    "swift",
-    "dockerfile"
-  ]);
-
-  if (langs.some((l) => blocked.has(l))) return false;
-
-  // At least one allowed, and all must be in allowed/blocklist checked above
-  return langs.some((l) => allowed.has(l));
 }
 
-function computeLiveUrl(repo, override, languages, type) {
-  const rawOverride = (override.liveUrl || "").trim();
-  if (rawOverride) return rawOverride;
-
-  // If you explicitly set hasLive in projects.json, keep it (your manual overrides win)
-  const hasLiveOverride = override.hasLive !== undefined ? !!override.hasLive : null;
-  if (hasLiveOverride === true) return `https://${GITHUB_USER}.github.io/${repo.name}/`;
-  if (hasLiveOverride === false) return null;
-
-  // default: only show live button for pure static sites AND if GitHub Pages is enabled
-  const hasPages = !!repo.has_pages;
-  if (!hasPages) return null;
-
-  if (!isPureStaticWebsite(languages, repo, override, type)) return null;
-
-  return `https://${GITHUB_USER}.github.io/${repo.name}/`;
+function loadLiveIndexCache() {
+  try {
+    const raw = localStorage.getItem(LIVE_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    return {};
+  }
 }
 
-function computeThumbnail(repo, override) {
-  if (override.thumbnail || override.thumb) return override.thumbnail || override.thumb;
-  return null;
+function saveLiveIndexCache() {
+  try {
+    localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify(liveIndexCache));
+  } catch (_) {}
 }
 
 function sortProjectsByLive() {
@@ -985,6 +1065,11 @@ function sortProjectsByLive() {
 }
 
 /* ---------- Thumbnail helpers (root images) ---------- */
+
+function computeThumbnail(repo, override) {
+  if (override.thumbnail || override.thumb) return override.thumbnail || override.thumb;
+  return null;
+}
 
 function loadThumbCache() {
   try {
@@ -1206,7 +1291,6 @@ function renderProjects() {
 
       // 🔥 runtime fallback: if image fails, try bust once (helps logo.gif)
       img.addEventListener("error", () => {
-        // prevent loop
         if (img.dataset.busted === "1") return;
         img.dataset.busted = "1";
         img.src = withBust(project.thumbnail);
@@ -1260,13 +1344,14 @@ function renderProjects() {
     githubBtn.innerHTML = `<span>${dict.btnGitHub || "View code"}</span>`;
     actions.appendChild(githubBtn);
 
+    // ✅ Live button only if liveUrl is set (manual override OR pages+index.html check)
     if (project.liveUrl) {
       const liveBtn = document.createElement("a");
       liveBtn.href = project.liveUrl;
       liveBtn.target = "_blank";
       liveBtn.rel = "noopener noreferrer";
       liveBtn.className = "btn-card btn-card-live";
-      liveBtn.innerHTML = `<span>${dict.btnLiveSite || "View live website"}</span>`;
+      liveBtn.innerHTML = `<span>${dict.btnLiveSite || "Open live website"}</span>`;
       actions.appendChild(liveBtn);
     }
 
@@ -1600,8 +1685,6 @@ function openImageModal(src, captionText) {
   actions.appendChild(closeBtn);
 
   inner.appendChild(actions);
-
-  // ✅ hint removed (no "click outside / Esc" text)
 
   modal.appendChild(inner);
   modal.hidden = false;
