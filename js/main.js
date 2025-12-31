@@ -1634,7 +1634,6 @@ function setupImageModal() {
     if (event.key === "Escape") closeImageModal();
   });
 }
-
 function openImageModal(src, captionText) {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
@@ -1656,39 +1655,24 @@ function openImageModal(src, captionText) {
   img.addEventListener("click", closeImageModal);
 
   figure.appendChild(img);
-
-  if (captionText) {
-    const caption = document.createElement("figcaption");
-    caption.className = "image-modal-caption";
-    caption.textContent = captionText;
-    figure.appendChild(caption);
-  }
-
   inner.appendChild(figure);
 
   const actions = document.createElement("div");
   actions.className = "image-modal-actions";
 
-  const openTabBtn = document.createElement("a");
-  openTabBtn.href = src;
-  openTabBtn.target = "_blank";
-  openTabBtn.rel = "noopener noreferrer";
-  openTabBtn.className = "image-modal-btn";
-  openTabBtn.textContent = dict.modalOpenNewTab || "Open in new tab";
-  actions.appendChild(openTabBtn);
-
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.className = "image-modal-btn image-modal-close";
-  closeBtn.textContent = dict.modalClose || "Close";
+  closeBtn.textContent = dict.modalClose || "Sluiten";
   closeBtn.addEventListener("click", closeImageModal);
-  actions.appendChild(closeBtn);
 
+  actions.appendChild(closeBtn);
   inner.appendChild(actions);
 
   modal.appendChild(inner);
   modal.hidden = false;
 }
+
 
 function closeImageModal() {
   const modal = document.getElementById("imageModal");
