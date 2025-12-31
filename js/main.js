@@ -746,6 +746,9 @@ async function loadProjects() {
     if (repo.archived || repo.fork) return false;
     const name = (repo.name || "").toLowerCase();
     if (name === "projects") return false;
+    if (name.includes("Distance")) return false;
+    if (name.includes("Study")) return false;
+    if (name.includes("Monsterzoo")) return false;
     if (name.includes("munchkin")) return false;
     if (name.includes("pso") && name.includes("wiiu")) return false;
     return true;
