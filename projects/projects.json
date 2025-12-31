@@ -1,5 +1,17 @@
 [
   {
+    "name": "Address-Distance-Calculator",
+    "description": "Address Distance Calculator Web API for creating, reading, updating and deleting addresses, and calculating the distance in kilometers between Dutch addresses using the Bing Maps REST API and GeoCoordinatePortable.",
+    "language": "C#",
+    "languages": [
+      "C#"
+    ],
+    "hasPages": false,
+    "pagesUrl": "",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "AvanSync",
     "description": "AvanSync is a client–server application that demonstrates core C++ concepts: networking, concurrency, modular design and unit testing.",
     "language": "C++",
@@ -201,6 +213,19 @@
     "thumbnailUrl": ""
   },
   {
+    "name": "Monsterzoo",
+    "description": "Monsterzoo is a small browser-based JavaScript game built as a final assignment. You manage a zoo full of monsters: create them, customize them, place them on different fields, and move or delete them while dealing with changing weather conditions.",
+    "language": "JavaScript",
+    "languages": [
+      "JS",
+      "HTML"
+    ],
+    "hasPages": false,
+    "pagesUrl": "",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "Munchkin",
     "description": "We have made this website as an assignment from Avans Hogeschool in 's-Hertogenbosch. copyright 2017 © Ferran Hendiks & Xia de Visser",
     "language": "SCSS",
@@ -276,6 +301,20 @@
     "language": "C++",
     "languages": [
       "C++"
+    ],
+    "hasPages": false,
+    "pagesUrl": "",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
+    "name": "Study-Mate",
+    "description": "Study-Mate is a Laravel 7 web application that lets you manage everything around a school or course program in one place: courses, teachers, exams and grades (CRUD). It was built as a final assignment (Eindopdracht) to practice full-stack Laravel development.",
+    "language": "PHP",
+    "languages": [
+      "PHP",
+      "Blade",
+      "Vue"
     ],
     "hasPages": false,
     "pagesUrl": "",
