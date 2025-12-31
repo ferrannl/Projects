@@ -100,8 +100,11 @@ function onYouTubeIframeAPIReady() {
   const el = document.getElementById(containerId);
   if (!el || !window.YT || !YT.Player) return;
 
+  // ✅ new background video
+  const NEW_BG_VIDEO_ID = "oHg5SJYRHA0";
+
   bgPlayer = new YT.Player(containerId, {
-    videoId: "YeUE1G07yH8",
+    videoId: NEW_BG_VIDEO_ID,
     playerVars: {
       autoplay: 0,
       controls: 0,
@@ -109,14 +112,14 @@ function onYouTubeIframeAPIReady() {
       rel: 0,
       modestbranding: 1,
       loop: 1,
-      playlist: "oHg5SJYRHA0",
+      playlist: NEW_BG_VIDEO_ID,
       playsinline: 1
     },
     events: {
       onReady: (event) => {
         bgPlayerReady = true;
         try {
-          event.target.setVolume(30);
+          event.target.setVolume(20);
         } catch (_) {}
       }
     }
@@ -133,7 +136,10 @@ const I18N = {
     gateEnSub: "Internationaal",
     gateDeSub: "Voor mijn buren",
     gateEsSub: "Voor vrienden uit Spanje en de Canarische Eilanden",
+
+    // ✅ new subtitle
     subtitle: "Op deze website vind je een selectie van mijn projecten op één plek.",
+
     aboutTitle: "Over mij",
     aboutP1:
       "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
@@ -167,8 +173,11 @@ const I18N = {
     mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
     headerLangButton: "Taal",
     footerBuilt: "Gemaakt met ♥ door Ferran",
+
+    // ✅ renamed buttons
     btnGitHub: "Bekijk code",
     btnLiveSite: "Bekijk live website",
+
     btnDownload: "Download",
 
     paintClearButton: "Wissen",
@@ -192,7 +201,10 @@ const I18N = {
     gateEnSub: "International",
     gateDeSub: "For my neighbors",
     gateEsSub: "For friends from Spain & the Canary Islands",
+
+    // ✅ new subtitle
     subtitle: "On this website you can find a selection of my projects in one place.",
+
     aboutTitle: "About me",
     aboutP1:
       "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
@@ -226,8 +238,11 @@ const I18N = {
     mediaEmptyState: "No media found with these filters.",
     headerLangButton: "Language",
     footerBuilt: "Built with ♥ by Ferran",
+
+    // ✅ renamed buttons
     btnGitHub: "View code",
     btnLiveSite: "View live website",
+
     btnDownload: "Download",
 
     paintClearButton: "Clear",
@@ -251,7 +266,10 @@ const I18N = {
     gateEnSub: "International",
     gateDeSub: "Für meine Nachbarn",
     gateEsSub: "Für Freunde aus Spanien & den Kanaren",
+
+    // ✅ new subtitle
     subtitle: "Auf dieser Website findest du eine Auswahl meiner Projekte an einem Ort.",
+
     aboutTitle: "Über mich",
     aboutP1:
       "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
@@ -285,8 +303,11 @@ const I18N = {
     mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
     headerLangButton: "Sprache",
     footerBuilt: "Erstellt mit ♥ von Ferran",
+
+    // ✅ renamed buttons
     btnGitHub: "Code ansehen",
     btnLiveSite: "Live-Website ansehen",
+
     btnDownload: "Download",
 
     paintClearButton: "Leeren",
@@ -310,7 +331,10 @@ const I18N = {
     gateEnSub: "Internacional",
     gateDeSub: "Para mis vecinos",
     gateEsSub: "Para amigos de España y Canarias",
+
+    // ✅ new subtitle
     subtitle: "En esta web encontrarás una selección de mis proyectos en un solo lugar.",
+
     aboutTitle: "Sobre mí",
     aboutP1:
       "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
@@ -344,8 +368,11 @@ const I18N = {
     mediaEmptyState: "No se encontró media con estos filtros.",
     headerLangButton: "Idioma",
     footerBuilt: "Hecho con ♥ por Ferran",
+
+    // ✅ renamed buttons
     btnGitHub: "Ver código",
-    btnLiveSite: "Ver sitio en vivo",
+    btnLiveSite: "Ver web en vivo",
+
     btnDownload: "Descargar",
 
     paintClearButton: "Borrar",
@@ -681,14 +708,17 @@ async function loadProjects() {
   projects = repos.map((repo) => {
     const o = overridesByName[(repo.name || "").toLowerCase()] || {};
     const displayName = formatRepoName(o.displayName || repo.name || "");
-    const description = o.description || repo.description || "No description yet.";
+
+    // ✅ shorten very long descriptions + ellipsis
+    const rawDesc = o.description || repo.description || "No description yet.";
+    const description = shortenDescription(rawDesc);
 
     const overrideLangs = Array.isArray(o.languages) ? o.languages : o.langs;
     const languages = getLanguagesList(repo.language, overrideLangs);
 
     const type = guessProjectType(repo, o, languages);
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
-    const liveUrl = computeLiveUrl(repo, o, languages);
+    const liveUrl = computeLiveUrl(repo, o, languages, type);
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -856,45 +886,87 @@ function guessProjectType(repo, override, languages) {
   return "other";
 }
 
-/* ---------- Project helpers: liveUrl, thumbnail ---------- */
+/* ---------- Project helpers: description shortening, liveUrl, thumbnail ---------- */
 
-const LIVE_ALLOWED_LANGS = new Set(["html", "css", "less", "js"]);
+function shortenDescription(text) {
+  const s = String(text || "").trim();
+  if (!s) return "";
 
-function isEligibleLiveSite(repo, override, languages) {
-  // If user explicitly set liveUrl, allow it (manual override)
-  const explicit = String(override?.liveUrl || "").trim();
-  if (explicit) return true;
+  // Keep it neat, end with ellipsis if it's long.
+  // (CSS already clamps lines; this prevents super-long paragraphs.)
+  const MAX = 220;
+  if (s.length <= MAX) return s;
 
-  const name = (repo?.name || "").toLowerCase();
-  const desc = (repo?.description || "").toLowerCase();
-  const joined = `${name} ${desc}`;
-
-  // Block obvious backend stacks
-  if (joined.includes("laravel")) return false;
-
-  const langs = Array.isArray(languages) ? languages : [];
-  const lowerLangs = langs.map((l) => String(l).toLowerCase());
-
-  // Block PHP (and therefore Laravel-ish stuff)
-  if (lowerLangs.includes("php")) return false;
-
-  // Only allow pure frontend languages
-  if (!lowerLangs.length) return false;
-  return lowerLangs.every((l) => LIVE_ALLOWED_LANGS.has(l));
+  // cut on a word boundary
+  const cut = s.slice(0, MAX);
+  const lastSpace = cut.lastIndexOf(" ");
+  const safe = lastSpace > 140 ? cut.slice(0, lastSpace) : cut;
+  return safe.replace(/[.,;:\s]+$/, "") + "…";
 }
 
-function computeLiveUrl(repo, override, languages) {
+function isPureStaticWebsite(languages, repo, override, type) {
+  // Only show live site button for pure HTML/CSS/LESS/JS (and variants),
+  // NOT for PHP/Laravel etc.
+  const langs = (languages || []).map((l) => String(l).toLowerCase());
+
+  // explicit block
+  if (langs.includes("php") || langs.includes("laravel")) return false;
+
+  // Sometimes repo language may be PHP but languages list was overridden
+  const primary = String(repo?.language || "").toLowerCase();
+  if (primary === "php") return false;
+
+  // If it looks like Laravel in name/desc/tags -> block
+  const joined =
+    `${repo?.name || ""} ${repo?.description || ""} ${(override?.tags || []).join(" ")}`
+      .toLowerCase();
+  if (joined.includes("laravel")) return false;
+
+  // Must be website-ish for showing live pages
+  if (type && type !== "website") {
+    // allow override later via hasLive/liveUrl, but default logic: keep it website-only
+    return false;
+  }
+
+  // allowed set (your request: HTML, CSS, LESS, JS)
+  const allowed = new Set(["html", "css", "less", "js", "javascript", "typescript"]);
+  if (!langs.length) return false;
+
+  // if it contains any "not-allowed" tech -> block
+  const blocked = new Set([
+    "php",
+    "laravel",
+    "c#",
+    ".net",
+    "java",
+    "python",
+    "go",
+    "rust",
+    "kotlin",
+    "swift",
+    "dockerfile"
+  ]);
+
+  if (langs.some((l) => blocked.has(l))) return false;
+
+  // At least one allowed, and all must be in allowed/blocklist checked above
+  return langs.some((l) => allowed.has(l));
+}
+
+function computeLiveUrl(repo, override, languages, type) {
   const rawOverride = (override.liveUrl || "").trim();
   if (rawOverride) return rawOverride;
 
-  // allow explicit "hasLive" false to disable
-  if (override.hasLive !== undefined && !override.hasLive) return null;
+  // If you explicitly set hasLive in projects.json, keep it (your manual overrides win)
+  const hasLiveOverride = override.hasLive !== undefined ? !!override.hasLive : null;
+  if (hasLiveOverride === true) return `https://${GITHUB_USER}.github.io/${repo.name}/`;
+  if (hasLiveOverride === false) return null;
 
+  // default: only show live button for pure static sites AND if GitHub Pages is enabled
   const hasPages = !!repo.has_pages;
   if (!hasPages) return null;
 
-  // Only show for pure frontend websites
-  if (!isEligibleLiveSite(repo, override, languages)) return null;
+  if (!isPureStaticWebsite(languages, repo, override, type)) return null;
 
   return `https://${GITHUB_USER}.github.io/${repo.name}/`;
 }
@@ -1167,14 +1239,6 @@ function renderProjects() {
     const desc = document.createElement("p");
     desc.className = "project-desc";
     desc.textContent = project.description;
-
-    // ✅ detect overflow and only then add fade + dots
-    requestAnimationFrame(() => {
-      try {
-        const overflow = desc.scrollHeight > desc.clientHeight + 1;
-        desc.classList.toggle("is-faded", overflow);
-      } catch (_) {}
-    });
 
     const meta = document.createElement("div");
     meta.className = "project-meta";
@@ -1536,6 +1600,8 @@ function openImageModal(src, captionText) {
   actions.appendChild(closeBtn);
 
   inner.appendChild(actions);
+
+  // ✅ hint removed (no "click outside / Esc" text)
 
   modal.appendChild(inner);
   modal.hidden = false;
