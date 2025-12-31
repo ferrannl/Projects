@@ -353,8 +353,6 @@ If you open a PR, keep the code:
 
 * **Email:** [ferranhendriks@outlook.com](mailto:ferranhendriks@outlook.com)
 * **Portfolio:** [ferrannl.github.io/Projects](https://ferrannl.github.io/Projects/)
-* **X / Twitter:** [PikalexNL](https://x.com/PikalexNL)
-* **Twitch:** [PikalexNL](https://twitch.tv/PikalexNL)
 * **Reddit:** [PikalexNL](https://www.reddit.com/user/PikalexNL)
 * **Discord:** [@kadavernl](https://discord.com/users/276441877497118721)
 * **GitHub:** [@ferrannl](https://github.com/ferrannl)
