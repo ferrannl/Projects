@@ -182,6 +182,21 @@
     "thumbnailUrl": ""
   },
   {
+    "name": "Layton-Puzzles",
+    "description": "Work in progres....                                                                                                                                                                                                                                           A true gentleman leaves no puzzle unsolved!",
+    "language": "Python",
+    "languages": [
+      "Python",
+      "JS",
+      "CSS",
+      "HTML"
+    ],
+    "hasPages": true,
+    "pagesUrl": "https://ferrannl.github.io/Layton-Puzzles/",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "Linear-Algebra",
     "description": "Small space simulation that demonstrates how linear algebra is used in game development. Made using C++ and SDL",
     "language": "C",
