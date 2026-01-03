@@ -1,55 +1,89 @@
 /* css/season-autumn.css */
-/* Autumn: falling leaves + cozy amber / tea vibes */
+/* Autumn: big windy leaves + warm tea palette */
 
 :root {
-  --bg: #090511;
-  --bg-alt: #2b1307;
-  --card-bg: rgba(11, 8, 18, 0.95);
+  /* Palette shift */
+  --bg: #12070a;
+  --bg-alt: #2b1206;
+  --card-bg: rgba(14, 8, 14, 0.955);
+  --border-subtle: rgba(255,255,255,0.085);
 
-  --accent: #b0172f;
-  --accent-soft: rgba(176, 23, 47, 0.20);
-  --accent-alt: #d08a3a;
+  /* Accents */
+  --accent: #b0172f; /* keep brand */
+  --accent-soft: rgba(176, 23, 47, 0.22);
+  --accent-alt: #d78a2f; /* tea/orange */
 
-  --text: #fff7ef;
-  --text-muted: rgba(255, 218, 190, 0.70);
+  --text: #fff6ef;
+  --text-muted: rgba(255, 220, 195, 0.70);
 }
 
-/* Cozy glow */
+/* Cozy amber glow */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.20;
+  opacity: 0.22;
   background:
-    radial-gradient(circle at 20% 30%, rgba(208,138,58,0.22), transparent 60%),
-    radial-gradient(circle at 80% 60%, rgba(176,23,47,0.10), transparent 62%),
-    radial-gradient(circle at 55% 85%, rgba(255,180,90,0.12), transparent 62%);
+    radial-gradient(circle at 22% 28%, rgba(215,138,47,0.25), transparent 60%),
+    radial-gradient(circle at 78% 30%, rgba(255,170,90,0.16), transparent 62%),
+    radial-gradient(circle at 70% 85%, rgba(176,23,47,0.10), transparent 60%),
+    radial-gradient(circle at 30% 86%, rgba(255,120,60,0.12), transparent 60%);
+  filter: blur(0.5px);
 }
 
-/* Falling leaves (two layers) */
+/* Big leaf sprites (SVG backgrounds) moving diagonally + wind */
 body::before {
   content: "";
   position: fixed;
-  inset: -10% 0 0 0;
+  inset: -10% -15% -10% -15%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.50;
-  background:
-    radial-gradient(8px 5px at 12px 10px, rgba(208,138,58,0.55) 45%, transparent 46%) 0 0/180px 180px,
-    radial-gradient(7px 4px at 18px 14px, rgba(255,170,90,0.40) 45%, transparent 46%) 50px 60px/220px 220px,
-    radial-gradient(6px 4px at 10px 18px, rgba(176,23,47,0.30) 45%, transparent 46%) 20px 20px/260px 260px;
-  filter: blur(0.25px);
-  animation: autumnLeaves 14s linear infinite;
+  opacity: 0.78;
+
+  /* Leaf SVG (simple stylized) — reused with different tints */
+  --leaf1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cpath d='M14 46C22 22 49 8 77 12c19 3 31 15 32 30 1 17-10 32-28 40-28 13-56 4-67-12-6-9-7-17-14-24z' fill='%23d78a2f'/%3E%3Cpath d='M24 52c20-10 41-16 74-20' stroke='%236b2a16' stroke-width='3' stroke-linecap='round' opacity='.65'/%3E%3C/svg%3E");
+  --leaf2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cpath d='M16 52C26 22 54 10 82 14c16 3 26 12 28 25 3 18-8 35-28 45-25 12-55 6-67-8-8-9-9-16-16-24z' fill='%23ffb15a'/%3E%3Cpath d='M26 56c18-12 43-20 70-24' stroke='%23813a18' stroke-width='3' stroke-linecap='round' opacity='.6'/%3E%3C/svg%3E");
+  --leaf3: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cpath d='M16 48C28 20 56 10 82 14c17 2 29 11 31 26 2 17-9 34-30 44-27 13-57 3-67-12-7-10-7-16-15-24z' fill='%23b0172f'/%3E%3Cpath d='M26 52c22-12 43-18 72-22' stroke='%23501620' stroke-width='3' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E");
+
+  background-image:
+    var(--leaf1), var(--leaf2), var(--leaf3),
+    var(--leaf2), var(--leaf1), var(--leaf3);
+
+  background-repeat: no-repeat;
+
+  /* Big sizes (expressive) */
+  background-size:
+    92px 70px, 110px 82px, 86px 66px,
+    120px 90px, 96px 72px, 132px 98px;
+
+  /* Spread start positions */
+  background-position:
+    8%  -5%,
+    22% -18%,
+    45% -12%,
+    66% -22%,
+    78% -8%,
+    92% -25%;
+
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.55));
+  animation: autumnWind 9.5s linear infinite;
 }
 
-@keyframes autumnLeaves {
-  0%   { transform: translateY(-10%) translateX(0) rotate(0deg); }
-  50%  { transform: translateY(2%)   translateX(1.2%) rotate(1deg); }
-  100% { transform: translateY(18%)  translateX(-1.6%) rotate(-1deg); }
+/* Strong wind: left -> right + downward + slight wobble */
+@keyframes autumnWind {
+  0% {
+    transform: translateX(-6%) translateY(-6%) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(6%) translateY(6%) rotate(2deg);
+  }
+  100% {
+    transform: translateX(12%) translateY(18%) rotate(-1deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before { animation: none; opacity: 0.26; }
+  body::before { animation: none; opacity: 0.28; }
 }
