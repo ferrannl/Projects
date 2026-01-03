@@ -498,4 +498,3 @@
   // If DOM isn't ready, querySelectorAll just returns empty arrays.
   apply(document);
 })();
-```0
