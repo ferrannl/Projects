@@ -1,143 +1,68 @@
 /* css/season-summer.css */
-/* SUMMER — yellow/green/light-blue overhaul + big sunny bokeh */
+/* Dark base stays. Sunny accents + subtle sparkles. */
 
 :root{
-  --bg:#f7fffe;
-  --bg-alt:#bff6ff;
-  --card-bg:rgba(255,255,255,0.74);
-  --border-subtle:rgba(0,85,110,0.16);
-
-  --accent:#ffd248;         /* sun */
-  --accent-soft:rgba(255,210,72,0.24);
-  --accent-alt:#2eea7a;     /* green pop */
-
-  --text:#052832;
-  --text-muted:rgba(5,40,50,0.70);
-
-  --shadow-soft: 0 22px 60px rgba(0, 75, 95, 0.16);
+  --accent:#ffd54d;              /* sun */
+  --accent-soft:rgba(255,213,77,0.22);
+  --accent-alt:#49e6ff;          /* light blue */
 }
 
-body{
-  background:
-    radial-gradient(circle at 70% 18%, rgba(255,210,72,0.72), transparent 55%),
-    radial-gradient(circle at 20% 28%, rgba(46,234,122,0.45), transparent 60%),
-    radial-gradient(circle at 60% 86%, rgba(80,210,255,0.55), transparent 62%),
-    linear-gradient(145deg, #ffffff 0%, #e6fffb 22%, #bff6ff 52%, #d7ffe6 78%, #fff7c8 100%);
-  color: var(--text);
-}
+::selection { background: rgba(255,213,77,0.24); color:#0b1026; }
+::-moz-selection { background: rgba(255,213,77,0.24); color:#0b1026; }
 
-::selection{ background: rgba(255,210,72,0.34); color:#052832; }
-::-moz-selection{ background: rgba(255,210,72,0.34); color:#052832; }
-
-.site-header{
-  background:
-    radial-gradient(circle at 0 0, rgba(255,245,210,0.85), transparent 60%),
-    linear-gradient(145deg, rgba(255,255,255,0.80), rgba(200,250,255,0.70));
-  border: 1px solid rgba(0,85,110,0.14);
-  box-shadow: 0 26px 70px rgba(0, 75, 95, 0.16);
-}
-
-.project-card,
-.media-card,
-.about-section,
-.playground-card{
-  background:
-    radial-gradient(circle at 0 0, rgba(255,245,210,0.55), transparent 60%),
-    linear-gradient(145deg, rgba(255,255,255,0.72), rgba(210,255,235,0.62));
-  border: 1px solid rgba(0,85,110,0.12);
-  box-shadow: 0 18px 55px rgba(0, 75, 95, 0.12);
-}
-
-.tabs{
-  background: rgba(255,255,255,0.68);
-  border: 1px solid rgba(0,85,110,0.14);
-  box-shadow: 0 14px 40px rgba(0,75,95,0.12);
-}
 .tabs::before{
-  background: linear-gradient(135deg, rgba(255,210,72,0.92), rgba(46,234,122,0.88));
+  background: linear-gradient(135deg, rgba(255,213,77,0.92), rgba(73,230,255,0.78));
 }
 
-.btn-card{
-  background: rgba(255,255,255,0.72);
-  border-color: rgba(0,85,110,0.14);
-  color: var(--text);
+.project-card:hover{
+  background: linear-gradient(145deg, rgba(10, 14, 32, 0.98), rgba(7, 10, 28, 0.98));
+  border-color: rgba(255,213,77,0.22);
 }
-.btn-card:hover{
-  background: rgba(255,255,255,0.88);
-  border-color: rgba(255,210,72,0.38);
+.project-card::before{
+  background:
+    radial-gradient(circle at top right, rgba(255,213,77,0.20), transparent 60%),
+    radial-gradient(circle at bottom left, rgba(73,230,255,0.16), transparent 60%);
 }
 
 .btn-card-live::before{
   background: conic-gradient(
     from 0deg,
-    rgba(255,210,72,0),
-    rgba(255,210,72,0.95),
-    rgba(46,234,122,0.95),
-    rgba(80,210,255,0.85),
-    rgba(255,210,72,0.95),
-    rgba(255,210,72,0)
+    rgba(255,213,77,0),
+    rgba(255,213,77,0.95),
+    rgba(73,230,255,0.80),
+    rgba(46,234,122,0.70),
+    rgba(255,213,77,0.95),
+    rgba(255,213,77,0)
   );
 }
 .btn-card-live::after{
-  background: radial-gradient(circle at 0 0, rgba(255,245,210,0.72), rgba(205,250,255,0.85));
+  background: radial-gradient(circle at 0 0, rgba(255,213,77,0.12), rgba(4, 7, 24, 1));
 }
 
-.social-chip{
-  background: rgba(255,255,255,0.72);
-  border-color: rgba(0,85,110,0.14);
-  color: rgba(5,40,50,0.78);
-}
+.media-volume-slider::-webkit-slider-thumb{ background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.media-volume-slider::-moz-range-thumb{ background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-/* Very visible sun bokeh overlay */
+/* Summer sparkles (tiny soft bokeh dots) */
 body::before{
   content:"";
-  position:fixed;
-  inset:-15% -15%;
-  z-index:0;
-  pointer-events:none;
-  opacity:0.75;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.12;
   background:
-    radial-gradient(circle at 18% 30%, rgba(255,210,72,0.40) 0 160px, transparent 190px),
-    radial-gradient(circle at 72% 22%, rgba(255,170,80,0.28) 0 140px, transparent 175px),
-    radial-gradient(circle at 48% 66%, rgba(80,210,255,0.22) 0 190px, transparent 230px),
-    radial-gradient(circle at 82% 78%, rgba(46,234,122,0.20) 0 170px, transparent 210px),
-    conic-gradient(from 220deg at 72% 18%,
-      rgba(255,210,72,0.00) 0deg,
-      rgba(255,210,72,0.16) 18deg,
-      rgba(255,210,72,0.00) 40deg,
-      rgba(255,210,72,0.14) 62deg,
-      rgba(255,210,72,0.00) 88deg,
-      rgba(255,210,72,0.12) 130deg,
-      rgba(255,210,72,0.00) 180deg,
-      rgba(255,210,72,0.14) 230deg,
-      rgba(255,210,72,0.00) 285deg,
-      rgba(255,210,72,0.12) 340deg,
-      rgba(255,210,72,0.00) 360deg
-    );
-  mix-blend-mode: soft-light;
-  filter: blur(0.9px);
-  animation: summerDrift 6.8s ease-in-out infinite;
+    radial-gradient(circle, rgba(255,213,77,0.80) 0 1.3px, transparent 2.8px) 0 0 / 220px 220px,
+    radial-gradient(circle, rgba(73,230,255,0.70) 0 1.1px, transparent 2.6px) 60px 40px / 320px 320px,
+    radial-gradient(circle, rgba(46,234,122,0.55) 0 1.0px, transparent 2.4px) 20px 80px / 420px 420px;
+  animation: summerSparkle 14s linear infinite;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
 }
 
-@keyframes summerDrift{
-  0%{ transform: translateX(-2%) translateY(-1%) scale(1.00); opacity:0.62; }
-  50%{ transform: translateX(2%) translateY(1%) scale(1.03); opacity:0.78; }
-  100%{ transform: translateX(-2%) translateY(-1%) scale(1.00); opacity:0.62; }
-}
-
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  opacity:0.18;
-  background:
-    radial-gradient(circle at 70% 18%, rgba(255,255,255,0.65), transparent 60%),
-    radial-gradient(circle at 22% 86%, rgba(255,255,255,0.35), transparent 65%);
-  mix-blend-mode: screen;
+@keyframes summerSparkle{
+  from { background-position: 0 -600px, 60px -800px, 20px -1000px; }
+  to   { background-position: -120px 900px, -60px 1100px, -160px 1400px; }
 }
 
 @media (prefers-reduced-motion: reduce){
-  body::before{ animation:none; opacity:0.35; }
+  body::before{ animation: none; opacity: 0.08; }
 }
