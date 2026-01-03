@@ -183,12 +183,12 @@
   },
   {
     "name": "Layton-Puzzles",
-    "description": "Work in progres....                                                                                                                                                                                                                                           A true gentleman leaves no puzzle unsolved!",
-    "language": "Python",
+    "description": "A true gentleman leaves no puzzle unsolved!",
+    "language": "JavaScript",
     "languages": [
-      "Python",
       "JS",
       "CSS",
+      "Python",
       "HTML"
     ],
     "hasPages": true,
