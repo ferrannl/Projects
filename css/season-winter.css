@@ -1,20 +1,23 @@
 /* css/season-winter.css */
-/* Winter: snowfall + frosty glow (lightweight, no JS) */
+/* Winter: clean snowfall + cool icy palette */
 
 :root {
-  --bg: #040612;
-  --bg-alt: #0b1a3d;
-  --card-bg: rgba(6, 9, 24, 0.96);
+  /* Palette shift */
+  --bg: #030616;
+  --bg-alt: #0a1e4a;
+  --card-bg: rgba(6, 10, 28, 0.965);
+  --border-subtle: rgba(255, 255, 255, 0.09);
 
-  --accent: #b0172f;
+  /* Accents */
+  --accent: #b0172f; /* keep your brand red */
   --accent-soft: rgba(176, 23, 47, 0.28);
-  --accent-alt: #6aa6ff;
+  --accent-alt: #86b6ff;
 
-  --text: #f8f8ff;
-  --text-muted: rgba(220, 227, 255, 0.72);
+  --text: #f8fbff;
+  --text-muted: rgba(220, 235, 255, 0.74);
 }
 
-/* Ambient icy glow */
+/* Icy ambient glow */
 body::after {
   content: "";
   position: fixed;
@@ -23,39 +26,34 @@ body::after {
   pointer-events: none;
   opacity: 0.22;
   background:
-    radial-gradient(circle at 18% 24%, rgba(255,255,255,0.22), transparent 40%),
-    radial-gradient(circle at 78% 20%, rgba(255,255,255,0.14), transparent 45%),
-    radial-gradient(circle at 42% 86%, rgba(255,255,255,0.12), transparent 55%),
-    radial-gradient(circle at 85% 78%, rgba(120,190,255,0.10), transparent 55%);
-  filter: blur(0.3px);
+    radial-gradient(circle at 18% 24%, rgba(255,255,255,0.20), transparent 44%),
+    radial-gradient(circle at 78% 18%, rgba(170,220,255,0.14), transparent 55%),
+    radial-gradient(circle at 48% 88%, rgba(255,255,255,0.10), transparent 60%),
+    radial-gradient(circle at 92% 76%, rgba(100,190,255,0.10), transparent 58%);
+  filter: blur(0.4px);
 }
 
-/* Snowfall (two layers for depth) */
+/* Snow (two sizes, gentle drift) */
 body::before {
   content: "";
   position: fixed;
   inset: -20% 0 0 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.62;
   background:
-    radial-gradient(circle, rgba(255,255,255,0.85) 0 1.2px, transparent 1.6px) 0 0/120px 120px,
-    radial-gradient(circle, rgba(255,255,255,0.55) 0 1.0px, transparent 1.4px) 40px 60px/160px 160px,
-    radial-gradient(circle, rgba(255,255,255,0.35) 0 0.9px, transparent 1.3px) 10px 30px/220px 220px;
-  animation: winterSnowFall 16s linear infinite;
-  filter: blur(0.2px);
+    radial-gradient(circle, rgba(255,255,255,0.92) 0 1.6px, transparent 2.2px) 0 0/120px 120px,
+    radial-gradient(circle, rgba(255,255,255,0.62) 0 1.3px, transparent 2.0px) 40px 60px/170px 170px,
+    radial-gradient(circle, rgba(255,255,255,0.38) 0 1.1px, transparent 1.8px) 10px 30px/240px 240px;
+  animation: winterSnow 12.5s linear infinite;
+  filter: blur(0.15px);
 }
 
-@keyframes winterSnowFall {
-  0% {
-    transform: translateY(-12%) translateX(0);
-  }
-  100% {
-    transform: translateY(18%) translateX(-2%);
-  }
+@keyframes winterSnow {
+  0%   { transform: translateY(-14%) translateX(0%); }
+  100% { transform: translateY(20%)  translateX(-2.2%); }
 }
 
-/* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   body::before { animation: none; opacity: 0.28; }
 }
