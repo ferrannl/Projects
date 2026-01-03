@@ -1,5 +1,5 @@
 /* css/season-spring.css */
-/* Spring: fresher, brighter, little more green/sky */
+/* Spring: pollen float + fresh green/sky glow */
 
 :root {
   --bg: #050a14;
@@ -7,22 +7,50 @@
   --card-bg: rgba(7, 12, 26, 0.94);
 
   --accent: #b0172f;
-  --accent-soft: rgba(176, 23, 47, 0.22);
+  --accent-soft: rgba(176, 23, 47, 0.20);
   --accent-alt: #59d38c;
 
   --text: #f8f8ff;
   --text-muted: rgba(224, 245, 234, 0.74);
 }
 
+/* Soft spring ambient */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
+  pointer-events: none;
   opacity: 0.18;
   background:
-    radial-gradient(circle at 15% 25%, rgba(89,211,140,0.16), transparent 55%),
-    radial-gradient(circle at 80% 20%, rgba(99,180,255,0.10), transparent 60%),
-    radial-gradient(circle at 55% 85%, rgba(176,23,47,0.10), transparent 55%);
+    radial-gradient(circle at 15% 25%, rgba(89,211,140,0.18), transparent 58%),
+    radial-gradient(circle at 80% 22%, rgba(99,180,255,0.12), transparent 60%),
+    radial-gradient(circle at 55% 85%, rgba(176,23,47,0.08), transparent 58%);
+}
+
+/* Pollen / dust motes drifting upward */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.50;
+  background:
+    radial-gradient(circle, rgba(255,245,160,0.35) 0 1.3px, transparent 1.8px) 0 0/140px 140px,
+    radial-gradient(circle, rgba(175,255,210,0.26) 0 1.1px, transparent 1.6px) 60px 40px/190px 190px,
+    radial-gradient(circle, rgba(200,220,255,0.18) 0 1.0px, transparent 1.5px) 20px 90px/240px 240px;
+  animation: springPollen 18s ease-in-out infinite;
+  filter: blur(0.15px);
+}
+
+@keyframes springPollen {
+  0%   { transform: translateY(6%)  translateX(0);   opacity: 0.35; }
+  35%  { transform: translateY(0%)  translateX(1%);  opacity: 0.55; }
+  70%  { transform: translateY(-6%) translateX(-1%); opacity: 0.45; }
+  100% { transform: translateY(6%)  translateX(0);   opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; opacity: 0.24; }
 }
