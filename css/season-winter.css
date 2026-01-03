@@ -1,59 +1,131 @@
 /* css/season-winter.css */
-/* Winter: clean snowfall + cool icy palette */
+/* WINTER — icy blue/white overhaul + visible snow */
 
-:root {
-  /* Palette shift */
-  --bg: #030616;
-  --bg-alt: #0a1e4a;
-  --card-bg: rgba(6, 10, 28, 0.965);
-  --border-subtle: rgba(255, 255, 255, 0.09);
+:root{
+  --bg:#eef6ff;
+  --bg-alt:#a9d6ff;
+  --card-bg:rgba(255,255,255,0.78);
+  --border-subtle:rgba(20,60,120,0.18);
 
-  /* Accents */
-  --accent: #b0172f; /* keep your brand red */
-  --accent-soft: rgba(176, 23, 47, 0.28);
-  --accent-alt: #86b6ff;
+  --accent:#2a78ff;
+  --accent-soft:rgba(42,120,255,0.22);
+  --accent-alt:#ffffff;
 
-  --text: #f8fbff;
-  --text-muted: rgba(220, 235, 255, 0.74);
+  --text:#08223f;
+  --text-muted:rgba(8,34,63,0.72);
+
+  --shadow-soft: 0 22px 60px rgba(0, 35, 90, 0.22);
 }
 
-/* Icy ambient glow */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.22;
+/* Strong winter background */
+body{
   background:
-    radial-gradient(circle at 18% 24%, rgba(255,255,255,0.20), transparent 44%),
-    radial-gradient(circle at 78% 18%, rgba(170,220,255,0.14), transparent 55%),
-    radial-gradient(circle at 48% 88%, rgba(255,255,255,0.10), transparent 60%),
-    radial-gradient(circle at 92% 76%, rgba(100,190,255,0.10), transparent 58%);
-  filter: blur(0.4px);
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.92), transparent 55%),
+    radial-gradient(circle at 82% 22%, rgba(180,225,255,0.90), transparent 60%),
+    radial-gradient(circle at 50% 82%, rgba(120,180,255,0.55), transparent 60%),
+    linear-gradient(145deg, #f7fbff 0%, #d9efff 32%, #a9d6ff 68%, #eaf6ff 100%);
+  color: var(--text);
 }
 
-/* Snow (two sizes, gentle drift) */
-body::before {
-  content: "";
-  position: fixed;
-  inset: -20% 0 0 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.62;
+/* selection */
+::selection{ background: rgba(42,120,255,0.30); color:#061a2f; }
+::-moz-selection{ background: rgba(42,120,255,0.30); color:#061a2f; }
+
+/* Make “glass” feel crisp */
+.site-header{
   background:
-    radial-gradient(circle, rgba(255,255,255,0.92) 0 1.6px, transparent 2.2px) 0 0/120px 120px,
-    radial-gradient(circle, rgba(255,255,255,0.62) 0 1.3px, transparent 2.0px) 40px 60px/170px 170px,
-    radial-gradient(circle, rgba(255,255,255,0.38) 0 1.1px, transparent 1.8px) 10px 30px/240px 240px;
-  animation: winterSnow 12.5s linear infinite;
-  filter: blur(0.15px);
+    radial-gradient(circle at 0 0, rgba(255,255,255,0.95), transparent 55%),
+    linear-gradient(145deg, rgba(255,255,255,0.82), rgba(210,236,255,0.72));
+  border: 1px solid rgba(20, 60, 120, 0.16);
+  box-shadow: 0 26px 70px rgba(0, 35, 90, 0.22);
 }
 
-@keyframes winterSnow {
-  0%   { transform: translateY(-14%) translateX(0%); }
-  100% { transform: translateY(20%)  translateX(-2.2%); }
+.project-card,
+.media-card,
+.about-section,
+.playground-card{
+  background:
+    radial-gradient(circle at 0 0, rgba(255,255,255,0.92), transparent 55%),
+    linear-gradient(145deg, rgba(255,255,255,0.78), rgba(230,246,255,0.68));
+  border: 1px solid rgba(20,60,120,0.14);
+  box-shadow: 0 18px 55px rgba(0, 35, 90, 0.16);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  body::before { animation: none; opacity: 0.28; }
+.tabs{
+  background: rgba(255,255,255,0.68);
+  border: 1px solid rgba(20,60,120,0.16);
+  box-shadow: 0 14px 40px rgba(0,35,90,0.18);
+}
+.tabs::before{
+  background: linear-gradient(135deg, rgba(42,120,255,0.92), rgba(120,200,255,0.80));
+}
+
+.btn-card{
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(20,60,120,0.18);
+  color: var(--text);
+}
+.btn-card:hover{
+  background: rgba(255,255,255,0.86);
+  border-color: rgba(42,120,255,0.35);
+}
+
+.btn-card-live::before{
+  background: conic-gradient(
+    from 0deg,
+    rgba(42,120,255,0),
+    rgba(42,120,255,0.95),
+    rgba(120,200,255,0.95),
+    rgba(42,120,255,0.95),
+    rgba(42,120,255,0)
+  );
+}
+.btn-card-live::after{
+  background: radial-gradient(circle at 0 0, rgba(255,255,255,0.65), rgba(230,246,255,0.85));
+}
+
+.social-chip{
+  background: rgba(255,255,255,0.70);
+  border-color: rgba(20,60,120,0.18);
+  color: rgba(8,34,63,0.78);
+}
+
+/* Snow overlay (very visible) */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-20% -10%;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.95;
+  background:
+    radial-gradient(circle, rgba(255,255,255,1) 0 2.2px, transparent 3.2px) 0 0/120px 120px,
+    radial-gradient(circle, rgba(255,255,255,0.95) 0 1.8px, transparent 2.8px) 40px 60px/160px 160px,
+    radial-gradient(circle, rgba(240,250,255,0.85) 0 1.6px, transparent 2.6px) 10px 30px/220px 220px;
+  filter: drop-shadow(0 10px 18px rgba(0,40,90,0.10));
+  animation: winterSnow 8.8s linear infinite;
+}
+
+@keyframes winterSnow{
+  0%{ transform: translateY(-12%) translateX(0%); }
+  100%{ transform: translateY(22%) translateX(-4%); }
+}
+
+/* Extra icy glow */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.35;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255,255,255,0.85), transparent 55%),
+    radial-gradient(circle at 78% 18%, rgba(140,210,255,0.55), transparent 60%),
+    radial-gradient(circle at 60% 88%, rgba(60,140,255,0.25), transparent 65%);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body::before{ animation:none; opacity:0.45; }
 }
