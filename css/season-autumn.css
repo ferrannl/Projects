@@ -1,89 +1,133 @@
 /* css/season-autumn.css */
-/* Autumn: big windy leaves + warm tea palette */
+/* AUTUMN — brown/orange overhaul + big windy leaves */
 
-:root {
-  /* Palette shift */
-  --bg: #12070a;
-  --bg-alt: #2b1206;
-  --card-bg: rgba(14, 8, 14, 0.955);
-  --border-subtle: rgba(255,255,255,0.085);
+:root{
+  --bg:#2a1408;
+  --bg-alt:#ffb15a;
+  --card-bg:rgba(34,18,10,0.72);
+  --border-subtle:rgba(255,215,170,0.18);
 
-  /* Accents */
-  --accent: #b0172f; /* keep brand */
-  --accent-soft: rgba(176, 23, 47, 0.22);
-  --accent-alt: #d78a2f; /* tea/orange */
+  --accent:#ff7a2f;        /* orange pop */
+  --accent-soft:rgba(255,122,47,0.22);
+  --accent-alt:#ffd08a;    /* warm highlight */
 
-  --text: #fff6ef;
-  --text-muted: rgba(255, 220, 195, 0.70);
+  --text:#fff3e6;
+  --text-muted:rgba(255,215,180,0.74);
+
+  --shadow-soft: 0 22px 60px rgba(0, 0, 0, 0.42);
 }
 
-/* Cozy amber glow */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.22;
+body{
   background:
-    radial-gradient(circle at 22% 28%, rgba(215,138,47,0.25), transparent 60%),
-    radial-gradient(circle at 78% 30%, rgba(255,170,90,0.16), transparent 62%),
-    radial-gradient(circle at 70% 85%, rgba(176,23,47,0.10), transparent 60%),
-    radial-gradient(circle at 30% 86%, rgba(255,120,60,0.12), transparent 60%);
-  filter: blur(0.5px);
+    radial-gradient(circle at 18% 18%, rgba(255,180,90,0.40), transparent 58%),
+    radial-gradient(circle at 80% 26%, rgba(255,122,47,0.32), transparent 62%),
+    radial-gradient(circle at 55% 88%, rgba(120,50,20,0.55), transparent 62%),
+    linear-gradient(145deg, #1a0d07 0%, #2a1408 34%, #5a2d10 62%, #ffb15a 100%);
+  color: var(--text);
 }
 
-/* Big leaf sprites (SVG backgrounds) moving diagonally + wind */
-body::before {
-  content: "";
-  position: fixed;
-  inset: -10% -15% -10% -15%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.78;
+::selection{ background: rgba(255,122,47,0.30); color:#1a0d07; }
+::-moz-selection{ background: rgba(255,122,47,0.30); color:#1a0d07; }
 
-  /* Leaf SVG (simple stylized) — reused with different tints */
-  --leaf1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cpath d='M14 46C22 22 49 8 77 12c19 3 31 15 32 30 1 17-10 32-28 40-28 13-56 4-67-12-6-9-7-17-14-24z' fill='%23d78a2f'/%3E%3Cpath d='M24 52c20-10 41-16 74-20' stroke='%236b2a16' stroke-width='3' stroke-linecap='round' opacity='.65'/%3E%3C/svg%3E");
-  --leaf2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cpath d='M16 52C26 22 54 10 82 14c16 3 26 12 28 25 3 18-8 35-28 45-25 12-55 6-67-8-8-9-9-16-16-24z' fill='%23ffb15a'/%3E%3Cpath d='M26 56c18-12 43-20 70-24' stroke='%23813a18' stroke-width='3' stroke-linecap='round' opacity='.6'/%3E%3C/svg%3E");
-  --leaf3: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='90' viewBox='0 0 120 90'%3E%3Cpath d='M16 48C28 20 56 10 82 14c17 2 29 11 31 26 2 17-9 34-30 44-27 13-57 3-67-12-7-10-7-16-15-24z' fill='%23b0172f'/%3E%3Cpath d='M26 52c22-12 43-18 72-22' stroke='%23501620' stroke-width='3' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E");
-
-  background-image:
-    var(--leaf1), var(--leaf2), var(--leaf3),
-    var(--leaf2), var(--leaf1), var(--leaf3);
-
-  background-repeat: no-repeat;
-
-  /* Big sizes (expressive) */
-  background-size:
-    92px 70px, 110px 82px, 86px 66px,
-    120px 90px, 96px 72px, 132px 98px;
-
-  /* Spread start positions */
-  background-position:
-    8%  -5%,
-    22% -18%,
-    45% -12%,
-    66% -22%,
-    78% -8%,
-    92% -25%;
-
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.55));
-  animation: autumnWind 9.5s linear infinite;
+.site-header{
+  background:
+    radial-gradient(circle at 0 0, rgba(255,180,90,0.35), transparent 60%),
+    linear-gradient(145deg, rgba(35,18,10,0.86), rgba(80,40,18,0.82));
+  border: 1px solid rgba(255,215,170,0.16);
+  box-shadow: 0 26px 70px rgba(0,0,0,0.48);
 }
 
-/* Strong wind: left -> right + downward + slight wobble */
-@keyframes autumnWind {
-  0% {
-    transform: translateX(-6%) translateY(-6%) rotate(-2deg);
-  }
-  50% {
-    transform: translateX(6%) translateY(6%) rotate(2deg);
-  }
-  100% {
-    transform: translateX(12%) translateY(18%) rotate(-1deg);
-  }
+.project-card,
+.media-card,
+.about-section,
+.playground-card{
+  background:
+    radial-gradient(circle at 0 0, rgba(255,180,90,0.16), transparent 60%),
+    linear-gradient(145deg, rgba(34,18,10,0.76), rgba(60,30,14,0.72));
+  border: 1px solid rgba(255,215,170,0.14);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.50);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  body::before { animation: none; opacity: 0.28; }
+.tabs{
+  background: rgba(34,18,10,0.70);
+  border: 1px solid rgba(255,215,170,0.14);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+}
+.tabs::before{
+  background: linear-gradient(135deg, rgba(255,122,47,0.92), rgba(255,177,90,0.86));
+}
+
+.btn-card{
+  background: rgba(34,18,10,0.72);
+  border-color: rgba(255,215,170,0.16);
+  color: var(--text);
+}
+.btn-card:hover{
+  background: rgba(50,26,12,0.82);
+  border-color: rgba(255,122,47,0.40);
+}
+
+.btn-card-live::before{
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,122,47,0),
+    rgba(255,122,47,0.95),
+    rgba(255,177,90,0.95),
+    rgba(255,122,47,0.95),
+    rgba(255,122,47,0)
+  );
+}
+.btn-card-live::after{
+  background: radial-gradient(circle at 0 0, rgba(255,180,90,0.18), rgba(34,18,10,0.86));
+}
+
+.social-chip{
+  background: rgba(34,18,10,0.72);
+  border-color: rgba(255,215,170,0.14);
+  color: rgba(255,215,180,0.82);
+}
+
+/* BIG windy leaves overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-14% -18%;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.95;
+
+  --l1:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='130' viewBox='0 0 170 130'%3E%3Cpath d='M18 70C30 30 70 12 112 18c28 4 44 22 45 42 2 24-14 45-42 58-40 18-80 6-96-18-9-14-10-24-19-30z' fill='%23ffb15a'/%3E%3Cpath d='M30 78c28-14 56-22 104-28' stroke='%23521f0c' stroke-width='4' stroke-linecap='round' opacity='.65'/%3E%3C/svg%3E");
+  --l2:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='130' viewBox='0 0 170 130'%3E%3Cpath d='M20 74C34 34 76 16 118 22c24 4 40 20 42 40 4 26-12 50-42 64-36 18-78 8-96-14-12-14-12-24-22-34z' fill='%23ff7a2f'/%3E%3Cpath d='M34 84c26-16 60-26 100-32' stroke='%23411509' stroke-width='4' stroke-linecap='round' opacity='.60'/%3E%3C/svg%3E");
+  --l3:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='130' viewBox='0 0 170 130'%3E%3Cpath d='M20 70C36 32 78 18 118 24c25 4 42 18 44 40 2 24-14 46-44 60-38 18-80 6-96-18-11-15-12-24-22-36z' fill='%23d95a1f'/%3E%3Cpath d='M34 78c30-16 60-24 102-30' stroke='%234c1b0b' stroke-width='4' stroke-linecap='round' opacity='.62'/%3E%3C/svg%3E");
+
+  background-image: var(--l1), var(--l2), var(--l3), var(--l2), var(--l1), var(--l3);
+  background-repeat:no-repeat;
+  background-size: 140px 110px, 180px 140px, 120px 95px, 210px 160px, 150px 120px, 230px 175px;
+  background-position: 6% -22%, 22% -18%, 44% -26%, 62% -20%, 78% -30%, 92% -14%;
+
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,0.45));
+  animation: autumnWind 5.6s linear infinite;
+}
+
+@keyframes autumnWind{
+  0%{ transform: translateX(-14%) translateY(-10%) rotate(-8deg); }
+  40%{ transform: translateX(2%) translateY(6%) rotate(6deg); }
+  100%{ transform: translateX(22%) translateY(26%) rotate(-6deg); }
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.18;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255,180,90,0.28), transparent 60%),
+    radial-gradient(circle at 82% 30%, rgba(255,122,47,0.20), transparent 62%);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body::before{ animation:none; opacity:0.35; }
 }
