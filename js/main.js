@@ -15,6 +15,54 @@ const DEFAULT_LANG = "nl";
 const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
+/* ---------- Seasonal theme (Amsterdam) ---------- */
+
+const AMSTERDAM_TZ = "Europe/Amsterdam";
+const SEASON_CSS_KEY = "ferranSeasonOverride"; // optional manual override
+
+function getAmsterdamMonth() {
+  // month 1..12 in Amsterdam, independent of visitor timezone
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: AMSTERDAM_TZ,
+    month: "2-digit"
+  }).formatToParts(new Date());
+  const m = parts.find((p) => p.type === "month")?.value;
+  return parseInt(m, 10) || (new Date().getMonth() + 1);
+}
+
+// Meteorological seasons (NL): Spring Mar-May, Summer Jun-Aug, Autumn Sep-Nov, Winter Dec-Feb
+function detectSeasonNL() {
+  const m = getAmsterdamMonth();
+  if (m >= 3 && m <= 5) return "spring";
+  if (m >= 6 && m <= 8) return "summer";
+  if (m >= 9 && m <= 11) return "autumn";
+  return "winter";
+}
+
+function applySeasonTheme() {
+  const link = document.getElementById("seasonStylesheet");
+  if (!link) return;
+
+  // allow manual override: localStorage OR ?season=winter
+  const urlSeason = new URLSearchParams(location.search).get("season");
+  const saved = (() => {
+    try {
+      return localStorage.getItem(SEASON_CSS_KEY);
+    } catch (_) {
+      return null;
+    }
+  })();
+
+  const raw = (urlSeason || saved || "").toLowerCase().trim();
+  const override = ["spring", "summer", "autumn", "winter"].includes(raw) ? raw : null;
+
+  const season = override || detectSeasonNL();
+  link.href = `css/season-${season}.css`;
+
+  // optional hook
+  document.body.dataset.season = season;
+}
+
 /* ---------- Random useless websites list ---------- */
 
 const USELESS_WEB_URLS = [
@@ -428,6 +476,9 @@ const I18N = {
 
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("js-enabled");
+
+  // ✅ apply seasonal css early
+  applySeasonTheme();
 
   // hard-remove any leftover postboard HTML if it still exists (safety)
   document.getElementById("postboardForm")?.closest(".playground-card")?.remove();
@@ -1392,7 +1443,7 @@ function renderProjects() {
     card.appendChild(actions);
     grid.appendChild(card);
   });
-    // ... einde van renderProjects()
+
   applyDescriptionClampMarkers();
 }
 
@@ -1652,6 +1703,7 @@ function setupImageModal() {
     if (event.key === "Escape") closeImageModal();
   });
 }
+
 function openImageModal(src, captionText) {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
@@ -1690,7 +1742,6 @@ function openImageModal(src, captionText) {
   modal.appendChild(inner);
   modal.hidden = false;
 }
-
 
 function closeImageModal() {
   const modal = document.getElementById("imageModal");
