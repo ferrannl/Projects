@@ -1,56 +1,77 @@
 /* css/season-spring.css */
-/* Spring: pollen float + fresh green/sky glow */
+/* Spring: big drifting petals + fresh green/pink palette */
 
 :root {
-  --bg: #050a14;
-  --bg-alt: #123f2b;
-  --card-bg: rgba(7, 12, 26, 0.94);
+  /* Palette shift */
+  --bg: #041015;
+  --bg-alt: #114a2c;
+  --card-bg: rgba(6, 14, 22, 0.95);
+  --border-subtle: rgba(255,255,255,0.08);
 
-  --accent: #b0172f;
-  --accent-soft: rgba(176, 23, 47, 0.20);
-  --accent-alt: #59d38c;
+  --accent: #b0172f; /* still you */
+  --accent-soft: rgba(255, 120, 175, 0.22); /* blossom tint */
+  --accent-alt: #5fe0a0;
 
-  --text: #f8f8ff;
-  --text-muted: rgba(224, 245, 234, 0.74);
+  --text: #f7fffb;
+  --text-muted: rgba(210, 255, 235, 0.72);
 }
 
-/* Soft spring ambient */
+/* Fresh spring glow (green + blossom) */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.18;
+  opacity: 0.22;
   background:
-    radial-gradient(circle at 15% 25%, rgba(89,211,140,0.18), transparent 58%),
-    radial-gradient(circle at 80% 22%, rgba(99,180,255,0.12), transparent 60%),
-    radial-gradient(circle at 55% 85%, rgba(176,23,47,0.08), transparent 58%);
+    radial-gradient(circle at 16% 24%, rgba(95,224,160,0.22), transparent 62%),
+    radial-gradient(circle at 76% 26%, rgba(255,140,200,0.16), transparent 62%),
+    radial-gradient(circle at 46% 88%, rgba(100,190,255,0.10), transparent 65%);
+  filter: blur(0.5px);
 }
 
-/* Pollen / dust motes drifting upward */
+/* Petals: bigger, more visible, drifting */
 body::before {
   content: "";
   position: fixed;
-  inset: 0;
+  inset: -10% -10% -10% -10%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.50;
-  background:
-    radial-gradient(circle, rgba(255,245,160,0.35) 0 1.3px, transparent 1.8px) 0 0/140px 140px,
-    radial-gradient(circle, rgba(175,255,210,0.26) 0 1.1px, transparent 1.6px) 60px 40px/190px 190px,
-    radial-gradient(circle, rgba(200,220,255,0.18) 0 1.0px, transparent 1.5px) 20px 90px/240px 240px;
-  animation: springPollen 18s ease-in-out infinite;
-  filter: blur(0.15px);
+  opacity: 0.78;
+
+  --petal1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M60 14c18 18 30 34 30 52 0 18-14 30-30 30S30 84 30 66c0-18 12-34 30-52z' fill='%23ff9bd1' opacity='.92'/%3E%3Cpath d='M60 26c10 12 16 22 16 34 0 10-7 18-16 18s-16-8-16-18c0-12 6-22 16-34z' fill='%23ffd1e7' opacity='.70'/%3E%3C/svg%3E");
+  --petal2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M62 18c18 16 28 30 28 46 0 20-14 32-30 32S32 84 32 64c0-16 12-30 30-46z' fill='%23ff76b9' opacity='.88'/%3E%3Cpath d='M62 30c9 10 14 18 14 28 0 11-7 18-14 18s-14-7-14-18c0-10 5-18 14-28z' fill='%23ffe0f0' opacity='.65'/%3E%3C/svg%3E");
+
+  background-image:
+    var(--petal1), var(--petal2), var(--petal1),
+    var(--petal2), var(--petal1), var(--petal2);
+
+  background-repeat: no-repeat;
+
+  /* Big petals */
+  background-size:
+    84px 84px, 62px 62px, 96px 96px,
+    70px 70px, 110px 110px, 78px 78px;
+
+  background-position:
+    10% -18%,
+    28% -10%,
+    48% -22%,
+    66% -14%,
+    82% -26%,
+    92% -8%;
+
+  filter: drop-shadow(0 12px 20px rgba(0,0,0,0.45));
+  animation: springPetals 10.8s linear infinite;
 }
 
-@keyframes springPollen {
-  0%   { transform: translateY(6%)  translateX(0);   opacity: 0.35; }
-  35%  { transform: translateY(0%)  translateX(1%);  opacity: 0.55; }
-  70%  { transform: translateY(-6%) translateX(-1%); opacity: 0.45; }
-  100% { transform: translateY(6%)  translateX(0);   opacity: 0.35; }
+@keyframes springPetals {
+  0%   { transform: translateX(-3%) translateY(-8%) rotate(-2deg); }
+  50%  { transform: translateX(5%)  translateY(7%)  rotate(2deg); }
+  100% { transform: translateX(10%) translateY(18%) rotate(-1deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before { animation: none; opacity: 0.24; }
+  body::before { animation: none; opacity: 0.26; }
 }
