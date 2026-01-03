@@ -1,39 +1,14 @@
 /* css/season-autumn.css */
-/* Keep base dark blue. Accent becomes warm orange/brown. Few small leaves drifting. */
-
 :root{
   --accent:#ff7a2f;
   --accent-soft:rgba(255,122,47,0.28);
-  --accent-alt:#d2a46a;
+  --accent-soft-2:rgba(255,122,47,0.20);
+  --accent-soft-3:rgba(255,122,47,0.12);
+
+  --bg-accent-glow: rgba(255,122,47,0.20);
 }
 
-::selection { background: var(--accent-soft); color:#fff; }
-::-moz-selection { background: var(--accent-soft); color:#fff; }
-
-.tabs::before{
-  background: linear-gradient(135deg, rgba(255,122,47,0.86), rgba(11,26,61,0.95));
-}
-
-#search:focus { border-color: rgba(255,122,47,0.85); }
-
-.btn-card-live::before{
-  background: conic-gradient(
-    from 0deg,
-    rgba(255,122,47,0),
-    rgba(255,122,47,0.9),
-    rgba(11,26,61,0.9),
-    rgba(255,122,47,0.9),
-    rgba(255,122,47,0)
-  );
-}
-.btn-card-live::after{
-  background: radial-gradient(circle at 0 0, rgba(255,122,47,0.20), rgba(4, 7, 24, 1));
-}
-
-.media-volume-slider::-webkit-slider-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-.media-volume-slider::-moz-range-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-
-/* FEW small leaves: huge tile sizes + low opacity. */
+/* few small leaves */
 body::before{
   content:"";
   position: fixed;
@@ -45,10 +20,9 @@ body::before{
   --leaf:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='34' viewBox='0 0 42 34'%3E%3Cpath d='M5 19C8 9 18 4 28 6c7 2 11 7 11 13 0 7-4 13-11 16-10 4-20 2-24-5-2-3-3-6-4-7z' fill='%23ff7a2f' opacity='.92'/%3E%3Cpath d='M8 20c7-4 14-6 26-8' stroke='%233a1204' stroke-width='2.5' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E");
 
   background:
-    var(--leaf) 0 0 / 900px 900px repeat,
-    var(--leaf) 240px 180px / 1300px 1300px repeat;
-  animation: autumnDrift 18s linear infinite;
-  filter: drop-shadow(0 10px 16px rgba(0,0,0,0.30));
+    var(--leaf) 0 0 / 980px 980px repeat,
+    var(--leaf) 240px 180px / 1400px 1400px repeat;
+  animation: autumnDrift 20s linear infinite;
 }
 
 @keyframes autumnDrift{
