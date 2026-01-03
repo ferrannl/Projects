@@ -1,66 +1,82 @@
 /* css/season-summer.css */
-/* Summer: warm glow + subtle heat shimmer */
+/* Summer: vibrant sun bokeh + rays, stronger palette shift */
 
 :root {
-  --bg: #070512;
-  --bg-alt: #2a2a08;
-  --card-bg: rgba(10, 9, 24, 0.94);
+  /* Palette shift */
+  --bg: #050715;
+  --bg-alt: #0b2b3f;
+  --card-bg: rgba(7, 10, 28, 0.94);
+  --border-subtle: rgba(255,255,255,0.085);
 
-  --accent: #b0172f;
-  --accent-soft: rgba(176, 23, 47, 0.16);
-  --accent-alt: #ffcf5a;
+  --accent: #b0172f; /* keep brand */
+  --accent-soft: rgba(255, 220, 120, 0.20);
+  --accent-alt: #ffd15a; /* sunny */
 
-  --text: #fff9f2;
-  --text-muted: rgba(255, 235, 210, 0.72);
+  --text: #fffdf6;
+  --text-muted: rgba(255, 244, 214, 0.72);
 }
 
-/* Golden sun glow */
+/* Sun glow + subtle sky */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.18;
+  opacity: 0.24;
   background:
-    radial-gradient(circle at 70% 18%, rgba(255,207,90,0.22), transparent 55%),
-    radial-gradient(circle at 20% 78%, rgba(255,140,60,0.12), transparent 62%),
-    radial-gradient(circle at 45% 45%, rgba(176,23,47,0.07), transparent 60%);
+    radial-gradient(circle at 72% 20%, rgba(255, 209, 90, 0.26), transparent 60%),
+    radial-gradient(circle at 30% 80%, rgba(90, 210, 255, 0.14), transparent 62%),
+    radial-gradient(circle at 15% 30%, rgba(120, 255, 190, 0.10), transparent 65%),
+    radial-gradient(circle at 60% 90%, rgba(176, 23, 47, 0.07), transparent 65%);
+  filter: blur(0.55px);
 }
 
-/* Heat shimmer (moving transparent bands) */
+/* Big sun bokeh + gentle drift */
 body::before {
   content: "";
   position: fixed;
-  inset: 0;
+  inset: -12% -12% -12% -12%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.60;
+
   background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.00) 0%,
-      rgba(255,255,255,0.03) 12%,
-      rgba(255,255,255,0.00) 25%,
-      rgba(255,255,255,0.02) 38%,
-      rgba(255,255,255,0.00) 52%,
-      rgba(255,255,255,0.02) 68%,
-      rgba(255,255,255,0.00) 82%,
-      rgba(255,255,255,0.02) 100%
+    /* big bokeh circles */
+    radial-gradient(circle at 20% 30%, rgba(255, 209, 90, 0.20) 0 140px, transparent 160px),
+    radial-gradient(circle at 70% 22%, rgba(255, 170, 90, 0.16) 0 120px, transparent 150px),
+    radial-gradient(circle at 48% 58%, rgba(90, 220, 255, 0.10) 0 160px, transparent 190px),
+    radial-gradient(circle at 80% 78%, rgba(120, 255, 190, 0.10) 0 140px, transparent 170px),
+
+    /* sun rays */
+    conic-gradient(
+      from 220deg at 72% 20%,
+      rgba(255, 220, 140, 0.00) 0deg,
+      rgba(255, 220, 140, 0.10) 18deg,
+      rgba(255, 220, 140, 0.00) 36deg,
+      rgba(255, 220, 140, 0.12) 58deg,
+      rgba(255, 220, 140, 0.00) 82deg,
+      rgba(255, 220, 140, 0.10) 110deg,
+      rgba(255, 220, 140, 0.00) 140deg,
+      rgba(255, 220, 140, 0.10) 176deg,
+      rgba(255, 220, 140, 0.00) 210deg,
+      rgba(255, 220, 140, 0.10) 252deg,
+      rgba(255, 220, 140, 0.00) 300deg,
+      rgba(255, 220, 140, 0.12) 340deg,
+      rgba(255, 220, 140, 0.00) 360deg
     );
+
   mix-blend-mode: soft-light;
-  filter: blur(0.6px);
-  animation: summerHeat 6.5s ease-in-out infinite;
-  transform-origin: center;
+  filter: blur(0.8px);
+  animation: summerDrift 8.4s ease-in-out infinite;
 }
 
-@keyframes summerHeat {
-  0%   { transform: translateY(0) skewX(0deg) scaleY(1); opacity: 0.18; }
-  35%  { transform: translateY(-1.2%) skewX(0.4deg) scaleY(1.02); opacity: 0.30; }
-  70%  { transform: translateY(0.8%) skewX(-0.35deg) scaleY(1.015); opacity: 0.26; }
-  100% { transform: translateY(0) skewX(0deg) scaleY(1); opacity: 0.18; }
+@keyframes summerDrift {
+  0%   { transform: translateX(-2%) translateY(-1%) scale(1.00); opacity: 0.45; }
+  45%  { transform: translateX(2%)  translateY(1%)  scale(1.02); opacity: 0.62; }
+  100% { transform: translateX(-2%) translateY(-1%) scale(1.00); opacity: 0.45; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before { animation: none; opacity: 0.18; }
+  body::before { animation: none; opacity: 0.22; }
 }
