@@ -15,7 +15,7 @@
   <!-- Base styles -->
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- ✅ Seasonal overrides (auto-chosen by JS for Amsterdam) -->
+  <!-- ✅ Seasonal overrides (JS will set the correct season file) -->
   <link id="seasonStylesheet" rel="stylesheet" href="css/season-winter.css" />
 
   <!-- YouTube IFrame API for background video -->
@@ -136,6 +136,8 @@
     </header>
 
     <main class="page-main">
+      <!-- ... keep the rest of your HTML exactly the same ... -->
+
       <section class="about-section">
         <h2 class="section-title" data-i18n="aboutTitle">Over mij</h2>
         <p class="about-text" data-i18n="aboutP1">
@@ -165,9 +167,7 @@
 
       <section class="search-section">
         <label for="search" class="search-label" data-i18n="searchLabel">Zoeken</label>
-        <input
-          id="search"
-          type="search"
+        <input id="search" type="search"
           placeholder="Zoek in projecten op naam, beschrijving, programmeertaal of tags…"
           autocomplete="off"
         />
@@ -225,9 +225,7 @@
         <div class="playground-grid">
           <article class="playground-card playground-paint">
             <h2 class="playground-title" data-i18n="playgroundPaintTitle">MS Paint Playground</h2>
-            <p class="playground-text" data-i18n="playgroundPaintText">
-              MS Paint-remake, veel tekenplezier!
-            </p>
+            <p class="playground-text" data-i18n="playgroundPaintText">MS Paint-remake, veel tekenplezier!</p>
 
             <div class="playground-embed">
               <iframe
@@ -239,12 +237,7 @@
 
             <div class="playground-paint-controls">
               <div class="paint-buttons-row">
-                <button
-                  type="button"
-                  class="btn-paint"
-                  data-paint-action="clear"
-                  data-i18n="paintClearButton"
-                >
+                <button type="button" class="btn-paint" data-paint-action="clear" data-i18n="paintClearButton">
                   Wissen <span class="shortcut-hint" data-i18n="paintClearShortcutHint">(Ctrl+Shift+N)</span>
                 </button>
               </div>
@@ -256,12 +249,7 @@
             <p class="playground-text" data-i18n="playgroundRandomText">
               Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.
             </p>
-            <button
-              type="button"
-              id="randomSiteButton"
-              class="playground-random-btn"
-              data-i18n="randomButtonLabel"
-            >
+            <button type="button" id="randomSiteButton" class="playground-random-btn" data-i18n="randomButtonLabel">
               NEEM ME MEE NAAR EEN WILLEKEURIGE WEBSITE
             </button>
           </article>
