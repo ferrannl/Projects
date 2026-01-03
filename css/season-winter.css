@@ -1,45 +1,14 @@
 /* css/season-winter.css */
-/* Keep base dark blue. Only accent changes + snow overlay (unchanged vibe). */
-
 :root{
   --accent:#7cc7ff;
   --accent-soft:rgba(124,199,255,0.32);
-  --accent-alt:#cfefff;
+  --accent-soft-2:rgba(124,199,255,0.22);
+  --accent-soft-3:rgba(124,199,255,0.14);
+
+  /* ✅ This fixes your “secondary red background glow” */
+  --bg-accent-glow: rgba(124,199,255,0.26);
 }
 
-/* Selection */
-::selection { background: var(--accent-soft); color:#fff; }
-::-moz-selection { background: var(--accent-soft); color:#fff; }
-
-/* Tabs pill inherits accent automatically in your base,
-   but we can nudge it slightly cooler. */
-.tabs::before{
-  background: linear-gradient(135deg, rgba(124,199,255,0.85), rgba(11,26,61,0.95));
-}
-
-/* Focus ring (search) */
-#search:focus { border-color: rgba(124,199,255,0.85); }
-
-/* Live button ring */
-.btn-card-live::before{
-  background: conic-gradient(
-    from 0deg,
-    rgba(124,199,255,0),
-    rgba(124,199,255,0.9),
-    rgba(11,26,61,0.9),
-    rgba(124,199,255,0.9),
-    rgba(124,199,255,0)
-  );
-}
-.btn-card-live::after{
-  background: radial-gradient(circle at 0 0, rgba(124,199,255,0.22), rgba(4, 7, 24, 1));
-}
-
-/* Slider thumbs */
-.media-volume-slider::-webkit-slider-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-.media-volume-slider::-moz-range-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-
-/* Snow overlay (subtle, small dots) */
 body::before{
   content:"";
   position: fixed;
@@ -54,12 +23,10 @@ body::before{
   animation: winterSnowDrift 12s linear infinite;
   filter: drop-shadow(0 8px 18px rgba(0,0,0,0.25));
 }
-
 @keyframes winterSnowDrift{
   from { background-position: 0 -600px, 40px -800px, 10px -1000px; }
   to   { background-position: -80px 900px, -20px 1100px, -60px 1400px; }
 }
-
 @media (prefers-reduced-motion: reduce){
   body::before{ animation: none; opacity: 0.10; }
 }
