@@ -346,6 +346,14 @@ body.bg-video-active .bg-video-overlay {
   border-color: rgba(255, 69, 0, 0.9);
 }
 
+/* ✅ Spotify tint */
+.social-spotify {
+  background:
+    radial-gradient(circle at 0 0, rgba(29, 185, 84, 0.45), transparent 60%),
+    rgba(7, 10, 28, 0.97);
+  border-color: rgba(29, 185, 84, 0.9);
+}
+
 /* ---------- About section ---------- */
 
 .page-main {
@@ -758,7 +766,6 @@ body.bg-video-active .bg-video-overlay {
   bottom: 0;
   padding-left: 0.4rem;
 }
-
 
 .project-meta {
   display: flex;
