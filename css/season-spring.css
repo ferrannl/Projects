@@ -1,40 +1,15 @@
+
 /* css/season-spring.css */
-/* Keep base dark blue. Switch red accent -> blossom pink. Add a few tiny petals. */
-
 :root{
-  --accent:#ff5aa8;                 /* blossom pink */
+  --accent:#ff5aa8;
   --accent-soft:rgba(255,90,168,0.30);
-  --accent-alt:#69ffbf;             /* fresh green hint */
+  --accent-soft-2:rgba(255,90,168,0.20);
+  --accent-soft-3:rgba(255,90,168,0.12);
+
+  --bg-accent-glow: rgba(255,90,168,0.22);
 }
 
-::selection { background: var(--accent-soft); color:#fff; }
-::-moz-selection { background: var(--accent-soft); color:#fff; }
-
-.tabs::before{
-  background: linear-gradient(135deg, rgba(255,90,168,0.85), rgba(11,26,61,0.95));
-}
-
-#search:focus { border-color: rgba(255,90,168,0.85); }
-
-.btn-card-live::before{
-  background: conic-gradient(
-    from 0deg,
-    rgba(255,90,168,0),
-    rgba(255,90,168,0.9),
-    rgba(11,26,61,0.9),
-    rgba(255,90,168,0.9),
-    rgba(255,90,168,0)
-  );
-}
-.btn-card-live::after{
-  background: radial-gradient(circle at 0 0, rgba(255,90,168,0.22), rgba(4, 7, 24, 1));
-}
-
-.media-volume-slider::-webkit-slider-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-.media-volume-slider::-moz-range-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-
-/* A FEW small petals (not huge, not a carpet).
-   We use very large tile sizes + low opacity so only a few show at once. */
+/* small, FEW petals */
 body::before{
   content:"";
   position: fixed;
@@ -46,9 +21,9 @@ body::before{
   --petal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M18 4c6 5 9 10 9 16 0 6-4 10-9 10S9 26 9 20c0-6 3-11 9-16z' fill='%23ff5aa8' opacity='.9'/%3E%3Cpath d='M18 10c3 3 5 6 5 10 0 3-2 6-5 6s-5-3-5-6c0-4 2-7 5-10z' fill='%23ffd6ea' opacity='.75'/%3E%3C/svg%3E");
 
   background:
-    var(--petal) 0 0 / 640px 640px repeat,
-    var(--petal) 120px 220px / 920px 920px repeat;
-  animation: springPetals 16s linear infinite;
+    var(--petal) 0 0 / 740px 740px repeat,
+    var(--petal) 120px 220px / 1120px 1120px repeat;
+  animation: springPetals 18s linear infinite;
   filter: drop-shadow(0 10px 14px rgba(0,0,0,0.28));
 }
 
