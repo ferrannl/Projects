@@ -1,40 +1,15 @@
+
 /* css/season-summer.css */
-/* Keep base dark blue. Accent becomes warm sunny. Add sunshine shimmer (no falling). */
-
 :root{
-  --accent:#ffd24a;                 /* sun */
+  --accent:#ffd24a;
   --accent-soft:rgba(255,210,74,0.26);
-  --accent-alt:#49e6ff;             /* aqua pop */
+  --accent-soft-2:rgba(255,210,74,0.18);
+  --accent-soft-3:rgba(255,210,74,0.11);
+
+  --bg-accent-glow: rgba(255,210,74,0.20);
 }
 
-::selection { background: var(--accent-soft); color:#0b1026; }
-::-moz-selection { background: var(--accent-soft); color:#0b1026; }
-
-.tabs::before{
-  background: linear-gradient(135deg, rgba(255,210,74,0.88), rgba(11,26,61,0.95));
-}
-
-#search:focus { border-color: rgba(255,210,74,0.85); }
-
-.btn-card-live::before{
-  background: conic-gradient(
-    from 0deg,
-    rgba(255,210,74,0),
-    rgba(255,210,74,0.9),
-    rgba(11,26,61,0.9),
-    rgba(255,210,74,0.9),
-    rgba(255,210,74,0)
-  );
-}
-.btn-card-live::after{
-  background: radial-gradient(circle at 0 0, rgba(255,210,74,0.20), rgba(4, 7, 24, 1));
-}
-
-.media-volume-slider::-webkit-slider-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-.media-volume-slider::-moz-range-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
-
-/* Sunshine shimmer: soft diagonal light sweep + tiny bokeh.
-   Subtle and “summer-y”, NOT snowing. */
+/* sunshine shimmer (NOT snow) */
 body::before{
   content:"";
   position: fixed;
@@ -43,18 +18,17 @@ body::before{
   z-index: 0;
   opacity: 0.12;
   background:
-    radial-gradient(circle, rgba(255,210,74,0.38) 0 1.2px, transparent 3.2px) 0 0 / 520px 520px,
-    radial-gradient(circle, rgba(73,230,255,0.22) 0 1.0px, transparent 3.0px) 180px 120px / 760px 760px,
+    radial-gradient(circle, rgba(255,210,74,0.32) 0 1.2px, transparent 3.2px) 0 0 / 560px 560px,
+    radial-gradient(circle, rgba(80,220,255,0.18) 0 1.0px, transparent 3.0px) 180px 120px / 820px 820px,
     linear-gradient(110deg,
       transparent 0%,
       rgba(255,210,74,0.00) 35%,
-      rgba(255,210,74,0.12) 50%,
+      rgba(255,210,74,0.10) 50%,
       rgba(255,210,74,0.00) 65%,
       transparent 100%
     );
   background-repeat: repeat, repeat, no-repeat;
-  animation: summerShimmer 9.5s ease-in-out infinite;
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.22));
+  animation: summerShimmer 10s ease-in-out infinite;
 }
 
 @keyframes summerShimmer{
