@@ -1,0 +1,31 @@
+/* css/season-winter.css */
+/* Winter: crisp, cool, snowy glow (keeps your red accent vibe) */
+
+:root {
+  --bg: #040612;
+  --bg-alt: #0b1a3d;
+  --card-bg: rgba(6, 9, 24, 0.96);
+
+  --accent: #b0172f;
+  --accent-soft: rgba(176, 23, 47, 0.28);
+  --accent-alt: #6aa6ff;
+
+  --text: #f8f8ff;
+  --text-muted: rgba(220, 227, 255, 0.72);
+}
+
+/* Snowy shimmer overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.25;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.25), transparent 35%),
+    radial-gradient(circle at 70% 20%, rgba(255,255,255,0.18), transparent 40%),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.14), transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(255,255,255,0.12), transparent 40%);
+  filter: blur(0.2px);
+}
