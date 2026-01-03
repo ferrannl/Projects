@@ -133,4 +133,11 @@ body::after{
   pointer-events:none;
   opacity:0.18;
   background:
-    radial-gradient(
+    radial-gradient(circle at 70% 18%, rgba(255,255,255,0.65), transparent 60%),
+    radial-gradient(circle at 22% 86%, rgba(255,255,255,0.35), transparent 65%);
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body::before{ animation:none; opacity:0.35; }
+}
