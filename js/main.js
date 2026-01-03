@@ -16,51 +16,73 @@ const LANG_STORAGE_KEY = "ferranProjectsLang";
 const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
 
 /* ---------- Seasonal theme (Amsterdam) ---------- */
+/* ---------- Seasonal theme (Amsterdam) ---------- */
 
 const AMSTERDAM_TZ = "Europe/Amsterdam";
-const SEASON_CSS_KEY = "ferranSeasonOverride"; // optional manual override
+const SEASON_CSS_KEY = "ferranSeasonOverride";
 
-function getAmsterdamMonth() {
-  // month 1..12 in Amsterdam, independent of visitor timezone
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: AMSTERDAM_TZ,
-    month: "2-digit"
-  }).formatToParts(new Date());
-  const m = parts.find((p) => p.type === "month")?.value;
-  return parseInt(m, 10) || (new Date().getMonth() + 1);
+function ensureSeasonStylesheetLink() {
+  let link = document.getElementById("seasonStylesheet");
+  if (link) return link;
+
+  // Create it if missing (bulletproof)
+  link = document.createElement("link");
+  link.id = "seasonStylesheet";
+  link.rel = "stylesheet";
+  link.href = "css/season-winter.css";
+
+  // Put it right after your base stylesheet if possible
+  const base = document.querySelector('link[rel="stylesheet"][href*="css/style.css"]');
+  if (base && base.parentNode) base.parentNode.insertBefore(link, base.nextSibling);
+  else document.head.appendChild(link);
+
+  return link;
 }
 
-// Meteorological seasons (NL): Spring Mar-May, Summer Jun-Aug, Autumn Sep-Nov, Winter Dec-Feb
+function getAmsterdamMonth() {
+  try {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: AMSTERDAM_TZ,
+      month: "2-digit"
+    }).formatToParts(new Date());
+
+    const m = parts.find(p => p.type === "month")?.value;
+    const n = parseInt(m, 10);
+    return Number.isFinite(n) ? n : (new Date().getMonth() + 1);
+  } catch (_) {
+    // fallback if timezone formatting not supported
+    return new Date().getMonth() + 1;
+  }
+}
+
+// Meteorological seasons NL (simple + correct vibe)
 function detectSeasonNL() {
   const m = getAmsterdamMonth();
   if (m >= 3 && m <= 5) return "spring";
   if (m >= 6 && m <= 8) return "summer";
   if (m >= 9 && m <= 11) return "autumn";
-  return "winter";
+  return "winter"; // Dec-Feb
 }
 
 function applySeasonTheme() {
-  const link = document.getElementById("seasonStylesheet");
-  if (!link) return;
+  const link = ensureSeasonStylesheetLink();
 
-  // allow manual override: localStorage OR ?season=winter
-  const urlSeason = new URLSearchParams(location.search).get("season");
-  const saved = (() => {
-    try {
-      return localStorage.getItem(SEASON_CSS_KEY);
-    } catch (_) {
-      return null;
-    }
-  })();
+  const params = new URLSearchParams(location.search);
+  const urlSeason = (params.get("season") || "").toLowerCase().trim();
 
-  const raw = (urlSeason || saved || "").toLowerCase().trim();
-  const override = ["spring", "summer", "autumn", "winter"].includes(raw) ? raw : null;
+  let saved = "";
+  try { saved = (localStorage.getItem(SEASON_CSS_KEY) || "").toLowerCase().trim(); } catch (_) {}
+
+  const wanted = urlSeason || saved;
+  const override = ["spring", "summer", "autumn", "winter"].includes(wanted) ? wanted : null;
 
   const season = override || detectSeasonNL();
   link.href = `css/season-${season}.css`;
 
-  // optional hook
   document.body.dataset.season = season;
+
+  // tiny debug help (you can remove later)
+  console.log("[season] active:", season, "->", link.href);
 }
 
 /* ---------- Random useless websites list ---------- */
