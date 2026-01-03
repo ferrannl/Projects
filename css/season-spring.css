@@ -1,69 +1,62 @@
 /* css/season-spring.css */
-/* Dark base stays. Blossom accents + petals. */
+/* Keep base dark blue. Switch red accent -> blossom pink. Add a few tiny petals. */
 
 :root{
-  --accent:#ff5fb2;              /* blossom */
-  --accent-soft:rgba(255,95,178,0.24);
-  --accent-alt:#42f1b2;          /* fresh green */
+  --accent:#ff5aa8;                 /* blossom pink */
+  --accent-soft:rgba(255,90,168,0.30);
+  --accent-alt:#69ffbf;             /* fresh green hint */
 }
 
-::selection { background: rgba(255,95,178,0.26); color:#fff; }
-::-moz-selection { background: rgba(255,95,178,0.26); color:#fff; }
+::selection { background: var(--accent-soft); color:#fff; }
+::-moz-selection { background: var(--accent-soft); color:#fff; }
 
 .tabs::before{
-  background: linear-gradient(135deg, rgba(255,95,178,0.92), rgba(66,241,178,0.72));
+  background: linear-gradient(135deg, rgba(255,90,168,0.85), rgba(11,26,61,0.95));
 }
 
-.project-card:hover{
-  background: linear-gradient(145deg, rgba(10, 14, 32, 0.98), rgba(7, 10, 28, 0.98));
-  border-color: rgba(255,95,178,0.22);
-}
-.project-card::before{
-  background:
-    radial-gradient(circle at top right, rgba(255,95,178,0.22), transparent 60%),
-    radial-gradient(circle at bottom left, rgba(66,241,178,0.16), transparent 60%);
-}
+#search:focus { border-color: rgba(255,90,168,0.85); }
 
 .btn-card-live::before{
   background: conic-gradient(
     from 0deg,
-    rgba(255,95,178,0),
-    rgba(255,95,178,0.95),
-    rgba(66,241,178,0.85),
-    rgba(255,95,178,0.95),
-    rgba(255,95,178,0)
+    rgba(255,90,168,0),
+    rgba(255,90,168,0.9),
+    rgba(11,26,61,0.9),
+    rgba(255,90,168,0.9),
+    rgba(255,90,168,0)
   );
 }
 .btn-card-live::after{
-  background: radial-gradient(circle at 0 0, rgba(255,95,178,0.14), rgba(4, 7, 24, 1));
+  background: radial-gradient(circle at 0 0, rgba(255,90,168,0.22), rgba(4, 7, 24, 1));
 }
 
-.media-volume-slider::-webkit-slider-thumb{ background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.media-volume-slider::-moz-range-thumb{ background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.media-volume-slider::-webkit-slider-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
+.media-volume-slider::-moz-range-thumb{ box-shadow: 0 0 0 3px var(--accent-soft); background: var(--accent); }
 
-/* Petals (small, many, continuous) */
+/* A FEW small petals (not huge, not a carpet).
+   We use very large tile sizes + low opacity so only a few show at once. */
 body::before{
   content:"";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.16;
+  opacity: 0.10;
 
-  --petal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 10c14 12 22 24 22 38 0 14-10 24-22 24S18 62 18 48c0-14 8-26 22-38z' fill='%23ff5fb2' opacity='.9'/%3E%3Cpath d='M40 22c8 8 12 14 12 24 0 8-6 14-12 14s-12-6-12-14c0-10 4-16 12-24z' fill='%23ffd6ec' opacity='.7'/%3E%3C/svg%3E");
+  --petal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M18 4c6 5 9 10 9 16 0 6-4 10-9 10S9 26 9 20c0-6 3-11 9-16z' fill='%23ff5aa8' opacity='.9'/%3E%3Cpath d='M18 10c3 3 5 6 5 10 0 3-2 6-5 6s-5-3-5-6c0-4 2-7 5-10z' fill='%23ffd6ea' opacity='.75'/%3E%3C/svg%3E");
 
   background:
-    var(--petal) 0 0 / 180px 180px repeat,
-    var(--petal) 40px 60px / 260px 260px repeat;
-  animation: springPetals 10.5s linear infinite;
-  filter: drop-shadow(0 10px 16px rgba(0,0,0,0.28));
+    var(--petal) 0 0 / 640px 640px repeat,
+    var(--petal) 120px 220px / 920px 920px repeat;
+  animation: springPetals 16s linear infinite;
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,0.28));
 }
 
 @keyframes springPetals{
-  from { background-position: 0 -700px, 40px -900px; }
-  to   { background-position: 120px 1000px, 220px 1200px; }
+  from { background-position: 0 -900px, 120px -1200px; }
+  to   { background-position: 160px 1200px, 320px 1600px; }
 }
 
 @media (prefers-reduced-motion: reduce){
-  body::before{ animation: none; opacity: 0.09; }
+  body::before{ animation: none; opacity: 0.06; }
 }
