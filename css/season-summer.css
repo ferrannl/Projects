@@ -1,82 +1,136 @@
 /* css/season-summer.css */
-/* Summer: vibrant sun bokeh + rays, stronger palette shift */
+/* SUMMER — yellow/green/light-blue overhaul + big sunny bokeh */
 
-:root {
-  /* Palette shift */
-  --bg: #050715;
-  --bg-alt: #0b2b3f;
-  --card-bg: rgba(7, 10, 28, 0.94);
-  --border-subtle: rgba(255,255,255,0.085);
+:root{
+  --bg:#f7fffe;
+  --bg-alt:#bff6ff;
+  --card-bg:rgba(255,255,255,0.74);
+  --border-subtle:rgba(0,85,110,0.16);
 
-  --accent: #b0172f; /* keep brand */
-  --accent-soft: rgba(255, 220, 120, 0.20);
-  --accent-alt: #ffd15a; /* sunny */
+  --accent:#ffd248;         /* sun */
+  --accent-soft:rgba(255,210,72,0.24);
+  --accent-alt:#2eea7a;     /* green pop */
 
-  --text: #fffdf6;
-  --text-muted: rgba(255, 244, 214, 0.72);
+  --text:#052832;
+  --text-muted:rgba(5,40,50,0.70);
+
+  --shadow-soft: 0 22px 60px rgba(0, 75, 95, 0.16);
 }
 
-/* Sun glow + subtle sky */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.24;
+body{
   background:
-    radial-gradient(circle at 72% 20%, rgba(255, 209, 90, 0.26), transparent 60%),
-    radial-gradient(circle at 30% 80%, rgba(90, 210, 255, 0.14), transparent 62%),
-    radial-gradient(circle at 15% 30%, rgba(120, 255, 190, 0.10), transparent 65%),
-    radial-gradient(circle at 60% 90%, rgba(176, 23, 47, 0.07), transparent 65%);
-  filter: blur(0.55px);
+    radial-gradient(circle at 70% 18%, rgba(255,210,72,0.72), transparent 55%),
+    radial-gradient(circle at 20% 28%, rgba(46,234,122,0.45), transparent 60%),
+    radial-gradient(circle at 60% 86%, rgba(80,210,255,0.55), transparent 62%),
+    linear-gradient(145deg, #ffffff 0%, #e6fffb 22%, #bff6ff 52%, #d7ffe6 78%, #fff7c8 100%);
+  color: var(--text);
 }
 
-/* Big sun bokeh + gentle drift */
-body::before {
-  content: "";
-  position: fixed;
-  inset: -12% -12% -12% -12%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.60;
+::selection{ background: rgba(255,210,72,0.34); color:#052832; }
+::-moz-selection{ background: rgba(255,210,72,0.34); color:#052832; }
 
+.site-header{
   background:
-    /* big bokeh circles */
-    radial-gradient(circle at 20% 30%, rgba(255, 209, 90, 0.20) 0 140px, transparent 160px),
-    radial-gradient(circle at 70% 22%, rgba(255, 170, 90, 0.16) 0 120px, transparent 150px),
-    radial-gradient(circle at 48% 58%, rgba(90, 220, 255, 0.10) 0 160px, transparent 190px),
-    radial-gradient(circle at 80% 78%, rgba(120, 255, 190, 0.10) 0 140px, transparent 170px),
+    radial-gradient(circle at 0 0, rgba(255,245,210,0.85), transparent 60%),
+    linear-gradient(145deg, rgba(255,255,255,0.80), rgba(200,250,255,0.70));
+  border: 1px solid rgba(0,85,110,0.14);
+  box-shadow: 0 26px 70px rgba(0, 75, 95, 0.16);
+}
 
-    /* sun rays */
-    conic-gradient(
-      from 220deg at 72% 20%,
-      rgba(255, 220, 140, 0.00) 0deg,
-      rgba(255, 220, 140, 0.10) 18deg,
-      rgba(255, 220, 140, 0.00) 36deg,
-      rgba(255, 220, 140, 0.12) 58deg,
-      rgba(255, 220, 140, 0.00) 82deg,
-      rgba(255, 220, 140, 0.10) 110deg,
-      rgba(255, 220, 140, 0.00) 140deg,
-      rgba(255, 220, 140, 0.10) 176deg,
-      rgba(255, 220, 140, 0.00) 210deg,
-      rgba(255, 220, 140, 0.10) 252deg,
-      rgba(255, 220, 140, 0.00) 300deg,
-      rgba(255, 220, 140, 0.12) 340deg,
-      rgba(255, 220, 140, 0.00) 360deg
+.project-card,
+.media-card,
+.about-section,
+.playground-card{
+  background:
+    radial-gradient(circle at 0 0, rgba(255,245,210,0.55), transparent 60%),
+    linear-gradient(145deg, rgba(255,255,255,0.72), rgba(210,255,235,0.62));
+  border: 1px solid rgba(0,85,110,0.12);
+  box-shadow: 0 18px 55px rgba(0, 75, 95, 0.12);
+}
+
+.tabs{
+  background: rgba(255,255,255,0.68);
+  border: 1px solid rgba(0,85,110,0.14);
+  box-shadow: 0 14px 40px rgba(0,75,95,0.12);
+}
+.tabs::before{
+  background: linear-gradient(135deg, rgba(255,210,72,0.92), rgba(46,234,122,0.88));
+}
+
+.btn-card{
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,85,110,0.14);
+  color: var(--text);
+}
+.btn-card:hover{
+  background: rgba(255,255,255,0.88);
+  border-color: rgba(255,210,72,0.38);
+}
+
+.btn-card-live::before{
+  background: conic-gradient(
+    from 0deg,
+    rgba(255,210,72,0),
+    rgba(255,210,72,0.95),
+    rgba(46,234,122,0.95),
+    rgba(80,210,255,0.85),
+    rgba(255,210,72,0.95),
+    rgba(255,210,72,0)
+  );
+}
+.btn-card-live::after{
+  background: radial-gradient(circle at 0 0, rgba(255,245,210,0.72), rgba(205,250,255,0.85));
+}
+
+.social-chip{
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,85,110,0.14);
+  color: rgba(5,40,50,0.78);
+}
+
+/* Very visible sun bokeh overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-15% -15%;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.75;
+  background:
+    radial-gradient(circle at 18% 30%, rgba(255,210,72,0.40) 0 160px, transparent 190px),
+    radial-gradient(circle at 72% 22%, rgba(255,170,80,0.28) 0 140px, transparent 175px),
+    radial-gradient(circle at 48% 66%, rgba(80,210,255,0.22) 0 190px, transparent 230px),
+    radial-gradient(circle at 82% 78%, rgba(46,234,122,0.20) 0 170px, transparent 210px),
+    conic-gradient(from 220deg at 72% 18%,
+      rgba(255,210,72,0.00) 0deg,
+      rgba(255,210,72,0.16) 18deg,
+      rgba(255,210,72,0.00) 40deg,
+      rgba(255,210,72,0.14) 62deg,
+      rgba(255,210,72,0.00) 88deg,
+      rgba(255,210,72,0.12) 130deg,
+      rgba(255,210,72,0.00) 180deg,
+      rgba(255,210,72,0.14) 230deg,
+      rgba(255,210,72,0.00) 285deg,
+      rgba(255,210,72,0.12) 340deg,
+      rgba(255,210,72,0.00) 360deg
     );
-
   mix-blend-mode: soft-light;
-  filter: blur(0.8px);
-  animation: summerDrift 8.4s ease-in-out infinite;
+  filter: blur(0.9px);
+  animation: summerDrift 6.8s ease-in-out infinite;
 }
 
-@keyframes summerDrift {
-  0%   { transform: translateX(-2%) translateY(-1%) scale(1.00); opacity: 0.45; }
-  45%  { transform: translateX(2%)  translateY(1%)  scale(1.02); opacity: 0.62; }
-  100% { transform: translateX(-2%) translateY(-1%) scale(1.00); opacity: 0.45; }
+@keyframes summerDrift{
+  0%{ transform: translateX(-2%) translateY(-1%) scale(1.00); opacity:0.62; }
+  50%{ transform: translateX(2%) translateY(1%) scale(1.03); opacity:0.78; }
+  100%{ transform: translateX(-2%) translateY(-1%) scale(1.00); opacity:0.62; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  body::before { animation: none; opacity: 0.22; }
-}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:0.18;
+  background:
+    radial-gradient(
