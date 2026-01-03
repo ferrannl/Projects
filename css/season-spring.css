@@ -1,0 +1,28 @@
+/* css/season-spring.css */
+/* Spring: fresher, brighter, little more green/sky */
+
+:root {
+  --bg: #050a14;
+  --bg-alt: #123f2b;
+  --card-bg: rgba(7, 12, 26, 0.94);
+
+  --accent: #b0172f;
+  --accent-soft: rgba(176, 23, 47, 0.22);
+  --accent-alt: #59d38c;
+
+  --text: #f8f8ff;
+  --text-muted: rgba(224, 245, 234, 0.74);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(89,211,140,0.16), transparent 55%),
+    radial-gradient(circle at 80% 20%, rgba(99,180,255,0.10), transparent 60%),
+    radial-gradient(circle at 55% 85%, rgba(176,23,47,0.10), transparent 55%);
+}
