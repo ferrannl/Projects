@@ -1,4 +1,17 @@
 /* js/main.js */
+/* =========================================================
+   Ferran Projects – FULL JS (everything) 
+   ✅ Includes: GitHub loading + cache, projects overrides, thumbnails,
+      GitHub Pages live detection (index.html in root), media index,
+      tabs + filters + search placeholder, image modal,
+      random useless websites button, YouTube secret bg video toggle,
+      paint toolbar (clear only), description clamp markers,
+      ✅ Season system: auto NL/Amsterdam + ?season= override,
+         seasonal CSS link switch + seasonal accent vars + subtle effects,
+         seasonal avatar swap.
+   ❌ Removed ONLY: i18n dictionary + language gate translation logic.
+   ========================================================= */
+
 /* ---------- Config ---------- */
 
 const GITHUB_USER = "ferrannl";
@@ -10,80 +23,8 @@ const CACHE_KEY = "ferranProjectsCacheV2";
 const THUMB_CACHE_KEY = "ferranProjectsThumbsV4"; // bump key (new thumb logic)
 const LIVE_CACHE_KEY = "ferranProjectsLiveIndexV1"; // cache: repoName -> { hasIndex: bool, ts: number }
 
-const SUPPORTED_LANGS = ["nl", "en", "de", "es"];
+/* NOTE: i18n removed on purpose. Keep these only if you still use them elsewhere. */
 const DEFAULT_LANG = "nl";
-const LANG_STORAGE_KEY = "ferranProjectsLang";
-const LANG_GATE_SEEN_KEY = "ferranProjectsLangSeenGate";
-
-/* ---------- Seasonal theme (Amsterdam) ---------- */
-/* ---------- Seasonal theme (Amsterdam) ---------- */
-
-const AMSTERDAM_TZ = "Europe/Amsterdam";
-const SEASON_CSS_KEY = "ferranSeasonOverride";
-
-function ensureSeasonStylesheetLink() {
-  let link = document.getElementById("seasonStylesheet");
-  if (link) return link;
-
-  // Create it if missing (bulletproof)
-  link = document.createElement("link");
-  link.id = "seasonStylesheet";
-  link.rel = "stylesheet";
-  link.href = "css/season-winter.css";
-
-  // Put it right after your base stylesheet if possible
-  const base = document.querySelector('link[rel="stylesheet"][href*="css/style.css"]');
-  if (base && base.parentNode) base.parentNode.insertBefore(link, base.nextSibling);
-  else document.head.appendChild(link);
-
-  return link;
-}
-
-function getAmsterdamMonth() {
-  try {
-    const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: AMSTERDAM_TZ,
-      month: "2-digit"
-    }).formatToParts(new Date());
-
-    const m = parts.find(p => p.type === "month")?.value;
-    const n = parseInt(m, 10);
-    return Number.isFinite(n) ? n : (new Date().getMonth() + 1);
-  } catch (_) {
-    // fallback if timezone formatting not supported
-    return new Date().getMonth() + 1;
-  }
-}
-
-// Meteorological seasons NL (simple + correct vibe)
-function detectSeasonNL() {
-  const m = getAmsterdamMonth();
-  if (m >= 3 && m <= 5) return "spring";
-  if (m >= 6 && m <= 8) return "summer";
-  if (m >= 9 && m <= 11) return "autumn";
-  return "winter"; // Dec-Feb
-}
-
-function applySeasonTheme() {
-  const link = ensureSeasonStylesheetLink();
-
-  const params = new URLSearchParams(location.search);
-  const urlSeason = (params.get("season") || "").toLowerCase().trim();
-
-  let saved = "";
-  try { saved = (localStorage.getItem(SEASON_CSS_KEY) || "").toLowerCase().trim(); } catch (_) {}
-
-  const wanted = urlSeason || saved;
-  const override = ["spring", "summer", "autumn", "winter"].includes(wanted) ? wanted : null;
-
-  const season = override || detectSeasonNL();
-  link.href = `css/season-${season}.css`;
-
-  document.body.dataset.season = season;
-
-  // tiny debug help (you can remove later)
-  console.log("[season] active:", season, "->", link.href);
-}
 
 /* ---------- Random useless websites list ---------- */
 
@@ -198,314 +139,500 @@ function onYouTubeIframeAPIReady() {
   });
 }
 
-/* ---------- i18n dictionary ---------- */
+/* =========================================================
+   SEASONS (Amsterdam/NL)
+   - Auto by month
+   - Override via ?season=winter|spring|summer|autumn
+   - Also accepts your old typo: ?seaosn=
+   - Switches a <link id="seasonStylesheet">
+   - Sets subtle CSS vars for accent replacement (no red)
+   - Adds subtle seasonal effects (snow/leaves/blossom/sun haze)
+   - Swaps avatar image by season
+   ========================================================= */
 
-const I18N = {
-  nl: {
-    gateTitle: "Kies je taal",
-    gateHint: "Je kunt dit later wijzigen via de taalknop bovenaan.",
-    gateNlSub: "Moedertaal",
-    gateEnSub: "Internationaal",
-    gateDeSub: "Voor mijn buren",
-    gateEsSub: "Voor vrienden uit Spanje en de Canarische Eilanden",
+const SEASON_ORDER = ["winter", "spring", "summer", "autumn"];
 
-    // UPDATED subtitle
-    subtitle: "Op deze website vind je een selectie van mijn projecten op één plek.",
+// Update these paths to match your repo structure.
+const SEASON_CSS = {
+  winter: "./css/season-winter.css",
+  spring: "./css/season-spring.css",
+  summer: "./css/season-summer.css",
+  autumn: "./css/season-autumn.css"
+};
 
-    aboutTitle: "Over mij",
-    aboutP1:
-      "Hey 👋🏻 Ferran hier. Ik ben een Nederlandse 🇳🇱 developer uit Utrecht / ’s-Hertogenbosch. Ik bouw graag websites, apps en kleine tools om mezelf en anderen te helpen.",
-    aboutP2: "",
+// Avatar images (you said you will provide 4 + default)
+const AVATARS = {
+  default: "./assets/profile-default.png",
+  winter: "./assets/profile-winter.png",
+  spring: "./assets/profile-spring.png",
+  summer: "./assets/profile-summer.png",
+  autumn: "./assets/profile-autumn.png"
+};
 
-    playgroundPaintTitle: "MS Paint Playground",
-    playgroundPaintText: "MS Paint-remake, veel tekenplezier!",
-    playgroundRandomTitle: "Random website-knop",
-    playgroundRandomText:
-      "Nieuwsgierig of verveeld? Klik op de knop en er opent een willekeurige, rare website in een nieuw tabblad.",
-    randomButtonLabel: "Neem me mee naar een willekeurige website",
-
-    tabProjects: "Projecten",
-    tabMedia: "Media",
-    tabPlayground: "Playground",
-
-    searchLabel: "Zoeken",
-
-    filterTypeLabel: "Type",
-    typeAll: "Alles",
-    typeWebsite: "Websites",
-    typeMobile: "Mobiel",
-    typeApi: "API’s / Backend",
-    typeSchool: "School / Studie",
-    typeGame: "Game",
-    typeOther: "Overig",
-
-    filterLanguageLabel: "Taal",
-    languageFilterAll: "Alle talen",
-
-    mediaTypeLabel: "Media type",
-    mediaKindAll: "Alles",
-    mediaKindImages: "Afbeeldingen",
-    mediaKindVideos: "Video’s",
-    mediaKindAudio: "Audio",
-
-    emptyState: "Geen projecten gevonden met deze zoekopdracht of filters. Probeer iets anders.",
-    mediaEmptyState: "Geen media gevonden met deze zoekopdracht of filters.",
-
-    headerLangButton: "Taal",
-    footerBuilt: "Gemaakt met ♥ door Ferran",
-
-    // UPDATED buttons
-    btnGitHub: "Bekijk code",
-    btnLiveSite: "Bekijk live website",
-    btnDownload: "Download",
-
-    paintClearButton: "Wissen",
-    paintClearShortcutHint: "(Ctrl+Shift+N)",
-    confirmClearPaint: "Canvas wissen? Dit reset de Paint-app.",
-
-    modalOpenNewTab: "Openen in nieuw tabblad",
-    modalClose: "Sluiten",
-
-    mediaOpen: "Openen",
-    mediaDownload: "Download",
-    mediaView: "Bekijken",
-    mediaVolume: "Volume",
-    mediaLoop: "🔁 Loop",
-    mediaLoopTitle: "Loop aan/uit"
+// Subtle accent palettes — replaces your red accent with seasonal colors.
+// Keep site DARK; we only touch accent-y tokens.
+const SEASON_VARS = {
+  winter: {
+    "--accent": "#7fb8ff",
+    "--accent-soft": "rgba(127,184,255,.25)",
+    "--accent-alt": "#cfe6ff",
+    "--season-glow": "rgba(127,184,255,.18)",
+    "--season-glow-2": "rgba(220,240,255,.10)"
   },
-
-  en: {
-    gateTitle: "Choose your language",
-    gateHint: "You can change it later with the language button at the top.",
-    gateNlSub: "Native",
-    gateEnSub: "International",
-    gateDeSub: "For my neighbors",
-    gateEsSub: "For friends from Spain & the Canary Islands",
-
-    // UPDATED subtitle
-    subtitle: "On this website you can find a selection of my projects in one place.",
-
-    aboutTitle: "About me",
-    aboutP1:
-      "Hey 👋🏻 Ferran here. I’m a Dutch 🇳🇱 developer from Utrecht / ’s-Hertogenbosch. I like building websites, apps and small tools to help myself and others.",
-    aboutP2: "",
-
-    playgroundPaintTitle: "MS Paint Playground",
-    playgroundPaintText: "MS Paint remake, have fun drawing!",
-    playgroundRandomTitle: "Random Website Button",
-    playgroundRandomText:
-      "Feeling curious or bored? Hit the button and let it launch a random weird website in a new tab.",
-    randomButtonLabel: "Take me to a random website",
-
-    tabProjects: "Projects",
-    tabMedia: "Media",
-    tabPlayground: "Playground",
-
-    searchLabel: "Search",
-
-    filterTypeLabel: "Type",
-    typeAll: "All",
-    typeWebsite: "Websites",
-    typeMobile: "Mobile",
-    typeApi: "APIs / Backend",
-    typeSchool: "School / Study",
-    typeGame: "Game",
-    typeOther: "Other",
-
-    filterLanguageLabel: "Language",
-    languageFilterAll: "All languages",
-
-    mediaTypeLabel: "Media type",
-    mediaKindAll: "All",
-    mediaKindImages: "Images",
-    mediaKindVideos: "Videos",
-    mediaKindAudio: "Audio",
-
-    emptyState: "No projects found with these filters. Try something else.",
-    mediaEmptyState: "No media found with these filters.",
-
-    headerLangButton: "Language",
-    footerBuilt: "Built with ♥ by Ferran",
-
-    // UPDATED buttons
-    btnGitHub: "View code",
-    btnLiveSite: "Open live website",
-    btnDownload: "Download",
-
-    paintClearButton: "Clear",
-    paintClearShortcutHint: "(Ctrl+Shift+N)",
-    confirmClearPaint: "Clear the canvas? This will reset the Paint app.",
-
-    modalOpenNewTab: "Open in new tab",
-    modalClose: "Close",
-
-    mediaOpen: "Open",
-    mediaDownload: "Download",
-    mediaView: "View",
-    mediaVolume: "Volume",
-    mediaLoop: "🔁 Loop",
-    mediaLoopTitle: "Toggle loop"
+  spring: {
+    "--accent": "#ff78b5",
+    "--accent-soft": "rgba(255,120,181,.22)",
+    "--accent-alt": "#7de7a8",
+    "--season-glow": "rgba(255,120,181,.15)",
+    "--season-glow-2": "rgba(125,231,168,.10)"
   },
-
-  de: {
-    gateTitle: "Wähle deine Sprache",
-    gateHint: "Du kannst sie später oben über die Sprach-Schaltfläche ändern.",
-    gateNlSub: "Muttersprache",
-    gateEnSub: "International",
-    gateDeSub: "Für meine Nachbarn",
-    gateEsSub: "Für Freunde aus Spanien & den Kanaren",
-
-    // UPDATED subtitle
-    subtitle: "Auf dieser Website findest du eine Auswahl meiner Projekte an einem Ort.",
-
-    aboutTitle: "Über mich",
-    aboutP1:
-      "Hey 👋🏻 hier ist Ferran. Ich bin ein niederländischer 🇳🇱 Entwickler aus Utrecht / ’s-Hertogenbosch und baue gern Websites, Apps und kleine Tools, um mir und anderen zu helfen.",
-    aboutP2: "",
-
-    playgroundPaintTitle: "MS-Paint-Playground",
-    playgroundPaintText: "MS-Paint-Remake, viel Spaß beim Zeichnen!",
-    playgroundRandomTitle: "Zufällige-Website-Button",
-    playgroundRandomText:
-      "Neugierig oder gelangweilt? Klick auf den Button und es öffnet sich eine zufällige, verrückte Website in einem neuen Tab.",
-    randomButtonLabel: "Bring mich zu einer zufälligen Website",
-
-    tabProjects: "Projekte",
-    tabMedia: "Medien",
-    tabPlayground: "Playground",
-
-    searchLabel: "Suchen",
-
-    filterTypeLabel: "Typ",
-    typeAll: "Alle",
-    typeWebsite: "Websites",
-    typeMobile: "Mobile",
-    typeApi: "APIs / Backend",
-    typeSchool: "Schule / Studium",
-    typeGame: "Game",
-    typeOther: "Sonstiges",
-
-    filterLanguageLabel: "Sprache",
-    languageFilterAll: "Alle Sprachen",
-
-    mediaTypeLabel: "Medientyp",
-    mediaKindAll: "Alle",
-    mediaKindImages: "Bilder",
-    mediaKindVideos: "Videos",
-    mediaKindAudio: "Audio",
-
-    emptyState: "Keine Projekte mit dieser Suche oder diesen Filtern gefunden. Probier etwas anderes.",
-    mediaEmptyState: "Keine Medien mit dieser Suche oder diesen Filtern gefunden.",
-
-    headerLangButton: "Sprache",
-    footerBuilt: "Erstellt mit ♥ von Ferran",
-
-    // UPDATED buttons
-    btnGitHub: "Code ansehen",
-    btnLiveSite: "Live-Website öffnen",
-    btnDownload: "Download",
-
-    paintClearButton: "Leeren",
-    paintClearShortcutHint: "(Strg+Umschalt+N)",
-    confirmClearPaint: "Canvas leeren? Das setzt die Paint-App zurück.",
-
-    modalOpenNewTab: "In neuem Tab öffnen",
-    modalClose: "Schließen",
-
-    mediaOpen: "Öffnen",
-    mediaDownload: "Download",
-    mediaView: "Ansehen",
-    mediaVolume: "Lautstärke",
-    mediaLoop: "🔁 Loop",
-    mediaLoopTitle: "Loop umschalten"
+  summer: {
+    "--accent": "#ffd96a",
+    "--accent-soft": "rgba(255,217,106,.20)",
+    "--accent-alt": "#69d3ff",
+    "--season-glow": "rgba(255,217,106,.14)",
+    "--season-glow-2": "rgba(105,211,255,.10)"
   },
-
-  es: {
-    gateTitle: "Elige tu idioma",
-    gateHint: "Puedes cambiarlo después con el botón de idioma arriba.",
-    gateNlSub: "Idioma nativo",
-    gateEnSub: "Internacional",
-    gateDeSub: "Para mis vecinos",
-    gateEsSub: "Para amigos de España y Canarias",
-
-    // UPDATED subtitle
-    subtitle: "En esta web encontrarás una selección de mis proyectos en un solo lugar.",
-
-    aboutTitle: "Sobre mí",
-    aboutP1:
-      "Hola 👋🏻 soy Ferran. Soy un desarrollador 🇳🇱 de Utrecht / ’s-Hertogenbosch. Me gusta crear webs, apps y pequeñas herramientas para ayudarme a mí y a otras personas.",
-    aboutP2: "",
-
-    playgroundPaintTitle: "Playground de MS Paint",
-    playgroundPaintText: "Remake de MS Paint, ¡diviértete dibujando!",
-    playgroundRandomTitle: "Botón de web aleatoria",
-    playgroundRandomText:
-      "¿Curioso o aburrido? Pulsa el botón y se abrirá una web rara al azar en una nueva pestaña.",
-    randomButtonLabel: "Llévame a una web aleatoria",
-
-    tabProjects: "Proyectos",
-    tabMedia: "Media",
-    tabPlayground: "Playground",
-
-    searchLabel: "Buscar",
-
-    filterTypeLabel: "Tipo",
-    typeAll: "Todo",
-    typeWebsite: "Webs",
-    typeMobile: "Móvil",
-    typeApi: "APIs / Backend",
-    typeSchool: "Escuela / Estudio",
-    typeGame: "Juego",
-    typeOther: "Otros",
-
-    filterLanguageLabel: "Idioma",
-    languageFilterAll: "Todos los idiomas",
-
-    mediaTypeLabel: "Tipo de media",
-    mediaKindAll: "Todo",
-    mediaKindImages: "Imágenes",
-    mediaKindVideos: "Vídeos",
-    mediaKindAudio: "Audio",
-
-    emptyState: "No se encontraron proyectos con estos filtros. Prueba otra cosa.",
-    mediaEmptyState: "No se encontró media con estos filtros.",
-
-    headerLangButton: "Idioma",
-    footerBuilt: "Hecho con ♥ por Ferran",
-
-    // UPDATED buttons
-    btnGitHub: "Ver código",
-    btnLiveSite: "Abrir sitio en vivo",
-    btnDownload: "Descargar",
-
-    paintClearButton: "Borrar",
-    paintClearShortcutHint: "(Ctrl+Shift+N)",
-    confirmClearPaint: "¿Borrar el lienzo? Esto reiniciará la app de Paint.",
-
-    modalOpenNewTab: "Abrir en una nueva pestaña",
-    modalClose: "Cerrar",
-
-    mediaOpen: "Abrir",
-    mediaDownload: "Descargar",
-    mediaView: "Ver",
-    mediaVolume: "Volumen",
-    mediaLoop: "🔁 Loop",
-    mediaLoopTitle: "Alternar loop"
+  autumn: {
+    "--accent": "#ff9a4a",
+    "--accent-soft": "rgba(255,154,74,.22)",
+    "--accent-alt": "#ffd2a1",
+    "--season-glow": "rgba(255,154,74,.16)",
+    "--season-glow-2": "rgba(151,88,39,.12)"
   }
 };
 
-/* ---------- Init ---------- */
+function getSeasonFromDateAmsterdam() {
+  // Month mapping (NL seasons, simple)
+  // winter: Dec–Feb, spring: Mar–May, summer: Jun–Aug, autumn: Sep–Nov
+  // We'll use the user's local time in Amsterdam (browser locale/timezone).
+  const m = new Date().getMonth(); // 0..11
+  if (m === 11 || m === 0 || m === 1) return "winter";
+  if (m >= 2 && m <= 4) return "spring";
+  if (m >= 5 && m <= 7) return "summer";
+  return "autumn";
+}
+
+function getSeasonOverride() {
+  const params = new URLSearchParams(location.search);
+  const raw = (params.get("season") || params.get("seaosn") || "").toLowerCase().trim();
+  if (!raw) return null;
+  const cleaned = raw.replace(/[^a-z]/g, "");
+  if (SEASON_ORDER.includes(cleaned)) return cleaned;
+  // aliases
+  if (cleaned === "fall") return "autumn";
+  return null;
+}
+
+function ensureSeasonLinkTag() {
+  let link = document.getElementById("seasonStylesheet");
+  if (link && link.tagName.toLowerCase() === "link") return link;
+
+  link = document.createElement("link");
+  link.id = "seasonStylesheet";
+  link.rel = "stylesheet";
+  link.href = ""; // set later
+  document.head.appendChild(link);
+  return link;
+}
+
+function applySeasonCss(season) {
+  const link = ensureSeasonLinkTag();
+  const href = SEASON_CSS[season];
+  if (!href) return;
+
+  // Cache-bust so your changes show instantly during dev
+  const busted = href + (href.includes("?") ? "&" : "?") + "v=" + Date.now();
+  link.href = busted;
+}
+
+function applySeasonVars(season) {
+  const vars = SEASON_VARS[season];
+  if (!vars) return;
+
+  const root = document.documentElement;
+  Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
+
+  // Useful hook for CSS too
+  document.body.setAttribute("data-season", season);
+}
+
+function applySeasonAvatar(season) {
+  // Try your existing avatar selector:
+  const img = document.querySelector(".profile-avatar-inner img");
+  if (!img) return;
+
+  const chosen = AVATARS[season] || AVATARS.default;
+  if (!chosen) return;
+
+  // only swap if different to avoid reloading on small reruns
+  if (img.dataset.seasonSrc === chosen) return;
+
+  img.dataset.seasonSrc = chosen;
+  img.src = chosen;
+}
+
+function setThemeRedToSeason(season) {
+  // Your original CSS has "red" baked into some gradients that use rgba(176,23,47,..)
+  // We can override ONLY the bits that are built from variables by setting variables above.
+  // But any hardcoded red in CSS should be removed in seasonal CSS files.
+  // This function exists for you to add quick JS overrides if needed.
+  // (Leaving it intentionally minimal to avoid fighting your CSS.)
+  document.documentElement.style.setProperty("--selection-bg", "var(--accent-soft)");
+}
+
+function applySeason(season) {
+  applySeasonCss(season);
+  applySeasonVars(season);
+  applySeasonAvatar(season);
+  setThemeRedToSeason(season);
+  setupSeasonEffects(season);
+}
+
+function initSeason() {
+  const override = getSeasonOverride();
+  const season = override || getSeasonFromDateAmsterdam();
+  applySeason(season);
+}
+
+/* ---------- Seasonal effects (subtle, continuous, not huge) ---------- */
+
+let seasonFx = null;
+
+function prefersReducedMotion() {
+  return !!window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function setupSeasonEffects(season) {
+  // clear old
+  if (seasonFx && typeof seasonFx.destroy === "function") seasonFx.destroy();
+  seasonFx = null;
+
+  if (prefersReducedMotion()) return;
+
+  if (season === "winter") seasonFx = createSnowFx();
+  else if (season === "autumn") seasonFx = createLeafFx();
+  else if (season === "spring") seasonFx = createBlossomFx();
+  else if (season === "summer") seasonFx = createSunHazeFx();
+}
+
+function createFxCanvas() {
+  const c = document.createElement("canvas");
+  c.className = "season-fx-canvas";
+  Object.assign(c.style, {
+    position: "fixed",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    pointerEvents: "none",
+    zIndex: "0", // behind .app (your app z-index is 1)
+    opacity: "1"
+  });
+  document.body.appendChild(c);
+
+  const ctx = c.getContext("2d", { alpha: true });
+
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = Math.floor(window.innerWidth * dpr);
+    c.height = Math.floor(window.innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+
+  let raf = 0;
+  const onResize = () => resize();
+  window.addEventListener("resize", onResize);
+
+  return {
+    canvas: c,
+    ctx,
+    start(loop) {
+      const tick = (t) => {
+        raf = requestAnimationFrame(tick);
+        loop(t);
+      };
+      raf = requestAnimationFrame(tick);
+    },
+    stop() {
+      cancelAnimationFrame(raf);
+    },
+    destroy() {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      c.remove();
+    }
+  };
+}
+
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function createSnowFx() {
+  const fx = createFxCanvas();
+  const { ctx } = fx;
+
+  const flakes = [];
+  const count = Math.round(Math.min(90, Math.max(35, window.innerWidth / 18)));
+
+  function spawn() {
+    flakes.length = 0;
+    for (let i = 0; i < count; i++) {
+      flakes.push({
+        x: rand(0, window.innerWidth),
+        y: rand(-window.innerHeight, window.innerHeight),
+        r: rand(0.8, 2.2),
+        vy: rand(0.35, 1.15),
+        vx: rand(-0.25, 0.25),
+        wob: rand(0, Math.PI * 2),
+        wobSp: rand(0.002, 0.006)
+      });
+    }
+  }
+  spawn();
+
+  fx.start(() => {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "rgba(230,245,255,0.85)";
+    flakes.forEach((f) => {
+      f.wob += f.wobSp;
+      f.x += f.vx + Math.sin(f.wob) * 0.2;
+      f.y += f.vy;
+
+      if (f.y > window.innerHeight + 10) {
+        f.y = -10;
+        f.x = rand(0, window.innerWidth);
+      }
+      if (f.x < -10) f.x = window.innerWidth + 10;
+      if (f.x > window.innerWidth + 10) f.x = -10;
+
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  });
+
+  return fx;
+}
+
+function createLeafFx() {
+  const fx = createFxCanvas();
+  const { ctx } = fx;
+
+  const leaves = [];
+  const count = Math.round(Math.min(22, Math.max(8, window.innerWidth / 90)));
+
+  function makeLeaf() {
+    return {
+      x: rand(-40, window.innerWidth + 40),
+      y: rand(-window.innerHeight, 0),
+      s: rand(0.55, 1.0), // scale -> small
+      vy: rand(0.45, 1.15),
+      vx: rand(0.45, 1.55), // left->right drift
+      rot: rand(0, Math.PI * 2),
+      vr: rand(-0.02, 0.02),
+      wob: rand(0, Math.PI * 2),
+      wobSp: rand(0.004, 0.01),
+      hue: rand(18, 38), // orange/brown
+      alpha: rand(0.55, 0.9)
+    };
+  }
+
+  for (let i = 0; i < count; i++) leaves.push(makeLeaf());
+
+  function drawLeaf(l) {
+    ctx.save();
+    ctx.translate(l.x, l.y);
+    ctx.rotate(l.rot);
+
+    const w = 10 * l.s;
+    const h = 6 * l.s;
+
+    // simple leaf shape
+    ctx.beginPath();
+    ctx.moveTo(-w, 0);
+    ctx.quadraticCurveTo(-w * 0.2, -h, 0, 0);
+    ctx.quadraticCurveTo(-w * 0.2, h, -w, 0);
+    ctx.closePath();
+
+    ctx.fillStyle = `hsla(${l.hue}, 85%, 62%, ${l.alpha})`;
+    ctx.fill();
+
+    // vein
+    ctx.strokeStyle = `hsla(${l.hue - 10}, 55%, 35%, ${l.alpha * 0.55})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-w * 0.95, 0);
+    ctx.lineTo(0, 0);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  fx.start(() => {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    leaves.forEach((l) => {
+      l.wob += l.wobSp;
+      l.x += l.vx + Math.sin(l.wob) * 0.35;
+      l.y += l.vy;
+      l.rot += l.vr;
+
+      if (l.y > window.innerHeight + 40 || l.x > window.innerWidth + 60) {
+        const n = makeLeaf();
+        n.y = -20;
+        n.x = rand(-40, window.innerWidth * 0.35);
+        leaves[leaves.indexOf(l)] = n;
+      } else {
+        drawLeaf(l);
+      }
+    });
+  });
+
+  return fx;
+}
+
+function createBlossomFx() {
+  const fx = createFxCanvas();
+  const { ctx } = fx;
+
+  const petals = [];
+  const count = Math.round(Math.min(24, Math.max(9, window.innerWidth / 85)));
+
+  function makePetal() {
+    return {
+      x: rand(-40, window.innerWidth + 40),
+      y: rand(-window.innerHeight, 0),
+      s: rand(0.5, 0.95), // small
+      vy: rand(0.35, 0.95),
+      vx: rand(0.25, 1.05),
+      rot: rand(0, Math.PI * 2),
+      vr: rand(-0.02, 0.02),
+      wob: rand(0, Math.PI * 2),
+      wobSp: rand(0.004, 0.01),
+      alpha: rand(0.55, 0.9)
+    };
+  }
+
+  for (let i = 0; i < count; i++) petals.push(makePetal());
+
+  function drawPetal(p) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+
+    const w = 9 * p.s;
+    const h = 6 * p.s;
+
+    ctx.beginPath();
+    ctx.moveTo(0, -h);
+    ctx.bezierCurveTo(w, -h, w, h, 0, h);
+    ctx.bezierCurveTo(-w, h, -w, -h, 0, -h);
+    ctx.closePath();
+
+    ctx.fillStyle = `rgba(255, 170, 210, ${p.alpha})`;
+    ctx.fill();
+
+    ctx.strokeStyle = `rgba(255, 255, 255, ${p.alpha * 0.25})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  fx.start(() => {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    petals.forEach((p) => {
+      p.wob += p.wobSp;
+      p.x += p.vx + Math.sin(p.wob) * 0.35;
+      p.y += p.vy;
+      p.rot += p.vr;
+
+      if (p.y > window.innerHeight + 40 || p.x > window.innerWidth + 60) {
+        const n = makePetal();
+        n.y = -20;
+        n.x = rand(-40, window.innerWidth * 0.35);
+        petals[petals.indexOf(p)] = n;
+      } else {
+        drawPetal(p);
+      }
+    });
+  });
+
+  return fx;
+}
+
+function createSunHazeFx() {
+  // Subtle warm “sun specks” + glow drift, not snow.
+  const fx = createFxCanvas();
+  const { ctx } = fx;
+
+  const specks = [];
+  const count = Math.round(Math.min(26, Math.max(10, window.innerWidth / 80)));
+
+  function makeSpeck() {
+    return {
+      x: rand(0, window.innerWidth),
+      y: rand(0, window.innerHeight),
+      r: rand(0.8, 1.8),
+      vx: rand(-0.08, 0.12),
+      vy: rand(-0.06, 0.10),
+      a: rand(0.12, 0.28),
+      wob: rand(0, Math.PI * 2),
+      wobSp: rand(0.002, 0.005)
+    };
+  }
+
+  for (let i = 0; i < count; i++) specks.push(makeSpeck());
+
+  fx.start(() => {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // soft top-left sun glow
+    const grd = ctx.createRadialGradient(140, 120, 20, 140, 120, Math.min(520, window.innerWidth * 0.6));
+    grd.addColorStop(0, "rgba(255, 225, 130, 0.10)");
+    grd.addColorStop(1, "rgba(255, 225, 130, 0)");
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+    specks.forEach((s) => {
+      s.wob += s.wobSp;
+      s.x += s.vx + Math.sin(s.wob) * 0.08;
+      s.y += s.vy + Math.cos(s.wob) * 0.06;
+
+      if (s.x < -10) s.x = window.innerWidth + 10;
+      if (s.x > window.innerWidth + 10) s.x = -10;
+      if (s.y < -10) s.y = window.innerHeight + 10;
+      if (s.y > window.innerHeight + 10) s.y = -10;
+
+      ctx.fillStyle = `rgba(255, 240, 200, ${s.a})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+
+  return fx;
+}
+
+/* =========================================================
+   Init
+   ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("js-enabled");
 
-  // ✅ apply seasonal css early
-  applySeasonTheme();
-
   // hard-remove any leftover postboard HTML if it still exists (safety)
   document.getElementById("postboardForm")?.closest(".playground-card")?.remove();
 
-  setupLanguage();
+  // ✅ season first (sets CSS + vars early)
+  initSeason();
+
+  // (i18n removed) – keep lang attribute stable
+  document.documentElement.lang = DEFAULT_LANG;
+
   setupTabsAndFilters();
   setupSearch();
   setupImageModal();
@@ -518,119 +645,31 @@ document.addEventListener("DOMContentLoaded", () => {
   loadMedia();
 });
 
-/* ---------- Helpers: search placeholder per lang + tab ---------- */
+/* ---------- Helpers: clamp markers ---------- */
 
 function applyDescriptionClampMarkers() {
   const cards = document.querySelectorAll(".project-desc");
   cards.forEach((p) => {
-    // reset eerst
     p.classList.remove("is-clamped");
-
-    // Detect overflow: als de content hoger is dan het zichtbare blok
-    // kleine tolerantie voor rounding:
     const isOverflowing = p.scrollHeight > p.clientHeight + 1;
     if (isOverflowing) p.classList.add("is-clamped");
   });
 }
 
-function getSearchPlaceholder(lang, view) {
+/* ---------- Helpers: search placeholder per tab ---------- */
+
+function getSearchPlaceholder(view) {
   const tab = view || "projects";
-  const l = SUPPORTED_LANGS.includes(lang) ? lang : DEFAULT_LANG;
 
-  if (tab === "media") {
-    if (l === "nl") return "Zoek in media op titel of bestandsnaam…";
-    if (l === "de") return "Suche in Medien nach Titel oder Dateiname…";
-    if (l === "es") return "Busca en media por título o nombre de archivo…";
-    return "Search media by title or filename…";
-  }
-
-  if (tab === "playground") {
-    if (l === "nl") return "Zoek in Playground-tools op naam of beschrijving…";
-    if (l === "de") return "Suche in Playground-Tools nach Name oder Beschreibung…";
-    if (l === "es") return "Busca herramientas del Playground por nombre o descripción…";
-    return "Search playground tools by name or description…";
-  }
-
-  if (l === "nl") return "Zoek in projecten op naam, beschrijving, programmeertaal of tags…";
-  if (l === "de") return "Suche in Projekten nach Name, Beschreibung, Sprache oder Tags…";
-  if (l === "es") return "Busca proyectos por nombre, descripción, lenguaje o etiquetas…";
+  if (tab === "media") return "Search media by title or filename…";
+  if (tab === "playground") return "Search playground tools by name or description…";
   return "Search projects by name, description, language or tags…";
 }
 
 function updateSearchPlaceholder() {
   const searchInput = document.getElementById("search");
   if (!searchInput) return;
-  searchInput.placeholder = getSearchPlaceholder(state.lang, state.activeTab);
-}
-
-/* ---------- Language / gate ---------- */
-
-function setupLanguage() {
-  const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
-  const gateSeen = localStorage.getItem(LANG_GATE_SEEN_KEY) === "1";
-
-  const initialLang = SUPPORTED_LANGS.includes(savedLang) ? savedLang : DEFAULT_LANG;
-  state.lang = initialLang;
-
-  const gate = document.getElementById("langGate");
-  if (gate) {
-    if (gateSeen) gate.hidden = true;
-
-    gate.addEventListener("click", (event) => {
-      const btn = event.target.closest(".btn-lang");
-      if (!btn) return;
-      const langCode = btn.dataset.lang;
-      if (!SUPPORTED_LANGS.includes(langCode)) return;
-
-      setLanguage(langCode);
-      localStorage.setItem(LANG_GATE_SEEN_KEY, "1");
-      gate.hidden = true;
-    });
-  }
-
-  const headerLangButton = document.getElementById("headerLangButton");
-  if (headerLangButton && gate) {
-    headerLangButton.addEventListener("click", () => {
-      gate.hidden = false;
-      updateLanguageGateActive();
-    });
-  }
-
-  setLanguage(initialLang);
-  updateLanguageGateActive();
-}
-
-function setLanguage(lang) {
-  state.lang = lang;
-  try {
-    localStorage.setItem(LANG_STORAGE_KEY, lang);
-  } catch (_) {}
-
-  const dict = I18N[lang] || I18N[DEFAULT_LANG] || {};
-  document.documentElement.lang = lang;
-
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.getAttribute("data-i18n");
-    const value = dict[key];
-    if (typeof value === "string") el.textContent = value;
-  });
-
-  document.querySelectorAll("[data-i18n-footer-built]").forEach((el) => {
-    const value = dict.footerBuilt;
-    if (typeof value === "string") el.textContent = value;
-  });
-
-  updateSearchPlaceholder();
-  updateLanguageGateActive();
-  renderProjects();
-  renderMedia();
-}
-
-function updateLanguageGateActive() {
-  document.querySelectorAll(".btn-lang").forEach((btn) => {
-    const code = btn.dataset.lang;
-    btn.classList.toggle("active", code === state.lang);
-  });
+  searchInput.placeholder = getSearchPlaceholder(state.activeTab);
 }
 
 /* ---------- Tabs & filters visibility ---------- */
@@ -941,7 +980,7 @@ function formatRepoName(raw) {
 
 /**
  * Improved language list:
- * - Keeps your existing mapping (HTML -> HTML/CSS/JS, C# -> C#/.NET)
+ * - Keeps your mapping (HTML -> HTML/CSS/JS, C# -> C#/.NET)
  * - Adds framework hints from repo name/description (ASP.NET, WPF, WinForms, Java Swing, JavaFX, etc.)
  */
 function getLanguagesList(repo, overrideList) {
@@ -960,7 +999,7 @@ function getLanguagesList(repo, overrideList) {
       .map((l) => String(l))
       .filter((l) => !BLOCKED_LANGUAGES.includes(l.toLowerCase()));
 
-    // Also enrich override list with framework hints (harmless)
+    // Enrich override list with framework hints (harmless)
     addIf(cleaned, "ASP.NET", /asp\.net|aspnet/.test(joined));
     addIf(cleaned, "WPF", /\bwpf\b/.test(joined));
     addIf(cleaned, "WinForms", /winforms|windows forms/.test(joined));
@@ -987,7 +1026,7 @@ function getLanguagesList(repo, overrideList) {
   else if (p === "c++") list.push("C++", "C");
   else list.push(primary);
 
-  // Framework enrichment (this is what you complained about)
+  // Framework enrichment
   if (p === "c#" || list.some((x) => String(x).toLowerCase() === "c#")) {
     addIf(list, "ASP.NET", /asp\.net|aspnet/.test(joined));
     addIf(list, "WPF", /\bwpf\b/.test(joined));
@@ -1050,7 +1089,7 @@ function guessProjectType(repo, override, languages) {
   const isMobile = has(["android", "ios", "xamarin", "apk", "swiftui", "flutter", "react native", "react-native"]);
   const isSchool = has(["school", "study", "studie", "uni", "hogeschool", "opdracht", "assignment", "stage", "internship"]);
 
-  // ✅ Fix: websites should include JS/TS/CSS too (so they don't disappear under "Websites" filter)
+  // ✅ websites include JS/TS/CSS too
   const isWebsite =
     ["html", "javascript", "typescript", "css"].includes(lang) ||
     (Array.isArray(languages) && languages.some((l) => ["html", "css", "js", "typescript"].includes(String(l).toLowerCase()))) ||
@@ -1360,8 +1399,6 @@ function renderProjects() {
   }
   emptyState.style.display = "none";
 
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
-
   filtered.forEach((project) => {
     const card = document.createElement("article");
     card.className = "project-card";
@@ -1378,7 +1415,7 @@ function renderProjects() {
       img.src = project.thumbnail;
       img.alt = project.displayName;
 
-      // 🔥 runtime fallback: if image fails, try bust once (helps logo.gif)
+      // runtime fallback: if image fails, try bust once (helps logo.gif)
       img.addEventListener("error", () => {
         if (img.dataset.busted === "1") return;
         img.dataset.busted = "1";
@@ -1430,17 +1467,17 @@ function renderProjects() {
     githubBtn.target = "_blank";
     githubBtn.rel = "noopener noreferrer";
     githubBtn.className = "btn-card";
-    githubBtn.innerHTML = `<span>${dict.btnGitHub || "View code"}</span>`;
+    githubBtn.innerHTML = `<span>View code</span>`;
     actions.appendChild(githubBtn);
 
-    // ✅ Live button only if liveUrl is set (manual override OR pages+index.html check)
+    // Live button only if liveUrl is set (manual OR pages+index.html check)
     if (project.liveUrl) {
       const liveBtn = document.createElement("a");
       liveBtn.href = project.liveUrl;
       liveBtn.target = "_blank";
       liveBtn.rel = "noopener noreferrer";
       liveBtn.className = "btn-card btn-card-live";
-      liveBtn.innerHTML = `<span>${dict.btnLiveSite || "Open live website"}</span>`;
+      liveBtn.innerHTML = `<span>Open live website</span>`;
       actions.appendChild(liveBtn);
     }
 
@@ -1539,13 +1576,12 @@ function getFilteredMedia() {
 }
 
 function createVolumeRow(mediaEl) {
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
   const row = document.createElement("div");
   row.className = "media-volume-row";
 
   const label = document.createElement("span");
   label.className = "media-volume-label";
-  label.textContent = dict.mediaVolume || "Volume";
+  label.textContent = "Volume";
 
   const slider = document.createElement("input");
   slider.type = "range";
@@ -1577,7 +1613,6 @@ function renderMedia() {
   const emptyState = document.getElementById("mediaEmptyState");
   if (!grid || !emptyState) return;
 
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
   const filtered = getFilteredMedia();
 
   grid.innerHTML = "";
@@ -1631,8 +1666,8 @@ function renderMedia() {
       const loopBtn = document.createElement("button");
       loopBtn.type = "button";
       loopBtn.className = "media-action-btn media-loop-btn";
-      loopBtn.textContent = dict.mediaLoop || "🔁 Loop";
-      loopBtn.title = dict.mediaLoopTitle || "Toggle loop";
+      loopBtn.textContent = "🔁 Loop";
+      loopBtn.title = "Toggle loop";
       loopBtn.addEventListener("click", () => {
         video.loop = !video.loop;
         loopBtn.classList.toggle("is-active", video.loop);
@@ -1646,13 +1681,13 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = dict.mediaOpen || "Open";
+      openBtn.textContent = "Open";
 
       const downloadBtn = document.createElement("a");
       downloadBtn.href = item.path;
       downloadBtn.download = "";
       downloadBtn.className = "media-action-btn";
-      downloadBtn.textContent = dict.mediaDownload || "Download";
+      downloadBtn.textContent = "Download";
 
       actions.appendChild(openBtn);
       actions.appendChild(downloadBtn);
@@ -1684,7 +1719,7 @@ function renderMedia() {
       const viewBtn = document.createElement("button");
       viewBtn.type = "button";
       viewBtn.className = "media-action-btn";
-      viewBtn.textContent = dict.mediaView || "View";
+      viewBtn.textContent = "View";
       viewBtn.addEventListener("click", () => openImageModal(item.path, item.title));
       actions.appendChild(viewBtn);
     } else {
@@ -1693,7 +1728,7 @@ function renderMedia() {
       openBtn.target = "_blank";
       openBtn.rel = "noopener noreferrer";
       openBtn.className = "media-action-btn";
-      openBtn.textContent = dict.mediaOpen || "Open";
+      openBtn.textContent = "Open";
       actions.appendChild(openBtn);
     }
 
@@ -1701,7 +1736,7 @@ function renderMedia() {
     downloadBtn.href = item.path;
     downloadBtn.download = "";
     downloadBtn.className = "media-action-btn";
-    downloadBtn.textContent = dict.mediaDownload || "Download";
+    downloadBtn.textContent = "Download";
     actions.appendChild(downloadBtn);
 
     card.appendChild(title);
@@ -1730,8 +1765,6 @@ function openImageModal(src, captionText) {
   const modal = document.getElementById("imageModal");
   if (!modal) return;
 
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
-
   modal.innerHTML = "";
 
   const inner = document.createElement("div");
@@ -1755,7 +1788,7 @@ function openImageModal(src, captionText) {
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.className = "image-modal-btn image-modal-close";
-  closeBtn.textContent = dict.modalClose || "Sluiten";
+  closeBtn.textContent = "Close";
   closeBtn.addEventListener("click", closeImageModal);
 
   actions.appendChild(closeBtn);
@@ -1795,7 +1828,7 @@ function setupPlaygroundRandomButton() {
   });
 }
 
-/* ---------- Paint toolbar + shortcuts (ONLY CLEAR + i18n confirm) ---------- */
+/* ---------- Paint toolbar + shortcuts (ONLY CLEAR + confirm) ---------- */
 
 function setupPaintToolbar() {
   const paintCard = document.querySelector(".playground-paint");
@@ -1818,10 +1851,9 @@ function setupPaintToolbar() {
 
 function handlePaintAction(action) {
   if (!paintIframe) return;
-  const dict = I18N[state.lang] || I18N[DEFAULT_LANG] || {};
 
   if (action === "clear") {
-    const ok = window.confirm(dict.confirmClearPaint || "Clear the canvas? This will reset the Paint app.");
+    const ok = window.confirm("Clear the canvas? This will reset the Paint app.");
     if (!ok) return;
     reloadPaintIframe();
   }
