@@ -162,11 +162,11 @@ const SEASON_CSS = {
 
 // Avatar images (you said you will provide 4 + default)
 const AVATARS = {
-  default: "./assets/profile-default.png",
-  winter: "./assets/profile-winter.png",
-  spring: "./assets/profile-spring.png",
-  summer: "./assets/profile-summer.png",
-  autumn: "./assets/profile-autumn.png"
+  default: "./assets/profile-default.gif",
+  winter: "./assets/profile-winter.gif",
+  spring: "./assets/profile-spring.gif",
+  summer: "./assets/profile-summer.gif",
+  autumn: "./assets/profile-autumn.gif"
 };
 
 // Subtle accent palettes — replaces your red accent with seasonal colors.
