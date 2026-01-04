@@ -1351,16 +1351,13 @@ body.bg-video-active .bg-video-overlay {
 }
 
 .lang-gate-logo {
-  font-family: 'Akura Popo', cursive;
+  font-family: var(--font-title);
   font-size: 1.05rem;
-
   text-transform: uppercase;
-  letter-spacing: 0.14em; /* slightly reduced for Akura Popo */
-
+  letter-spacing: 0.22em;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 0.35rem;
 }
-
 
 .lang-gate-title {
   font-size: 1.35rem;
