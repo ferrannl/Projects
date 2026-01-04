@@ -1,6 +1,6 @@
 /* js/main.js */
 /* =========================================================
-   Ferran Projects – FULL JS (everything) 
+   Ferran Projects – FULL JS (everything)
    ✅ Includes: GitHub loading + cache, projects overrides, thumbnails,
       GitHub Pages live detection (index.html in root), media index,
       tabs + filters + search placeholder, image modal,
@@ -9,6 +9,9 @@
       ✅ Season system: auto NL/Amsterdam + ?season= override,
          seasonal CSS link switch + seasonal accent vars + subtle effects,
          seasonal avatar swap.
+   ✅ NEW: Projects pagination (6 per page) to reduce GIF/FX lag.
+   ✅ NEW: GIF thumbs do NOT animate in grid; they animate only in modal.
+         (Grid shows a non-GIF preview instead; modal opens the real GIF.)
    ❌ Removed ONLY: i18n dictionary + language gate translation logic.
    ========================================================= */
 
@@ -20,11 +23,14 @@ const PROJECTS_URL = "./projects/projects.json";
 const MEDIA_INDEX_URL = "./media/media.json";
 
 const CACHE_KEY = "ferranProjectsCacheV2";
-const THUMB_CACHE_KEY = "ferranProjectsThumbsV4"; // bump key (new thumb logic)
+const THUMB_CACHE_KEY = "ferranProjectsThumbsV5"; // bump key (new gif-preview logic)
 const LIVE_CACHE_KEY = "ferranProjectsLiveIndexV1"; // cache: repoName -> { hasIndex: bool, ts: number }
 
 /* NOTE: i18n removed on purpose. Keep these only if you still use them elsewhere. */
 const DEFAULT_LANG = "nl";
+
+/* ✅ Pagination */
+const PROJECTS_PAGE_SIZE = 6;
 
 /* ---------- Random useless websites list ---------- */
 
@@ -93,7 +99,10 @@ const state = {
   typeFilter: "all",
   languageFilter: "all",
   mediaTypeFilter: "all",
-  lang: DEFAULT_LANG
+  lang: DEFAULT_LANG,
+
+  /* ✅ pagination */
+  projectsPage: 1
 };
 
 /* Small words not capitalized in titles (except first word) */
@@ -205,7 +214,6 @@ const SEASON_VARS = {
 function getSeasonFromDateAmsterdam() {
   // Month mapping (NL seasons, simple)
   // winter: Dec–Feb, spring: Mar–May, summer: Jun–Aug, autumn: Sep–Nov
-  // We'll use the user's local time in Amsterdam (browser locale/timezone).
   const m = new Date().getMonth(); // 0..11
   if (m === 11 || m === 0 || m === 1) return "winter";
   if (m >= 2 && m <= 4) return "spring";
@@ -219,7 +227,6 @@ function getSeasonOverride() {
   if (!raw) return null;
   const cleaned = raw.replace(/[^a-z]/g, "");
   if (SEASON_ORDER.includes(cleaned)) return cleaned;
-  // aliases
   if (cleaned === "fall") return "autumn";
   return null;
 }
@@ -231,7 +238,7 @@ function ensureSeasonLinkTag() {
   link = document.createElement("link");
   link.id = "seasonStylesheet";
   link.rel = "stylesheet";
-  link.href = ""; // set later
+  link.href = "";
   document.head.appendChild(link);
   return link;
 }
@@ -241,7 +248,7 @@ function applySeasonCss(season) {
   const href = SEASON_CSS[season];
   if (!href) return;
 
-  // Cache-bust so your changes show instantly during dev
+  // cache-bust during dev
   const busted = href + (href.includes("?") ? "&" : "?") + "v=" + Date.now();
   link.href = busted;
 }
@@ -252,20 +259,16 @@ function applySeasonVars(season) {
 
   const root = document.documentElement;
   Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
-
-  // Useful hook for CSS too
   document.body.setAttribute("data-season", season);
 }
 
 function applySeasonAvatar(season) {
-  // Try your existing avatar selector:
   const img = document.querySelector(".profile-avatar-inner img");
   if (!img) return;
 
   const chosen = AVATARS[season] || AVATARS.default;
   if (!chosen) return;
 
-  // only swap if different to avoid reloading on small reruns
   if (img.dataset.seasonSrc === chosen) return;
 
   img.dataset.seasonSrc = chosen;
@@ -273,11 +276,6 @@ function applySeasonAvatar(season) {
 }
 
 function setThemeRedToSeason(season) {
-  // Your original CSS has "red" baked into some gradients that use rgba(176,23,47,..)
-  // We can override ONLY the bits that are built from variables by setting variables above.
-  // But any hardcoded red in CSS should be removed in seasonal CSS files.
-  // This function exists for you to add quick JS overrides if needed.
-  // (Leaving it intentionally minimal to avoid fighting your CSS.)
   document.documentElement.style.setProperty("--selection-bg", "var(--accent-soft)");
 }
 
@@ -295,7 +293,7 @@ function initSeason() {
   applySeason(season);
 }
 
-/* ---------- Seasonal effects (subtle, continuous, not huge) ---------- */
+/* ---------- Seasonal effects (subtle) ---------- */
 
 let seasonFx = null;
 
@@ -304,7 +302,6 @@ function prefersReducedMotion() {
 }
 
 function setupSeasonEffects(season) {
-  // clear old
   if (seasonFx && typeof seasonFx.destroy === "function") seasonFx.destroy();
   seasonFx = null;
 
@@ -325,7 +322,7 @@ function createFxCanvas() {
     width: "100%",
     height: "100%",
     pointerEvents: "none",
-    zIndex: "0", // behind .app (your app z-index is 1)
+    zIndex: "0",
     opacity: "1"
   });
   document.body.appendChild(c);
@@ -429,14 +426,14 @@ function createLeafFx() {
     return {
       x: rand(-40, window.innerWidth + 40),
       y: rand(-window.innerHeight, 0),
-      s: rand(0.55, 1.0), // scale -> small
+      s: rand(0.55, 1.0),
       vy: rand(0.45, 1.15),
-      vx: rand(0.45, 1.55), // left->right drift
+      vx: rand(0.45, 1.55),
       rot: rand(0, Math.PI * 2),
       vr: rand(-0.02, 0.02),
       wob: rand(0, Math.PI * 2),
       wobSp: rand(0.004, 0.01),
-      hue: rand(18, 38), // orange/brown
+      hue: rand(18, 38),
       alpha: rand(0.55, 0.9)
     };
   }
@@ -451,7 +448,6 @@ function createLeafFx() {
     const w = 10 * l.s;
     const h = 6 * l.s;
 
-    // simple leaf shape
     ctx.beginPath();
     ctx.moveTo(-w, 0);
     ctx.quadraticCurveTo(-w * 0.2, -h, 0, 0);
@@ -461,7 +457,6 @@ function createLeafFx() {
     ctx.fillStyle = `hsla(${l.hue}, 85%, 62%, ${l.alpha})`;
     ctx.fill();
 
-    // vein
     ctx.strokeStyle = `hsla(${l.hue - 10}, 55%, 35%, ${l.alpha * 0.55})`;
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -505,7 +500,7 @@ function createBlossomFx() {
     return {
       x: rand(-40, window.innerWidth + 40),
       y: rand(-window.innerHeight, 0),
-      s: rand(0.5, 0.95), // small
+      s: rand(0.5, 0.95),
       vy: rand(0.35, 0.95),
       vx: rand(0.25, 1.05),
       rot: rand(0, Math.PI * 2),
@@ -565,7 +560,6 @@ function createBlossomFx() {
 }
 
 function createSunHazeFx() {
-  // Subtle warm “sun specks” + glow drift, not snow.
   const fx = createFxCanvas();
   const { ctx } = fx;
 
@@ -590,7 +584,6 @@ function createSunHazeFx() {
   fx.start(() => {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    // soft top-left sun glow
     const grd = ctx.createRadialGradient(140, 120, 20, 140, 120, Math.min(520, window.innerWidth * 0.6));
     grd.addColorStop(0, "rgba(255, 225, 130, 0.10)");
     grd.addColorStop(1, "rgba(255, 225, 130, 0)");
@@ -624,13 +617,10 @@ function createSunHazeFx() {
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("js-enabled");
 
-  // hard-remove any leftover postboard HTML if it still exists (safety)
   document.getElementById("postboardForm")?.closest(".playground-card")?.remove();
 
-  // ✅ season first (sets CSS + vars early)
   initSeason();
 
-  // (i18n removed) – keep lang attribute stable
   document.documentElement.lang = DEFAULT_LANG;
 
   setupTabsAndFilters();
@@ -773,6 +763,7 @@ function setupTabsAndFilters() {
   if (typeFilter) {
     typeFilter.addEventListener("change", () => {
       state.typeFilter = typeFilter.value;
+      state.projectsPage = 1; // ✅ reset page
       renderProjects();
     });
   }
@@ -780,6 +771,7 @@ function setupTabsAndFilters() {
   if (languageFilter) {
     languageFilter.addEventListener("change", () => {
       state.languageFilter = languageFilter.value;
+      state.projectsPage = 1; // ✅ reset page
       renderProjects();
     });
   }
@@ -800,7 +792,10 @@ function setupSearch() {
 
   searchEl.addEventListener("input", () => {
     state.search = searchEl.value.trim();
-    if (state.activeTab === "projects") renderProjects();
+    if (state.activeTab === "projects") {
+      state.projectsPage = 1; // ✅ reset page
+      renderProjects();
+    }
     if (state.activeTab === "media") renderMedia();
   });
 
@@ -877,9 +872,9 @@ async function loadProjects() {
     const type = guessProjectType(repo, o, languages);
     const tags = Array.isArray(o.tags) ? [...o.tags] : [];
 
-    // Live URL is now resolved later (must have GitHub Pages AND index.html in repo root)
     const liveUrl = resolveManualLiveUrl(repo, o);
 
+    // thumbnail is computed later; store override if any
     const thumbnail = computeThumbnail(repo, o);
 
     return {
@@ -890,19 +885,24 @@ async function loadProjects() {
       languages,
       type,
       tags,
-      liveUrl,       // can be manual override now; github-pages live added later
+      liveUrl,
       githubUrl: repo.html_url,
-      thumbnail
+
+      // ✅ new thumb fields
+      thumbnail,          // can be gif or any
+      thumbPreview: null, // what we show in the grid (never animated gif)
+      thumbAnimated: null // if original was gif, it goes here (only used in modal)
     };
   });
 
-  // sort (manual live first, then later we re-sort after live checks)
   sortProjectsByLive();
   buildLanguageFilterOptions(projects);
-  renderProjects();
-  loadProjectThumbnails();
 
-  // ✅ after initial paint: resolve “real” GitHub Pages live URLs based on index.html
+  state.projectsPage = 1; // ✅
+  renderProjects();
+
+  await loadProjectThumbnails();
+
   await resolveGitHubPagesLiveUrls();
   sortProjectsByLive();
   renderProjects();
@@ -978,11 +978,6 @@ function formatRepoName(raw) {
     .join(" ");
 }
 
-/**
- * Improved language list:
- * - Keeps your mapping (HTML -> HTML/CSS/JS, C# -> C#/.NET)
- * - Adds framework hints from repo name/description (ASP.NET, WPF, WinForms, Java Swing, JavaFX, etc.)
- */
 function getLanguagesList(repo, overrideList) {
   const primary = repo?.language;
   const name = String(repo?.name || "").toLowerCase();
@@ -999,7 +994,6 @@ function getLanguagesList(repo, overrideList) {
       .map((l) => String(l))
       .filter((l) => !BLOCKED_LANGUAGES.includes(l.toLowerCase()));
 
-    // Enrich override list with framework hints (harmless)
     addIf(cleaned, "ASP.NET", /asp\.net|aspnet/.test(joined));
     addIf(cleaned, "WPF", /\bwpf\b/.test(joined));
     addIf(cleaned, "WinForms", /winforms|windows forms/.test(joined));
@@ -1026,7 +1020,6 @@ function getLanguagesList(repo, overrideList) {
   else if (p === "c++") list.push("C++", "C");
   else list.push(primary);
 
-  // Framework enrichment
   if (p === "c#" || list.some((x) => String(x).toLowerCase() === "c#")) {
     addIf(list, "ASP.NET", /asp\.net|aspnet/.test(joined));
     addIf(list, "WPF", /\bwpf\b/.test(joined));
@@ -1089,7 +1082,6 @@ function guessProjectType(repo, override, languages) {
   const isMobile = has(["android", "ios", "xamarin", "apk", "swiftui", "flutter", "react native", "react-native"]);
   const isSchool = has(["school", "study", "studie", "uni", "hogeschool", "opdracht", "assignment", "stage", "internship"]);
 
-  // ✅ websites include JS/TS/CSS too
   const isWebsite =
     ["html", "javascript", "typescript", "css"].includes(lang) ||
     (Array.isArray(languages) && languages.some((l) => ["html", "css", "js", "typescript"].includes(String(l).toLowerCase()))) ||
@@ -1105,42 +1097,28 @@ function guessProjectType(repo, override, languages) {
 
 /* ---------- Live URL logic ---------- */
 
-/**
- * Manual overrides still allowed:
- * - override.liveUrl explicitly: always return it
- * - override.hasLive is NOT trusted anymore for auto-detect (index.html rule wins)
- */
 function resolveManualLiveUrl(repo, override) {
   const rawOverride = (override?.liveUrl || "").trim();
   if (rawOverride) return rawOverride;
-  return null; // auto live resolved later by GitHub Pages + index.html check
+  return null;
 }
 
-/**
- * Show “Open live website” only if:
- * - repo.has_pages is true (GitHub Pages enabled)
- * - AND index.html exists in repository root
- */
 async function resolveGitHubPagesLiveUrls() {
   const now = Date.now();
-  const TTL = 1000 * 60 * 60 * 24 * 7; // 7 days cache
+  const TTL = 1000 * 60 * 60 * 24 * 7; // 7 days
 
   const tasks = projects.map(async (p) => {
-    // keep manual overrides
     if (p.liveUrl) return;
 
-    // find repo object
     const repo = repos.find((r) => String(r.name).toLowerCase() === String(p.name).toLowerCase());
     if (!repo || !repo.has_pages) return;
 
-    // cache hit?
     const cached = liveIndexCache[p.name];
     if (cached && typeof cached.hasIndex === "boolean" && (now - (cached.ts || 0)) < TTL) {
       if (cached.hasIndex) p.liveUrl = `https://${GITHUB_USER}.github.io/${p.name}/`;
       return;
     }
 
-    // check root index.html via contents API
     const hasIndex = await repoHasRootIndexHtml(p.name);
     liveIndexCache[p.name] = { hasIndex, ts: now };
     saveLiveIndexCache();
@@ -1216,10 +1194,6 @@ function saveThumbCache() {
   } catch (_) {}
 }
 
-/**
- * "exists" check: try HEAD, fallback GET.
- * For GIF specifically: do GET (some CDNs/proxies behave weird on HEAD).
- */
 async function checkImageExists(url, preferGet = false) {
   try {
     if (!preferGet) {
@@ -1233,22 +1207,39 @@ async function checkImageExists(url, preferGet = false) {
   }
 }
 
-/** cache-busting without breaking raw URLs */
 function withBust(url) {
   const sep = url.includes("?") ? "&" : "?";
   return `${url}${sep}v=${Date.now()}`;
 }
 
+/* ✅ helper */
+function isGifUrl(url) {
+  const u = String(url || "").toLowerCase();
+  return u.endsWith(".gif") || u.includes(".gif?");
+}
+
+function opengraphFallback(repoName) {
+  return `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
+}
+
+/**
+ * ✅ NEW THUMB RULE:
+ * - We may still *store* the best root image (logo.gif is fine),
+ * - BUT: if it is a GIF, we do NOT display it in the grid.
+ *   Instead:
+ *     project.thumbAnimated = gif
+ *     project.thumbPreview  = best non-gif we can find (logo.png/jpg/webp/svg), else opengraph
+ * - Modal uses thumbAnimated (gif), so it plays only when clicked.
+ */
 async function loadProjectThumbnails() {
   const promises = projects.map(async (project) => {
     const repoName = project.name;
 
-    // 1) explicit override thumb
+    // 1) explicit override
     if (project.thumbnail && !thumbCache[repoName]) {
-      const ok = await checkImageExists(project.thumbnail, project.thumbnail.toLowerCase().endsWith(".gif"));
+      const ok = await checkImageExists(project.thumbnail, isGifUrl(project.thumbnail));
       if (ok) {
         thumbCache[repoName] = project.thumbnail;
-        return;
       } else {
         project.thumbnail = null;
       }
@@ -1258,18 +1249,26 @@ async function loadProjectThumbnails() {
     const cached = thumbCache[repoName];
     if (cached) {
       project.thumbnail = cached;
-      return;
     }
 
-    // 3) try repo root (logo.gif highest priority)
-    const rootThumb = await findRepoRootThumbnail(repoName);
-    let finalUrl = rootThumb;
+    // 3) try repo root if still none
+    if (!project.thumbnail) {
+      const rootBest = await findRepoRootThumbnail(repoName);
+      project.thumbnail = rootBest || opengraphFallback(repoName);
+      thumbCache[repoName] = project.thumbnail;
+    }
 
-    // 4) fallback: GitHub opengraph
-    if (!finalUrl) finalUrl = `https://opengraph.githubassets.com/1/${GITHUB_USER}/${repoName}`;
+    // ✅ finalize preview vs animated
+    if (isGifUrl(project.thumbnail)) {
+      project.thumbAnimated = project.thumbnail;
 
-    project.thumbnail = finalUrl;
-    thumbCache[repoName] = finalUrl;
+      // try to find a non-gif companion in root (logo.png etc)
+      const nonGif = await findRepoRootNonGifThumbnail(repoName);
+      project.thumbPreview = nonGif || opengraphFallback(repoName);
+    } else {
+      project.thumbAnimated = null;
+      project.thumbPreview = project.thumbnail || opengraphFallback(repoName);
+    }
   });
 
   await Promise.all(promises);
@@ -1294,37 +1293,24 @@ async function findRepoRootThumbnail(repoName) {
 
     const score = (name) => {
       const lower = name.toLowerCase();
-
-      // ✅ ABSOLUTE prio: logo.gif
       if (lower === "logo.gif") return 0;
-
-      // next: common logo formats
       if (lower === "logo.png") return 1;
       if (lower === "logo.jpg" || lower === "logo.jpeg") return 2;
       if (lower === "logo.webp") return 3;
       if (lower === "logo.svg") return 4;
-
-      // other "logo.*"
       if (lower.startsWith("logo.")) return 5;
-
-      // other common thumbs
       if (lower === "thumbnail.png" || lower === "thumb.png") return 6;
       if (lower === "preview.png") return 7;
-
-      // avoid diagrams
       if (lower.includes("classdiagram")) return 20;
       if (lower.includes("diagram")) return 21;
-
       return 50;
     };
 
     imageFiles.sort((a, b) => score(a.name) - score(b.name));
     const chosen = imageFiles[0];
 
-    const encodedName = encodeURIComponent(chosen.name);
-    const raw = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodedName}`;
+    const raw = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodeURIComponent(chosen.name)}`;
 
-    // For GIF: validate with GET, and if flaky -> bust query once
     const isGif = (chosen.name || "").toLowerCase().endsWith(".gif");
     if (isGif) {
       const ok = await checkImageExists(raw, true);
@@ -1334,20 +1320,10 @@ async function findRepoRootThumbnail(repoName) {
       const ok2 = await checkImageExists(busted, true);
       if (ok2) return busted;
 
-      // if gif fails, try next best: logo.png/jpg/etc if available
-      const fallbackOrder = ["logo.png", "logo.jpg", "logo.jpeg", "logo.webp", "logo.svg"];
-      const map = new Map(imageFiles.map((f) => [f.name.toLowerCase(), f]));
-      for (const fname of fallbackOrder) {
-        const f = map.get(fname);
-        if (!f) continue;
-        const u = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodeURIComponent(f.name)}`;
-        const okf = await checkImageExists(u, false);
-        if (okf) return u;
-      }
+      // if gif fails, no root thumb
       return null;
     }
 
-    // non-gif: normal check
     const ok = await checkImageExists(raw, false);
     if (!ok) return null;
     return raw;
@@ -1355,6 +1331,173 @@ async function findRepoRootThumbnail(repoName) {
     console.error("Failed to load root thumbnail for", repoName, err);
     return null;
   }
+}
+
+/* ✅ find best non-gif in root for preview */
+async function findRepoRootNonGifThumbnail(repoName) {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${repoName}/contents/`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+
+    const files = data.filter((item) => item.type === "file");
+    const imageFiles = files.filter((item) => {
+      const ext = (item.name.split(".").pop() || "").toLowerCase();
+      return ["jpg", "jpeg", "png", "svg", "webp"].includes(ext);
+    });
+    if (!imageFiles.length) return null;
+
+    const score = (name) => {
+      const lower = name.toLowerCase();
+      if (lower === "logo.png") return 0;
+      if (lower === "logo.jpg" || lower === "logo.jpeg") return 1;
+      if (lower === "logo.webp") return 2;
+      if (lower === "logo.svg") return 3;
+      if (lower.startsWith("logo.")) return 4;
+      if (lower === "thumbnail.png" || lower === "thumb.png") return 5;
+      if (lower === "preview.png") return 6;
+      if (lower.includes("classdiagram")) return 20;
+      if (lower.includes("diagram")) return 21;
+      return 50;
+    };
+
+    imageFiles.sort((a, b) => score(a.name) - score(b.name));
+    const chosen = imageFiles[0];
+
+    const raw = `https://raw.githubusercontent.com/${GITHUB_USER}/${repoName}/HEAD/${encodeURIComponent(chosen.name)}`;
+    const ok = await checkImageExists(raw, false);
+    if (!ok) return null;
+    return raw;
+  } catch (_) {
+    return null;
+  }
+}
+
+/* ---------- Pagination helpers ---------- */
+
+function getTotalPages(total, size) {
+  return Math.max(1, Math.ceil(total / size));
+}
+
+function clamp(n, a, b) {
+  return Math.min(b, Math.max(a, n));
+}
+
+function ensureProjectsPagerEl() {
+  const view = document.getElementById("projectsView");
+  if (!view) return null;
+
+  let pager = document.getElementById("projectsPager");
+  if (pager) return pager;
+
+  pager = document.createElement("div");
+  pager.id = "projectsPager";
+  pager.className = "pager";
+
+  view.appendChild(pager);
+  return pager;
+}
+
+function renderProjectsPager(totalItems) {
+  const pager = ensureProjectsPagerEl();
+  if (!pager) return;
+
+  const totalPages = getTotalPages(totalItems, PROJECTS_PAGE_SIZE);
+  state.projectsPage = clamp(state.projectsPage, 1, totalPages);
+
+  // hide pager if only 1 page
+  if (totalPages <= 1) {
+    pager.innerHTML = "";
+    pager.style.display = "none";
+    return;
+  }
+  pager.style.display = "";
+
+  pager.innerHTML = "";
+
+  const makeBtn = (label, disabled, onClick, extraClass = "") => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = `pager-btn ${extraClass}`.trim();
+    b.textContent = label;
+    b.disabled = !!disabled;
+    b.addEventListener("click", onClick);
+    return b;
+  };
+
+  const prev = makeBtn("‹ Prev", state.projectsPage === 1, () => {
+    state.projectsPage = clamp(state.projectsPage - 1, 1, totalPages);
+    renderProjects();
+    scrollProjectsGridIntoView();
+  });
+
+  const next = makeBtn("Next ›", state.projectsPage === totalPages, () => {
+    state.projectsPage = clamp(state.projectsPage + 1, 1, totalPages);
+    renderProjects();
+    scrollProjectsGridIntoView();
+  });
+
+  pager.appendChild(prev);
+
+  // page numbers (windowed)
+  const windowSize = 5;
+  const half = Math.floor(windowSize / 2);
+  let start = Math.max(1, state.projectsPage - half);
+  let end = Math.min(totalPages, start + windowSize - 1);
+  start = Math.max(1, end - windowSize + 1);
+
+  if (start > 1) {
+    pager.appendChild(makeBtn("1", false, () => {
+      state.projectsPage = 1;
+      renderProjects();
+      scrollProjectsGridIntoView();
+    }, "pager-num"));
+    if (start > 2) {
+      const dots = document.createElement("span");
+      dots.className = "pager-dots";
+      dots.textContent = "…";
+      pager.appendChild(dots);
+    }
+  }
+
+  for (let p = start; p <= end; p++) {
+    const isActive = p === state.projectsPage;
+    const b = makeBtn(String(p), false, () => {
+      state.projectsPage = p;
+      renderProjects();
+      scrollProjectsGridIntoView();
+    }, `pager-num ${isActive ? "is-active" : ""}`.trim());
+    pager.appendChild(b);
+  }
+
+  if (end < totalPages) {
+    if (end < totalPages - 1) {
+      const dots = document.createElement("span");
+      dots.className = "pager-dots";
+      dots.textContent = "…";
+      pager.appendChild(dots);
+    }
+    pager.appendChild(makeBtn(String(totalPages), false, () => {
+      state.projectsPage = totalPages;
+      renderProjects();
+      scrollProjectsGridIntoView();
+    }, "pager-num"));
+  }
+
+  pager.appendChild(next);
+
+  const info = document.createElement("div");
+  info.className = "pager-info";
+  info.textContent = `Page ${state.projectsPage} / ${totalPages}`;
+  pager.appendChild(info);
+}
+
+function scrollProjectsGridIntoView() {
+  const grid = document.getElementById("projectsGrid");
+  if (!grid) return;
+  const y = grid.getBoundingClientRect().top + window.scrollY - 130;
+  window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
 }
 
 /* ---------- Project rendering + click-to-enlarge thumbnail ---------- */
@@ -1385,21 +1528,36 @@ function getFilteredProjects() {
   });
 }
 
+function getPagedProjects(filtered) {
+  const totalPages = getTotalPages(filtered.length, PROJECTS_PAGE_SIZE);
+  state.projectsPage = clamp(state.projectsPage, 1, totalPages);
+
+  const start = (state.projectsPage - 1) * PROJECTS_PAGE_SIZE;
+  const end = start + PROJECTS_PAGE_SIZE;
+  return filtered.slice(start, end);
+}
+
 function renderProjects() {
   const grid = document.getElementById("projectsGrid");
   const emptyState = document.getElementById("emptyState");
   if (!grid || !emptyState) return;
 
   const filtered = getFilteredProjects();
+  const paged = getPagedProjects(filtered);
+
   grid.innerHTML = "";
 
   if (!filtered.length) {
     emptyState.style.display = "block";
+    renderProjectsPager(0);
     return;
   }
   emptyState.style.display = "none";
 
-  filtered.forEach((project) => {
+  // ✅ pager for filtered set
+  renderProjectsPager(filtered.length);
+
+  paged.forEach((project) => {
     const card = document.createElement("article");
     card.className = "project-card";
 
@@ -1409,20 +1567,33 @@ function renderProjects() {
     const thumb = document.createElement("div");
     thumb.className = "project-thumb";
 
-    if (project.thumbnail) {
+    // ✅ choose preview (never animated in grid)
+    const gridThumb = project.thumbPreview || project.thumbnail;
+
+    if (gridThumb) {
       thumb.classList.add("has-image");
       const img = document.createElement("img");
-      img.src = project.thumbnail;
+      img.src = gridThumb;
       img.alt = project.displayName;
+      img.loading = "lazy";
+      img.decoding = "async";
 
-      // runtime fallback: if image fails, try bust once (helps logo.gif)
+      // runtime fallback: bust once (helps flaky raw urls)
       img.addEventListener("error", () => {
         if (img.dataset.busted === "1") return;
         img.dataset.busted = "1";
-        img.src = withBust(project.thumbnail);
+        img.src = withBust(gridThumb);
       });
 
       thumb.appendChild(img);
+
+      // subtle badge when original is a GIF
+      if (project.thumbAnimated) {
+        const badge = document.createElement("span");
+        badge.className = "thumb-badge";
+        badge.textContent = "GIF";
+        thumb.appendChild(badge);
+      }
     } else {
       const span = document.createElement("span");
       span.textContent = (project.displayName || "?").charAt(0).toUpperCase();
@@ -1470,7 +1641,6 @@ function renderProjects() {
     githubBtn.innerHTML = `<span>View code</span>`;
     actions.appendChild(githubBtn);
 
-    // Live button only if liveUrl is set (manual OR pages+index.html check)
     if (project.liveUrl) {
       const liveBtn = document.createElement("a");
       liveBtn.href = project.liveUrl;
@@ -1481,19 +1651,21 @@ function renderProjects() {
       actions.appendChild(liveBtn);
     }
 
-    // click card (except buttons) -> modal with big thumbnail
+    // ✅ click card -> modal with REAL thumbnail (gif only plays here)
     card.addEventListener("click", (e) => {
       if (e.target.closest("a, button, .project-actions")) return;
-      if (!project.thumbnail) return;
-      openImageModal(project.thumbnail, project.displayName);
+
+      const modalSrc = project.thumbAnimated || project.thumbnail || project.thumbPreview;
+      if (!modalSrc) return;
+      openImageModal(modalSrc, project.displayName);
     });
 
-    // click thumbnail -> modal
     thumb.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (!project.thumbnail) return;
-      openImageModal(project.thumbnail, project.displayName);
+      const modalSrc = project.thumbAnimated || project.thumbnail || project.thumbPreview;
+      if (!modalSrc) return;
+      openImageModal(modalSrc, project.displayName);
     });
 
     card.appendChild(titleRow);
@@ -1638,6 +1810,8 @@ function renderMedia() {
       const img = document.createElement("img");
       img.src = item.path;
       img.alt = item.title;
+      img.loading = "lazy";
+      img.decoding = "async";
       preview.appendChild(img);
       preview.addEventListener("click", () => openImageModal(item.path, item.title));
     } else if (item.type === "video") {
@@ -1649,7 +1823,6 @@ function renderMedia() {
       video.playsInline = true;
       video.preload = "metadata";
 
-      // pause other videos when one starts
       video.addEventListener("play", () => {
         document.querySelectorAll("video").forEach((v) => {
           if (v !== video) v.pause();
@@ -1777,6 +1950,8 @@ function openImageModal(src, captionText) {
   img.className = "image-modal-img";
   img.src = src;
   img.alt = captionText || "";
+  img.loading = "eager";
+  img.decoding = "async";
   img.addEventListener("click", closeImageModal);
 
   figure.appendChild(img);
@@ -1879,7 +2054,6 @@ function handlePaintShortcuts(event) {
 
   if (!ctrl) return;
 
-  // Ctrl+Shift+N -> Clear
   if (key === "n" && shift) {
     event.preventDefault();
     handlePaintAction("clear");
