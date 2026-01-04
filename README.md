@@ -124,8 +124,6 @@ Supported languages:
 - 🇳🇱 **Nederlands** (default)
 - 🇬🇧 **English**
 - 🇩🇪 **Deutsch**
-- 🇵🇱 **Polski**
-- 🇹🇷 **Türkçe**
 - 🇪🇸 **Español**
 
 Key points:
