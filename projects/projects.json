@@ -156,20 +156,6 @@
     "thumbnailUrl": ""
   },
   {
-    "name": "kerstquiz-2025",
-    "description": "2025's Family Christmas Quiz",
-    "language": "JavaScript",
-    "languages": [
-      "JS",
-      "CSS",
-      "HTML"
-    ],
-    "hasPages": true,
-    "pagesUrl": "https://ferrannl.github.io/kerstquiz-2025/",
-    "tags": [],
-    "thumbnailUrl": ""
-  },
-  {
     "name": "Kolonisten-van-Catan",
     "description": "A Java implementation of (parts of) The Settlers of Catan. This is an Eclipse-based project.",
     "language": "Java",
@@ -192,7 +178,7 @@
       "HTML"
     ],
     "hasPages": true,
-    "pagesUrl": "https://ferrannl.github.io/Layton-Puzzles/",
+    "pagesUrl": "https://ferrannl.github.io/Layton-Puzzles,/",
     "tags": [],
     "thumbnailUrl": ""
   },
