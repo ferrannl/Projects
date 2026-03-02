@@ -236,7 +236,7 @@ jobs:
             );
 
             // 4) Ensure a "Last updated" footer exists
-            if (readme.includes("Last updated: 2026-03-01 05:14:04 UTC
+            if (readme.includes("Last updated: 2026-03-02 05:10:35 UTC
               readme = readme.replace(/Last updated:.*/, `Last updated: ${updatedAt}`);
             } else {
               readme += `\n\n---\n_Last updated: ${updatedAt}_\n`;
