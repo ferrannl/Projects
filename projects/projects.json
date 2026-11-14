@@ -280,6 +280,20 @@
     "thumbnailUrl": ""
   },
   {
+    "name": "omaherfstquiz",
+    "description": "",
+    "language": "JavaScript",
+    "languages": [
+      "JS",
+      "CSS",
+      "HTML"
+    ],
+    "hasPages": true,
+    "pagesUrl": "https://ferrannl.github.io/omaherfstquiz/",
+    "tags": [],
+    "thumbnailUrl": ""
+  },
+  {
     "name": "pso-wiiu-guide",
     "description": "Guide how to setup and play Phantasy Star Online EPI+II on WiiU",
     "language": "HTML",
